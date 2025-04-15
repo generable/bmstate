@@ -1,0 +1,515 @@
+---
+title: "Baseline hazard and covariate effect recovery (multitransition)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Baseline hazard and covariate effect recovery (multitransition)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(pkmstate)
+```
+
+
+
+Studying the recovery baseline hazard + of effect of sex, age, and dose 
+on a multistate model with several transitions.
+
+# Setup
+
+```{r setup, message=FALSE, warning=FALSE}
+# Load necessary libraries
+library(cmdstanr)
+library(tidyverse)
+library(msm)
+library(reshape2)
+library(survival)
+library(splines2)
+library(tidybayes)
+library(furrr)
+library(SurvMetrics)
+
+options(future.globals.maxSize = 4 * 10^9)
+
+params <- list(
+  N_subject = 2000,
+  covariates = c("sex", "first_dose_amount", "age"),
+  iter_warmup = 600,
+  iter_sampling = 300,
+  NK = 3,
+  chains = 1,
+  last_n = 2,
+  prior_only = FALSE,
+  hazard_only = TRUE,
+  do_cf = FALSE,
+  sm_name = "msm-general-mixp.stan"
+)
+
+NP <- params$iter_sampling # number of paths to sample per sub when gen paths
+NR <- 2
+all_states <- c("Randomization", "Bleed", "Fatality", "Censor")
+terminal_states <- as.character(na.omit(stringr::str_extract(all_states, ".*Fatality.*")))
+
+source(here::here("exploratory_multistate/R/sim.R"))
+source(here::here("exploratory_multistate/R/draws.R"))
+source(here::here("exploratory_multistate/R/PathData.R"))
+source(here::here("exploratory_multistate/R/pathgen.R"))
+source(here::here("exploratory_multistate/R/plot.R"))
+source(here::here("exploratory_multistate/R/standata.R"))
+source(here::here("exploratory_multistate/R/summarize.R"))
+source(here::here("exploratory_multistate/R/scores.R"))
+
+theme_set(theme_bw() +
+  theme(
+    strip.placement = "outside",
+    strip.background = element_blank(),
+    strip.text.y.left = element_text(angle = 90),
+    text = element_text(size = 7)
+  ))
+```
+
+# Model
+
+```{r model, message=FALSE, warning=FALSE}
+stan_file <- here::here(
+  paste0("exploratory_multistate/stan/", params$sm_name)
+)
+mod <- cmdstan_model(stan_file)
+```
+
+
+
+# Experiment definition
+
+```{r}
+possible_covs <- c(
+  "sex", "age", "first_dose_amount", "pk_pre_dose", "pk_post_dose",
+  "country", "country_num", "dose_adjustment", "dose_arm"
+)
+
+run_experiment <- function(N_subject, h0_true, df_beta_true) {
+  # Simulate data
+  d <- simulate_multitransition_data(
+    N_subject, possible_covs, h0_true, df_beta_true, 2
+  )
+  pd <- d$pd
+  dt <- pd$as_transitions()
+  split <- do_split(dt)
+
+  # Stan data
+  stan_dat <- create_stan_data(
+    pd, NULL, params$covariates, "age", "age", "age",
+    split$train_sub, split$test_sub,
+    P = 100, NK = params$NK,
+    do_pk = FALSE,
+    prior_only = params$prior_only
+  )
+  sd <- stan_dat$stan_data
+
+  # Fit the model
+  fit <- mod$sample(
+    data = sd,
+    iter_warmup = params$iter_warmup,
+    iter_sampling = params$iter_sampling,
+    chains = params$chains,
+    refresh = 500,
+    adapt_delta = 0.95,
+    init = 0.1
+  )
+
+  # Path prediction
+  gq <- mod$generate_quantities(fit, data = sd)
+  TFI <- legend_to_TFI_matrix(dt$legend)
+  t_max_gen <- 3 * 365.25 # 3 yr
+  t_start <- 0
+  init_state <- 1
+
+  # Finding subjects for whom to predict
+  sub_first_rows <- subject_df_with_idx(pd, split$train_sub, stan_dat$id_map_train)
+  sub_first_rows_test <- subject_df_with_idx(pd, split$test_sub, stan_dat$id_map_test)
+  sub_ids_char <- pd$subject_df %>% filter(subject_id %in% split$train_sub)
+  sub_ids_char_test <- pd$subject_df %>% filter(subject_id %in% split$test_sub)
+
+  # Paths from 0 to 3 years starting from Randomization
+  paths_3yr <- generate_paths_many_subjects(gq, sd, possible_covs,
+    TFI, init_state, t_start, t_max_gen,
+    state_names = pd$state_names,
+    trans_names = dt$legend$trans_char,
+    df_subjects = sub_first_rows,
+    terminal_states = pd$terminal_states,
+    num_paths = NP, n_repeats = NR,
+  )
+
+  # Paths from 0 to 3 years starting from Randomization
+  paths_3yr_oos <- generate_paths_many_subjects(gq, sd, possible_covs,
+    TFI, init_state, t_start, t_max_gen,
+    state_names = pd$state_names,
+    trans_names = dt$legend$trans_char,
+    df_subjects = sub_first_rows_test,
+    terminal_states = pd$terminal_states,
+    num_paths = NP, n_repeats = NR,
+    oos = TRUE
+  )
+  h0_true_all <- d$h0
+  m_sub <- d$m_sub
+  out <- dplyr::lst(
+    fit, stan_dat, pd, dt, paths_3yr, paths_3yr_oos,
+    sub_first_rows, sub_first_rows_test, N_subject, df_beta_true,
+    h0_true_all, m_sub, split
+  )
+  return(out)
+}
+
+run_experiment_postproc <- function(res) {
+  # Study the covariate effects and baseline hazard
+  sd <- res$stan_dat$stan_data
+  plt_oth <- NULL
+  if (sd$N_oth > 0) {
+    plt_oth <- plot_other_beta(res$fit, res$stan_dat, res$dt, res$df_beta_true)
+    ff <- function(x) {
+      x + theme(axis.text.y = element_text(angle = 90, hjust = 0.5))
+    }
+    plt_oth <- lapply(plt_oth, ff)
+  }
+  df_h0 <- as.tibble(data.frame(
+    transition = c(1, 2, 3, 4),
+    log_h0_true = log(res$h0_true_all)
+  ))
+  ttl <- paste0("time = ", round(res$fit$time()$total, 3))
+  plt_h0 <- plot_h0(res$fit, sd, res$dt$legend, all_states, df_h0) +
+    xlab("Time (days)") + theme(legend.position = "none") +
+    ggtitle(ttl)
+  list_beta <- c(plt_oth)
+  plt_beta <- ggarrange(plotlist = list_beta)
+
+  # Event probabilities
+  names <- c("1. Obs", "2. IS pred", "3. OOS pred")
+  plt_a <- plot_p_event(res$pd, res$paths_3yr, res$paths_3yr_oos, names)
+  plt_b <- plot_p_event_by_dose(res$pd, res$paths_3yr, res$paths_3yr_oos, names) +
+    ggtitle("By dose")
+  plt_freq <- ggarrange(plt_a, plt_b, nrow = 1, ncol = 2)
+
+  # Brier score
+  target_times <- seq(0, 3 * 365.25, by = 365.25 / 4)
+  ppsurv_subj <- summarize_ppsurv(
+    res$paths_3yr,
+    target_times = target_times,
+    by = c("subject_id"),
+    truncate_at_terminal_events = FALSE
+  )
+  ppsurv_subj_oos <- summarize_ppsurv(
+    res$paths_3yr_oos,
+    target_times = target_times,
+    by = c("subject_id"),
+    truncate_at_terminal_events = FALSE
+  )
+  train_sub <- res$sub_first_rows$subject_id
+  test_sub <- res$sub_first_rows_test$subject_id
+  plt_bs_is <- create_brier_score_plot(
+    ppsurv_subj, res$pd, train_sub
+  ) + ggtitle("Brier scores (in-sample)")
+  plt_bs_oos <- create_brier_score_plot(
+    ppsurv_subj_oos, res$pd, test_sub
+  ) + ggtitle("Brier scores (out-of-sample)")
+  plt_brier_all <- ggarrange(plt_bs_is, plt_bs_oos, nrow = 2, ncol = 1)
+
+  # Concordance index
+  ci_eval <- create_cindex_plot(
+    res$pd, all_states, res$paths_3yr, res$paths_3yr_oos,
+    train_sub, test_sub,
+    ppsurv_subj, ppsurv_subj_oos
+  )
+  plt_ci_all <- ggarrange(ci_eval$plt_ci_is, ci_eval$plt_ci_oos, nrow = 2, ncol = 1)
+
+  # Saving plots to pdf
+  p <- list(plt_beta, plt_freq, plt_brier_all, plt_ci_all, plt_h0)
+  library(gridExtra)
+  fn <- paste0(
+    "sim-multi-", res$N_subject, "-", res$h0_true_all, "-",
+    paste0(res$df_beta_true$beta_true, collapse = "_"), ".pdf"
+  )
+  pdf(fn, onefile = TRUE)
+  for (i in seq(length(p))) {
+    do.call("grid.arrange", p[i])
+  }
+  dev.off()
+
+  # Return
+  list(
+    plt_a = ggarrange(plt_beta, plt_freq,
+      nrow = 2, ncol = 1,
+      heights = c(1, 0.7)
+    ),
+    plt_b = plt_brier_all,
+    plt_c = plt_ci_all,
+    plt_d = plt_h0
+  )
+}
+```
+
+
+# Running the experiments
+
+```{r, fig.width=7, fig.height=14, message=FALSE, warning=FALSE}
+H0 <- c(0.0005)
+res <- length(H0)
+j <- 0
+out <- list()
+df_beta_true0 <- data.frame(
+  cov_name = rep(c("age", "sex", "first_dose_amount"), each = 4),
+  trans_idx = rep(c(1, 2, 3, 4), times = 3),
+  beta_true = rep(0, 3 * 4)
+)
+df_beta_true1 <- df_beta_true0
+df_beta_true1$beta_true[which(df_beta_true1$cov_name == "age")] <- 0.5
+df_beta_true1$beta_true[which(df_beta_true1$cov_name == "sex")] <- 0.5
+print(df_beta_true1)
+
+for (baz in H0) {
+  j <- j + 1
+  baz <- rep(H0[j], 4)
+  baz[2] <- 2 * baz[2]
+  baz[3] <- 1.5 * baz[3]
+  r0 <- run_experiment(params$N_subject, baz, df_beta_true0)
+  p0 <- run_experiment_postproc(r0)
+  r1 <- run_experiment(params$N_subject, baz, df_beta_true1)
+  p1 <- run_experiment_postproc(r1)
+  out[[j]] <- list(no_effect = p0, true_effect = p1)
+}
+names(out) <- c("high")
+```
+
+# Results with high baseline hazards
+
+## Parameter and rate recovery
+
+::: {.panel-tabset}
+
+### No true effect
+
+```{r, fig.width=9, fig.height=7.5, message=FALSE, warning=FALSE}
+out$high$no_effect$plt_a
+```
+
+```{r, fig.width=7, fig.height=5, message=FALSE, warning=FALSE}
+out$high$no_effect$plt_d
+```
+
+### True effect
+
+```{r, fig.width=9, fig.height=7.5, message=FALSE, warning=FALSE}
+out$high$true_effect$plt_a
+```
+
+
+```{r, fig.width=7, fig.height=5, message=FALSE, warning=FALSE}
+out$high$true_effect$plt_d
+```
+
+:::
+
+
+## Brier scores
+
+::: {.panel-tabset}
+
+### No true effect
+
+```{r, fig.width=9, fig.height=7.5, message=FALSE, warning=FALSE}
+out$high$no_effect$plt_b
+```
+
+### True effect
+
+```{r, fig.width=9, fig.height=7.5, message=FALSE, warning=FALSE}
+out$high$true_effect$plt_b
+```
+
+:::
+
+
+## Concordance index
+
+::: {.panel-tabset}
+
+### No true effect
+
+```{r, fig.width=9, fig.height=7.5, message=FALSE, warning=FALSE}
+out$high$no_effect$plt_c
+```
+
+### True effect
+
+```{r, fig.width=9, fig.height=7.5, message=FALSE, warning=FALSE}
+out$high$true_effect$plt_c
+```
+
+:::
+
+## Hazard multiplier comparison
+
+::: {.panel-tabset}
+
+```{r, fig.width=7, fig.height=4}
+hazard_mult_recovery <- function(res) {
+  id_map <- res$stan_dat$id_map_train
+  idx_train <- id_map$x_sub
+  m_sub <- log(res$m_sub[res$split$train_sub, ])
+  n_trans <- ncol(m_sub)
+  m_sub <- as.vector(m_sub)
+  h0 <- exp(get_and_format_log_h0_draws(res$fit))
+  idx <- res$stan_dat$stan_data$sub_start_idx
+  log_C <- get_and_format_log_C_haz_draws(res$fit, FALSE)
+  m_sub_draws <- log_C[, , idx]
+  m_sub_mean <- apply(m_sub_draws, c(2, 3), mean)
+  m_sub_mean <- as.vector(t(m_sub_mean))
+  subject_id <- id_map$subject_id
+  trans_idx <- rep(1:n_trans, each = nrow(id_map))
+  df <- data.frame(subject_id, m_sub, m_sub_mean, trans_idx)
+  colnames(df) <- c("subject_id", "log_m", "log_m_mean", "transition")
+  df <- as_tibble(df %>% left_join(res$pd$subject_df, by = "subject_id"))
+  df <- df %>% left_join(res$dt$legend, by = "transition")
+  df$sex <- as.factor(df$sex)
+  df$first_dose_amount <- as.factor(df$first_dose_amount)
+  df
+}
+
+# Plot
+plot_hazard_mult_recovery <- function(res) {
+  df_hm <- hazard_mult_recovery(res)
+  plt_a <- ggplot(df_hm, aes(x = log_m, y = log_m - log_m_mean, color = sex)) +
+    facet_wrap(. ~ trans_char, scales = "free", nrow = 1) +
+    geom_line(alpha = 0.5) +
+    geom_point(alpha = 0.5)
+  plt_b <- ggplot(df_hm, aes(x = log_m, y = log_m - log_m_mean, color = first_dose_amount)) +
+    facet_wrap(. ~ trans_char, scales = "free", nrow = 1) +
+    geom_line(alpha = 0.5) +
+    geom_point(alpha = 0.5)
+  ggarrange(plt_a, plt_b, nrow = 2, ncol = 1)
+}
+```
+
+### No true effect
+
+```{r, fig.width=7, fig.height=4}
+plot_hazard_mult_recovery(r0)
+```
+
+
+### True effect
+
+```{r, fig.width=7, fig.height=4}
+plot_hazard_mult_recovery(r1)
+```
+
+:::
+
+
+## Instant hazard comparison
+
+::: {.panel-tabset}
+
+```{r, fig.width=7, fig.height=4}
+inst_haz_recovery <- function(res, trans_idx) {
+  id_map <- res$stan_dat$id_map_train
+  idx_train <- id_map$x_sub
+  m_sub <- log(res$m_sub[res$split$train_sub, ])[, trans_idx]
+  h0 <- exp(get_and_format_log_h0_draws(res$fit)[, trans_idx, 1]) # take first time point, is const
+  idx <- res$stan_dat$stan_data$sub_start_idx
+  log_C <- get_and_format_log_C_haz_draws(res$fit, FALSE)
+  m_sub_draws <- log_C[, trans_idx, idx]
+  df <- NULL
+  S <- nrow(m_sub_draws)
+  for (draw_idx in 1:S) {
+    df_j <- data.frame(
+      inst_haz = h0[draw_idx] * exp(m_sub_draws[draw_idx, ])
+    )
+    df_j$draw_idx <- draw_idx
+    df <- rbind(df, df_j)
+  }
+  df$subject_id <- rep(id_map$subject_id, times = S)
+  df$inst_haz_true <- rep(res$h0_true_all[trans_idx] * exp(m_sub), times = S)
+  df <- as.tibble(df)
+  df <- as_tibble(df %>% left_join(res$pd$subject_df, by = "subject_id"))
+  df$sex <- as.factor(df$sex)
+  df$first_dose_amount <- as.factor(df$first_dose_amount)
+  df
+}
+
+# Plot
+plot_inst_haz_recovery <- function(res, trans_idx) {
+  df_ih <- inst_haz_recovery(res, trans_idx)
+  b <- df_ih %>%
+    group_by(subject_id) %>%
+    slice(1) %>%
+    select(-inst_haz)
+  a <- df_ih %>%
+    group_by(subject_id) %>%
+    summarize(ih_mean = mean(inst_haz))
+  a <- left_join(a, b, by = "subject_id")
+  plt_a <- ggplot(a, aes(x = inst_haz_true, y = inst_haz_true - ih_mean, color = sex)) +
+    geom_line(alpha = 0.5) +
+    geom_point(alpha = 0.5) +
+    scale_x_log10() +
+    theme(legend.position = "top")
+  plt_b <- ggplot(a, aes(x = inst_haz_true, y = inst_haz_true - ih_mean, color = first_dose_amount)) +
+    geom_line(alpha = 0.5) +
+    geom_point(alpha = 0.5) +
+    scale_x_log10() +
+    theme(legend.position = "top")
+  ggarrange(plt_a, plt_b, nrow = 2, ncol = 1)
+}
+```
+
+
+### With true effect
+
+```{r, fig.width=7, fig.height=4}
+a <- plot_inst_haz_recovery(r1, 1)
+b <- plot_inst_haz_recovery(r1, 2)
+c <- plot_inst_haz_recovery(r1, 3)
+d <- plot_inst_haz_recovery(r1, 4)
+plt <- ggarrange(a, b, c, d, nrow = 1, ncol = 4, labels = c(1, 2, 3, 4))
+plt
+```
+
+:::
+
+
+# Comparing to mstate
+
+## Average hazard recovery
+
+```{r, fig.width=7, fig.height=4}
+mstate_recovery <- function(res) {
+  ms <- res$pd$as_msdata()
+  msfit <- fit_mstate(ms$msdata)
+  h0 <- estimate_average_hazard(msfit)
+  plt <- plot_cumhaz_msfit(msfit, ms$legend)
+  h0$h0_true <- res$h0_true_all
+  list(
+    h0 = h0,
+    plt = plt
+  )
+}
+
+mr0 <- mstate_recovery(r0)
+print(mr0$h0)
+mr1 <- mstate_recovery(r1)
+print(mr1$h0)
+plt_r <- ggarrange(
+  mr0$plt, mr1$plt,
+  nrow = 1, ncol = 2, labels = c("no effect", "true effect"),
+  legend.grob = get_legend(mr0$plt)
+)
+
+plt_r
+```
