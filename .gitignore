@@ -1,0 +1,15 @@
+*.Rproj.user
+*.Rhistory
+*.RData
+*.Ruserdata
+*.DS_Store
+*.exe
+*.so
+*.o
+*.dll
+docs/
+*.html
+*_cache/
+*_files/
+.Rproj.user
+inst/doc
