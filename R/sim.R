@@ -199,13 +199,13 @@ simulate_path <- function(h0_true, log_hazard_mult, subject_idx, sys_idx = 0) {
 compute_true_hazard_mult <- function(sex, age, fda, df_beta_true) {
   beta_sex <- df_beta_true |>
     filter(cov_name == "sex") |>
-    pull(beta_true)
+    dplyr::pull(beta_true)
   beta_age <- df_beta_true |>
     filter(cov_name == "age") |>
-    pull(beta_true)
+    dplyr::pull(beta_true)
   beta_dose <- df_beta_true |>
     filter(cov_name == "first_dose_amount") |>
-    pull(beta_true)
+    dplyr::pull(beta_true)
   checkmate::assert_number(beta_sex)
   checkmate::assert_number(beta_age)
   checkmate::assert_number(beta_dose)
