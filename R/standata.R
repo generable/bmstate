@@ -550,7 +550,11 @@ which_format_for_stan <- function(x, name) {
 }
 
 
-# Matrix indicating possible transitions given current state
+#' Create matrix indicating possible transitions given current state
+#'
+#' @export
+#' @param legend PathData legend
+#' @return a binary matrix
 legend_to_PT_matrix <- function(legend) {
   trans <- legend$transition
   M <- max(c(legend$state, legend$prev_state)) # number of states
@@ -570,7 +574,11 @@ legend_to_PT_matrix <- function(legend) {
 }
 
 
-# State/transition legend to TFI matrix
+#' State/transition legend to TFI matrix
+#'
+#' @export
+#' @param legend PathData legend
+#' @return an integer matrix
 legend_to_TFI_matrix <- function(legend) {
   M <- max(c(legend$state, legend$prev_state))
   TFI <- matrix(0, M, M)
