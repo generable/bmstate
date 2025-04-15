@@ -197,14 +197,14 @@ simulate_path <- function(h0_true, log_hazard_mult, subject_idx, sys_idx = 0) {
 
 # Hazard multiplier
 compute_true_hazard_mult <- function(sex, age, fda, df_beta_true) {
-  beta_sex <- df_beta_true %>%
-    filter(cov_name == "sex") %>%
+  beta_sex <- df_beta_true |>
+    filter(cov_name == "sex") |>
     pull(beta_true)
-  beta_age <- df_beta_true %>%
-    filter(cov_name == "age") %>%
+  beta_age <- df_beta_true |>
+    filter(cov_name == "age") |>
     pull(beta_true)
-  beta_dose <- df_beta_true %>%
-    filter(cov_name == "first_dose_amount") %>%
+  beta_dose <- df_beta_true |>
+    filter(cov_name == "first_dose_amount") |>
     pull(beta_true)
   checkmate::assert_number(beta_sex)
   checkmate::assert_number(beta_age)
@@ -220,7 +220,15 @@ compute_true_hazard_mult <- function(sex, age, fda, df_beta_true) {
   log_hazard_mult
 }
 
-# Simulate subject paths
+#' Data simulation (multitransition)
+#'
+#' @export
+#' @param N_subject number of subjects
+#' @param covs covariates
+#' @param h0_true true baseline hazard value (constant)
+#' @param df_beta_true true covariate effects
+#' @param sys_idx index of simulation system
+#' @param state_names names of the states
 simulate_multitransition_data <- function(
     N_subject, covs, h0_true, df_beta_true, sys_idx = 1,
     state_names = NULL) {
@@ -237,7 +245,7 @@ simulate_multitransition_data <- function(
     fda <- c(15, 30, 60)[sample(3, 1)]
     log_hazard_mult <- rep(0, n_trans)
     for (h in 1:n_trans) {
-      df_beta_true_h <- df_beta_true %>% filter(trans_idx == h)
+      df_beta_true_h <- df_beta_true |> filter(trans_idx == h)
       log_hazard_mult[h] <- compute_true_hazard_mult(sex, age, fda, df_beta_true_h)
     }
     m_sub[n, ] <- exp(log_hazard_mult)
@@ -270,7 +278,14 @@ simulate_multitransition_data <- function(
 }
 
 
-# Simulate subject paths
+
+#' Data simulation
+#'
+#' @export
+#' @param N_subject number of subjects
+#' @param covs covariates
+#' @param h0_true true baseline hazard value (constant)
+#' @param df_beta_true true covariate effects
 simulate_singletransition_data <- function(N_subject, covs,
                                            h0_true = 0.001,
                                            df_beta_true = NULL) {
@@ -325,12 +340,12 @@ do_split <- function(dt) {
 create_sim_pathdata <- function(df, term_state, state_names, covs) {
   # Filter censor events after terminal state
   term_state_idx <- which(state_names == term_state)
-  df <- df %>%
-    group_by(subject_id) %>%
+  df <- df |>
+    group_by(subject_id) |>
     mutate(first_termstate_time = ifelse(any(state == term_state_idx),
       min(time[state == term_state_idx]), Inf
-    )) %>%
-    filter(time <= first_termstate_time) %>%
+    )) |>
+    filter(time <= first_termstate_time) |>
     select(-first_termstate_time)
 
   # Create PathData

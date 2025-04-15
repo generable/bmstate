@@ -61,9 +61,9 @@ plot_bf <- function(sd) {
 
 # Plot log baseline hazard
 plot_h0 <- function(fit, sd, legend, all_states, log_h0_true = NULL) {
-  df <- fit %>% spread_draws(log_h0[transition, time_idx])
+  df <- fit |> spread_draws(log_h0[transition, time_idx])
   if (!is.null(log_h0_true)) {
-    df <- df %>% left_join(log_h0_true, by = "transition")
+    df <- df |> left_join(log_h0_true, by = "transition")
   }
   plt <- plot_fun_per_transition(df, sd, legend, "log_h0", "t_pred", all_states) +
     ggtitle("Log baseline hazard") + theme(strip.text = element_text(
@@ -80,7 +80,7 @@ plot_h0 <- function(fit, sd, legend, all_states, log_h0_true = NULL) {
 # Plot age_effect
 plot_age_effect <- function(fit, sd, legend, all_states, filter_transitions = NULL,
                             filter_types = NULL) {
-  df <- fit %>% spread_draws(age_effect[flag, transition, time_idx])
+  df <- fit |> spread_draws(age_effect[flag, transition, time_idx])
   plot_fun_per_transition(df, sd, legend, "age_effect", "x_age_pred",
     all_states = all_states,
     filter_transitions = filter_transitions, filter_types = filter_types
@@ -96,7 +96,7 @@ plot_fun_per_transition <- function(df, sd, legend, name, t_name, all_states,
   t_pred <- sd[[t_name]]
   P <- length(t_pred)
   df_t <- data.frame(time_idx = seq_len(P), time = t_pred)
-  df <- df %>% left_join(df_t, by = "time_idx")
+  df <- df |> left_join(df_t, by = "time_idx")
   df$trans_type <- legend$trans_type[df$transition]
   df$Type <- as.factor(type_names[df$trans_type])
   df$Transition <- paste0(df$trans_type, ":", trans_names[df$transition])
@@ -108,7 +108,7 @@ plot_fun_per_transition <- function(df, sd, legend, name, t_name, all_states,
     df <- df |>
       filter(Type %in% filter_types)
   }
-  df %>%
+  df |>
     ggplot(aes(x = time, y = !!sym(name), fill = Type)) +
     stat_lineribbon(alpha = 0.5) +
     facet_wrap(~Transition, ncol = 5) +
@@ -128,7 +128,7 @@ name_legend <- function(legend, state_names) {
 plot_transitions_pd <- function(pd, idx) {
   dat <- pd$df
   all_states <- pd$state_names
-  df <- dat %>%
+  df <- dat |>
     filter(subject_id == unique(dat$subject_id)[idx]) |>
     mutate(
       state_char = all_states[state],
@@ -152,7 +152,7 @@ debug_standata <- function(pd, dat_trans, sd, idx, trans_names, all_states,
   checkmate::assert_class(pd, "PathData")
   dat <- pd$as_data_frame()
   sub_id <- subject_idx_to_id(id_map_train, idx)
-  df <- dat %>%
+  df <- dat |>
     filter(subject_id == sub_id) |>
     mutate(
       state_char = all_states[state],
@@ -211,13 +211,13 @@ plot_effect_beta_pk <- function(a, beta_name, group_by) {
 }
 
 plot_effects_pk <- function(fit, params) {
-  a <- fit %>% spread_draws(beta_ka[flag, var])
+  a <- fit |> spread_draws(beta_ka[flag, var])
   a$cov <- params$ka_covariates[a$var]
   p1 <- plot_effect_beta_pk(a, "beta_ka", "cov")
-  a <- fit %>% spread_draws(beta_CL[flag, var])
+  a <- fit |> spread_draws(beta_CL[flag, var])
   a$cov <- params$CL_covariates[a$var]
   p2 <- plot_effect_beta_pk(a, "beta_CL", "cov")
-  a <- fit %>% spread_draws(beta_V2[flag, var])
+  a <- fit |> spread_draws(beta_V2[flag, var])
   a$cov <- params$V2_covariates[a$var]
   p3 <- plot_effect_beta_pk(a, "beta_V2", "cov")
 
@@ -234,7 +234,7 @@ plot_effect_beta <- function(a, beta_name, legend, all_states, df_true = NULL) {
   trans_types <- legend$trans_type
   names_long <- paste0(trans_names, " (", 1:length(trans_names), ")")
   if (!is.null(df_true)) {
-    a <- a %>% left_join(df_true, by = "trans_idx")
+    a <- a |> left_join(df_true, by = "trans_idx")
   }
   a$Transition <- names_long[a$trans_idx]
   a$trans_type <- trans_types[a$trans_idx]
@@ -320,7 +320,7 @@ plot_inst_haz <- function(log_C, h0, sd, trans_names, draw_idx_hl = 1) {
     x = time, y = inst_haz, group = draw_idx
   )) +
     geom_line(alpha = 0.25) +
-    geom_line(data = df %>% filter(hl), color = "red") +
+    geom_line(data = df |> filter(hl), color = "red") +
     ylab("Hazard") +
     facet_wrap(. ~ trans_name) +
     scale_y_log10() +
@@ -380,7 +380,7 @@ plot_pred_conc <- function(fit, conc, conc_lasttwo, sd, sd_gq, sub_idx,
       upper = as.vector(quantile(ci_l2, probs = 0.95))
     )
     if (cut) {
-      df_l2 <- df_l2 %>% filter(t >= t_ss_end_l2)
+      df_l2 <- df_l2 |> filter(t >= t_ss_end_l2)
     }
   }
   df_dat <- data.frame(t = t_obs, conc = conc_obs)
@@ -471,13 +471,13 @@ plot_cor <- function(sd, x, y, name_x, name_y) {
 # df_beta_true must be a data frame with columns trans_idx, cov_name, and beta_true
 plot_other_beta <- function(fit, stan_dat, dt, df_beta_true = NULL) {
   names <- stan_dat$x_oth_names
-  a <- fit %>% spread_draws(beta_oth[cov_idx, trans_idx])
+  a <- fit |> spread_draws(beta_oth[cov_idx, trans_idx])
   a$cov_name <- as.factor(names[a$cov_idx])
   plt_oth <- NULL
   for (j in seq_len(stan_dat$stan_data$N_oth)) {
-    a_nam <- a %>% filter(cov_name == names[j])
+    a_nam <- a |> filter(cov_name == names[j])
     if (!is.null(df_beta_true)) {
-      df_true <- df_beta_true %>% filter(cov_name == names[j])
+      df_true <- df_beta_true |> filter(cov_name == names[j])
     } else {
       df_true <- NULL
     }
@@ -710,19 +710,19 @@ create_cindex_plot <- function(pd, all_states, paths_3yr, paths_3yr_oos,
   )
 
   # Comparison table
-  ci_is_table <- ci_is_table %>%
+  ci_is_table <- ci_is_table |>
     left_join(
-      ci_is2 %>% select(method, Event, cindex),
+      ci_is2 |> select(method, Event, cindex),
       by = join_by(method, Event),
       suffix = c(".v1", ".v2")
-    ) %>%
+    ) |>
     select(method, Event, cindex.v1, cindex.v2)
-  ci_oos_table <- ci_oos_table %>%
+  ci_oos_table <- ci_oos_table |>
     left_join(
-      ci_oos2 %>% select(method, Event, cindex),
+      ci_oos2 |> select(method, Event, cindex),
       by = join_by(method, Event),
       suffix = c(".v1", ".v2")
-    ) %>%
+    ) |>
     select(method, Event, cindex.v1, cindex.v2)
 
   # Plot

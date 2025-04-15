@@ -1037,9 +1037,9 @@ c_index <- function(pd_obs, pd_pred, state_idx, kmfit, subject_ids, t_eval) {
 km_fit <- function(pd, state_idx, subject_ids) {
   checkmate::assert_number(state_idx)
   covs <- c("subject_id", "first_dose_amount", "dose_adjustment")
-  df_obs <- pd$as_data_frame(covariates = covs) %>%
+  df_obs <- pd$as_data_frame(covariates = covs) |>
     filter(subject_id %in% subject_ids)
-  te_obs <- time_to_event(df_obs, state_idx) %>% select(-path_id)
+  te_obs <- time_to_event(df_obs, state_idx) |> select(-path_id)
   te_obs <- add_dose_arm(te_obs, df_obs)
   survival::survfit(survival::Surv(time, observed) ~ dose_arm, te_obs)
 }
@@ -1058,32 +1058,32 @@ km_predict <- function(kmfit, time) {
 # Add dose arm to df
 add_dose_arm <- function(te_obs, df) {
   df$dose_arm <- paste0(df$dose_adjustment, "-", df$first_dose_amount)
-  df <- df %>%
-    select(subject_id, dose_arm) %>%
-    ungroup() %>%
-    group_by(subject_id) %>%
+  df <- df |>
+    select(subject_id, dose_arm) |>
+    ungroup() |>
+    group_by(subject_id) |>
     dplyr::slice(1)
-  te_obs %>% left_join(df, by = "subject_id")
+  te_obs |> left_join(df, by = "subject_id")
 }
 
 # First event times and event probabilities given path data
 first_events <- function(pd_obs, pd_pred, state_idx, kmfit, subject_ids, tev) {
   # Filter subjects
   covs <- c("subject_id", "dose_adjustment", "first_dose_amount")
-  df_obs <- pd_obs$as_data_frame(covariates = covs) %>%
+  df_obs <- pd_obs$as_data_frame(covariates = covs) |>
     filter(subject_id %in% subject_ids)
-  df_pred <- pd_pred$as_data_frame(covariates = covs) %>%
+  df_pred <- pd_pred$as_data_frame(covariates = covs) |>
     filter(subject_id %in% subject_ids)
 
   # Times to first event
-  te_pred <- time_to_event(df_pred, state_idx) %>% select(-path_id)
-  te_med <- te_pred %>%
-    group_by(subject_id) %>%
+  te_pred <- time_to_event(df_pred, state_idx) |> select(-path_id)
+  te_med <- te_pred |>
+    group_by(subject_id) |>
     summarize(t_msm = mean(time))
-  te_prop <- te_pred %>%
-    group_by(subject_id) %>%
+  te_prop <- te_pred |>
+    group_by(subject_id) |>
     summarize(p_msm = mean(observed))
-  te_obs <- time_to_event(df_obs, state_idx) %>% select(-path_id)
+  te_obs <- time_to_event(df_obs, state_idx) |> select(-path_id)
   te_obs <- add_dose_arm(te_obs, df_obs)
 
   # Kaplan-Maier
@@ -1094,9 +1094,9 @@ first_events <- function(pd_obs, pd_pred, state_idx, kmfit, subject_ids, tev) {
 
   # Return
   list(
-    df = te_obs %>%
-      left_join(te_med, by = "subject_id") %>%
-      left_join(te_prop, by = "subject_id") %>%
+    df = te_obs |>
+      left_join(te_med, by = "subject_id") |>
+      left_join(te_prop, by = "subject_id") |>
       left_join(df_km, by = "dose_arm"),
     km_plot = sp,
     km_fit = km_fit,
@@ -1121,9 +1121,9 @@ plot_cindex <- function(ci, name, nrow = NULL, ncol = NULL) {
   for (j in 1:length(ci)) {
     res <- ci[[j]]
     rn <- res[[name]]
-    df <- res$df %>% arrange(observed)
+    df <- res$df |> arrange(observed)
     st <- paste0("ci = ", round(rn, 4))
-    plt <- df %>% ggplot(aes(x = time, y = !!sym(ylab), color = observed)) +
+    plt <- df |> ggplot(aes(x = time, y = !!sym(ylab), color = observed)) +
       geom_point(alpha = 0.95, size = 0.4)
     plots[[j]] <- plt + ggtitle(names(ci)[j], subtitle = st) +
       theme(legend.position = "top") +

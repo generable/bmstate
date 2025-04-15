@@ -124,8 +124,8 @@ run_experiment <- function(N_subject, h0_true, df_beta_true) {
   # Finding subjects for whom to predict
   sub_first_rows <- subject_df_with_idx(pd, split$train_sub, stan_dat$id_map_train)
   sub_first_rows_test <- subject_df_with_idx(pd, split$test_sub, stan_dat$id_map_test)
-  sub_ids_char <- pd$subject_df %>% filter(subject_id %in% split$train_sub)
-  sub_ids_char_test <- pd$subject_df %>% filter(subject_id %in% split$test_sub)
+  sub_ids_char <- pd$subject_df |> filter(subject_id %in% split$train_sub)
+  sub_ids_char_test <- pd$subject_df |> filter(subject_id %in% split$test_sub)
 
   # Paths from 0 to 3 years starting from Randomization
   paths_3yr <- generate_paths_many_subjects(gq, sd, possible_covs,
@@ -364,8 +364,8 @@ hazard_mult_recovery <- function(res) {
   trans_idx <- rep(1:n_trans, each = nrow(id_map))
   df <- data.frame(subject_id, m_sub, m_sub_mean, trans_idx)
   colnames(df) <- c("subject_id", "log_m", "log_m_mean", "transition")
-  df <- as_tibble(df %>% left_join(res$pd$subject_df, by = "subject_id"))
-  df <- df %>% left_join(res$dt$legend, by = "transition")
+  df <- as_tibble(df |> left_join(res$pd$subject_df, by = "subject_id"))
+  df <- df |> left_join(res$dt$legend, by = "transition")
   df$sex <- as.factor(df$sex)
   df$first_dose_amount <- as.factor(df$first_dose_amount)
   df
@@ -427,7 +427,7 @@ inst_haz_recovery <- function(res, trans_idx) {
   df$subject_id <- rep(id_map$subject_id, times = S)
   df$inst_haz_true <- rep(res$h0_true_all[trans_idx] * exp(m_sub), times = S)
   df <- as.tibble(df)
-  df <- as_tibble(df %>% left_join(res$pd$subject_df, by = "subject_id"))
+  df <- as_tibble(df |> left_join(res$pd$subject_df, by = "subject_id"))
   df$sex <- as.factor(df$sex)
   df$first_dose_amount <- as.factor(df$first_dose_amount)
   df
@@ -436,12 +436,12 @@ inst_haz_recovery <- function(res, trans_idx) {
 # Plot
 plot_inst_haz_recovery <- function(res, trans_idx) {
   df_ih <- inst_haz_recovery(res, trans_idx)
-  b <- df_ih %>%
-    group_by(subject_id) %>%
-    slice(1) %>%
+  b <- df_ih |>
+    group_by(subject_id) |>
+    slice(1) |>
     select(-inst_haz)
-  a <- df_ih %>%
-    group_by(subject_id) %>%
+  a <- df_ih |>
+    group_by(subject_id) |>
     summarize(ih_mean = mean(inst_haz))
   a <- left_join(a, b, by = "subject_id")
   plt_a <- ggplot(a, aes(x = inst_haz_true, y = inst_haz_true - ih_mean, color = sex)) +

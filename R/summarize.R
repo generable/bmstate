@@ -2,18 +2,18 @@
 p_event <- function(paths_df, state_names = NULL) {
   nonevent_states <- c("Censor", "Randomization")
   n_paths <- length(unique(paths_df$path_id))
-  paths_df <- paths_df %>%
-    arrange(path_id, time) %>%
-    group_by(state) %>%
+  paths_df <- paths_df |>
+    arrange(path_id, time) |>
+    group_by(state) |>
     filter(is_event == 1)
   df_empty <- data.frame(state_char = state_names, state = 1:length(state_names))
-  df <- paths_df %>%
+  df <- paths_df |>
     summarise(p_paths = dplyr::n_distinct(path_id) / n_paths)
-  df <- df %>% filter(state != 0)
-  df <- df_empty %>% left_join(df, by = join_by(state))
+  df <- df |> filter(state != 0)
+  df <- df_empty |> left_join(df, by = join_by(state))
   df$p_paths[is.na(df$p_paths)] <- 0
   df
-  df %>% filter(!(state_char %in% nonevent_states))
+  df |> filter(!(state_char %in% nonevent_states))
 }
 
 # Above but for each subject separately
@@ -36,7 +36,7 @@ p_event_by_subject <- function(pd, draw_idx = NULL, rep_idx = NULL) {
   names(list_of_dfs) <- a
   out <- stack_list_of_dfs(list_of_dfs)
   out$subject_id <- out$name
-  out %>% select(-name)
+  out |> select(-name)
 }
 
 # Stack list of data frames to one data frame
@@ -117,8 +117,8 @@ cf_p_event_by_subject_by_rep <- function(list_of_pds, n_repeats) {
     df_j$rep_idx <- j
     df <- rbind(df, df_j)
   }
-  df %>%
-    group_by(state_char, cf_dose) %>%
+  df |>
+    group_by(state_char, cf_dose) |>
     summarize(
       p_mean = mean(p_paths), p_std = sd(p_paths),
       .groups = "drop"
@@ -133,8 +133,8 @@ cf_p_event_by_subject_by_draw <- function(list_of_pds, n_draws) {
     df_j$draw_idx <- j
     df <- rbind(df, df_j)
   }
-  df %>%
-    group_by(state_char, cf_dose) %>%
+  df |>
+    group_by(state_char, cf_dose) |>
     summarize(
       p_mean = mean(p_paths), p_std = sd(p_paths),
       .groups = "drop"
@@ -215,8 +215,8 @@ estimate_noevent_probability <- function(data, time_points) {
 # Time to first time state_idx is observed in observed paths
 # Could be replaced by PathData$as_time_to_first_event()
 time_to_event <- function(df, state_idx) {
-  df %>%
-    group_by(path_id, subject_id) %>%
+  df |>
+    group_by(path_id, subject_id) |>
     summarize(
       time = ifelse(any(state == state_idx),
         min(time[state == state_idx]), max(time)

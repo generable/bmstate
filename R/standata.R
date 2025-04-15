@@ -1,6 +1,6 @@
 # Get actual even times from transitions data frame
 get_event_times <- function(df, trans_names) {
-  df <- df %>% filter(transition > 0)
+  df <- df |> filter(transition > 0)
   df <- df[, c("time", "transition")]
   df$trans_name <- as.factor(trans_names[df$transition])
   df
@@ -56,7 +56,7 @@ create_stan_data_spline <- function(dat, sd, k, P, NK, PT, t_max) {
   # Loop through subjects
   for (n in 1:N_sub) {
     pb$tick()
-    df_n <- dat %>% filter(subject_id == ids[n])
+    df_n <- dat |> filter(subject_id == ids[n])
     id_map <- rbind(id_map, data.frame(n, ids[n]))
     R <- nrow(df_n)
     for (r in 1:R) {
@@ -126,7 +126,7 @@ create_stan_data_idmap <- function(dat) {
 
   # Loop through subjects
   for (n in 1:N_sub) {
-    df_n <- dat %>% filter(subject_id == ids[n])
+    df_n <- dat |> filter(subject_id == ids[n])
     id_map <- rbind(id_map, data.frame(n, ids[n]))
     x_sub[n] <- n
   }
@@ -189,7 +189,7 @@ create_stan_data_pk <- function(pk, sd, id_map_train, id_map_test) {
       last_two_doses[n, ] <- 1
       pk_lloq[n] <- 1
     } else {
-      pk_sub <- pk %>% filter(subject_id == sub_id)
+      pk_sub <- pk |> filter(subject_id == sub_id)
       if (nrow(pk_sub) != 1) {
         stop("found multiple rows for subject ", n)
       }
@@ -210,7 +210,7 @@ create_stan_data_pk <- function(pk, sd, id_map_train, id_map_test) {
       last_times_oos[n, ] <- 1
       last_doses_oos[n, ] <- 1
     } else {
-      pk_sub <- pk %>% filter(subject_id == sub_id)
+      pk_sub <- pk |> filter(subject_id == sub_id)
       if (nrow(pk_sub) != 1) {
         stop("found multiple rows for subject ", n)
       }
@@ -405,11 +405,11 @@ create_stan_data <- function(pd, pk, covariates,
   checkmate::assert_class(pd, "PathData")
   dt <- pd$as_transitions()
 
-  dat <- dt$df %>% filter(subject_id %in% train_sub)
-  dat_oos <- dt$df %>%
-    filter(subject_id %in% test_sub) %>%
-    group_by(subject_id) %>%
-    slice(1) %>%
+  dat <- dt$df |> filter(subject_id %in% train_sub)
+  dat_oos <- dt$df |>
+    filter(subject_id %in% test_sub) |>
+    group_by(subject_id) |>
+    slice(1) |>
     ungroup()
   PT <- legend_to_PT_matrix(dt$legend)
   N_trans <- max(dt$legend$transition)
@@ -518,17 +518,17 @@ create_stan_data <- function(pd, pk, covariates,
 average_haz_per_ttype <- function(pd, dt) {
   msdata <- pd$as_msdata()$msdata
   msfit <- fit_mstate(msdata)
-  h0 <- estimate_average_hazard(msfit) %>% arrange(trans)
-  df_ttype <- dt$legend %>% select(transition, trans_type)
+  h0 <- estimate_average_hazard(msfit) |> arrange(trans)
+  df_ttype <- dt$legend |> select(transition, trans_type)
   df_ttype$trans <- df_ttype$transition
-  h0 <- h0 %>% left_join(df_ttype, by = "trans")
-  df_mean_log_h0 <- h0 %>%
-    filter(avg_haz > 0) %>%
-    group_by(trans_type) %>%
-    mutate(log_haz = log(avg_haz)) %>%
-    summarize(log_h0_avg = mean(log_haz)) %>%
+  h0 <- h0 |> left_join(df_ttype, by = "trans")
+  df_mean_log_h0 <- h0 |>
+    filter(avg_haz > 0) |>
+    group_by(trans_type) |>
+    mutate(log_haz = log(avg_haz)) |>
+    summarize(log_h0_avg = mean(log_haz)) |>
     arrange(trans_type)
-  df_ttype <- df_ttype %>% left_join(df_mean_log_h0, by = "trans_type")
+  df_ttype <- df_ttype |> left_join(df_mean_log_h0, by = "trans_type")
 }
 
 # Edit Stan data, sort of computes which() for the binary vectors of each
@@ -564,7 +564,7 @@ legend_to_PT_matrix <- function(legend) {
   us <- unique(legend$prev_state)
   L <- length(us)
   for (j in seq_len(L)) {
-    rows <- legend %>% filter(prev_state == us[j])
+    rows <- legend |> filter(prev_state == us[j])
     possible <- rows$transition
     PT[possible, us[j]] <- 1
   }
@@ -592,13 +592,13 @@ legend_to_TFI_matrix <- function(legend) {
 # Validate the transitions format data frame to be passed to
 # create_stan_data
 validate_dat_trans <- function(df) {
-  df <- df %>%
-    group_by(subject_id, time) %>%
+  df <- df |>
+    group_by(subject_id, time) |>
     mutate(
       n_distinct_times = n()
-    ) %>%
+    ) |>
     ungroup()
-  invalid <- unique((df %>% filter(n_distinct_times > 1))$subject_id)
+  invalid <- unique((df |> filter(n_distinct_times > 1))$subject_id)
   if (length(invalid) > 0) {
     str <- paste0(invalid, collapse = ", ")
     msg <- paste0(

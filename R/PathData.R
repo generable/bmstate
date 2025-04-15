@@ -20,11 +20,11 @@ create_pathdata <- function(df, covs, ...) {
   df$path_id <- paste0(df$subject_id, draw_idx, rep_idx)
   df$draw_idx <- 1
   df$rep_idx <- 1
-  subject_df <- df %>%
-    group_by(subject_id) %>%
+  subject_df <- df |>
+    group_by(subject_id) |>
     slice(1)
-  link_df <- df %>%
-    group_by(path_id) %>%
+  link_df <- df |>
+    group_by(path_id) |>
     slice(1)
   PathData$new(subject_df, df, link_df, covs = covs, ...)
 }
@@ -108,15 +108,15 @@ PathData <- R6::R6Class(
       self$covs
     },
     lengths = function() {
-      self$path_df %>%
-        filter(is_event == TRUE) %>%
-        group_by(path_id) %>%
+      self$path_df |>
+        filter(is_event == TRUE) |>
+        group_by(path_id) |>
         count()
     },
     longest_path = function() {
       lens <- self$lengths()
       idx <- which(lens$n == max(lens$n))[1]
-      df <- self$path_df %>% filter(path_id == lens$path_id[idx])
+      df <- self$path_df |> filter(path_id == lens$path_id[idx])
       self$filter(unique(df$path_id))
     },
     get_event_states = function() {
@@ -169,12 +169,12 @@ PathData <- R6::R6Class(
         df <- df |>
           truncate_after_terminal_events(term_states)
       }
-      out <- df %>% inner_join(self$link_df, by = "path_id", relationship = "many-to-one")
+      out <- df |> inner_join(self$link_df, by = "path_id", relationship = "many-to-one")
       sub_df <- self$subject_df
       if (!is.null(covariates)) {
         sub_df <- sub_df |> select(subject_index, one_of(covariates))
       }
-      out <- out %>% inner_join(sub_df, by = "subject_index", relationship = "many-to-one")
+      out <- out |> inner_join(sub_df, by = "subject_index", relationship = "many-to-one")
       stopifnot(nrow(out) == nrow(df))
       out
     },
@@ -210,7 +210,7 @@ PathData <- R6::R6Class(
       df <- self$as_data_frame()
       df$is_event <- as.factor(df$is_event)
       ids <- unique(df$path_id)[1:n_paths]
-      df <- df %>%
+      df <- df |>
         filter(path_id %in% ids) |>
         mutate(
           state_char = self$state_names[state],
@@ -250,13 +250,13 @@ PathData <- R6::R6Class(
           is.null(!!draw_ids_keep) | draw_idx %in% draw_ids_keep,
           subject_index %in% subject_df$subject_index
         )
-      path_df <- self$path_df %>%
+      path_df <- self$path_df |>
         filter(
           is.null(path_ids_keep) | path_id %in% path_ids_keep,
           path_id %in% link_df$path_id
         )
-      link_df <- link_df %>% filter(path_id %in% unique(path_df$path_id))
-      subject_df <- subject_df %>% filter(subject_index %in%
+      link_df <- link_df |> filter(path_id %in% unique(path_df$path_id))
+      subject_df <- subject_df |> filter(subject_index %in%
         unique(link_df$subject_index))
       link_df <- link_df |>
         left_join(subject_df |> select(subject_index, subject_id),
@@ -335,7 +335,7 @@ as_transitions_char <- function(dat, state_names, terminal_states) {
   df <- NULL
   ids <- unique(dat$subject_id)
   for (id in ids) {
-    dat_id <- dat %>% filter(subject_id == id)
+    dat_id <- dat |> filter(subject_id == id)
     df <- rbind(df, as_transitions_char_single(dat_id, state_names, terminal_states))
   }
 
@@ -351,7 +351,7 @@ as_transitions <- function(dat, state_names, state_types, terminal_states, covs,
   dat_trans <- as_transitions_char(dat, state_names, terminal_states)
 
   # Create legend first
-  r <- tidyr::expand_grid(prev_state = state_names, state = state_names) %>%
+  r <- tidyr::expand_grid(prev_state = state_names, state = state_names) |>
     mutate(trans_char = format_transition_char(prev_state, state)) |>
     filter(
       !prev_state %in% terminal_states, # no transition from terminal state
@@ -365,7 +365,7 @@ as_transitions <- function(dat, state_names, state_types, terminal_states, covs,
       prev_state = as.integer(factor(prev_state, levels = state_names, ordered = T))
     ) |>
     as.data.frame()
-  legend <- r[, c("trans_char", "prev_state", "state", "terminal")] %>%
+  legend <- r[, c("trans_char", "prev_state", "state", "terminal")] |>
     filter(!is.na(trans_char))
   legend$transition <- seq_len(nrow(legend))
   trans_names <- legend$trans_char
@@ -425,14 +425,14 @@ check_and_sort_paths <- function(df) {
 
 # Get subject df with numeric subject index
 subject_df_with_idx <- function(pd, subs, id_map) {
-  df <- pd$subject_df %>% filter(subject_id %in% subs)
+  df <- pd$subject_df |> filter(subject_id %in% subs)
   df$sub_idx <- id_map$x_sub[match(df$subject_id, id_map$subject_id)]
   df
 }
 
 # Filter pathdata to subjects
 filter_pathdata <- function(pd, subjects_keep) {
-  df_new <- pd$df %>% filter(subject_id %in% subjects_keep)
+  df_new <- pd$df |> filter(subject_id %in% subjects_keep)
   PathData$new(df_new, pd$state_names, pd$covs,
     terminal_states = pd$terminal_states,
     censor_states = pd$censor_states,
@@ -449,7 +449,7 @@ pathdata_to_mstate_format <- function(pd, covariates = FALSE) {
   PT <- legend_to_PT_matrix(dt$legend)
   TFI <- legend_to_TFI_matrix(dt$legend)
   for (sid in siu) {
-    df_j <- df %>% filter(subject_id == sid)
+    df_j <- df |> filter(subject_id == sid)
     df_out <- rbind(df_out, to_mstate_format_part1(df_j))
   }
   df_out <- to_mstate_format_part2(df_out, PT, TFI)
@@ -458,8 +458,8 @@ pathdata_to_mstate_format <- function(pd, covariates = FALSE) {
   attr(df_out, "trans") <- tmat
   class(df_out) <- c("msdata", "data.frame")
   if (covariates) {
-    sdf <- pd$subject_df %>% mutate(id = subject_id)
-    df_out <- df_out %>% left_join(sdf, by = "id")
+    sdf <- pd$subject_df |> mutate(id = subject_id)
+    df_out <- df_out |> left_join(sdf, by = "id")
   }
   list(
     msdata = df_out,
@@ -556,7 +556,7 @@ plot_cumhaz_msfit <- function(msfit, legend = NULL) {
   if (!is.null(legend)) {
     leg <- legend[, c("transition", "trans_char")]
     df$transition <- df$trans
-    df <- df %>% left_join(leg, by = "transition")
+    df <- df |> left_join(leg, by = "transition")
     df$trans <- paste0(df$transition, ": ", df$trans_char)
   } else {
     df$trans <- as.factor(df$trans)
@@ -566,8 +566,8 @@ plot_cumhaz_msfit <- function(msfit, legend = NULL) {
     ylab("Cumulative Hazard")
 }
 estimate_average_hazard <- function(msfit) {
-  msfit$Haz %>%
-    group_by(trans) %>%
+  msfit$Haz |>
+    group_by(trans) |>
     summarise(
       avg_haz = (last(Haz) - first(Haz)) / (last(time) - first(time))
     )
@@ -637,8 +637,8 @@ to_single_event <- function(pd, event) {
   pid <- unique(path_df$path_id)
   path_df_new <- NULL
   for (path in pid) {
-    df <- path_df %>%
-      filter(path_id == path) %>%
+    df <- path_df |>
+      filter(path_id == path) |>
       arrange(time)
     df$row_num <- 1:nrow(df)
     ri <- which(df$state == STATE)
@@ -650,12 +650,12 @@ to_single_event <- function(pd, event) {
       df <- df[c(1, ri[1]), ]
       df$state[2] <- 2
     }
-    path_df_new <- rbind(path_df_new, df %>% select(-row_num))
+    path_df_new <- rbind(path_df_new, df |> select(-row_num))
   }
 
   state_names <- c("Randomization", event, "Censor")
-  link_df <- pd$link_df %>% left_join(
-    pd$subject_df %>% select(subject_id, subject_index),
+  link_df <- pd$link_df |> left_join(
+    pd$subject_df |> select(subject_id, subject_index),
     by = "subject_index"
   )
   PathData$new(pd$subject_df, path_df_new, link_df,
