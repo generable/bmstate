@@ -58,14 +58,6 @@ NR <- 2
 all_states <- c("Randomization", "Bleed", "Fatality", "Censor")
 terminal_states <- as.character(na.omit(stringr::str_extract(all_states, ".*Fatality.*")))
 
-source(here::here("exploratory_multistate/R/sim.R"))
-source(here::here("exploratory_multistate/R/draws.R"))
-source(here::here("exploratory_multistate/R/PathData.R"))
-source(here::here("exploratory_multistate/R/pathgen.R"))
-source(here::here("exploratory_multistate/R/plot.R"))
-source(here::here("exploratory_multistate/R/standata.R"))
-source(here::here("exploratory_multistate/R/summarize.R"))
-source(here::here("exploratory_multistate/R/scores.R"))
 
 theme_set(theme_bw() +
   theme(
@@ -79,10 +71,7 @@ theme_set(theme_bw() +
 # Model
 
 ```{r model, message=FALSE, warning=FALSE}
-stan_file <- here::here(
-  paste0("exploratory_multistate/stan/", params$sm_name)
-)
-mod <- cmdstan_model(stan_file)
+mod <- pkmstate::create_stan_model()
 ```
 
 
