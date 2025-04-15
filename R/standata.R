@@ -375,13 +375,23 @@ create_stan_data_intervalidx <- function(t_start, t_end, t_grid, delta_grid) {
 }
 
 
-# Creating Stan data list
-# P = num of prediction points
-# NK = number of internal spline knots
-# pk = pk data frame
-# t_max = max time point for prediction
-# pred_oos = run in out-of-sample prediction mode? should always be FALSE when
-#   fitting the model, only can be TRUE when running standalone GQ
+#' Creating Stan data list
+#'
+#' @export
+#' @param P num of prediction points
+#' @param NK number of internal spline knots
+#' @param pd PD data frame
+#' @param pk PK data frame
+#' @param covariates hazard covariates
+#' @param ka_covariates covariates that affect ka in PK model
+#' @param CL_covariates covariates that affect CL in PK model
+#' @param V2_covariates covariates that affect V2 in PK model
+#' @param train_sub training subjects
+#' @param test_sub test subjects
+#' @param t_max max time of interest
+#' @param do_pk should pk model be used
+#' @param prior_only ignore likelihood?
+#' @return A list of data for Stan.
 create_stan_data <- function(pd, pk, covariates,
                              ka_covariates,
                              CL_covariates,
