@@ -180,12 +180,12 @@ PathData <- R6::R6Class(
     check_valid_state = function(check_states, state_names, min_len) {
       checkmate::assert_character(check_states, min.len = min_len)
       assertthat::assert_that(all(check_states %in% state_names))
-      assertthat::assert_that(none(check_states, duplicated))
+      assertthat::assert_that(purrr::none(check_states, duplicated))
     },
     check_states = function(state_names, terminal_states, initial_states,
                             censor_states, path_df) {
       checkmate::assert_character(state_names, min.len = 1)
-      assertthat::assert_that(none(state_names, duplicated))
+      assertthat::assert_that(purrr::none(state_names, duplicated))
       observed_states <- unique(state_names[path_df$state])
       self$check_valid_state(observed_states, state_names, min_len = 1)
       self$check_valid_state(terminal_states, state_names, min_len = 0)
