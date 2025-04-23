@@ -30,14 +30,29 @@ create_pathdata <- function(df, covs, ...) {
 }
 
 
-# R6 Class
-
+#' Path data class (R6 class)
+#'
+#' @export
+#' @field subject_df Data frame with one row per subject. Must have
+#' \code{subject_id} and all covariates as columns.
+#' @field path_df Data frame of actual paths. Must have \code{path_id},
+#' \code{state}, \code{time}, and \code{is_event} as columns.
+#' @field link_df Links the path and subject data frames. Must have
+#' \code{path_id}, \code{draw_idx}, \code{rep_idx}, and \code{subject_id} as
+#' columns.
+#' @field covs Covariate column names.
+#' @field state_names Names of the states.
+#' @field state_types State types.
+#' @field terminal_states Terminal states.
+#' @field initial_states Initial states.
+#' @field censor_states Censoring states.
+#' @field dt TODO
 PathData <- R6::R6Class(
   classname = "PathData",
   public = list(
     subject_df = NULL, # must have subject_id and all covariates
-    path_df = NULL, # must have path_id, state, time, and is_event
-    link_df = NULL, # must have path_id, draw_idx, rep_ix, and subject_id
+    path_df = NULL, # must have
+    link_df = NULL, #
     covs = NULL,
     state_names = NULL,
     state_types = NULL,
@@ -45,6 +60,17 @@ PathData <- R6::R6Class(
     initial_states = NULL,
     censor_states = NULL,
     dt = NULL,
+
+    #' Initialize
+    #' @param subject_df Subjects data frame.
+    #' @param path_df Paths data frame.
+    #' @param link_df Link data frame.
+    #' @param covs Covariate column names.
+    #' @param check_order Check order of paths?
+    #' @param state_names Names of the states.
+    #' @param terminal_states Terminal states.
+    #' @param initial_states Initial states.
+    #' @param censor_states Censoring states.
     initialize = function(subject_df, path_df, link_df,
                           state_names, covs = NULL, check_order = TRUE,
                           terminal_states = c(),
@@ -104,21 +130,25 @@ PathData <- R6::R6Class(
       self$path_df <- path_df
       self$link_df <- link_df
     },
+    #' Get names of covariates
     covariate_names = function() {
       self$covs
     },
+    #' Get path lenghts
     lengths = function() {
       self$path_df |>
         filter(is_event == TRUE) |>
         group_by(path_id) |>
         count()
     },
+    #' Get longest path
     longest_path = function() {
       lens <- self$lengths()
       idx <- which(lens$n == max(lens$n))[1]
       df <- self$path_df |> filter(path_id == lens$path_id[idx])
       self$filter(unique(df$path_id))
     },
+    #' Get indices of event states
     get_event_states = function() {
       match(self$get_event_state_names(), self$state_names)
     },
