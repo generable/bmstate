@@ -276,21 +276,29 @@ PathData <- R6::R6Class(
       prop
     },
 
-    #' Graph plot of the transition proportion matrix
+    #' Visualize the transition proportion matrix as a graph
     #'
     #' @param digits Max number of digits to show in numbers
     #' @param ... Arguments passed to \code{\link{diagram::plotmat}}.
-    #' @return nothing
+    #' @return a list
     plot_graph = function(digits = 3, ...) {
       f <- self$trans_matrix()
       f <- round(f, digits)
       cn <- colnames(f)
       idx_noevent <- find_one("Censoring", cn)
+      idx_term <- which(colnames(f) %in% self$terminal_states)
+      idx_init <- which(colnames(f) %in% self$initial_states)
       color <- rep("black", length(cn))
       col <- "gray60"
+      col_term <- "firebrick"
+      col_init <- "steelblue2"
       color[idx_noevent] <- col
+      color[idx_term] <- col_term
+      color[idx_init] <- col_init
       acol <- matrix("black", nrow(f), ncol(f))
       acol[, idx_noevent] <- col
+      acol[, idx_term] <- col_term
+      acol[, idx_init] <- col_init
       diagram::plotmat(t(f),
         txt.col = color,
         arr.col = t(acol),

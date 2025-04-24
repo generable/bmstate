@@ -262,7 +262,7 @@ Transition proportion matrix}
 
 \subsection{Returns}{
 a matrix
-Graph plot of the transition proportion matrix
+Visualize the transition proportion matrix as a graph
 }
 }
 \if{html}{\out{<hr>}}
@@ -283,7 +283,7 @@ Graph plot of the transition proportion matrix
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-nothing
+a list
 }
 }
 \if{html}{\out{<hr>}}
