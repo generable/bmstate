@@ -270,12 +270,14 @@ Graph plot of the transition proportion matrix
 \if{latex}{\out{\hypertarget{method-PathData-plot_graph}{}}}
 \subsection{Method \code{plot_graph()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$plot_graph(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$plot_graph(digits = 3, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
+\item{\code{digits}}{Max number of digits to show in numbers}
+
 \item{\code{...}}{Arguments passed to \code{\link{diagram::plotmat}}.}
 }
 \if{html}{\out{</div>}}

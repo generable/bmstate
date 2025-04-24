@@ -278,10 +278,12 @@ PathData <- R6::R6Class(
 
     #' Graph plot of the transition proportion matrix
     #'
+    #' @param digits Max number of digits to show in numbers
     #' @param ... Arguments passed to \code{\link{diagram::plotmat}}.
     #' @return nothing
-    plot_graph = function(...) {
+    plot_graph = function(digits = 3, ...) {
       f <- self$trans_matrix()
+      f <- round(f, digits)
       cn <- colnames(f)
       idx_noevent <- which(cn == "Censoring")
       if (length(idx_noevent) != 1) {
