@@ -271,7 +271,7 @@ PathData <- R6::R6Class(
       r <- self$as_msdata()
       prop <- mstate::events(r$msdata)$Proportions
       cn <- colnames(prop)
-      idx_noevent <- which(cn == "no event")
+      idx_noevent <- find_one("no event", cn)
       colnames(prop)[idx_noevent] <- "Censoring"
       prop
     },
@@ -285,16 +285,11 @@ PathData <- R6::R6Class(
       f <- self$trans_matrix()
       f <- round(f, digits)
       cn <- colnames(f)
-      idx_noevent <- which(cn == "Censoring")
-      if (length(idx_noevent) != 1) {
-        stop("unexpected behaviour")
-      }
+      idx_noevent <- find_one("Censoring", cn)
       color <- rep("black", length(cn))
       col <- "gray60"
       color[idx_noevent] <- col
       acol <- matrix("black", nrow(f), ncol(f))
-      print(acol)
-      print(idx_noevent)
       acol[, idx_noevent] <- col
       diagram::plotmat(t(f),
         txt.col = color,
@@ -700,14 +695,12 @@ cph_full_formula <- function(msdata, ttype = FALSE) {
   paste0(str, " + strata(", strata, ")")
 }
 
+
+
 # Pathdata to single event format
 to_single_event <- function(pd, event) {
-  state <- which(pd$state_names == event)
-  if (length(state) != 1) {
-    stop("invalid event")
-  }
   path_df <- pd$path_df
-  STATE <- state
+  STATE <- find_one(event, pd$state_names)
   pid <- unique(path_df$path_id)
   path_df_new <- NULL
   for (path in pid) {
