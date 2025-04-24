@@ -297,11 +297,13 @@ PathData <- R6::R6Class(
       color[idx_init] <- col_init
       acol <- matrix("black", nrow(f), ncol(f))
       acol[, idx_noevent] <- col
-      acol[, idx_term] <- col_term
-      acol[, idx_init] <- col_init
+      lcol <- acol
+      lcol[, idx_term] <- col_term
+      lcol[, idx_init] <- col_init
       diagram::plotmat(t(f),
         txt.col = color,
         arr.col = t(acol),
+        box.lcol = t(lcol),
         lcol = t(acol),
         shadow.size = 0,
         main = "Transition proportions",
