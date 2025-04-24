@@ -9,14 +9,14 @@ simulate_example_data <- function(N = 10, h0_base = 1e-4) {
     "country", "country_num", "dose_adjustment", "dose_arm"
   )
   num_covs <- 3
-  num_trans <- 4
+  num_trans <- 2
   num_beta <- num_covs * num_trans
   df_beta_true <- data.frame(
     cov_name = rep(c("age", "sex", "first_dose_amount"), each = num_trans),
     trans_idx = rep(seq_len(num_trans), times = num_covs),
     beta_true = rep(0, num_beta)
   )
-  h0_true <- rep(h0_base, 2)
+  h0_true <- rep(h0_base, num_trans)
   df_beta_true$beta_true[which(df_beta_true$cov_name == "age")] <- 0.5
   df_beta_true$beta_true[which(df_beta_true$cov_name == "sex")] <- 0.5
   simulate_multitransition_data(N, possible_covs, h0_true, df_beta_true)
