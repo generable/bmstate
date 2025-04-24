@@ -3,13 +3,15 @@
 #' @export
 #' @param N number of subjects
 #' @param h0_base base baseline hazard level
-simulate_example_data <- function(N = 10, h0_base = 1e-4) {
+#' @param sys_idx index of example system
+simulate_example_data <- function(N = 10, h0_base = 1e-4, sys_idx = 1) {
   possible_covs <- c(
     "sex", "age", "first_dose_amount", "pk_pre_dose", "pk_post_dose",
     "country", "country_num", "dose_adjustment", "dose_arm"
   )
   num_covs <- 3
-  num_trans <- 2
+  NT <- c(2, 4, 25)
+  num_trans <- NT[sys_idx]
   num_beta <- num_covs * num_trans
   df_beta_true <- data.frame(
     cov_name = rep(c("age", "sex", "first_dose_amount"), each = num_trans),
@@ -19,7 +21,9 @@ simulate_example_data <- function(N = 10, h0_base = 1e-4) {
   h0_true <- rep(h0_base, num_trans)
   df_beta_true$beta_true[which(df_beta_true$cov_name == "age")] <- 0.5
   df_beta_true$beta_true[which(df_beta_true$cov_name == "sex")] <- 0.5
-  simulate_multitransition_data(N, possible_covs, h0_true, df_beta_true)
+  simulate_multitransition_data(N, possible_covs, h0_true, df_beta_true,
+    sys_idx = sys_idx
+  )
 }
 
 

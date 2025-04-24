@@ -300,6 +300,12 @@ PathData <- R6::R6Class(
       lcol <- acol
       lcol[, idx_term] <- col_term
       lcol[, idx_init] <- col_init
+      n_box <- ncol(f)
+      pos <- matrix(0.0, n_box, 2)
+      for (j in seq_len(n_box)) {
+        pos[j, 1] <- (2 * j + 2) / (2 * (n_box + 3))
+        pos[j, 2] <- 0.5
+      }
       diagram::plotmat(t(f),
         txt.col = color,
         arr.col = t(acol),
@@ -307,6 +313,8 @@ PathData <- R6::R6Class(
         lcol = t(acol),
         shadow.size = 0,
         main = "Transition proportions",
+        pos = pos,
+        curve = 1, box.cex = 0.6, box.size = 0.055, cex = 0.6,
         ...
       )
     },

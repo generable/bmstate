@@ -4,12 +4,14 @@
 \alias{simulate_example_data}
 \title{Simulate example data}
 \usage{
-simulate_example_data(N = 10, h0_base = 1e-04)
+simulate_example_data(N = 10, h0_base = 1e-04, sys_idx = 1)
 }
 \arguments{
 \item{N}{number of subjects}
 
 \item{h0_base}{base baseline hazard level}
+
+\item{sys_idx}{index of example system}
 }
 \description{
 Simulate example data
