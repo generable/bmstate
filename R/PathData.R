@@ -315,6 +315,7 @@ PathData <- R6::R6Class(
         main = "Transition proportions",
         pos = pos,
         curve = 1, box.cex = 0.6, box.size = 0.055, cex = 0.6,
+        self.cex = 0.6,
         ...
       )
     },

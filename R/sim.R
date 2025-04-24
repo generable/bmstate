@@ -10,7 +10,7 @@ simulate_example_data <- function(N = 10, h0_base = 1e-4, sys_idx = 1) {
     "country", "country_num", "dose_adjustment", "dose_arm"
   )
   num_covs <- 3
-  NT <- c(2, 4, 25)
+  NT <- c(4, 9, 25)
   num_trans <- NT[sys_idx]
   num_beta <- num_covs * num_trans
   df_beta_true <- data.frame(
@@ -40,7 +40,7 @@ simulate_multitransition_data <- function(
     N_subject, covs, h0_true, df_beta_true, sys_idx = 1,
     state_names = NULL) {
   checkmate::assert_integerish(N_subject, lower = 1)
-  checkmate::assert_integerish(sys_idx, lower = 0, upper = 4)
+  checkmate::assert_integerish(sys_idx, lower = 1, upper = 3)
   df <- NULL
   pb <- progress::progress_bar$new(total = N_subject)
   n_trans <- length(h0_true)
@@ -81,50 +81,6 @@ simulate_multitransition_data <- function(
     pd = create_sim_pathdata(df, term_state, state_names, covs),
     h0 = sp$conf$h0_all,
     m_sub = m_sub
-  )
-}
-
-
-#' Data simulation (single transition)
-#'
-#' @export
-#' @param N_subject number of subjects
-#' @param covs covariates
-#' @param h0_true true baseline hazard value (constant)
-#' @param df_beta_true true covariate effects
-simulate_singletransition_data <- function(N_subject, covs,
-                                           h0_true = 0.001,
-                                           df_beta_true = NULL) {
-  checkmate::assert_integerish(N_subject, lower = 1)
-  df <- NULL
-  pb <- progress::progress_bar$new(total = N_subject)
-  for (n in 1:N_subject) {
-    pb$tick()
-    sex <- n %% 2
-    age <- round(30 + 60 * runif(1))
-    fda <- c(15, 30, 60)[sample(3, 1)]
-    log_hazard_mult <- compute_true_hazard_mult(sex, age, fda, df_beta_true)
-    sp <- simulate_path(h0_true, log_hazard_mult, n, 0)
-    df_j <- sp$df
-    df_j$sex <- sex
-    df_j$age <- age
-    df_j$country <- 1
-    df_j$country_num <- 1
-    df_j$first_dose_amount <- fda
-    df_j$dose_adjustment <- 0
-    df_j$dose_arm <- paste0(df_j$first_dose_amount, ":", df_j$dose_adjustment)
-    df_j$pk_pre_dose <- 1
-    df_j$pk_post_dose <- 1
-    df_j$subject_id <- n
-    df <- rbind(df, df_j)
-  }
-
-  # Finalize
-  term_state <- "Fatality"
-  state_names <- c("Randomization", "Fatality", "Censor")
-  list(
-    pd = create_sim_pathdata(df, term_state, state_names, covs),
-    h0 = sp$conf$h0_all
   )
 }
 
@@ -194,39 +150,7 @@ example_6state <- function(t_h0, h0_true, log_hazard_mult) {
   )
 }
 
-
-
 example_3state <- function(t_h0, h0_true, log_hazard_mult) {
-  checkmate::assert_numeric(h0_true, len = 2)
-  TFI <- matrix(
-    c(
-      0, 1, 0,
-      0, 0, 2,
-      0, 0, 0
-    ),
-    3, 3,
-    byrow = TRUE
-  )
-  h0_ <- rbind(
-    t_h0 * 0 + h0_true[1], # rand -> bleed
-    t_h0 * 0 + h0_true[2] # bleed -> fatal
-  )
-  h0 <- array(0, dim = c(1, nrow(h0_), ncol(h0_)))
-  n_trans <- dim(h0)[2]
-  h0[1, , ] <- h0_
-  m_sub <- array(0, dim = c(1, n_trans, 1))
-  m_sub[1, , 1] <- exp(log_hazard_mult)
-
-  # Return
-  list(
-    TFI = TFI,
-    m_sub = m_sub,
-    h0 = h0,
-    h0_all = h0_true
-  )
-}
-
-example_3state_alt <- function(t_h0, h0_true, log_hazard_mult) {
   checkmate::assert_numeric(h0_true, len = 4)
   TFI <- matrix(
     c(
@@ -258,35 +182,6 @@ example_3state_alt <- function(t_h0, h0_true, log_hazard_mult) {
   )
 }
 
-# Fatality only
-example_2state <- function(t_h0, h0_true, log_hazard_mult) {
-  TFI <- matrix(
-    c(
-      0, 1,
-      0, 0
-    ),
-    2, 2,
-    byrow = TRUE
-  )
-  h0_ <- rbind(
-    t_h0 * 0 + h0_true # rand -> fatality
-  )
-  h0 <- array(0, dim = c(1, nrow(h0_), ncol(h0_)))
-  n_trans <- dim(h0)[2]
-  h0[1, , ] <- h0_
-  m_sub <- array(0, dim = c(1, n_trans, 1))
-  m_sub[1, , 1] <- exp(log_hazard_mult)
-
-  # Return
-  list(
-    TFI = TFI,
-    m_sub = m_sub,
-    h0 = h0,
-    h0_all = h0_true
-  )
-}
-
-
 # Simulate a 3-year path for a single subject
 simulate_path <- function(h0_true, log_hazard_mult, subject_idx, sys_idx = 0) {
   init_state <- 1
@@ -297,13 +192,11 @@ simulate_path <- function(h0_true, log_hazard_mult, subject_idx, sys_idx = 0) {
   if (sys_idx == 1) {
     conf <- example_3state(t_h0, h0_true, log_hazard_mult)
   } else if (sys_idx == 2) {
-    conf <- example_3state_alt(t_h0, h0_true, log_hazard_mult)
+    conf <- example_4state(t_h0, h0_true, log_hazard_mult)
   } else if (sys_idx == 3) {
     conf <- example_6state(t_h0, h0_true, log_hazard_mult)
-  } else if (sys_idx == 4) {
-    conf <- example_4state(t_h0, h0_true, log_hazard_mult)
   } else {
-    conf <- example_2state(t_h0, h0_true, log_hazard_mult)
+    stop("invalid sys_idx")
   }
 
   h0 <- conf$h0
