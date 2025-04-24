@@ -281,7 +281,8 @@ PathData <- R6::R6Class(
     },
 
     # Filter based on path id, creates new object
-    filter = function(path_ids_keep = NULL, subject_ids_keep = NULL, rep_ids_keep = NULL, draw_ids_keep = NULL) {
+    filter = function(path_ids_keep = NULL, subject_ids_keep = NULL,
+                      rep_ids_keep = NULL, draw_ids_keep = NULL) {
       subject_df <- self$subject_df |>
         filter(is.null(subject_ids_keep) | subject_id %in% subject_ids_keep)
       link_df <- self$link_df |>
@@ -312,18 +313,8 @@ PathData <- R6::R6Class(
   )
 )
 
-
-
 shorten_name2 <- function(input_string) {
   input_string
-  # Split the input string by spaces and hyphens
-  # words <- unlist(strsplit(input_string, "[ -]"))
-
-  # Take the first three characters of each part
-  # shortened_parts <- substr(words, 1, 3)
-
-  # Reassemble the shortened parts into the final string
-  # paste(shortened_parts, collapse = "")
 }
 
 as_time_to_first_event <- function(dat, states, by = c()) {
