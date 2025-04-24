@@ -293,7 +293,7 @@ PathData <- R6::R6Class(
       color[idx_noevent] <- "firebrick"
       diagram::plotmat(t(f),
         txt.col = color, shadow.size = 0, ...,
-        main = "Transition proportions", box.type = "ellipse"
+        main = "Transition proportions"
       )
     },
 

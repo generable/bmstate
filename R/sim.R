@@ -2,21 +2,24 @@
 #'
 #' @export
 #' @param N number of subjects
-simulate_example_data <- function(N = 10) {
+#' @param h0_base base baseline hazard level
+simulate_example_data <- function(N = 10, h0_base = 1e-4) {
   possible_covs <- c(
     "sex", "age", "first_dose_amount", "pk_pre_dose", "pk_post_dose",
     "country", "country_num", "dose_adjustment", "dose_arm"
   )
-  df_beta_true0 <- data.frame(
-    cov_name = rep(c("age", "sex", "first_dose_amount"), each = 4),
-    trans_idx = rep(c(1, 2, 3, 4), times = 3),
-    beta_true = rep(0, 3 * 4)
+  num_covs <- 3
+  num_trans <- 4
+  num_beta <- num_covs * num_trans
+  df_beta_true <- data.frame(
+    cov_name = rep(c("age", "sex", "first_dose_amount"), each = num_trans),
+    trans_idx = rep(seq_len(num_trans), times = num_covs),
+    beta_true = rep(0, num_beta)
   )
-  df_beta_true1 <- df_beta_true0
-  h0_true <- rep(1e-4, 2)
-  df_beta_true1$beta_true[which(df_beta_true1$cov_name == "age")] <- 0.5
-  df_beta_true1$beta_true[which(df_beta_true1$cov_name == "sex")] <- 0.5
-  simulate_multitransition_data(N, possible_covs, h0_true, df_beta_true1)
+  h0_true <- rep(h0_base, 2)
+  df_beta_true$beta_true[which(df_beta_true$cov_name == "age")] <- 0.5
+  df_beta_true$beta_true[which(df_beta_true$cov_name == "sex")] <- 0.5
+  simulate_multitransition_data(N, possible_covs, h0_true, df_beta_true)
 }
 
 
