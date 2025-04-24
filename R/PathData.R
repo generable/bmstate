@@ -290,10 +290,19 @@ PathData <- R6::R6Class(
         stop("unexpected behaviour")
       }
       color <- rep("black", length(cn))
-      color[idx_noevent] <- "firebrick"
+      col <- "gray60"
+      color[idx_noevent] <- col
+      acol <- matrix("black", nrow(f), ncol(f))
+      print(acol)
+      print(idx_noevent)
+      acol[, idx_noevent] <- col
       diagram::plotmat(t(f),
-        txt.col = color, shadow.size = 0, ...,
-        main = "Transition proportions"
+        txt.col = color,
+        arr.col = t(acol),
+        lcol = t(acol),
+        shadow.size = 0,
+        main = "Transition proportions",
+        ...
       )
     },
 
