@@ -237,6 +237,7 @@ PathData <- R6::R6Class(
     },
 
     #' Step plot of the paths
+    #'
     #' @param n_paths Number of paths to subsample for plotting.
     #' @param alpha opacity
     plot_paths = function(n_paths = NULL, alpha = 0.5) {
@@ -261,6 +262,21 @@ PathData <- R6::R6Class(
         labs(x = "Time", y = "State", title = "State paths") +
         theme_minimal() +
         geom_point(mapping = aes(color = is_event, pch = is_event))
+    },
+
+    #' Transition frequency matrix
+    #'
+    #' @return a matrix
+    frequency_matrix = function() {
+      r <- self$as_msdata()
+      mstate::events(r$msdata)$Proportions
+    },
+
+    #' Graph plot of the paths
+    #'
+    #' @return nothing
+    plot_graph = function() {
+      NULL
     },
 
     # Fit CoxPH model

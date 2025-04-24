@@ -56,6 +56,8 @@ Initialize}
 \item \href{#method-PathData-as_data_frame}{\code{PathData$as_data_frame()}}
 \item \href{#method-PathData-as_transitions}{\code{PathData$as_transitions()}}
 \item \href{#method-PathData-plot_paths}{\code{PathData$plot_paths()}}
+\item \href{#method-PathData-frequency_matrix}{\code{PathData$frequency_matrix()}}
+\item \href{#method-PathData-plot_graph}{\code{PathData$plot_graph()}}
 \item \href{#method-PathData-coxph}{\code{PathData$coxph()}}
 \item \href{#method-PathData-filter}{\code{PathData$filter()}}
 \item \href{#method-PathData-clone}{\code{PathData$clone()}}
@@ -244,9 +246,35 @@ Step plot of the paths}
 \describe{
 \item{\code{n_paths}}{Number of paths to subsample for plotting.}
 
-\item{\code{alpha}}{opacity}
+\item{\code{alpha}}{opacity
+Transition frequency matrix}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-frequency_matrix"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-frequency_matrix}{}}}
+\subsection{Method \code{frequency_matrix()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$frequency_matrix()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+a matrix
+Graph plot of the paths
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-plot_graph"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-plot_graph}{}}}
+\subsection{Method \code{plot_graph()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$plot_graph()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+nothing
 }
 }
 \if{html}{\out{<hr>}}
