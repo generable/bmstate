@@ -16,7 +16,7 @@ simulate_example_data <- function(N = 10) {
   h0_true <- rep(1e-4, 2)
   df_beta_true1$beta_true[which(df_beta_true1$cov_name == "age")] <- 0.5
   df_beta_true1$beta_true[which(df_beta_true1$cov_name == "sex")] <- 0.5
-  simulate_multitransition_data(10, possible_covs, h0_true, df_beta_true1)
+  simulate_multitransition_data(N, possible_covs, h0_true, df_beta_true1)
 }
 
 

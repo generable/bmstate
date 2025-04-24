@@ -3,8 +3,8 @@ Type: Package
 Title: Bayesian multistate modeling with PK exposure as covariate
 Version: 0.0.1
 Author: Juho Timonen and Jacqueline Buros
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
+Maintainer: Juho Timonen <juho.timonen@iki.fi>
+Description: Bayesian multistate modeling with PK exposure as covariate
     Use four spaces when indenting paragraphs within the Description.
 License: What license is it under?
 Encoding: UTF-8
@@ -14,12 +14,22 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
+Depends: 
+    R (>= 3.5.0)
+SystemRequirements: CmdStan >= 2.33.0
+Remotes:
+  stan-dev/cmdstanr,
 Imports: 
+    checkmate,
     cmdstanr,
+    diagram,
     dplyr,
+    ggplot2,
     ggpubr,
     mstate,
+    posterior,
     progress,
+    purrr,
     R6,
     reshape2,
     splines2,

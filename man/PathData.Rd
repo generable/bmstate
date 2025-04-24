@@ -100,7 +100,8 @@ Initialize}
 Get names of covariates
 Get path lenghts
 Get longest path
-Get indices of event states}
+Get indices of event states
+Step plot of the paths}
 
 \item{\code{initial_states}}{Initial states.}
 }
@@ -235,9 +236,18 @@ Get indices of event states}
 \if{latex}{\out{\hypertarget{method-PathData-plot_paths}{}}}
 \subsection{Method \code{plot_paths()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$plot_paths(n_paths = 12)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$plot_paths(n_paths = NULL, alpha = 0.5)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{n_paths}}{Number of paths to subsample for plotting.}
+
+\item{\code{alpha}}{opacity}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-coxph"></a>}}

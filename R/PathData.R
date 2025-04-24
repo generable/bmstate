@@ -235,11 +235,21 @@ PathData <- R6::R6Class(
       }
       dt
     },
-    # Step plot of a path
-    plot_paths = function(n_paths = 12) {
+
+    #' Step plot of the paths
+    #' @param n_paths Number of paths to subsample for plotting.
+    #' @param alpha opacity
+    plot_paths = function(n_paths = NULL, alpha = 0.5) {
       df <- self$as_data_frame()
       df$is_event <- as.factor(df$is_event)
-      ids <- unique(df$path_id)[1:n_paths]
+      uid <- unique(df$path_id)
+      N <- length(uid)
+      if (is.null(n_paths)) {
+        idx_path <- seq_len(N)
+      } else {
+        idx_path <- sample.int(N, n_paths)
+      }
+      ids <- uid[idx_path]
       df <- df |>
         filter(path_id %in% ids) |>
         mutate(
@@ -247,7 +257,7 @@ PathData <- R6::R6Class(
           state = factor(state_char, levels = self$state_names, ordered = T)
         )
       ggplot(df, aes(x = time, y = state, group = path_id)) +
-        geom_step(direction = "hv") +
+        geom_step(direction = "hv", alpha = alpha) +
         labs(x = "Time", y = "State", title = "State paths") +
         theme_minimal() +
         geom_point(mapping = aes(color = is_event, pch = is_event))
