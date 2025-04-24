@@ -1,3 +1,126 @@
+#' Simulate example data
+#'
+#' @export
+#' @param N number of subjects
+simulate_example_data <- function(N = 10) {
+  possible_covs <- c(
+    "sex", "age", "first_dose_amount", "pk_pre_dose", "pk_post_dose",
+    "country", "country_num", "dose_adjustment", "dose_arm"
+  )
+  df_beta_true0 <- data.frame(
+    cov_name = rep(c("age", "sex", "first_dose_amount"), each = 4),
+    trans_idx = rep(c(1, 2, 3, 4), times = 3),
+    beta_true = rep(0, 3 * 4)
+  )
+  df_beta_true1 <- df_beta_true0
+  h0_true <- rep(1e-4, 2)
+  df_beta_true1$beta_true[which(df_beta_true1$cov_name == "age")] <- 0.5
+  df_beta_true1$beta_true[which(df_beta_true1$cov_name == "sex")] <- 0.5
+  simulate_multitransition_data(10, possible_covs, h0_true, df_beta_true1)
+}
+
+
+#' Data simulation (multitransition)
+#'
+#' @export
+#' @param N_subject number of subjects
+#' @param covs covariates
+#' @param h0_true true baseline hazard value (constant)
+#' @param df_beta_true true covariate effects
+#' @param sys_idx index of simulation system
+#' @param state_names names of the states
+simulate_multitransition_data <- function(
+    N_subject, covs, h0_true, df_beta_true, sys_idx = 1,
+    state_names = NULL) {
+  checkmate::assert_integerish(N_subject, lower = 1)
+  checkmate::assert_integerish(sys_idx, lower = 0, upper = 4)
+  df <- NULL
+  pb <- progress::progress_bar$new(total = N_subject)
+  n_trans <- length(h0_true)
+  m_sub <- matrix(0, N_subject, n_trans)
+  for (n in 1:N_subject) {
+    pb$tick()
+    sex <- n %% 2
+    age <- round(30 + 60 * runif(1))
+    fda <- c(15, 30, 60)[sample(3, 1)]
+    log_hazard_mult <- rep(0, n_trans)
+    for (h in 1:n_trans) {
+      df_beta_true_h <- df_beta_true |> filter(trans_idx == h)
+      log_hazard_mult[h] <- compute_true_hazard_mult(sex, age, fda, df_beta_true_h)
+    }
+    m_sub[n, ] <- exp(log_hazard_mult)
+    sp <- simulate_path(h0_true, log_hazard_mult, n, sys_idx)
+    df_j <- sp$df
+    df_j$sex <- sex
+    df_j$age <- age
+    df_j$country <- 1
+    df_j$country_num <- 1
+    df_j$first_dose_amount <- fda
+    df_j$dose_adjustment <- 0
+    df_j$dose_arm <- paste0(df_j$first_dose_amount, ":", df_j$dose_adjustment)
+    df_j$pk_pre_dose <- 1
+    df_j$pk_post_dose <- 1
+    df_j$subject_id <- n
+    df <- rbind(df, df_j)
+  }
+
+  # Finalize
+  term_state <- "Fatality"
+  if (is.null(state_names)) {
+    state_names <- c("Randomization", "Bleed", "Fatality", "Censor")
+  }
+
+  list(
+    pd = create_sim_pathdata(df, term_state, state_names, covs),
+    h0 = sp$conf$h0_all,
+    m_sub = m_sub
+  )
+}
+
+
+#' Data simulation (single transition)
+#'
+#' @export
+#' @param N_subject number of subjects
+#' @param covs covariates
+#' @param h0_true true baseline hazard value (constant)
+#' @param df_beta_true true covariate effects
+simulate_singletransition_data <- function(N_subject, covs,
+                                           h0_true = 0.001,
+                                           df_beta_true = NULL) {
+  checkmate::assert_integerish(N_subject, lower = 1)
+  df <- NULL
+  pb <- progress::progress_bar$new(total = N_subject)
+  for (n in 1:N_subject) {
+    pb$tick()
+    sex <- n %% 2
+    age <- round(30 + 60 * runif(1))
+    fda <- c(15, 30, 60)[sample(3, 1)]
+    log_hazard_mult <- compute_true_hazard_mult(sex, age, fda, df_beta_true)
+    sp <- simulate_path(h0_true, log_hazard_mult, n, 0)
+    df_j <- sp$df
+    df_j$sex <- sex
+    df_j$age <- age
+    df_j$country <- 1
+    df_j$country_num <- 1
+    df_j$first_dose_amount <- fda
+    df_j$dose_adjustment <- 0
+    df_j$dose_arm <- paste0(df_j$first_dose_amount, ":", df_j$dose_adjustment)
+    df_j$pk_pre_dose <- 1
+    df_j$pk_post_dose <- 1
+    df_j$subject_id <- n
+    df <- rbind(df, df_j)
+  }
+
+  # Finalize
+  term_state <- "Fatality"
+  state_names <- c("Randomization", "Fatality", "Censor")
+  list(
+    pd = create_sim_pathdata(df, term_state, state_names, covs),
+    h0 = sp$conf$h0_all
+  )
+}
+
 example_4state <- function(t_h0, h0_true, log_hazard_mult) {
   N_trans <- 9
   checkmate::assert_numeric(h0_true, len = N_trans)
@@ -220,107 +343,6 @@ compute_true_hazard_mult <- function(sex, age, fda, df_beta_true) {
   log_hazard_mult
 }
 
-#' Data simulation (multitransition)
-#'
-#' @export
-#' @param N_subject number of subjects
-#' @param covs covariates
-#' @param h0_true true baseline hazard value (constant)
-#' @param df_beta_true true covariate effects
-#' @param sys_idx index of simulation system
-#' @param state_names names of the states
-simulate_multitransition_data <- function(
-    N_subject, covs, h0_true, df_beta_true, sys_idx = 1,
-    state_names = NULL) {
-  checkmate::assert_integerish(N_subject, lower = 1)
-  checkmate::assert_integerish(sys_idx, lower = 0, upper = 4)
-  df <- NULL
-  pb <- progress::progress_bar$new(total = N_subject)
-  n_trans <- length(h0_true)
-  m_sub <- matrix(0, N_subject, n_trans)
-  for (n in 1:N_subject) {
-    pb$tick()
-    sex <- n %% 2
-    age <- round(30 + 60 * runif(1))
-    fda <- c(15, 30, 60)[sample(3, 1)]
-    log_hazard_mult <- rep(0, n_trans)
-    for (h in 1:n_trans) {
-      df_beta_true_h <- df_beta_true |> filter(trans_idx == h)
-      log_hazard_mult[h] <- compute_true_hazard_mult(sex, age, fda, df_beta_true_h)
-    }
-    m_sub[n, ] <- exp(log_hazard_mult)
-    sp <- simulate_path(h0_true, log_hazard_mult, n, sys_idx)
-    df_j <- sp$df
-    df_j$sex <- sex
-    df_j$age <- age
-    df_j$country <- 1
-    df_j$country_num <- 1
-    df_j$first_dose_amount <- fda
-    df_j$dose_adjustment <- 0
-    df_j$dose_arm <- paste0(df_j$first_dose_amount, ":", df_j$dose_adjustment)
-    df_j$pk_pre_dose <- 1
-    df_j$pk_post_dose <- 1
-    df_j$subject_id <- n
-    df <- rbind(df, df_j)
-  }
-
-  # Finalize
-  term_state <- "Fatality"
-  if (is.null(state_names)) {
-    state_names <- c("Randomization", "Bleed", "Fatality", "Censor")
-  }
-
-  list(
-    pd = create_sim_pathdata(df, term_state, state_names, covs),
-    h0 = sp$conf$h0_all,
-    m_sub = m_sub
-  )
-}
-
-
-
-#' Data simulation
-#'
-#' @export
-#' @param N_subject number of subjects
-#' @param covs covariates
-#' @param h0_true true baseline hazard value (constant)
-#' @param df_beta_true true covariate effects
-simulate_singletransition_data <- function(N_subject, covs,
-                                           h0_true = 0.001,
-                                           df_beta_true = NULL) {
-  checkmate::assert_integerish(N_subject, lower = 1)
-  df <- NULL
-  pb <- progress::progress_bar$new(total = N_subject)
-  for (n in 1:N_subject) {
-    pb$tick()
-    sex <- n %% 2
-    age <- round(30 + 60 * runif(1))
-    fda <- c(15, 30, 60)[sample(3, 1)]
-    log_hazard_mult <- compute_true_hazard_mult(sex, age, fda, df_beta_true)
-    sp <- simulate_path(h0_true, log_hazard_mult, n, 0)
-    df_j <- sp$df
-    df_j$sex <- sex
-    df_j$age <- age
-    df_j$country <- 1
-    df_j$country_num <- 1
-    df_j$first_dose_amount <- fda
-    df_j$dose_adjustment <- 0
-    df_j$dose_arm <- paste0(df_j$first_dose_amount, ":", df_j$dose_adjustment)
-    df_j$pk_pre_dose <- 1
-    df_j$pk_post_dose <- 1
-    df_j$subject_id <- n
-    df <- rbind(df, df_j)
-  }
-
-  # Finalize
-  term_state <- "Fatality"
-  state_names <- c("Randomization", "Fatality", "Censor")
-  list(
-    pd = create_sim_pathdata(df, term_state, state_names, covs),
-    h0 = sp$conf$h0_all
-  )
-}
 
 # Train-test split
 do_split <- function(dt) {

@@ -2,7 +2,7 @@
 % Please edit documentation in R/sim.R
 \name{simulate_singletransition_data}
 \alias{simulate_singletransition_data}
-\title{Data simulation}
+\title{Data simulation (single transition)}
 \usage{
 simulate_singletransition_data(
   N_subject,
@@ -21,5 +21,5 @@ simulate_singletransition_data(
 \item{df_beta_true}{true covariate effects}
 }
 \description{
-Data simulation
+Data simulation (single transition)
 }
