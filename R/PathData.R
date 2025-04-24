@@ -264,19 +264,35 @@ PathData <- R6::R6Class(
         geom_point(mapping = aes(color = is_event, pch = is_event))
     },
 
-    #' Transition frequency matrix
+    #' Transition proportion matrix
     #'
     #' @return a matrix
-    frequency_matrix = function() {
+    trans_matrix = function() {
       r <- self$as_msdata()
-      mstate::events(r$msdata)$Proportions
+      prop <- mstate::events(r$msdata)$Proportions
+      cn <- colnames(prop)
+      idx_noevent <- which(cn == "no event")
+      colnames(prop)[idx_noevent] <- "Censoring"
+      prop
     },
 
-    #' Graph plot of the paths
+    #' Graph plot of the transition proportion matrix
     #'
+    #' @param ... Arguments passed to \code{\link{diagram::plotmat}}.
     #' @return nothing
-    plot_graph = function() {
-      NULL
+    plot_graph = function(...) {
+      f <- self$trans_matrix()
+      cn <- colnames(f)
+      idx_noevent <- which(cn == "Censoring")
+      if (length(idx_noevent) != 1) {
+        stop("unexpected behaviour")
+      }
+      color <- rep("black", length(cn))
+      color[idx_noevent] <- "firebrick"
+      diagram::plotmat(t(f),
+        txt.col = color, shadow.size = 0, ...,
+        main = "Transition proportions", box.type = "ellipse"
+      )
     },
 
     # Fit CoxPH model

@@ -3,6 +3,8 @@ test_that("PathData methods work", {
   pd <- a$pd
   plt <- pd$plot_paths()
   expect_s3_class(plt, "ggplot")
-  freq <- pd$frequency_matrix()
+  freq <- pd$trans_matrix()
   expect_true(inherits(freq, "table"))
+  b <- pd$plot_graph()
+  expect_true("arr" %in% names(b))
 })
