@@ -304,7 +304,7 @@ PathData <- R6::R6Class(
       pos <- matrix(0.0, n_box, 2)
       for (j in seq_len(n_box)) {
         pos[j, 1] <- (2 * j + 2) / (2 * (n_box + 3))
-        pos[j, 2] <- 0.5
+        pos[j, 2] <- 0.8
       }
       diagram::plotmat(t(f),
         txt.col = color,
