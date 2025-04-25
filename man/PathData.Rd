@@ -270,13 +270,15 @@ Visualize the transition proportion matrix as a graph
 \if{latex}{\out{\hypertarget{method-PathData-plot_graph}{}}}
 \subsection{Method \code{plot_graph()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$plot_graph(digits = 3, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$plot_graph(digits = 3, include_censor = FALSE, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{digits}}{Max number of digits to show in numbers}
+
+\item{\code{include_censor}}{Include censoring state in the graph?}
 
 \item{\code{...}}{Arguments passed to \code{qgraph}}
 }

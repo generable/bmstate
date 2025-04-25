@@ -282,14 +282,16 @@ PathData <- R6::R6Class(
     #'
     #' @param digits Max number of digits to show in numbers
     #' @param ... Arguments passed to \code{qgraph}
+    #' @param include_censor Include censoring state in the graph?
     #' @return \code{qgraph} plot
-    plot_graph = function(digits = 3, ...) {
+    plot_graph = function(digits = 3, include_censor = FALSE, ...) {
       f <- self$trans_matrix()
       cn <- colnames(f)
       idx_noevent <- find_one("Censoring", cn)
       idx_term <- which(colnames(f) %in% self$terminal_states)
       idx_init <- which(colnames(f) %in% self$initial_states)
-      color <- rep("black", length(cn))
+      N <- length(cn)
+      color <- rep("black", N)
       col <- "gray60"
       col_term <- "firebrick"
       col_init <- "steelblue2"
@@ -301,6 +303,12 @@ PathData <- R6::R6Class(
       lcol <- acol
       lcol[, idx_term] <- col_term
       lcol[, idx_init] <- col_init
+      if (!include_censor) {
+        f <- f[1:(N - 1), 1:(N - 1)]
+        lcol <- lcol[1:(N - 1), 1:(N - 1)]
+        acol <- acol[1:(N - 1), 1:(N - 1)]
+        color <- color[1:(N - 1)]
+      }
       qgraph::qgraph(f,
         edge.labels = TRUE, label.color = color,
         edge.color = acol, ...
