@@ -303,15 +303,24 @@ PathData <- R6::R6Class(
       lcol <- acol
       lcol[, idx_term] <- col_term
       lcol[, idx_init] <- col_init
+
+      # Filter
+      idx_keep <- seq_len(N)
       if (!include_censor) {
-        f <- f[1:(N - 1), 1:(N - 1)]
-        lcol <- lcol[1:(N - 1), 1:(N - 1)]
-        acol <- acol[1:(N - 1), 1:(N - 1)]
-        color <- color[1:(N - 1)]
+        idx_keep <- setdiff(idx_keep, idx_noevent)
       }
+
+      f <- f[idx_keep, idx_keep, drop = F]
+      lcol <- lcol[idx_keep, idx_keep, drop = F]
+      acol <- acol[idx_keep, idx_keep, drop = F]
+      color <- color[idx_keep]
+
+      # Create plot
       qgraph::qgraph(f,
         edge.labels = TRUE, label.color = color,
-        edge.color = acol, ...
+        edge.color = acol,
+        fade = FALSE,
+        ...
       )
     },
 
