@@ -30,6 +30,7 @@ Imports:
     posterior,
     progress,
     purrr,
+    qgraph,
     R6,
     reshape2,
     splines2,

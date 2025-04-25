@@ -281,12 +281,10 @@ PathData <- R6::R6Class(
     #' Visualize the transition proportion matrix as a graph
     #'
     #' @param digits Max number of digits to show in numbers
-    #' @param ... Arguments passed to \code{plot} method of an \code{igraph}.
-    #' network
-    #' @return nothing
+    #' @param ... Arguments passed to \code{qgraph}
+    #' @return \code{qgraph} plot
     plot_graph = function(digits = 3, ...) {
       f <- self$trans_matrix()
-      f <- round(f, digits)
       cn <- colnames(f)
       idx_noevent <- find_one("Censoring", cn)
       idx_term <- which(colnames(f) %in% self$terminal_states)
@@ -303,11 +301,9 @@ PathData <- R6::R6Class(
       lcol <- acol
       lcol[, idx_term] <- col_term
       lcol[, idx_init] <- col_init
-      net <- igraph::graph_from_adjacency_matrix(f, weighted = TRUE)
-      plot(net,
-        vertex.color = "white", vertex.label.color = color,
-        layout = layout.circle,
-        ...
+      qgraph::qgraph(f,
+        edge.labels = TRUE, label.color = color,
+        edge.color = acol, ...
       )
     },
 
