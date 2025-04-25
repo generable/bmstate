@@ -273,14 +273,17 @@ PathData <- R6::R6Class(
       cn <- colnames(prop)
       idx_noevent <- find_one("no event", cn)
       colnames(prop)[idx_noevent] <- "Censoring"
+      prop <- rbind(prop, rep(0, ncol(prop)))
+      rownames(prop)[nrow(prop)] <- "Censoring"
       prop
     },
 
     #' Visualize the transition proportion matrix as a graph
     #'
     #' @param digits Max number of digits to show in numbers
-    #' @param ... Arguments passed to \code{\link{diagram::plotmat}}.
-    #' @return a list
+    #' @param ... Arguments passed to \code{plot} method of an \code{igraph}.
+    #' network
+    #' @return nothing
     plot_graph = function(digits = 3, ...) {
       f <- self$trans_matrix()
       f <- round(f, digits)
@@ -300,22 +303,10 @@ PathData <- R6::R6Class(
       lcol <- acol
       lcol[, idx_term] <- col_term
       lcol[, idx_init] <- col_init
-      n_box <- ncol(f)
-      pos <- matrix(0.0, n_box, 2)
-      for (j in seq_len(n_box)) {
-        pos[j, 1] <- (2 * j + 2) / (2 * (n_box + 3))
-        pos[j, 2] <- 0.8
-      }
-      diagram::plotmat(t(f),
-        txt.col = color,
-        arr.col = t(acol),
-        box.lcol = t(lcol),
-        lcol = t(acol),
-        shadow.size = 0,
-        main = "Transition proportions",
-        pos = pos,
-        curve = 1, box.cex = 0.6, box.size = 0.055, cex = 0.6,
-        self.cex = 0.6,
+      net <- igraph::graph_from_adjacency_matrix(f, weighted = TRUE)
+      plot(net,
+        vertex.color = "white", vertex.label.color = color,
+        layout = layout.circle,
         ...
       )
     },

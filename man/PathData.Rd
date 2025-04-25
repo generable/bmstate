@@ -278,12 +278,13 @@ Visualize the transition proportion matrix as a graph
 \describe{
 \item{\code{digits}}{Max number of digits to show in numbers}
 
-\item{\code{...}}{Arguments passed to \code{\link{diagram::plotmat}}.}
+\item{\code{...}}{Arguments passed to \code{plot} method of an \code{igraph}.
+network}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-a list
+igraph plot
 }
 }
 \if{html}{\out{<hr>}}
