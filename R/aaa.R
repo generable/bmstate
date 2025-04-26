@@ -1,6 +1,6 @@
 # MAIN DOCUMENTATION PAGE -------------------------------------------------
 
-#' The 'pkmstate' package.
+#' The 'bmstate' package.
 #'
 #' @description Bayesian multistate modeling using 'Stan'.
 #' @author Juho Timonen (first.last at iki.fi) and Jacki Buros
@@ -24,8 +24,8 @@
 #'  - \code{\link{subject_df_with_idx}}
 #' }
 #'
-#' @name pkmstate-package
-#' @aliases pkmstate
+#' @name bmstate-package
+#' @aliases bmstate
 #' @import ggplot2 tibble
 #' @importFrom R6 R6Class
 #' @importFrom posterior as_draws_rvars

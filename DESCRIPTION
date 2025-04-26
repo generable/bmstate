@@ -1,11 +1,12 @@
-Package: pkmstate
+Package: bmstate
 Type: Package
-Title: Bayesian multistate modeling with PK exposure as covariate
+Title: Bayesian multistate modeling using Stan
 Version: 0.0.1
 Author: Juho Timonen and Jacqueline Buros
 Maintainer: Juho Timonen <juho.timonen@iki.fi>
-Description: Bayesian multistate modeling with PK exposure as covariate
-    Use four spaces when indenting paragraphs within the Description.
+Description: Bayesian multistate modeling using 'Stan'. Option to estimate
+    drug exposure as covariate using a PK model and use it as a predictor
+    for different hazards.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true

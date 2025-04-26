@@ -5,10 +5,10 @@
 
 # Create package startup message
 create_startup_message <- function() {
-  v_pkg <- create_desc("pkmstate")
+  v_pkg <- create_desc("bmstate")
   msg <- paste0(
-    "Attached pkmstate", v_pkg,
-    ". Type ?pkmstate to get started."
+    "Attached bmstate", v_pkg,
+    ". Type ?bmstate to get started."
   )
   return(msg)
 }
