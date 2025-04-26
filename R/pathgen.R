@@ -315,7 +315,7 @@ generate_paths_many_subjects <- function(fit, sd, covs,
 
   p <- progressr::progressor(length(draw_ids))
   which_xsub <- sub_ids |>
-    set_names() |>
+    rlang::set_names() |>
     map(~ which(x_sub == .x))
   if (isTRUE(use_future)) {
     df <- draw_ids |>

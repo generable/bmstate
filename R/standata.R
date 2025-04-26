@@ -8,7 +8,7 @@ get_event_times <- function(df, trans_names) {
 
 # Evaluate B-spline basis at t
 bspline_basis <- function(t, k, knots, BK) {
-  bSpline(t,
+  splines2::bSpline(t,
     degree = k - 1, knots = knots, intercept = TRUE,
     Boundary.knots = BK
   )
@@ -46,7 +46,7 @@ create_stan_data_spline <- function(dat, sd, k, P, NK, PT, t_max) {
   t_start <- rep(0, N)
   ids <- unique(dat$subject_id) # keeps order ?
   N_sub <- length(ids)
-  pb <- progress_bar$new(total = N_sub)
+  pb <- progress::progress_bar$new(total = N_sub)
   n_obs <- 0
 
   # This creates also the integer subject ids (x_sub)

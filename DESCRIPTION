@@ -37,7 +37,9 @@ Imports:
     qgraph,
     R6,
     reshape2,
+    rlang,
     splines2,
+    stringr,
     survival,
     tidybayes
 RoxygenNote: 7.3.2
