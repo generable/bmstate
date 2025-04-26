@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(ggplot2)
 library(ggpubr)
-library(pkmstate)
+library(bmstate)
 ```
 
 
@@ -59,7 +59,7 @@ theme_set(theme_bw() +
 # Model
 
 ```{r model, message=FALSE, warning=FALSE}
-mod <- pkmstate::create_stan_model()
+mod <- bmstate::create_stan_model()
 ```
 
 

@@ -8,6 +8,6 @@ create_stan_model <- function(mixp = FALSE) {
   if (mixp) {
     fn <- "msm-general-mixp.stan"
   }
-  filepath <- system.file(file.path("stan", fn), package = "pkmstate")
+  filepath <- system.file(file.path("stan", fn), package = "bmstate")
   cmdstanr::cmdstan_model(filepath)
 }
