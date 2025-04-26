@@ -632,23 +632,42 @@ TFI_to_mstate_transmat <- function(TFI, state_names) {
   TFI
 }
 
+#' Fit Cox PH model using Breslow method
+#'
+#' @export
+#' @param msdat \code{msdata} object
+#' @param formula_rhs Formula right hand side that is appended to
+#' \code{Surv(Tstart, Tstop, status) ~ }. If \code{NULL} (default), then
+#' \code{strata(trans)} is used
 fit_coxph <- function(msdat, formula_rhs = NULL) {
   if (is.null(formula_rhs)) {
     formula_rhs <- "strata(trans)"
   }
   formula <- paste0("Surv(Tstart, Tstop, status) ~ ", formula_rhs)
-  coxph(as.formula(formula),
+  survival::coxph(as.formula(formula),
     data = msdat, method = "breslow"
   )
 }
+
+#' Fit 'mstate' model
+#'
+#' @export
+#' @param msdat \code{msdata} object
+#' @param formula formula
 fit_mstate <- function(msdat, formula = NULL) {
   cph <- fit_coxph(msdat, formula)
-  msfit(object = cph, variance = FALSE, trans = attr(msdat, "trans"))
+  mstate::msfit(object = cph, variance = FALSE, trans = attr(msdat, "trans"))
 }
 fit_basehaz <- function(msdat, ...) {
   cph <- fit_coxph(msdat)
-  basehaz(cph, ...)
+  survival::basehaz(cph, ...)
 }
+
+#' Plot cumulative hazard of 'msfit'
+#'
+#' @export
+#' @param msfit An \code{msfit} object
+#' @param legend transition name legend
 plot_cumhaz_msfit <- function(msfit, legend = NULL) {
   df <- msfit$Haz
   if (!is.null(legend)) {

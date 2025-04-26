@@ -38,6 +38,7 @@ Imports:
     R6,
     reshape2,
     splines2,
+    survival,
     tidybayes
 RoxygenNote: 7.3.2
 Config/testthat/edition: 3
