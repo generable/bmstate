@@ -256,7 +256,11 @@ compute_true_hazard_mult <- function(sex, age, fda, df_beta_true) {
 }
 
 
-# Train-test split
+#' Train-test split for a transitions data frame
+#'
+#' @export
+#' @param dt A transitions data frame
+#' @return a list with test and train subject indices
 do_split <- function(dt) {
   all_sub <- unique(dt$df$subject_id)
   N_sub <- length(all_sub)

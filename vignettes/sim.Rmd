@@ -15,6 +15,8 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
+library(ggplot2)
+library(ggpubr)
 library(pkmstate)
 ```
 
@@ -26,21 +28,10 @@ on a multistate model with several transitions.
 # Setup
 
 ```{r setup, message=FALSE, warning=FALSE}
-# Load necessary libraries
-library(cmdstanr)
-library(tidyverse)
-library(msm)
-library(reshape2)
-library(survival)
-library(splines2)
-library(tidybayes)
-library(furrr)
-library(SurvMetrics)
-
 options(future.globals.maxSize = 4 * 10^9)
 
 params <- list(
-  N_subject = 2000,
+  N_subject = 200,
   covariates = c("sex", "first_dose_amount", "age"),
   iter_warmup = 600,
   iter_sampling = 300,
@@ -50,14 +41,11 @@ params <- list(
   prior_only = FALSE,
   hazard_only = TRUE,
   do_cf = FALSE,
-  sm_name = "msm-general-mixp.stan"
+  mixp = FALSE
 )
 
 NP <- params$iter_sampling # number of paths to sample per sub when gen paths
 NR <- 2
-all_states <- c("Randomization", "Bleed", "Fatality", "Censor")
-terminal_states <- as.character(na.omit(stringr::str_extract(all_states, ".*Fatality.*")))
-
 
 theme_set(theme_bw() +
   theme(

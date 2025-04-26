@@ -247,8 +247,27 @@ generate_paths <- function(TFI, init_state, t_start, t_max,
   )
 }
 
-# Generate all paths for some subjects
-# n_repeats = number of times to repeat path generation for each draw
+#' Generate all paths for some subjects
+#'
+#' @export
+#' @param fit Stan model fit
+#' @param sd Stan data
+#' @param covs covariates
+#' @param TFI the TFI matrix
+#' @param init_state state where to initialize the paths
+#' @param t_start start time
+#' @param t_max_gen max time
+#' @param state_names state names
+#' @param trans_names transition names
+#' @param terminal_states names of terminal states
+#' @param df_subjects subjects data frame
+#' @param num_paths number of draws for which to generate paths
+#' @param oos out-of-sample mode?
+#' @param discretize discretize the times?
+#' @param n_repeats number of times to repeat path generation for each draw
+#' @param use_future use the \code{future} package?
+#' @param use_precomp use precomputation?
+#' @param tol multiplier for upper bound of hazard
 generate_paths_many_subjects <- function(fit, sd, covs,
                                          TFI, init_state, t_start, t_max_gen,
                                          state_names,
@@ -262,6 +281,13 @@ generate_paths_many_subjects <- function(fit, sd, covs,
                                          use_future = TRUE,
                                          use_precomp = TRUE,
                                          tol = 1.03) {
+  checkmate::assert_numeric(tol, lower = 1, len = 1)
+  checkmate::assert_logical(use_future, len = 1)
+  checkmate::assert_logical(use_precomp, len = 1)
+  checkmate::assert_logical(discretize, len = 1)
+  checkmate::assert_integerish(n_repeats, len = 1, lower = 1)
+  checkmate::assert_integerish(num_paths, len = 1, lower = 1)
+
   # Get draws as arrays
   message(glue::glue(" * reading draws..."))
   log_h0 <- get_and_format_log_h0_draws(fit)

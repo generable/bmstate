@@ -515,8 +515,14 @@ check_and_sort_paths <- function(df) {
   return(df)
 }
 
-# Get subject df with numeric subject index
+#' Get subject df with numeric subject index
+#'
+#' @export
+#' @param pd A \code{\link{PathData}} object
+#' @param subs Subject indices (from \code{\link{do_split}})
+#' @param id_map Maps numeric id to original id
 subject_df_with_idx <- function(pd, subs, id_map) {
+  checkmate::assert_class(pd, "PathData")
   df <- pd$subject_df |> filter(subject_id %in% subs)
   df$sub_idx <- id_map$x_sub[match(df$subject_id, id_map$subject_id)]
   df

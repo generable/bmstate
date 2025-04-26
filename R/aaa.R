@@ -19,7 +19,7 @@
 #' @importFrom R6 R6Class
 #' @importFrom posterior as_draws_rvars
 #' @importFrom dplyr filter mutate transmute group_by select slice count arrange
-#' @importFrom dplyr inner_join left_join
+#' @importFrom dplyr inner_join left_join distinct
 #'
 #'
 "_PACKAGE"
