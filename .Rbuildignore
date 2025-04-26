@@ -12,3 +12,4 @@ pkgdown/
 .Rhistory
 .gitignore
 ^codecov\.yml$
+dev/

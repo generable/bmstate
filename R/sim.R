@@ -33,7 +33,6 @@ simulate_example_data <- function(N = 10, h0_base = 1e-4, sys_idx = 1,
 
 #' Data simulation (multitransition)
 #'
-#' @export
 #' @param N_subject number of subjects
 #' @param covs covariates
 #' @param h0_true true baseline hazard value (constant)
