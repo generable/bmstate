@@ -10,9 +10,21 @@ Bayesian multistate modeling using 'Stan'.
 }
 \section{Getting started}{
 
-See the following \code{R6} classes.
+See the vignettes and the following exported functions and classes
+
 \itemize{
- \item \code{\link{PathData}}: Class to hold generated paths.
+ - \code{\link{PathData}}
+ - \code{\link{create_stan_data}}
+ - \code{\link{create_stan_model}}
+ - \code{\link{do_split}}
+ - \code{\link{fit_coxph}}
+ - \code{\link{fit_mstate}}
+ - \code{\link{generate_paths_many_subjects}}
+ - \code{\link{legend_to_PT_matrix}}
+ - \code{\link{legend_to_TFI_matrix}}
+ - \code{\link{plot_cumhaz_msfit}}
+ - \code{\link{simulate_example_data}}
+ - \code{\link{subject_df_with_idx}}
 }
 }
 

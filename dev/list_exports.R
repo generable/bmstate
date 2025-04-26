@@ -11,9 +11,10 @@ for (i in seq_len(L)) {
 }
 
 # Print list of exported functions
+# Paste the output of this to aaa.R
 L <- length(funs)
 for (i in seq_len(L)) {
   line <- funs[i]
   f <- substr(line, 8, nchar(line) - 1)
-  cat("  -", f, "\n")
+  cat("#'  - \\code{\\link{", f, "}} \n", sep = "")
 }
