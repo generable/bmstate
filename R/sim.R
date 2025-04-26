@@ -4,7 +4,10 @@
 #' @param N number of subjects
 #' @param h0_base base baseline hazard level
 #' @param sys_idx index of example system
-simulate_example_data <- function(N = 10, h0_base = 1e-4, sys_idx = 1) {
+#' @param effect_sizes true effect sizes for the three covariates
+#' (\code{age}, \code{sex}, \code{first_dose_amount})
+simulate_example_data <- function(N = 10, h0_base = 1e-4, sys_idx = 1,
+                                  effect_sizes = c(0.5, 0.5, 0)) {
   possible_covs <- c(
     "sex", "age", "first_dose_amount", "pk_pre_dose", "pk_post_dose",
     "country", "country_num", "dose_adjustment", "dose_arm"
@@ -19,8 +22,9 @@ simulate_example_data <- function(N = 10, h0_base = 1e-4, sys_idx = 1) {
     beta_true = rep(0, num_beta)
   )
   h0_true <- rep(h0_base, num_trans)
-  df_beta_true$beta_true[which(df_beta_true$cov_name == "age")] <- 0.5
-  df_beta_true$beta_true[which(df_beta_true$cov_name == "sex")] <- 0.5
+  df_beta_true$beta_true[which(df_beta_true$cov_name == "age")] <- effect_sizes[1]
+  df_beta_true$beta_true[which(df_beta_true$cov_name == "sex")] <- effect_sizes[2]
+  df_beta_true$beta_true[which(df_beta_true$cov_name == "first_dose_amount")] <- effect_sizes[3]
   simulate_multitransition_data(N, possible_covs, h0_true, df_beta_true,
     sys_idx = sys_idx
   )

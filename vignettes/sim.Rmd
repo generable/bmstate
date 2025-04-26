@@ -72,10 +72,11 @@ possible_covs <- c(
   "country", "country_num", "dose_adjustment", "dose_arm"
 )
 
-run_experiment <- function(N_subject, h0_true, df_beta_true) {
+run_experiment <- function(N_subject, h0_base, effect_sizes) {
   # Simulate data
-  d <- simulate_multitransition_data(
-    N_subject, possible_covs, h0_true, df_beta_true, 2
+  d <- simulate_example_data(N_subject,
+    sys_idx = 2, h0_base = h0_base,
+    effect_sizes = effect_sizes
   )
   pd <- d$pd
   dt <- pd$as_transitions()
@@ -240,24 +241,14 @@ H0 <- c(0.0005)
 res <- length(H0)
 j <- 0
 out <- list()
-df_beta_true0 <- data.frame(
-  cov_name = rep(c("age", "sex", "first_dose_amount"), each = 4),
-  trans_idx = rep(c(1, 2, 3, 4), times = 3),
-  beta_true = rep(0, 3 * 4)
-)
-df_beta_true1 <- df_beta_true0
-df_beta_true1$beta_true[which(df_beta_true1$cov_name == "age")] <- 0.5
-df_beta_true1$beta_true[which(df_beta_true1$cov_name == "sex")] <- 0.5
-print(df_beta_true1)
+e0 <- c(0, 0, 0)
+e1 <- c(0.5, 0.5, 0)
 
 for (baz in H0) {
   j <- j + 1
-  baz <- rep(H0[j], 4)
-  baz[2] <- 2 * baz[2]
-  baz[3] <- 1.5 * baz[3]
-  r0 <- run_experiment(params$N_subject, baz, df_beta_true0)
+  r0 <- run_experiment(params$N_subject, baz, e0)
   p0 <- run_experiment_postproc(r0)
-  r1 <- run_experiment(params$N_subject, baz, df_beta_true1)
+  r1 <- run_experiment(params$N_subject, baz, e1)
   p1 <- run_experiment_postproc(r1)
   out[[j]] <- list(no_effect = p0, true_effect = p1)
 }

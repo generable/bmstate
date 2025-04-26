@@ -4,7 +4,12 @@
 \alias{simulate_example_data}
 \title{Simulate example data}
 \usage{
-simulate_example_data(N = 10, h0_base = 1e-04, sys_idx = 1)
+simulate_example_data(
+  N = 10,
+  h0_base = 1e-04,
+  sys_idx = 1,
+  effect_sizes = c(0.5, 0.5, 0)
+)
 }
 \arguments{
 \item{N}{number of subjects}
@@ -12,6 +17,9 @@ simulate_example_data(N = 10, h0_base = 1e-04, sys_idx = 1)
 \item{h0_base}{base baseline hazard level}
 
 \item{sys_idx}{index of example system}
+
+\item{effect_sizes}{true effect sizes for the three covariates
+(\code{age}, \code{sex}, \code{first_dose_amount})}
 }
 \description{
 Simulate example data
