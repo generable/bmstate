@@ -134,12 +134,18 @@ PathData <- R6::R6Class(
     covariate_names = function() {
       self$covs
     },
-    #' Get path lenghts
+    #' Get path lenghts (among paths that include events)
     lengths = function() {
       self$path_df |>
         filter(is_event == TRUE) |>
         group_by(path_id) |>
         count()
+    },
+    #' Get number of paths
+    n_paths = function() {
+      nrow(self$path_df |>
+        group_by(.data$path_id) |>
+        count())
     },
     #' Get longest path
     longest_path = function() {
@@ -165,9 +171,6 @@ PathData <- R6::R6Class(
       df <- self$as_data_frame(covs, truncate = truncate)
       tt_event <- df |>
         as_time_to_first_event(states = self$get_event_states(), by = covs)
-    },
-    n_paths = function() {
-      nrow(self$link_df)
     },
     print = function() {
       n_path <- self$n_paths()

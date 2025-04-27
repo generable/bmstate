@@ -44,12 +44,12 @@ Initialize}
 \item \href{#method-PathData-new}{\code{PathData$new()}}
 \item \href{#method-PathData-covariate_names}{\code{PathData$covariate_names()}}
 \item \href{#method-PathData-lengths}{\code{PathData$lengths()}}
+\item \href{#method-PathData-n_paths}{\code{PathData$n_paths()}}
 \item \href{#method-PathData-longest_path}{\code{PathData$longest_path()}}
 \item \href{#method-PathData-get_event_states}{\code{PathData$get_event_states()}}
 \item \href{#method-PathData-get_event_state_names}{\code{PathData$get_event_state_names()}}
 \item \href{#method-PathData-as_msdata}{\code{PathData$as_msdata()}}
 \item \href{#method-PathData-as_time_to_first_event}{\code{PathData$as_time_to_first_event()}}
-\item \href{#method-PathData-n_paths}{\code{PathData$n_paths()}}
 \item \href{#method-PathData-print}{\code{PathData$print()}}
 \item \href{#method-PathData-check_valid_state}{\code{PathData$check_valid_state()}}
 \item \href{#method-PathData-check_states}{\code{PathData$check_states()}}
@@ -100,7 +100,8 @@ Initialize}
 
 \item{\code{censor_states}}{Censoring states.
 Get names of covariates
-Get path lenghts
+Get path lenghts (among paths that include events)
+Get number of paths
 Get longest path
 Get indices of event states
 Step plot of the paths}
@@ -125,6 +126,15 @@ Step plot of the paths}
 \subsection{Method \code{lengths()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$lengths()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-n_paths"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-n_paths}{}}}
+\subsection{Method \code{n_paths()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$n_paths()}\if{html}{\out{</div>}}
 }
 
 }
@@ -170,15 +180,6 @@ Step plot of the paths}
 \subsection{Method \code{as_time_to_first_event()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$as_time_to_first_event(covs = c("subject_id"), truncate = FALSE)}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PathData-n_paths"></a>}}
-\if{latex}{\out{\hypertarget{method-PathData-n_paths}{}}}
-\subsection{Method \code{n_paths()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$n_paths()}\if{html}{\out{</div>}}
 }
 
 }

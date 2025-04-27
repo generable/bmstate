@@ -403,6 +403,8 @@ create_stan_data <- function(pd, pk, covariates,
   checkmate::assert_logical(prior_only)
   checkmate::assert_logical(do_pk)
   checkmate::assert_class(pd, "PathData")
+  checkmate::assert_integerish(P, lower = 1, len = 1)
+  checkmate::assert_integerish(NK, lower = 1, len = 1)
   dt <- pd$as_transitions()
 
   dat <- dt$df |> filter(subject_id %in% train_sub)
