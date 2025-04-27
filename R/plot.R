@@ -228,7 +228,10 @@ plot_effects_pk <- function(fit, params) {
 
 # Plot KDE of effect multipliers for each transition
 # df_true must be a data frame with columns trans_idx and beta_true
-plot_effect_beta <- function(a, beta_name, legend, all_states, df_true = NULL) {
+plot_effect_beta <- function(a, beta_name, pd, df_true = NULL) {
+  dt <- pd$as_transitions()
+  legend <- dt$legend
+  all_states <- pd$state_names
   type_names <- .create_types(all_states)
   trans_names <- legend$trans_char
   trans_types <- legend$trans_type
@@ -467,9 +470,17 @@ plot_cor <- function(sd, x, y, name_x, name_y) {
   p
 }
 
-# Other
-# df_beta_true must be a data frame with columns trans_idx, cov_name, and beta_true
-plot_other_beta <- function(fit, stan_dat, dt, df_beta_true = NULL) {
+#' Plot coefficients for other covariates
+#'
+#' @export
+#' @param fit fit object
+#' @param stan_dat stan data list
+#' @param pd A \code{\link{PathData}} object.
+#' @param df_beta_true must be a data frame with columns \code{trans_idx},
+#' \code{cov_name} and \code{beta_true}
+plot_other_beta <- function(fit, stan_dat, pd,
+                            df_beta_true = NULL) {
+  checkmate::assert_class(pd, "PathData")
   names <- stan_dat$x_oth_names
   a <- fit |> tidybayes::spread_draws(beta_oth[cov_idx, trans_idx])
   a$cov_name <- as.factor(names[a$cov_idx])
@@ -482,7 +493,7 @@ plot_other_beta <- function(fit, stan_dat, dt, df_beta_true = NULL) {
       df_true <- NULL
     }
     plt_oth[[j]] <- plot_effect_beta(
-      a_nam, "beta_oth", dt$legend, all_states, df_true
+      a_nam, "beta_oth", pd, df_true
     ) + ggtitle(names[j]) + xlab(expression(beta))
   }
   plt_oth

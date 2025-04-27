@@ -2,16 +2,18 @@
 % Please edit documentation in R/sim.R
 \name{do_split}
 \alias{do_split}
-\title{Train-test split for a transitions data frame}
+\title{Train-test split}
 \usage{
-do_split(dt)
+do_split(pd, p_test = 0.25)
 }
 \arguments{
-\item{dt}{A transitions data frame}
+\item{pd}{A \code{\link{PathData}} object}
+
+\item{p_test}{Proportion of test subjects}
 }
 \value{
 a list with test and train subject indices
 }
 \description{
-Train-test split for a transitions data frame
+Train-test split
 }

@@ -263,15 +263,18 @@ compute_true_hazard_mult <- function(sex, age, fda, df_beta_true) {
 }
 
 
-#' Train-test split for a transitions data frame
+#' Train-test split
 #'
 #' @export
-#' @param dt A transitions data frame
+#' @param pd A \code{\link{PathData}} object
+#' @param p_test Proportion of test subjects
 #' @return a list with test and train subject indices
-do_split <- function(dt) {
-  all_sub <- unique(dt$df$subject_id)
+do_split <- function(pd, p_test = 0.25) {
+  checkmate::assert_class(pd, "PathData")
+  checkmate::assert_number(p_test, lower = 0, upper = 1)
+  all_sub <- unique(as.numeric(pd$subject_df$subject_index))
   N_sub <- length(all_sub)
-  i_test <- sample.int(N_sub, round(N_sub / 4))
+  i_test <- sample.int(N_sub, round(N_sub * p_test))
   test_sub <- all_sub[i_test]
   train_sub <- setdiff(all_sub, test_sub)
   list(

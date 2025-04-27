@@ -34,6 +34,7 @@
 #' @name bmstate-package
 #' @aliases bmstate
 #' @import ggplot2 tibble
+#' @importFrom ggpubr ggarrange get_legend annotate_figure
 #' @importFrom R6 R6Class
 #' @importFrom posterior as_draws_rvars
 #' @importFrom dplyr filter mutate transmute group_by select slice count

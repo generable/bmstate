@@ -42,6 +42,7 @@ Imports:
     splines2,
     stringr,
     survival,
+    tibble,
     tidybayes,
     tidyr
 RoxygenNote: 7.3.2

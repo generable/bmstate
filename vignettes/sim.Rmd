@@ -75,8 +75,7 @@ run_experiment <- function(N_subject, h0_base, effect_sizes) {
   )
   possible_covs <- d$covs
   pd <- d$pd
-  dt <- pd$as_transitions()
-  split <- do_split(dt)
+  split <- do_split(pd)
 
   # Stan data
   stan_dat <- create_stan_data(
@@ -113,6 +112,7 @@ run_experiment <- function(N_subject, h0_base, effect_sizes) {
   sub_ids_char_test <- pd$subject_df |> filter(subject_id %in% split$test_sub)
 
   # Paths from 0 to 3 years starting from Randomization
+  dt <- pd$as_transitions()
   paths_3yr <- generate_paths_many_subjects(gq, sd, possible_covs,
     TFI, init_state, t_start, t_max_gen,
     state_names = pd$state_names,
@@ -136,7 +136,7 @@ run_experiment <- function(N_subject, h0_base, effect_sizes) {
   m_sub <- d$m_sub
   df_beta_true <- d$df_beta_true
   out <- dplyr::lst(
-    fit, stan_dat, pd, dt, paths_3yr, paths_3yr_oos,
+    fit, stan_dat, pd, paths_3yr, paths_3yr_oos,
     sub_first_rows, sub_first_rows_test, N_subject, df_beta_true,
     h0_true_all, m_sub, split
   )
@@ -146,20 +146,22 @@ run_experiment <- function(N_subject, h0_base, effect_sizes) {
 run_experiment_postproc <- function(res) {
   # Study the covariate effects and baseline hazard
   sd <- res$stan_dat$stan_data
+  all_states <- res$pd$state_names
+  dt <- res$pd$as_transitions()
   plt_oth <- NULL
   if (sd$N_oth > 0) {
-    plt_oth <- plot_other_beta(res$fit, res$stan_dat, res$dt, res$df_beta_true)
+    plt_oth <- plot_other_beta(res$fit, res$stan_dat, all_states, res$df_beta_true)
     ff <- function(x) {
       x + theme(axis.text.y = element_text(angle = 90, hjust = 0.5))
     }
     plt_oth <- lapply(plt_oth, ff)
   }
-  df_h0 <- as.tibble(data.frame(
+  df_h0 <- tibble::as_tibble(data.frame(
     transition = c(1, 2, 3, 4),
     log_h0_true = log(res$h0_true_all)
   ))
   ttl <- paste0("time = ", round(res$fit$time()$total, 3))
-  plt_h0 <- plot_h0(res$fit, sd, res$dt$legend, all_states, df_h0) +
+  plt_h0 <- plot_h0(res$fit, sd, dt$legend, all_states, df_h0) +
     xlab("Time (days)") + theme(legend.position = "none") +
     ggtitle(ttl)
   list_beta <- c(plt_oth)
