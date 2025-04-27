@@ -2,11 +2,11 @@
 #'
 #' @export
 #' @param N number of subjects
-#' @param h0_base base baseline hazard level
 #' @param sys_idx index of example system
+#' @param h0_base base baseline hazard level
 #' @param effect_sizes true effect sizes for the three covariates
 #' (\code{age}, \code{sex}, \code{first_dose_amount})
-simulate_example_data <- function(N = 10, h0_base = 1e-4, sys_idx = 1,
+simulate_example_data <- function(N = 10, sys_idx = 1, h0_base = 1e-4,
                                   effect_sizes = c(0.5, 0.5, 0)) {
   possible_covs <- c(
     "sex", "age", "first_dose_amount", "pk_pre_dose", "pk_post_dose",
@@ -56,7 +56,9 @@ simulate_multitransition_data <- function(
     log_hazard_mult <- rep(0, n_trans)
     for (h in 1:n_trans) {
       df_beta_true_h <- df_beta_true |> filter(trans_idx == h)
-      log_hazard_mult[h] <- compute_true_hazard_mult(sex, age, fda, df_beta_true_h)
+      log_hazard_mult[h] <- compute_true_hazard_mult(
+        sex, age, fda, df_beta_true_h
+      )
     }
     m_sub[n, ] <- exp(log_hazard_mult)
     sp <- simulate_path(h0_true, log_hazard_mult, n, sys_idx)
@@ -94,7 +96,9 @@ simulate_multitransition_data <- function(
   list(
     pd = create_sim_pathdata(df, term_state, state_names, covs),
     h0 = sp$conf$h0_all,
-    m_sub = m_sub
+    m_sub = m_sub,
+    covs = covs,
+    df_beta_true = df_beta_true
   )
 }
 
@@ -198,7 +202,7 @@ example_6state <- function(t_h0, h0_true, log_hazard_mult) {
 
 
 # Simulate a 3-year path for a single subject
-simulate_path <- function(h0_true, log_hazard_mult, subject_idx, sys_idx = 0) {
+simulate_path <- function(h0_true, log_hazard_mult, subject_idx, sys_idx = 1) {
   init_state <- 1
   t_sub <- 0
   t_start <- 0

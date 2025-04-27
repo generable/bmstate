@@ -73,6 +73,7 @@ run_experiment <- function(N_subject, h0_base, effect_sizes) {
     sys_idx = 2, h0_base = h0_base,
     effect_sizes = effect_sizes
   )
+  possible_covs <- d$covs
   pd <- d$pd
   dt <- pd$as_transitions()
   split <- do_split(dt)
@@ -133,6 +134,7 @@ run_experiment <- function(N_subject, h0_base, effect_sizes) {
   )
   h0_true_all <- d$h0
   m_sub <- d$m_sub
+  df_beta_true <- d$df_beta_true
   out <- dplyr::lst(
     fit, stan_dat, pd, dt, paths_3yr, paths_3yr_oos,
     sub_first_rows, sub_first_rows_test, N_subject, df_beta_true,
