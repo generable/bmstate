@@ -24,8 +24,11 @@
 #'  - \code{\link{legend_to_PT_matrix}}
 #'  - \code{\link{legend_to_TFI_matrix}}
 #'  - \code{\link{plot_cumhaz_msfit}}
+#'  - \code{\link{plot_p_event}}
+#'  - \code{\link{plot_p_event_by_dose}}
 #'  - \code{\link{simulate_example_data}}
 #'  - \code{\link{subject_df_with_idx}}
+#'  - \code{\link{summarize_ppsurv}}
 #' }
 #'
 #' @name bmstate-package
