@@ -46,7 +46,7 @@
 #' @importFrom dplyr summarize summarise arrange first last rename
 #' @importFrom dplyr inner_join semi_join left_join anti_join join_by
 #' @importFrom dplyr distinct ungroup dense_rank if_else bind_rows
-#' @importFrom dplyr count add_count pull
+#' @importFrom dplyr count add_count pull lead
 #' @importFrom purrr map
 #' @importFrom stringr str_extract str_detect str_wrap str_c
 #' @importFrom survival strata

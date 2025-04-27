@@ -200,7 +200,7 @@ run_experiment_postproc <- function(res) {
 
   # Concordance index
   ci_eval <- create_cindex_plot(
-    res$pd, all_states, res$paths_3yr, res$paths_3yr_oos,
+    res$pd, res$paths_3yr, res$paths_3yr_oos,
     train_sub, test_sub,
     ppsurv_subj, ppsurv_subj_oos
   )

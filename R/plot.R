@@ -727,10 +727,10 @@ create_cindex_plot <- function(pd, paths_gen, paths_gen_oos,
     state_idx <- j + 1
     km_fits[[j]] <- km_fit(pd, state_idx, sub_ids_train)
     ci_is[[j]] <- c_index(
-      pd, paths_3yr, state_idx, km_fits[[j]], sub_ids_train, t_eval
+      pd, paths_gen, state_idx, km_fits[[j]], sub_ids_train, t_eval
     )
     ci_oos[[j]] <- c_index(
-      pd, paths_3yr_oos, state_idx, km_fits[[j]], sub_ids_test, t_eval
+      pd, paths_gen_oos, state_idx, km_fits[[j]], sub_ids_test, t_eval
     )
     ci_is_table <- rbind(ci_is_table, ci_is[[j]]$table)
     ci_oos_table <- rbind(ci_oos_table, ci_oos[[j]]$table)
@@ -741,7 +741,7 @@ create_cindex_plot <- function(pd, paths_gen, paths_gen_oos,
   # Implementation 2
   ci_is2 <- compute_scores(
     pd,
-    ppsurv = ppsurv_subj |> filter(time == 365.25 * 3),
+    ppsurv = ppsurv_subj |> filter(time == t_eval),
     km_formula = ~dose_arm,
     which = "cindex",
     keep_gt_info = FALSE
@@ -749,7 +749,7 @@ create_cindex_plot <- function(pd, paths_gen, paths_gen_oos,
 
   ci_oos2 <- compute_scores(
     pd,
-    ppsurv = ppsurv_subj_oos |> filter(time == 365.25 * 3),
+    ppsurv = ppsurv_subj_oos |> filter(time == t_eval),
     sub_ids_char_training = sub_ids_train,
     km_formula = ~dose_arm,
     which = "cindex",
