@@ -18,6 +18,7 @@ knitr::opts_chunk$set(
 library(ggplot2)
 library(ggpubr)
 library(bmstate)
+library(gridExtra)
 ```
 
 
@@ -214,7 +215,7 @@ run_experiment_postproc <- function(res) {
   )
   grDevices::pdf(fn, onefile = TRUE)
   for (i in seq(length(p))) {
-    do.call("gridExtra::grid.arrange", p[i])
+    do.call("grid.arrange", p[i])
   }
   grDevices::dev.off()
 
