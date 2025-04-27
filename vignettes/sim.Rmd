@@ -100,6 +100,7 @@ run_experiment <- function(N_subject, h0_base, effect_sizes) {
 
   # Path prediction
   gq <- mod$generate_quantities(fit, data = sd)
+  dt <- pd$as_transitions()
   TFI <- legend_to_TFI_matrix(dt$legend)
   t_max_gen <- 3 * 365.25 # 3 yr
   t_start <- 0
@@ -112,7 +113,6 @@ run_experiment <- function(N_subject, h0_base, effect_sizes) {
   sub_ids_char_test <- pd$subject_df |> filter(subject_id %in% split$test_sub)
 
   # Paths from 0 to 3 years starting from Randomization
-  dt <- pd$as_transitions()
   paths_3yr <- generate_paths_many_subjects(gq, sd, possible_covs,
     TFI, init_state, t_start, t_max_gen,
     state_names = pd$state_names,
@@ -150,7 +150,7 @@ run_experiment_postproc <- function(res) {
   dt <- res$pd$as_transitions()
   plt_oth <- NULL
   if (sd$N_oth > 0) {
-    plt_oth <- plot_other_beta(res$fit, res$stan_dat, all_states, res$df_beta_true)
+    plt_oth <- plot_other_beta(res$fit, res$stan_dat, res$pd, res$df_beta_true)
     ff <- function(x) {
       x + theme(axis.text.y = element_text(angle = 90, hjust = 0.5))
     }
@@ -161,7 +161,7 @@ run_experiment_postproc <- function(res) {
     log_h0_true = log(res$h0_true_all)
   ))
   ttl <- paste0("time = ", round(res$fit$time()$total, 3))
-  plt_h0 <- plot_h0(res$fit, sd, dt$legend, all_states, df_h0) +
+  plt_h0 <- plot_h0(res$fit, sd, res$pd, df_h0) +
     xlab("Time (days)") + theme(legend.position = "none") +
     ggtitle(ttl)
   list_beta <- c(plt_oth)
@@ -208,16 +208,15 @@ run_experiment_postproc <- function(res) {
 
   # Saving plots to pdf
   p <- list(plt_beta, plt_freq, plt_brier_all, plt_ci_all, plt_h0)
-  library(gridExtra)
   fn <- paste0(
     "sim-multi-", res$N_subject, "-", res$h0_true_all, "-",
     paste0(res$df_beta_true$beta_true, collapse = "_"), ".pdf"
   )
-  pdf(fn, onefile = TRUE)
+  grDevices::pdf(fn, onefile = TRUE)
   for (i in seq(length(p))) {
-    do.call("grid.arrange", p[i])
+    do.call("gridExtra::grid.arrange", p[i])
   }
-  dev.off()
+  grDevices::dev.off()
 
   # Return
   list(

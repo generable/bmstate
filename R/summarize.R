@@ -12,7 +12,6 @@ p_event <- function(paths_df, state_names = NULL) {
   df <- df |> filter(state != 0)
   df <- df_empty |> left_join(df, by = join_by(state))
   df$p_paths[is.na(df$p_paths)] <- 0
-  df
   df |> filter(!(state_char %in% nonevent_states))
 }
 

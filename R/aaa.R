@@ -40,9 +40,9 @@
 #' @importFrom dplyr filter mutate transmute group_by select slice count
 #' @importFrom dplyr summarize summarise arrange first last rename
 #' @importFrom dplyr inner_join semi_join left_join join_by
-#' @importFrom dplyr distinct ungroup dense_rank
+#' @importFrom dplyr distinct ungroup dense_rank if_else
 #' @importFrom purrr map
-#' @importFrom stringr str_extract str_detect
+#' @importFrom stringr str_extract str_detect str_wrap str_c
 #' @importFrom survival strata
 #' @importFrom rlang .data
 #'

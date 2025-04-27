@@ -268,6 +268,8 @@ generate_paths <- function(TFI, init_state, t_start, t_max,
 #' @param use_future use the \code{future} package?
 #' @param use_precomp use precomputation?
 #' @param tol multiplier for upper bound of hazard
+#' @return TODO: this function could be written more compactly
+#' with less arguments
 generate_paths_many_subjects <- function(fit, sd, covs,
                                          TFI, init_state, t_start, t_max_gen,
                                          state_names,

@@ -11,7 +11,7 @@ plot_other_beta(fit, stan_dat, pd, df_beta_true = NULL)
 
 \item{stan_dat}{stan data list}
 
-\item{pd}{A \code{\link{PathData}} object.}
+\item{pd}{A \code{\link{PathData}} object used to create the Stan data.}
 
 \item{df_beta_true}{must be a data frame with columns \code{trans_idx},
 \code{cov_name} and \code{beta_true}}

@@ -59,9 +59,15 @@ plot_bf <- function(sd) {
     ggtitle("Basis functions")
 }
 
-# Plot log baseline hazard
-plot_h0 <- function(fit, sd, legend, all_states, log_h0_true = NULL) {
+#' Plot log baseline hazard
+#'
+#' @inheritParams plot_other_beta
+#' @param log_h0_true true baseline hazards
+#' @param sd Stan data list
+plot_h0 <- function(fit, sd, pd, log_h0_true = NULL) {
   df <- fit |> tidybayes::spread_draws(log_h0[transition, time_idx])
+  dt <- pd$as_transitions()
+  all_states <- pd$state_names
   if (!is.null(log_h0_true)) {
     df <- df |> left_join(log_h0_true, by = "transition")
   }
@@ -475,7 +481,7 @@ plot_cor <- function(sd, x, y, name_x, name_y) {
 #' @export
 #' @param fit fit object
 #' @param stan_dat stan data list
-#' @param pd A \code{\link{PathData}} object.
+#' @param pd A \code{\link{PathData}} object used to create the Stan data.
 #' @param df_beta_true must be a data frame with columns \code{trans_idx},
 #' \code{cov_name} and \code{beta_true}
 plot_other_beta <- function(fit, stan_dat, pd,
@@ -647,8 +653,14 @@ plot_inst_haz_longest_path <- function(fit, sd, paths, id_map, oos, tr_names) {
   plot_inst_haz_subject(fit, sd, sub_idx, draw_idx, oos, tr_names)
 }
 
-# Plot BS
+#' Plot Brier scores
+#'
+#' @export
+#' @param ppsurv_subj \code{ppsurv} object
+#' @param pd \code{\link{PathData}} object
+#' @param sub_ids_char_training training subject ids (character)
 create_brier_score_plot <- function(ppsurv_subj, pd, sub_ids_char_training) {
+  checkmate::assert_class(pd, "PathData")
   sub_ids_char_test <- unique(ppsurv_subj$subject_id)
   scores <- compute_scores(
     pd,
@@ -676,7 +688,7 @@ create_brier_score_plot <- function(ppsurv_subj, pd, sub_ids_char_training) {
     bind_rows(km_scores_vs_dose |> mutate(method = "km per dose")) |>
     mutate(
       Event = factor(str_wrap(pd$state_names[state], width = 10, whitespace_only = T)),
-      Event = fct_reorder(Event, state)
+      Event = forcats::fct_reorder(Event, state)
     ) |>
     ggplot(aes(
       x = time / 365.25, y = brier_score,
@@ -689,10 +701,19 @@ create_brier_score_plot <- function(ppsurv_subj, pd, sub_ids_char_training) {
     scale_x_continuous("Study Time (years)")
 }
 
-# Concordance index
-create_cindex_plot <- function(pd, all_states, paths_3yr, paths_3yr_oos,
+#' Plot concordance indices
+#'
+#' @export
+#' @param ppsurv_subj \code{ppsurv} object
+#' @param ppsurv_subj_oos \code{ppsurv} object (out-of-sample)
+#' @param sub_ids_train training subject ids
+#' @param sub_ids_test test subject ids
+#' @inheritParams plot_p_event
+create_cindex_plot <- function(pd, paths_gen, paths_gen_oos,
                                sub_ids_train, sub_ids_test,
                                ppsurv_subj, ppsurv_subj_oos) {
+  all_states <- pd$state_names
+
   # Implementation 1
   ci_is <- list()
   ci_oos <- list()

@@ -62,6 +62,10 @@ generate_paths_many_subjects(
 
 \item{tol}{multiplier for upper bound of hazard}
 }
+\value{
+TODO: this function could be written more compactly
+with less arguments
+}
 \description{
 Generate all paths for some subjects
 }
