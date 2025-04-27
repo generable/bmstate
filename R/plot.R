@@ -212,7 +212,7 @@ plot_effect_beta_pk <- function(a, beta_name, group_by) {
     fill = !!sym(group_by), y = !!sym(group_by)
   )) +
     geom_vline(xintercept = 0, lty = 3) +
-    stat_dist_halfeye(alpha = 0.4) +
+    stat_halfeye(alpha = 0.4) +
     theme(legend.position = "none")
 }
 
