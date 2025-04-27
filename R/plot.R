@@ -71,7 +71,9 @@ plot_h0 <- function(fit, sd, pd, log_h0_true = NULL) {
   if (!is.null(log_h0_true)) {
     df <- df |> left_join(log_h0_true, by = "transition")
   }
-  plt <- plot_fun_per_transition(df, sd, legend, "log_h0", "t_pred", all_states) +
+  plt <- plot_fun_per_transition(
+    df, sd, dt$legend, "log_h0", "t_pred", all_states
+  ) +
     ggtitle("Log baseline hazard") + theme(strip.text = element_text(
       size = 5
     ), legend.position = "none")

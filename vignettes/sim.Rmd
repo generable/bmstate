@@ -157,7 +157,7 @@ run_experiment_postproc <- function(res) {
     plt_oth <- lapply(plt_oth, ff)
   }
   df_h0 <- tibble::as_tibble(data.frame(
-    transition = c(1, 2, 3, 4),
+    transition = seq_len(length(res$h0_true_all)),
     log_h0_true = log(res$h0_true_all)
   ))
   ttl <- paste0("time = ", round(res$fit$time()$total, 3))
