@@ -627,15 +627,18 @@ compute_scores <- function(pd, pred_pd = NULL,
   # expected survival probability according to K-M estimate
   km_prediction <- observed$p_event_per_subject |>
     group_by(state, time) |>
-    nest(predicted = c(subject_id, p_event_free)) |>
+    tidyr::nest(predicted = c(subject_id, p_event_free)) |>
     ungroup() |>
     mutate(
-      p_event_free = map(predicted, ~ dplyr::arrange(.x, subject_id) |> pull(p_event_free)),
+      p_event_free = map(predicted, ~ dplyr::arrange(.x, subject_id) |>
+        pull(p_event_free)),
     ) |>
     select(-predicted)
 
   # fix a rare but important edge case, if each lengths aren't the same
-  equal_lengths <- (km_prediction |> mutate(n_p = map_int(p_event_free, length)) |> distinct(n_p) |> nrow() == 1)
+  equal_lengths <- (km_prediction |>
+    mutate(n_p = map_int(p_event_free, length)) |>
+    distinct(n_p) |> nrow() == 1)
   if (isFALSE(equal_lengths)) {
     km_prediction <- observed$p_event_per_subject |>
       tidyr::expand(subject_id, time, state) |>
@@ -646,7 +649,7 @@ compute_scores <- function(pd, pred_pd = NULL,
       ) |>
       mutate(p_event_free = if_else(is.na(p_event_free), 0, p_event_free)) |>
       group_by(state, time) |>
-      nest(predicted = c(subject_id, p_event_free)) |>
+      tidyr::nest(predicted = c(subject_id, p_event_free)) |>
       ungroup() |>
       mutate(
         p_event_free = map(predicted, ~ dplyr::arrange(.x, subject_id) |> pull(p_event_free)),
@@ -710,7 +713,7 @@ compute_scores <- function(pd, pred_pd = NULL,
         by = join_by(time, state, subject_id, !!!by_syms)
       ) |>
       mutate(p_event_free = if_else(is.na(p_event_free), 0, p_event_free)) |>
-      nest(predicted = c(subject_id, p_event_free)) |>
+      tidyr::nest(predicted = c(subject_id, p_event_free)) |>
       mutate(
         predicted = map(predicted, arrange, subject_id),
         p_event_free = map(predicted, pull, p_event_free)
