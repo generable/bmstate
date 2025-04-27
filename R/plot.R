@@ -556,7 +556,7 @@ plot_p_event_by_dose <- function(pd, paths_gen, paths_gen_oos, names,
       p_paths = 1 - surv,
       state_char = pd$state_names[state]
     )
-  pe_pred <- summarize_ppsurv(paths_3yr,
+  pe_pred <- summarize_ppsurv(paths_gen,
     by = c("first_dose_amount"),
     target_times = t_max
   ) |>
@@ -564,7 +564,7 @@ plot_p_event_by_dose <- function(pd, paths_gen, paths_gen_oos, names,
       p_paths = 1 - surv,
       state_char = pd$state_names[state]
     )
-  pe_oos <- summarize_ppsurv(paths_3yr_oos,
+  pe_oos <- summarize_ppsurv(paths_gen_oos,
     by = c("first_dose_amount"),
     target_times = t_max
   ) |>
