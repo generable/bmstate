@@ -61,7 +61,7 @@ plot_bf <- function(sd) {
 
 # Plot log baseline hazard
 plot_h0 <- function(fit, sd, legend, all_states, log_h0_true = NULL) {
-  df <- fit |> spread_draws(log_h0[transition, time_idx])
+  df <- fit |> tidybayes::spread_draws(log_h0[transition, time_idx])
   if (!is.null(log_h0_true)) {
     df <- df |> left_join(log_h0_true, by = "transition")
   }
@@ -80,7 +80,7 @@ plot_h0 <- function(fit, sd, legend, all_states, log_h0_true = NULL) {
 # Plot age_effect
 plot_age_effect <- function(fit, sd, legend, all_states, filter_transitions = NULL,
                             filter_types = NULL) {
-  df <- fit |> spread_draws(age_effect[flag, transition, time_idx])
+  df <- fit |> tidybayes::spread_draws(age_effect[flag, transition, time_idx])
   plot_fun_per_transition(df, sd, legend, "age_effect", "x_age_pred",
     all_states = all_states,
     filter_transitions = filter_transitions, filter_types = filter_types
@@ -211,13 +211,13 @@ plot_effect_beta_pk <- function(a, beta_name, group_by) {
 }
 
 plot_effects_pk <- function(fit, params) {
-  a <- fit |> spread_draws(beta_ka[flag, var])
+  a <- fit |> tidybayes::spread_draws(beta_ka[flag, var])
   a$cov <- params$ka_covariates[a$var]
   p1 <- plot_effect_beta_pk(a, "beta_ka", "cov")
-  a <- fit |> spread_draws(beta_CL[flag, var])
+  a <- fit |> tidybayes::spread_draws(beta_CL[flag, var])
   a$cov <- params$CL_covariates[a$var]
   p2 <- plot_effect_beta_pk(a, "beta_CL", "cov")
-  a <- fit |> spread_draws(beta_V2[flag, var])
+  a <- fit |> tidybayes::spread_draws(beta_V2[flag, var])
   a$cov <- params$V2_covariates[a$var]
   p3 <- plot_effect_beta_pk(a, "beta_V2", "cov")
 
@@ -471,7 +471,7 @@ plot_cor <- function(sd, x, y, name_x, name_y) {
 # df_beta_true must be a data frame with columns trans_idx, cov_name, and beta_true
 plot_other_beta <- function(fit, stan_dat, dt, df_beta_true = NULL) {
   names <- stan_dat$x_oth_names
-  a <- fit |> spread_draws(beta_oth[cov_idx, trans_idx])
+  a <- fit |> tidybayes::spread_draws(beta_oth[cov_idx, trans_idx])
   a$cov_name <- as.factor(names[a$cov_idx])
   plt_oth <- NULL
   for (j in seq_len(stan_dat$stan_data$N_oth)) {
