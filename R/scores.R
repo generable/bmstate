@@ -1,6 +1,3 @@
-library(survival)
-library(SurvMetrics)
-
 .form_rhs_syms <- function(formula) {
   # confirm that formula contains no response variables
   if (attr(terms(formula), "response") == 1) {
@@ -267,7 +264,7 @@ summarize_ppsurv <- function(pd, target_times, by = "subject_id",
     mutate(grp = dense_rank(str_c(!!!split_syms, state))) |>
     select(time, is_event, state, grp, !!!split_syms, !!!by_syms) |>
     group_by(state, grp, !!!split_syms) |>
-    nest(data = c(time, is_event, !!!by_syms)) |>
+    tidyr::nest(data = c(time, is_event, !!!by_syms)) |>
     ungroup()
 
   res_data$data |>

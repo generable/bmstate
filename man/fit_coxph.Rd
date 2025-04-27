@@ -10,8 +10,11 @@ fit_coxph(msdat, formula_rhs = NULL)
 \item{msdat}{\code{msdata} object}
 
 \item{formula_rhs}{Formula right hand side that is appended to
-\code{Surv(Tstart, Tstop, status) ~ }. If \code{NULL} (default), then
+\code{survival::Surv(Tstart, Tstop, status) ~ }. If \code{NULL} (default), then
 \code{strata(trans)} is used}
+}
+\value{
+value returned by \code{survival::coxph}
 }
 \description{
 Fit Cox PH model using Breslow method

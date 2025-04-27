@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r libs}
 library(ggplot2)
 library(ggpubr)
 library(bmstate)
@@ -30,7 +30,7 @@ on a multistate model with several transitions.
 ```{r setup, message=FALSE, warning=FALSE}
 options(future.globals.maxSize = 4 * 10^9)
 
-params <- list(
+options <- list(
   N_subject = 200,
   covariates = c("sex", "first_dose_amount", "age"),
   iter_warmup = 600,
@@ -44,7 +44,7 @@ params <- list(
   mixp = FALSE
 )
 
-NP <- params$iter_sampling # number of paths to sample per sub when gen paths
+NP <- options$iter_sampling # number of paths to sample per sub when gen paths
 NR <- 2
 
 theme_set(theme_bw() +
@@ -79,20 +79,20 @@ run_experiment <- function(N_subject, h0_base, effect_sizes) {
 
   # Stan data
   stan_dat <- create_stan_data(
-    pd, NULL, params$covariates, "age", "age", "age",
+    pd, NULL, options$covariates, "age", "age", "age",
     split$train_sub, split$test_sub,
-    P = 100, NK = params$NK,
+    P = 100, NK = options$NK,
     do_pk = FALSE,
-    prior_only = params$prior_only
+    prior_only = options$prior_only
   )
   sd <- stan_dat$stan_data
 
   # Fit the model
   fit <- mod$sample(
     data = sd,
-    iter_warmup = params$iter_warmup,
-    iter_sampling = params$iter_sampling,
-    chains = params$chains,
+    iter_warmup = options$iter_warmup,
+    iter_sampling = options$iter_sampling,
+    chains = options$chains,
     refresh = 500,
     adapt_delta = 0.95,
     init = 0.1
@@ -241,9 +241,9 @@ e1 <- c(0.5, 0.5, 0)
 
 for (baz in H0) {
   j <- j + 1
-  r0 <- run_experiment(params$N_subject, baz, e0)
+  r0 <- run_experiment(options$N_subject, baz, e0)
   p0 <- run_experiment_postproc(r0)
-  r1 <- run_experiment(params$N_subject, baz, e1)
+  r1 <- run_experiment(options$N_subject, baz, e1)
   p1 <- run_experiment_postproc(r1)
   out[[j]] <- list(no_effect = p0, true_effect = p1)
 }
