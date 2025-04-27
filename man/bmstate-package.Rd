@@ -13,21 +13,24 @@ Bayesian multistate modeling using 'Stan'.
 See the vignettes and the following exported functions and classes
 
 \itemize{
- - \code{\link{PathData}}
- - \code{\link{create_stan_data}}
- - \code{\link{create_stan_model}}
- - \code{\link{do_split}}
- - \code{\link{fit_coxph}}
- - \code{\link{fit_mstate}}
- - \code{\link{generate_paths_many_subjects}}
- - \code{\link{legend_to_PT_matrix}}
- - \code{\link{legend_to_TFI_matrix}}
- - \code{\link{plot_cumhaz_msfit}}
- - \code{\link{plot_p_event}}
- - \code{\link{plot_p_event_by_dose}}
- - \code{\link{simulate_example_data}}
- - \code{\link{subject_df_with_idx}}
- - \code{\link{summarize_ppsurv}}
+ \item \code{\link{PathData}}
+ \item \code{\link{create_brier_score_plot}}
+ \item \code{\link{create_cindex_plot}}
+ \item \code{\link{create_stan_data}}
+ \item \code{\link{create_stan_model}}
+ \item \code{\link{do_split}}
+ \item \code{\link{fit_coxph}}
+ \item \code{\link{fit_mstate}}
+ \item \code{\link{generate_paths_many_subjects}}
+ \item \code{\link{legend_to_PT_matrix}}
+ \item \code{\link{legend_to_TFI_matrix}}
+ \item \code{\link{plot_cumhaz_msfit}}
+ \item \code{\link{plot_other_beta}}
+ \item \code{\link{plot_p_event}}
+ \item \code{\link{plot_p_event_by_dose}}
+ \item \code{\link{simulate_example_data}}
+ \item \code{\link{subject_df_with_idx}}
+ \item \code{\link{summarize_ppsurv}}
 }
 }
 

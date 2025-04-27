@@ -16,5 +16,5 @@ L <- length(funs)
 for (i in seq_len(L)) {
   line <- funs[i]
   f <- substr(line, 8, nchar(line) - 1)
-  cat("#'  - \\code{\\link{", f, "}} \n", sep = "")
+  cat("#'  \\item \\code{\\link{", f, "}} \n", sep = "")
 }
