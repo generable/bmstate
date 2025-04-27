@@ -327,6 +327,7 @@ out$high$true_effect$plt_c
 
 ```{r, fig.width=7, fig.height=4}
 hazard_mult_recovery <- function(res) {
+  dt <- res$pd$as_transitions()
   id_map <- res$stan_dat$id_map_train
   idx_train <- id_map$x_sub
   m_sub <- log(res$m_sub[res$split$train_sub, ])
@@ -343,7 +344,7 @@ hazard_mult_recovery <- function(res) {
   df <- data.frame(subject_id, m_sub, m_sub_mean, trans_idx)
   colnames(df) <- c("subject_id", "log_m", "log_m_mean", "transition")
   df <- as_tibble(df |> left_join(res$pd$subject_df, by = "subject_id"))
-  df <- df |> left_join(res$dt$legend, by = "transition")
+  df <- df |> left_join(dt$legend, by = "transition")
   df$sex <- as.factor(df$sex)
   df$first_dose_amount <- as.factor(df$first_dose_amount)
   df

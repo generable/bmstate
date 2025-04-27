@@ -22,6 +22,8 @@ See the vignettes and the following exported functions and classes
  \item \code{\link{fit_coxph}}
  \item \code{\link{fit_mstate}}
  \item \code{\link{generate_paths_many_subjects}}
+ \item \code{\link{get_and_format_log_C_haz_draws}}
+ \item \code{\link{get_and_format_log_h0_draws}}
  \item \code{\link{legend_to_PT_matrix}}
  \item \code{\link{legend_to_TFI_matrix}}
  \item \code{\link{plot_cumhaz_msfit}}

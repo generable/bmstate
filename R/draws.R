@@ -3,7 +3,11 @@ rv <- function(fit, name) {
   posterior::as_draws_rvars(fit$draws(name))[[name]]
 }
 
-# Used for path pred
+#' Extract log baseline hazard draws
+#'
+#' @export
+#' @param fit fit object
+#' @return an array with \code{dim = c(n_draws, n_hazards, n_pred)}
 get_and_format_log_h0_draws <- function(fit) {
   h0 <- posterior::merge_chains(rv(fit, "log_h0")) # shape c(N_trans, N_pred)
   H <- dim(h0)[1]
@@ -19,7 +23,12 @@ get_and_format_log_h0_draws <- function(fit) {
   out
 }
 
-# Used for path pred
+#' Extract log hazard multiplier draws
+#'
+#' @export
+#' @param fit fit object
+#' @param oos for out-of-sample subjects?
+#' @return an array with \code{dim = c(n_draws, n_hazards, n_obs)}
 get_and_format_log_C_haz_draws <- function(fit, oos) {
   vn <- "log_C_haz"
   if (oos) {
