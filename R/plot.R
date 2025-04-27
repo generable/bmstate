@@ -488,10 +488,19 @@ plot_other_beta <- function(fit, stan_dat, dt, df_beta_true = NULL) {
   plt_oth
 }
 
-plot_p_event <- function(pd, paths_3yr, paths_3yr_oos, names) {
+#' Plot event rates over all subjects
+#'
+#' @export
+#' @param pd A \code{\link{PathData}} object of observed data
+#' @param paths_gen A \code{\link{PathData}} object of generated paths
+#' (in-sample)
+#' @param paths_gen_oos A \code{\link{PathData}} object of generated paths
+#' (out-of-sample)
+#' @param names names of the three former objects
+plot_p_event <- function(pd, paths_gen, paths_gen_oos, names) {
   df1 <- p_event(pd$path_df, pd$state_names) # Observed
-  df2 <- p_event(paths_3yr$path_df, paths_3yr$state_names) # Pred. 3 yr
-  df3 <- p_event(paths_3yr_oos$path_df, paths_3yr_oos$state_names) # Pred. 3 yr (oos)
+  df2 <- p_event(paths_gen$path_df, paths_gen$state_names) # Pred.
+  df3 <- p_event(paths_gen_oos$path_df, paths_gen_oos$state_names) # Pred.(oos)
 
   df1$name <- names[1]
   df2$name <- names[2]
@@ -513,9 +522,13 @@ plot_p_event <- function(pd, paths_3yr, paths_3yr_oos, names) {
     scale_fill_brewer(palette = 3, type = "qual")
 }
 
-# Plot prob of event by dose
-plot_p_event_by_dose <- function(pd, paths_3yr, paths_3yr_oos, names) {
-  t_max <- 365.25 * 3
+#' Plot event rates over all subjects by dose
+#'
+#' @export
+#' @inheritParams plot_p_event
+#' @param t_max max time used in path generation
+plot_p_event_by_dose <- function(pd, paths_gen, paths_gen_oos, names,
+                                 t_max = 365.25 * 3) {
   pe_data <- summarize_ppsurv(pd,
     by = c("first_dose_amount"),
     target_times = t_max

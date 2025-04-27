@@ -1,4 +1,8 @@
 # MAIN DOCUMENTATION PAGE -------------------------------------------------
+#
+# dev note: see
+#   https://cran.r-project.org/web/packages/dplyr/vignettes/in-packages.html
+# for how to use dplyr in a package
 
 #' The 'bmstate' package.
 #'
@@ -36,6 +40,7 @@
 #' @importFrom purrr map
 #' @importFrom stringr str_extract str_detect
 #' @importFrom survival strata
+#' @importFrom rlang .data
 #'
 #'
 "_PACKAGE"

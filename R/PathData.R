@@ -698,7 +698,7 @@ truncate_after_terminal_events <- function(df, term_states) {
     summarise(term_time = min(time, na.rm = T)) |>
     ungroup()
   no_terms <- df |>
-    anti_join(term_events, by = "path_id")
+    dplyr::anti_join(term_events, by = "path_id")
   with_terms <- df |>
     inner_join(term_events, by = c("path_id")) |>
     filter(time <= term_time) |>

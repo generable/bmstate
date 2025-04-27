@@ -234,6 +234,16 @@
   by_formula
 }
 
+#' Summarize paths using 'ppsurv'
+#'
+#' @export
+#' @param pd A \code{\link{PathData}} object
+#' @param target_times Times where to summarize
+#' @param by Factor by which to summarize
+#' @param split_by Factor by which to split
+#' @param truncate_at_terminal_events Truncate paths at terminal events?
+#' TODO: explain this better
+#' @param use_old Use old version?
 summarize_ppsurv <- function(pd, target_times, by = "subject_id",
                              split_by = by,
                              truncate_at_terminal_events = TRUE,
