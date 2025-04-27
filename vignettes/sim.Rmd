@@ -67,11 +67,6 @@ mod <- bmstate::create_stan_model()
 # Experiment definition
 
 ```{r}
-possible_covs <- c(
-  "sex", "age", "first_dose_amount", "pk_pre_dose", "pk_post_dose",
-  "country", "country_num", "dose_adjustment", "dose_arm"
-)
-
 run_experiment <- function(N_subject, h0_base, effect_sizes) {
   # Simulate data
   d <- simulate_example_data(N_subject,
