@@ -1,7 +1,7 @@
 test_that("entire workflow works", {
   # Options
   options <- list(
-    N_subject = 100,
+    N_subject = 200,
     covariates = c("sex", "first_dose_amount", "age"),
     iter_warmup = 60,
     iter_sampling = 30,
@@ -74,7 +74,7 @@ test_that("entire workflow works", {
     terminal_states = pd$terminal_states,
     num_paths = NP, n_repeats = NR,
   )
-  expect_equal(paths_3yr$n_paths(), 900)
+  expect_equal(paths_3yr$n_paths(), 9000)
 
   # Paths from 0 to 3 years starting from Randomization
   paths_3yr_oos <- generate_paths_many_subjects(gq, sd, possible_covs,
@@ -86,48 +86,46 @@ test_that("entire workflow works", {
     num_paths = NP, n_repeats = NR,
     oos = TRUE
   )
-  expect_equal(paths_3yr_oos$n_paths(), 300)
+  expect_equal(paths_3yr_oos$n_paths(), 3000)
 
   h0_true_all <- d$h0
   m_sub <- d$m_sub
   df_beta_true <- d$df_beta_true
+  N_subject <- options$N_subject
   res <- dplyr::lst(
     fit, stan_dat, pd, paths_3yr, paths_3yr_oos,
     sub_first_rows, sub_first_rows_test, N_subject, df_beta_true,
     h0_true_all, m_sub, split
   )
 
-  # Study the covariate effects and baseline hazard
+  # Covariate effect and baseline hazard plots
   sd <- res$stan_dat$stan_data
   all_states <- res$pd$state_names
   dt <- res$pd$as_transitions()
-  plt_oth <- NULL
-  if (sd$N_oth > 0) {
-    plt_oth <- plot_other_beta(res$fit, res$stan_dat, res$pd, res$df_beta_true)
-    ff <- function(x) {
-      x + theme(axis.text.y = element_text(angle = 90, hjust = 0.5))
-    }
-    plt_oth <- lapply(plt_oth, ff)
-  }
+  plt_oth <- plot_other_beta(res$fit, res$stan_dat, res$pd, res$df_beta_true)
+  expect_equal(length(plt_oth), 3)
+
   df_h0 <- tibble::as_tibble(data.frame(
     transition = seq_len(length(res$h0_true_all)),
     log_h0_true = log(res$h0_true_all)
   ))
-  ttl <- paste0("time = ", round(res$fit$time()$total, 3))
-  plt_h0 <- plot_h0(res$fit, sd, res$pd, df_h0) +
-    xlab("Time (days)") + theme(legend.position = "none") +
-    ggtitle(ttl)
-  list_beta <- c(plt_oth)
-  plt_beta <- ggarrange(plotlist = list_beta)
+  plt_h0 <- plot_h0(res$fit, sd, res$pd, df_h0)
+  expect_s3_class(plt_h0, "ggplot")
 
   # Event probabilities
   names <- c("1. Obs", "2. IS pred", "3. OOS pred")
   plt_a <- plot_p_event(res$pd, res$paths_3yr, res$paths_3yr_oos, names)
-  plt_b <- plot_p_event_by_dose(res$pd, res$paths_3yr, res$paths_3yr_oos, names) +
-    ggtitle("By dose")
-  plt_freq <- ggarrange(plt_a, plt_b, nrow = 1, ncol = 2)
 
-  # Brier score
+  # no points selected for one or more curves, consider using the extend argument
+  plt_b <- plot_p_event_by_dose(res$pd, res$paths_3yr, res$paths_3yr_oos, names)
+  expect_s3_class(plt_a, "ggplot")
+  expect_s3_class(plt_b, "ggplot")
+
+  # Event summary
+  # There was 1 warning in `dplyr::mutate()`.
+  # i In argument: `event_surv = furrr::future_map(...)`.
+  # Caused by warning in `serializedSize()`:
+  #  ! 'package:stats' may not be available when loading
   target_times <- seq(0, 3 * 365.25, by = 365.25 / 4)
   ppsurv_subj <- summarize_ppsurv(
     res$paths_3yr,
@@ -141,15 +139,20 @@ test_that("entire workflow works", {
     by = c("subject_id"),
     truncate_at_terminal_events = FALSE
   )
+  expect_true(inherits(ppsurv_subj, "tbl_df"))
+  expect_true(inherits(ppsurv_subj_oos, "tbl_df"))
+
+  # Brier score
   train_sub <- res$sub_first_rows$subject_id
   test_sub <- res$sub_first_rows_test$subject_id
   plt_bs_is <- create_brier_score_plot(
     ppsurv_subj, res$pd, train_sub
-  ) + ggtitle("Brier scores (in-sample)")
+  )
   plt_bs_oos <- create_brier_score_plot(
     ppsurv_subj_oos, res$pd, test_sub
-  ) + ggtitle("Brier scores (out-of-sample)")
-  plt_brier_all <- ggarrange(plt_bs_is, plt_bs_oos, nrow = 2, ncol = 1)
+  )
+  expect_s3_class(plt_bs_is, "ggplot")
+  expect_s3_class(plt_bs_oos, "ggplot")
 
   # Concordance index
   ci_eval <- create_cindex_plot(
@@ -157,5 +160,7 @@ test_that("entire workflow works", {
     train_sub, test_sub,
     ppsurv_subj, ppsurv_subj_oos
   )
-  plt_ci_all <- ggarrange(ci_eval$plt_ci_is, ci_eval$plt_ci_oos, nrow = 2, ncol = 1)
+  expect_equal(length(ci_eval), 4)
+  expect_s3_class(ci_eval$plt_ci_is, "ggplot")
+  expect_s3_class(ci_eval$plt_ci_oos, "ggplot")
 })

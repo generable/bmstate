@@ -44,6 +44,7 @@ Imports:
     reshape2,
     rlang,
     splines2,
+    stats,
     stringr,
     survival,
     tibble,
