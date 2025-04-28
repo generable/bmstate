@@ -1,11 +1,3 @@
-# Get actual even times from transitions data frame
-get_event_times <- function(df, trans_names) {
-  df <- df |> filter(transition > 0)
-  df <- df[, c("time", "transition")]
-  df$trans_name <- as.factor(trans_names[df$transition])
-  df
-}
-
 # Evaluate B-spline basis at t
 bspline_basis <- function(t, k, knots, BK) {
   splines2::bSpline(t,
@@ -589,65 +581,6 @@ legend_to_TFI_matrix <- function(legend) {
     TFI[legend$prev_state[h], legend$state[h]] <- legend$transition[h]
   }
   TFI
-}
-
-# Validate the transitions format data frame to be passed to
-# create_stan_data
-validate_dat_trans <- function(df) {
-  df <- df |>
-    group_by(subject_id, time) |>
-    mutate(
-      n_distinct_times = n()
-    ) |>
-    ungroup()
-  invalid <- unique((df |> filter(n_distinct_times > 1))$subject_id)
-  if (length(invalid) > 0) {
-    str <- paste0(invalid, collapse = ", ")
-    msg <- paste0(
-      "Time points (interval end points) are not all unique for the following",
-      " subjects:\n",
-      str
-    )
-    stop(msg)
-  }
-  TRUE
-}
-
-
-# Summarize train-test split
-validate_split <- function(sd) {
-  sd$pre_conc_x1000 <- sd$conc_pk[, 1] * 1000
-  sd$pre_conc_x1000_oos <- sd$conc_pk_oos[, 1] * 1000
-  sd$post_conc_x1000 <- sd$conc_pk[, 2] * 1000
-  sd$post_conc_x1000_oos <- sd$conc_pk_oos[, 2] * 1000
-  get_summary_cont <- function(name) {
-    x <- sd[[name]]
-    x_oos <- sd[[paste0(name, "_oos")]]
-    str1 <- paste0(round(min(x), 3), "/", round(min(x_oos), 3))
-    str2 <- paste0(round(max(x), 3), "/", round(max(x_oos), 3))
-    str3 <- paste0(round(mean(x), 3), "/", round(mean(x_oos), 3))
-    c(str1, str2, str3)
-  }
-  get_summary_cat <- function(name) {
-    x <- sd[[name]]
-    x_oos <- sd[[paste0(name, "_oos")]]
-    s1 <- paste(sort(unique(x)), collapse = ", ")
-    s2 <- paste(sort(unique(x_oos)), collapse = ", ")
-    paste0("[", s1, "] / [", s2, "]")
-  }
-  names_cont <- c(
-    "x_fda", "pre_conc_x1000", "post_conc_x1000"
-  )
-  names_cat <- c("N_sub", "x_cnt")
-  table_cont <- sapply(names_cont, get_summary_cont)
-  table_cat <- as.matrix(sapply(names_cat, get_summary_cat))
-  rownames(table_cont) <- c("min", "max", "mean")
-  df_cat <- data.frame(table_cat)
-  colnames(df_cat) <- c("levels (train / test)")
-  list(
-    table_cont = data.frame(t(table_cont)),
-    table_cat = df_cat
-  )
 }
 
 # Computes time since last dose for both post and pre dose measurement

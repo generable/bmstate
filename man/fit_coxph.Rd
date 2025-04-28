@@ -10,7 +10,7 @@ fit_coxph(msdat, formula_rhs = NULL)
 \item{msdat}{\code{msdata} object}
 
 \item{formula_rhs}{Formula right hand side that is appended to
-\code{survival::Surv(Tstart, Tstop, status) ~ }. If \code{NULL} (default), then
+\code{Surv(Tstart, Tstop, status) ~ }. If \code{NULL} (default), then
 \code{strata(trans)} is used}
 }
 \value{

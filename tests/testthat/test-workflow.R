@@ -29,6 +29,9 @@ test_that("entire workflow works", {
   split <- do_split(pd)
   expect_true(inherits(pd, "PathData"))
   expect_equal(pd$n_paths(), options$N_subject)
+  expect_equal(pd$longest_path()$n_paths(), 1)
+  expect_message(print(pd))
+  expect_true(inherits(pd$coxph(), "coxph"))
 
   # Stan data
   stan_dat <- create_stan_data(

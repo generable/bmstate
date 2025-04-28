@@ -1,9 +1,4 @@
 # util
-pathdata_size_per_row <- function(pd) {
-  object.size(pd$df) / nrow(pd$df)
-}
-
-# util
 check_columns <- function(df, needed_columns) {
   if (!(all(needed_columns %in% colnames(df)))) {
     message("found = {", paste(colnames(df), collapse = ", "), "}")
@@ -531,16 +526,6 @@ subject_df_with_idx <- function(pd, subs, id_map) {
   df
 }
 
-# Filter pathdata to subjects
-filter_pathdata <- function(pd, subjects_keep) {
-  df_new <- pd$df |> filter(subject_id %in% subjects_keep)
-  PathData$new(df_new, pd$state_names, pd$covs,
-    terminal_states = pd$terminal_states,
-    censor_states = pd$censor_states,
-    initial_states = pd$initial_states
-  )
-}
-
 # To transition format used by mstate (msdata)
 pathdata_to_mstate_format <- function(pd, covariates = FALSE) {
   dt <- pd$as_transitions()
@@ -640,14 +625,14 @@ TFI_to_mstate_transmat <- function(TFI, state_names) {
 #' @export
 #' @param msdat \code{msdata} object
 #' @param formula_rhs Formula right hand side that is appended to
-#' \code{survival::Surv(Tstart, Tstop, status) ~ }. If \code{NULL} (default), then
+#' \code{Surv(Tstart, Tstop, status) ~ }. If \code{NULL} (default), then
 #' \code{strata(trans)} is used
 #' @return value returned by \code{survival::coxph}
 fit_coxph <- function(msdat, formula_rhs = NULL) {
   if (is.null(formula_rhs)) {
     formula_rhs <- "strata(trans)"
   }
-  formula <- paste0("survival::Surv(Tstart, Tstop, status) ~ ", formula_rhs)
+  formula <- paste0("Surv(Tstart, Tstop, status) ~ ", formula_rhs)
   survival::coxph(as.formula(formula),
     data = msdat, method = "breslow"
   )
