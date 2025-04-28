@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(pkmstate)
+library(bmstate)
 
-test_check("pkmstate")
+test_check("bmstate")
