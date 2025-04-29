@@ -195,8 +195,8 @@ debug_standata <- function(pd, dat_trans, sd, idx, trans_names, all_states,
   p2 <- plot_binary_matrix(transition, edge = TRUE) + ylab("Transition") +
     xlab("Interval") + ggtitle("Transition indicator (transition)") +
     scale_x_continuous(breaks = seq_len(R))
-  mat_plt <- ggarrange(p1, p2, nrow = 1, ncol = 2)
-  plt <- ggarrange(dat_plt, mat_plt, nrow = 2, ncol = 1)
+  mat_plt <- ggpubr::ggarrange(p1, p2, nrow = 1, ncol = 2)
+  plt <- ggpubr::ggarrange(dat_plt, mat_plt, nrow = 2, ncol = 1)
   list(
     df = df,
     plt = plt,
@@ -229,7 +229,7 @@ plot_effects_pk <- function(fit, params) {
   a$cov <- params$V2_covariates[a$var]
   p3 <- plot_effect_beta_pk(a, "beta_V2", "cov")
 
-  p <- ggarrange(p1, p2, p3, nrow = 1, ncol = 3)
+  p <- ggpubr::ggarrange(p1, p2, p3, nrow = 1, ncol = 3)
   annotate_figure(p, top = "Covariate effects in PK model")
 }
 
@@ -447,7 +447,7 @@ plot_pred_conc_many <- function(fit, gq, sd, sd_gq, ids_plot, id_map,
   st1 <- paste0("med. log_mu_pk = [", paste(round(mu_pk, 3), collapse = ","), "]")
   st2 <- paste0("med. log_sig_pk = [", paste(round(sig_pk, 3), collapse = ","), "]")
   supertitle <- paste(st1, st2, sep = ", ")
-  viz_conc <- ggarrange(plotlist = plt_conc, nrow = nrow, ncol = ncol)
+  viz_conc <- ggpubr::ggarrange(plotlist = plt_conc, nrow = nrow, ncol = ncol)
   annotate_figure(viz_conc, top = supertitle)
 }
 

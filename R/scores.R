@@ -1147,11 +1147,11 @@ plot_cindex <- function(ci, name, nrow = NULL, ncol = NULL) {
         legend.position = "none", text = element_text(size = 8)
       )
   }
-  plt <- ggpubr::arrange(
+  plt <- ggpubr::ggarrange(
     plotlist = plots, legend.grob = get_legend(plots[[1]]),
     nrow = nrow, ncol = ncol
   )
-  annotate_figure(plt, top = paste0("Concordance index (", ylab, ")"))
+  ggpubr::annotate_figure(plt, top = paste0("Concordance index (", ylab, ")"))
 }
 
 # Plot multiple concordance indices
@@ -1161,5 +1161,5 @@ plot_ci_multi <- function(ci) {
   ci_prob <- sapply(ci, function(x) x$ci_prob)
   plt_1 <- plot_cindex(ci, name = "ci_p_km", nrow = 1)
   plt_2 <- plot_cindex(ci, name = "ci_p_msm", nrow = 1)
-  ggpubr::arrange(plt_1, plt_2, ncol = 1, nrow = 2)
+  ggpubr::ggarrange(plt_1, plt_2, ncol = 1, nrow = 2)
 }
