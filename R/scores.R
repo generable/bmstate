@@ -514,7 +514,7 @@ summarize_ppsurv <- function(pd, target_times, by = "subject_id",
     dplyr::group_by(state, method, Event, !!!by) |>
     dplyr::arrange(time) |>
     mutate(
-      interval = lead(time, n = 1, order_by = time) - time,
+      interval = dplyr::lead(time, n = 1, order_by = time) - time,
       ibs = purrr::accumulate(brier_score * interval, sum)
     ) |>
     dplyr::ungroup()
@@ -631,7 +631,7 @@ compute_scores <- function(pd, pred_pd = NULL,
     dplyr::ungroup() |>
     mutate(
       p_event_free = map(predicted, ~ dplyr::arrange(.x, subject_id) |>
-        pull(p_event_free)),
+        dplyr::pull(p_event_free)),
     ) |>
     dplyr::select(-predicted)
 
@@ -654,7 +654,7 @@ compute_scores <- function(pd, pred_pd = NULL,
       mutate(
         p_event_free = map(
           predicted,
-          ~ dplyr::arrange(.x, subject_id) |> pull(p_event_free)
+          ~ dplyr::arrange(.x, subject_id) |> dplyr::pull(p_event_free)
         ),
       ) |>
       dplyr::select(-predicted)

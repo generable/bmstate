@@ -39,7 +39,7 @@ p_event_by_subject <- function(pd, draw_idx = NULL, rep_idx = NULL) {
 }
 
 # Stack list of data frames to one data frame
-# Could probably be replaced by dplyr::bind_rows()
+# Could probably be replaced by dplyr::dplyr::bind_rows()
 stack_list_of_dfs <- function(list_of_dfs) {
   bindfun <- function(x) {
     cbind(list_of_dfs[[x]], name = x)
@@ -57,7 +57,7 @@ stack_list_of_dfs <- function(list_of_dfs) {
     mutate(`_val` = str_c(!!!sym_vars, sep = ":"))
   state_names <- pd_list[[1]]$state_names
   vals <- pd_df |>
-    distinct(`_val`) |>
+    dplyr::distinct(`_val`) |>
     dplyr::pull(`_val`) |>
     sort()
 
@@ -67,7 +67,7 @@ stack_list_of_dfs <- function(list_of_dfs) {
     furrr::future_map_dfr(~ p_event(.x, state_names), .id = "_val")
 
   df |>
-    left_join(pd_df |> distinct(`_val`, !!!sym_vars)) |>
+    left_join(pd_df |> dplyr::distinct(`_val`, !!!sym_vars)) |>
     dplyr::select(-`_val`)
 }
 
@@ -79,7 +79,7 @@ stack_list_of_dfs <- function(list_of_dfs) {
   pd_df <- pd_df |>
     mutate(`_val` = str_c(!!!sym_vars, sep = ":"))
   vals <- pd_df |>
-    distinct(`_val`) |>
+    dplyr::distinct(`_val`) |>
     dplyr::pull(`_val`) |>
     sort()
   state_names <- pd$state_names
@@ -92,7 +92,7 @@ stack_list_of_dfs <- function(list_of_dfs) {
     )
 
   df |>
-    left_join(pd_df |> distinct(`_val`, !!!sym_vars), by = join_by(`_val`)) |>
+    left_join(pd_df |> dplyr::distinct(`_val`, !!!sym_vars), by = join_by(`_val`)) |>
     dplyr::select(-`_val`)
 }
 
@@ -164,7 +164,7 @@ plot_cf_dose_effect <- function(p_cf, n_repeats) {
 # Proportion of paths that had a given event until given time in a grid
 compute_proportion_up_to_time <- function(data, time_grid, event_states, byvars = vars()) {
   all_groups <- data |>
-    distinct(!!!byvars) |>
+    dplyr::distinct(!!!byvars) |>
     expand(!!!byvars) |>
     expand_grid(
       time = time_grid,
@@ -189,15 +189,15 @@ compute_proportion_up_to_time <- function(data, time_grid, event_states, byvars 
       p_paths = n_paths_visited / total_n_paths
     ) |>
     dplyr::ungroup() |>
-    distinct(!!!byvars, time, state, p_paths)
+    dplyr::distinct(!!!byvars, time, state, p_paths)
   results <- results_pre |>
-    bind_rows(all_groups) |>
+    dplyr::bind_rows(all_groups) |>
     dplyr::group_by(!!!byvars, state) |>
     dplyr::arrange(time) |>
     tidyr::fill(p_paths, .direction = "down") |>
     dplyr::ungroup() |>
     mutate(proportion = if_else(is.na(p_paths), 0, p_paths)) |>
-    distinct(!!!byvars, state, time, proportion) |>
+    dplyr::distinct(!!!byvars, state, time, proportion) |>
     dplyr::filter(time %in% time_grid)
 
   dplyr::as_tibble(results)
