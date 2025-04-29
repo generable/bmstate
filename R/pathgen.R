@@ -375,7 +375,7 @@ generate_paths_many_subjects <- function(fit, sd, covs,
   df$path_id <- paste0(df$sub_idx, "-", df$draw_idx, "-", df$rep_idx)
   df_link <- df |>
     dplyr::select(path_id, draw_idx, rep_idx, sub_idx) |>
-    distinct(path_id, .keep_all = TRUE) |>
+    dplyr::distinct(path_id, .keep_all = TRUE) |>
     mutate(sub_idx = as.integer(sub_idx)) |>
     left_join(
       df_subjects |>

@@ -758,7 +758,7 @@ summarize_event_prob <- function(pd, target_times, by = c("subject_id")) {
     bind_cols(pstate_cols) |>
     rgeco:::.tidy_km_strata() |>
     mutate(`vv` = as.integer(vv)) |>
-    left_join(surv_df |> distinct(vv, !!!by_syms), by = "vv") |>
+    left_join(surv_df |> dplyr::distinct(vv, !!!by_syms), by = "vv") |>
     dplyr::select(-vv)
 }
 

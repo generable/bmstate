@@ -85,7 +85,7 @@
   }
   p_event_groups <- training_observed_events |>
     dplyr::mutate(VAR = dplyr::dense_rank(!!!surv_vars)) |>
-    distinct(VAR, !!!surv_vars)
+    dplyr::distinct(VAR, !!!surv_vars)
   p_event <- training_observed_events |>
     mutate(one = 1) |>
     left_join(p_event_groups, by = dplyr::join_by(!!!surv_vars)) |>
@@ -119,7 +119,7 @@
 
   # now, project K-M estimates onto test pop, for each subject in surv_vars group
   p_event_per_subject <- test_observed_events |>
-    distinct(subject_id, !!!surv_vars) |>
+    dplyr::distinct(subject_id, !!!surv_vars) |>
     left_join(p_event_groups, by = dplyr::join_by(!!!surv_vars)) |>
     left_join(p_event, by = c("VAR"), multiple = "all", relationship = "many-to-many") |>
     dplyr::transmute(subject_id, state, time, p_event_free = surv) |>
@@ -297,7 +297,7 @@ summarize_ppsurv <- function(pd, target_times, by = "subject_id",
     ) |>
     dplyr::bind_rows(.id = "grp") |>
     mutate(grp = as.integer(grp)) |>
-    left_join(res_data |> distinct(grp, state, !!!split_syms))
+    left_join(res_data |> dplyr::distinct(grp, state, !!!split_syms))
 }
 
 .Cindex2 <- function(object, predicted, t_star = -1) {
@@ -638,7 +638,7 @@ compute_scores <- function(pd, pred_pd = NULL,
   # fix a rare but important edge case, if each lengths aren't the same
   equal_lengths <- (km_prediction |>
     mutate(n_p = map_int(p_event_free, length)) |>
-    distinct(n_p) |> nrow() == 1)
+    dplyr::distinct(n_p) |> nrow() == 1)
   if (isFALSE(equal_lengths)) {
     km_prediction <- observed$p_event_per_subject |>
       tidyr::expand(subject_id, time, state) |>
@@ -912,8 +912,8 @@ compute_one_calibration <- function(pd, pred_pd = NULL, ppsurv = NULL,
   # get Pr(survival) for each state and target_time
   merged_data <- predicted |>
     dplyr::ungroup() |>
-    mutate(n_subjects = n_distinct(subject_id)) |>
-    dplyr::filter(time %in% target_times, time > 0, state > 1) |>
+    mutate(n_subjects = dplyr::n_distinct(subject_id)) |>
+    dplyrfilter(time %in% target_times, time > 0, state > 1) |>
     left_join(observed_events,
       by = c("subject_id", "state"),
       multiple = "all", relationship = "many-to-one"
@@ -938,7 +938,7 @@ compute_one_calibration <- function(pd, pred_pd = NULL, ppsurv = NULL,
     left_join(state_decode)
 
   test_stat <- merged_data |>
-    distinct(time, state, psurv_bin, test_stat) |>
+    dplyr::distinct(time, state, psurv_bin, test_stat) |>
     dplyr::group_by(time, state) |>
     summarise(
       HLstat = sum(test_stat),
@@ -1147,7 +1147,7 @@ plot_cindex <- function(ci, name, nrow = NULL, ncol = NULL) {
         legend.position = "none", text = element_text(size = 8)
       )
   }
-  plt <- ggdplyr::arrange(
+  plt <- ggpubr::arrange(
     plotlist = plots, legend.grob = get_legend(plots[[1]]),
     nrow = nrow, ncol = ncol
   )
@@ -1161,5 +1161,5 @@ plot_ci_multi <- function(ci) {
   ci_prob <- sapply(ci, function(x) x$ci_prob)
   plt_1 <- plot_cindex(ci, name = "ci_p_km", nrow = 1)
   plt_2 <- plot_cindex(ci, name = "ci_p_msm", nrow = 1)
-  ggdplyr::arrange(plt_1, plt_2, ncol = 1, nrow = 2)
+  ggpubr::arrange(plt_1, plt_2, ncol = 1, nrow = 2)
 }

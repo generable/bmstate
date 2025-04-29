@@ -687,7 +687,7 @@ create_brier_score_plot <- function(ppsurv_subj, pd, sub_ids_char_training) {
   # plot
   scores |>
     mutate(method = if_else(method == "km", "km overall", method)) |>
-    bind_rows(km_scores_vs_dose |> mutate(method = "km per dose")) |>
+    dplyr::bind_rows(km_scores_vs_dose |> mutate(method = "km per dose")) |>
     mutate(
       Event = factor(str_wrap(pd$state_names[state], width = 10, whitespace_only = T)),
       Event = forcats::fct_reorder(Event, state)
