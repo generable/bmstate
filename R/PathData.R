@@ -713,11 +713,17 @@ plot_cumhaz_msfit <- function(msfit, legend = NULL) {
     geom_line() +
     ylab("Cumulative Hazard")
 }
+
+#' Estimate average hazard of an 'msfit'
+#'
+#' @export
+#' @param msfit An \code{msfit} object
 estimate_average_hazard <- function(msfit) {
   msfit$Haz |>
     dplyr::group_by(trans) |>
     summarise(
-      avg_haz = (dplyr::last(Haz) - dplyr::first(Haz)) / (dplyr::last(time) - dplyr::first(time))
+      avg_haz = (dplyr::last(Haz) - dplyr::first(Haz)) /
+        (dplyr::last(time) - dplyr::first(time))
     )
 }
 

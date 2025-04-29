@@ -19,6 +19,7 @@ See the vignettes and the following exported functions and classes
  \item \code{\link{create_stan_data}}
  \item \code{\link{create_stan_model}}
  \item \code{\link{do_split}}
+ \item \code{\link{estimate_average_hazard}}
  \item \code{\link{fit_coxph}}
  \item \code{\link{fit_mstate}}
  \item \code{\link{generate_paths_many_subjects}}
