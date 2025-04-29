@@ -207,18 +207,6 @@ run_experiment_postproc <- function(res) {
   )
   plt_ci_all <- ggarrange(ci_eval$plt_ci_is, ci_eval$plt_ci_oos, nrow = 2, ncol = 1)
 
-  # Saving plots to pdf
-  p <- list(plt_beta, plt_freq, plt_brier_all, plt_ci_all, plt_h0)
-  fn <- paste0(
-    "sim-multi-", res$N_subject, "-", res$h0_true_all, "-",
-    paste0(res$df_beta_true$beta_true, collapse = "_"), ".pdf"
-  )
-  grDevices::pdf(fn, onefile = TRUE)
-  for (i in seq(length(p))) {
-    do.call("grid.arrange", p[i])
-  }
-  grDevices::dev.off()
-
   # Return
   list(
     plt_a = ggarrange(plt_beta, plt_freq,
@@ -332,7 +320,7 @@ hazard_mult_recovery <- function(res) {
   trans_idx <- rep(1:n_trans, each = nrow(id_map))
   df <- data.frame(subject_id, m_sub, m_sub_mean, trans_idx)
   colnames(df) <- c("subject_id", "log_m", "log_m_mean", "transition")
-  df <- as_tibble(df |> left_join(res$pd$subject_df, by = "subject_id"))
+  df <- tibble::as_tibble(df |> left_join(res$pd$subject_df, by = "subject_id"))
   df <- df |> left_join(dt$legend, by = "transition")
   df$sex <- as.factor(df$sex)
   df$first_dose_amount <- as.factor(df$first_dose_amount)
@@ -390,8 +378,7 @@ inst_haz_recovery <- function(res, trans_idx) {
   }
   df$subject_id <- rep(id_map$subject_id, times = S)
   df$inst_haz_true <- rep(res$h0_true_all[trans_idx] * exp(m_sub), times = S)
-  df <- as.tibble(df)
-  df <- as_tibble(df |> left_join(res$pd$subject_df, by = "subject_id"))
+  df <- tibble::as_tibble(df |> left_join(res$pd$subject_df, by = "subject_id"))
   df$sex <- as.factor(df$sex)
   df$first_dose_amount <- as.factor(df$first_dose_amount)
   df
@@ -401,12 +388,12 @@ inst_haz_recovery <- function(res, trans_idx) {
 plot_inst_haz_recovery <- function(res, trans_idx) {
   df_ih <- inst_haz_recovery(res, trans_idx)
   b <- df_ih |>
-    group_by(subject_id) |>
-    slice(1) |>
-    select(-inst_haz)
+    dplyr::group_by(subject_id) |>
+    dplyr::slice(1) |>
+    dplyr::select(-inst_haz)
   a <- df_ih |>
-    group_by(subject_id) |>
-    summarize(ih_mean = mean(inst_haz))
+    dplyr::group_by(subject_id) |>
+    dplyr::summarize(ih_mean = mean(inst_haz))
   a <- left_join(a, b, by = "subject_id")
   plt_a <- ggplot(a, aes(x = inst_haz_true, y = inst_haz_true - ih_mean, color = sex)) +
     geom_line(alpha = 0.5) +
