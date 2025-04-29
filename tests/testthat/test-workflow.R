@@ -65,8 +65,8 @@ test_that("entire workflow works", {
   # Finding subjects for whom to predict
   sub_first_rows <- subject_df_with_idx(pd, split$train_sub, stan_dat$id_map_train)
   sub_first_rows_test <- subject_df_with_idx(pd, split$test_sub, stan_dat$id_map_test)
-  sub_ids_char <- pd$subject_df |> filter(subject_id %in% split$train_sub)
-  sub_ids_char_test <- pd$subject_df |> filter(subject_id %in% split$test_sub)
+  sub_ids_char <- pd$subject_df |> dplyr::filter(subject_id %in% split$train_sub)
+  sub_ids_char_test <- pd$subject_df |> dplyr::filter(subject_id %in% split$test_sub)
 
   # Paths from 0 to 3 years starting from Randomization
   paths_3yr <- generate_paths_many_subjects(gq, sd, possible_covs,
