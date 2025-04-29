@@ -225,7 +225,7 @@ generate_paths <- function(TFI, init_state, t_start, t_max,
   num_draws <- dim(log_h0)[1]
 
   df <- seq_len(num_draws) |>
-    map_dfr(
+    purrr::map_dfr(
       ~ .generate_paths_data(TFI,
         init_state, t_start, t_max,
         log_h0[.x, , , drop = FALSE],
@@ -318,10 +318,10 @@ generate_paths_many_subjects <- function(fit, sd, covs,
   p <- progressr::progressor(length(draw_ids))
   which_xsub <- sub_ids |>
     rlang::set_names() |>
-    map(~ which(x_sub == .x))
+    purrr::map(~ which(x_sub == .x))
   if (isTRUE(use_future)) {
     df <- draw_ids |>
-      furrr::future_map_dfr(
+      purrr::map_dfr(
         ~ .generate_paths_data(
           TFI = TFI, init_state = init_state, t_start = t_start, t_max = t_max_gen,
           log_h0 = log_h0[.x, , , drop = FALSE],
@@ -446,8 +446,8 @@ predict_paths <- function(fit, stan_dat, pd, t_max_gen = NULL, oos = FALSE,
   if (!is.null(num_paths)) {
     num_chains <- fit$num_chains()
     num_iter <- fit$runset$command_args() |>
-      map(keep, ~ str_detect(.x, pattern = "num_samples")) |>
-      map(~ str_extract(.x, "num_samples=(\\d+)", group = 1)) |>
+      purrr::map(keep, ~ str_detect(.x, pattern = "num_samples")) |>
+      purrr::map(~ str_extract(.x, "num_samples=(\\d+)", group = 1)) |>
       unlist() |>
       unique() |>
       as.integer()
@@ -504,8 +504,8 @@ predict_cf_paths <- function(fit, stan_dat, pd, dose, t_max_gen = NULL, oos = FA
   if (!is.null(num_paths)) {
     num_chains <- fit$num_chains()
     num_iter <- fit$runset$command_args() |>
-      map(keep, ~ str_detect(.x, pattern = "num_samples")) |>
-      map(~ str_extract(.x, "num_samples=(\\d+)", group = 1)) |>
+      purrr::map(keep, ~ str_detect(.x, pattern = "num_samples")) |>
+      purrr::map(~ str_extract(.x, "num_samples=(\\d+)", group = 1)) |>
       unlist() |>
       unique() |>
       as.integer()
