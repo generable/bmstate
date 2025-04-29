@@ -27,6 +27,7 @@ See the vignettes and the following exported functions and classes
  \item \code{\link{legend_to_PT_matrix}}
  \item \code{\link{legend_to_TFI_matrix}}
  \item \code{\link{plot_cumhaz_msfit}}
+ \item \code{\link{plot_h0}}
  \item \code{\link{plot_other_beta}}
  \item \code{\link{plot_p_event}}
  \item \code{\link{plot_p_event_by_dose}}
