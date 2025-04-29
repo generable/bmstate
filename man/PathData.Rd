@@ -178,7 +178,7 @@ Get names of states that are events (i.e. not initial and not censor)
 }
 
 \subsection{Returns}{
-TODO: has a bug because the initial state can be an event?
+character vector
 Convert to format used by the 'mstate' package
 }
 }

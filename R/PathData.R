@@ -161,7 +161,7 @@ PathData <- R6::R6Class(
     },
     #' Get names of states that are events (i.e. not initial and not censor)
     #'
-    #' @return TODO: has a bug because the initial state can be an event?
+    #' @return character vector
     get_event_state_names = function() {
       self$state_names |>
         purrr::discard(~ .x %in% self$initial_states) |>
