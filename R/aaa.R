@@ -47,7 +47,7 @@
 #' @importFrom dplyr mutate transmute group_by select slice
 #' @importFrom dplyr summarize summarise arrange
 #' @importFrom dplyr inner_join semi_join left_join anti_join join_by
-#' @importFrom dplyr distinct dense_rank if_else bind_rows
+#' @importFrom dplyr distinct dense_rank if_else
 #' @importFrom dplyr add_count
 #' @importFrom stringr str_extract str_detect str_wrap str_c
 #' @importFrom survival strata Surv

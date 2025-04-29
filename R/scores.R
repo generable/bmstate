@@ -27,7 +27,7 @@
       by = c("subject_id", surv_covs),
       states = pd$get_event_states()
     ) |>
-    select(subject_id, state, time, is_event, !!!surv_vars) |>
+    dplyr::select(subject_id, state, time, is_event, !!!surv_vars) |>
     mutate(one = 1)
   if (!is.null(sub_ids_char) && is.null(sub_ids_char_test) &&
     is.null(sub_ids_char_training)) {
@@ -47,9 +47,9 @@
     stop("You must provide either sub_ids_char or sub_ids_char_test & training, but neither were provided. Pls review your arguments.")
   }
   test_observed_events <- observed_events |>
-    filter(subject_id %in% sub_ids_char_test)
+    dplyr::filter(subject_id %in% sub_ids_char_test)
   training_observed_events <- observed_events |>
-    filter(subject_id %in% sub_ids_char_training)
+    dplyr::filter(subject_id %in% sub_ids_char_training)
 
   # we always compute true events & censoring distribution using test dataset
   prepared_observed_events <- test_observed_events |>
@@ -272,10 +272,10 @@ summarize_ppsurv <- function(pd, target_times, by = "subject_id",
       by = unique(c(split_by, by))
     ) |>
     mutate(grp = dense_rank(str_c(!!!split_syms, state))) |>
-    select(time, is_event, state, grp, !!!split_syms, !!!by_syms) |>
-    group_by(state, grp, !!!split_syms) |>
+    dplyr::select(time, is_event, state, grp, !!!split_syms, !!!by_syms) |>
+    dplyr::group_by(state, grp, !!!split_syms) |>
     tidyr::nest(data = c(time, is_event, !!!by_syms)) |>
-    ungroup()
+    dplyr::ungroup()
 
   res_data$data |>
     set_names(res_data$grp) |>
@@ -295,7 +295,7 @@ summarize_ppsurv <- function(pd, target_times, by = "subject_id",
           )
         )
     ) |>
-    bind_rows(.id = "grp") |>
+    dplyr::bind_rows(.id = "grp") |>
     mutate(grp = as.integer(grp)) |>
     left_join(res_data |> distinct(grp, state, !!!split_syms))
 }
@@ -511,13 +511,13 @@ summarize_ppsurv <- function(pd, target_times, by = "subject_id",
 .integrate_brier_score <- function(bs_estimate, by = c()) {
   by <- rlang::syms(by)
   bs_estimate |>
-    group_by(state, method, Event, !!!by) |>
+    dplyr::group_by(state, method, Event, !!!by) |>
     arrange(time) |>
     mutate(
       interval = lead(time, n = 1, order_by = time) - time,
       ibs = purrr::accumulate(brier_score * interval, sum)
     ) |>
-    ungroup()
+    dplyr::ungroup()
 }
 
 .common_subjects <- function(pd, pred_pd = NULL,
@@ -610,7 +610,7 @@ compute_scores <- function(pd, pred_pd = NULL,
       mutate(p_event_free = surv)
   } else if (!is.null(ppsurv)) {
     predicted <- ppsurv |>
-      filter(
+      dplyr::filter(
         subject_id %in% sub_ids_char,
         time %in% target_times
       ) |>
@@ -622,18 +622,18 @@ compute_scores <- function(pd, pred_pd = NULL,
 
   # observed data for each target time & state
   observed_data_per_state <- observed$prepared_observed_events |>
-    select(-event_data)
+    dplyr::select(-event_data)
 
   # expected survival probability according to K-M estimate
   km_prediction <- observed$p_event_per_subject |>
-    group_by(state, time) |>
+    dplyr::group_by(state, time) |>
     tidyr::nest(predicted = c(subject_id, p_event_free)) |>
-    ungroup() |>
+    dplyr::ungroup() |>
     mutate(
       p_event_free = map(predicted, ~ dplyr::arrange(.x, subject_id) |>
         pull(p_event_free)),
     ) |>
-    select(-predicted)
+    dplyr::select(-predicted)
 
   # fix a rare but important edge case, if each lengths aren't the same
   equal_lengths <- (km_prediction |>
@@ -644,17 +644,17 @@ compute_scores <- function(pd, pred_pd = NULL,
       tidyr::expand(subject_id, time, state) |>
       left_join(
         observed$p_event_per_subject |>
-          select(time, state, subject_id, p_event_free),
+          dplyr::select(time, state, subject_id, p_event_free),
         by = join_by(time, state, subject_id)
       ) |>
       mutate(p_event_free = if_else(is.na(p_event_free), 0, p_event_free)) |>
-      group_by(state, time) |>
+      dplyr::group_by(state, time) |>
       tidyr::nest(predicted = c(subject_id, p_event_free)) |>
-      ungroup() |>
+      dplyr::ungroup() |>
       mutate(
         p_event_free = map(predicted, ~ dplyr::arrange(.x, subject_id) |> pull(p_event_free)),
       ) |>
-      select(-predicted)
+      dplyr::select(-predicted)
   }
 
   km_scores <- NULL
@@ -709,7 +709,7 @@ compute_scores <- function(pd, pred_pd = NULL,
     futile.logger::flog.info("Starting preparation of msm data ...")
     msm_prediction <- predicted |>
       tidyr::expand(subject_id, time, state, !!!by_syms) |>
-      left_join(predicted |> select(time, state, subject_id, p_event_free, !!!by_syms),
+      left_join(predicted |> dplyr::select(time, state, subject_id, p_event_free, !!!by_syms),
         by = join_by(time, state, subject_id, !!!by_syms)
       ) |>
       mutate(p_event_free = if_else(is.na(p_event_free), 0, p_event_free)) |>
@@ -718,7 +718,7 @@ compute_scores <- function(pd, pred_pd = NULL,
         predicted = map(predicted, arrange, subject_id),
         p_event_free = map(predicted, pull, p_event_free)
       ) |>
-      select(-predicted)
+      dplyr::select(-predicted)
 
     if ("brier_score" %in% which) {
       futile.logger::flog.info("Starting computation of brier score for msm data ...")
@@ -773,7 +773,7 @@ compute_scores <- function(pd, pred_pd = NULL,
 
   if (isFALSE(keep_gt_info)) {
     bs_estimates <- bs_estimates |>
-      select(-p_event_free, -st_surv, -gt_times)
+      dplyr::select(-p_event_free, -st_surv, -gt_times)
   }
   if ("brier_score" %in% which) {
     bs_estimates <- bs_estimates |>
@@ -793,7 +793,7 @@ compute_d_calibration <- function(pd, pred_pd,
   observed_events <- pd$as_time_to_first_event(
     truncate = truncate_at_terminal_events
   ) |>
-    filter(subject_id %in% sub_ids_char)
+    dplyr::filter(subject_id %in% sub_ids_char)
   observed_times <- unique(observed_events$time) |> sort()
   if (!is.null(pred_pd)) {
     predicted <- .prepare_predicted_data(pred_pd,
@@ -804,10 +804,10 @@ compute_d_calibration <- function(pd, pred_pd,
 
   # get Pr(survival) for each observed event time and each state
   merged_data <- observed_events |>
-    select(subject_id, state, time, is_event, Event) |>
+    dplyr::select(subject_id, state, time, is_event, Event) |>
     left_join(
       predicted$p_event_per_subject |>
-        select(subject_id, state, time, proportion, p_event_free),
+        dplyr::select(subject_id, state, time, proportion, p_event_free),
       by = c("subject_id", "state", "time")
     )
 
@@ -817,28 +817,28 @@ compute_d_calibration <- function(pd, pred_pd,
     value = seq(from = 0.05, to = 0.95, by = 0.1)
   ) |>
     mutate(p_qtile = cut_interval(value, length = 0.1, ordered_result = TRUE)) |>
-    select(-value)
+    dplyr::select(-value)
 
   qtiles_observed <- merged_data |>
-    filter(is_event == 1) |>
+    dplyr::filter(is_event == 1) |>
     cross_join(all_qtiles) |>
-    filter(p_event_free <= p_qtile_ub, p_event_free > p_qtile_lb) |>
-    group_by(p_qtile, Event, state) |>
+    dplyr::filter(p_event_free <= p_qtile_ub, p_event_free > p_qtile_lb) |>
+    dplyr::group_by(p_qtile, Event, state) |>
     tally() |>
-    ungroup() |>
+    dplyr::ungroup() |>
     arrange(Event, state, p_qtile)
 
   qtiles_censored <- merged_data |>
-    filter(is_event == 0) |>
+    dplyr::filter(is_event == 0) |>
     cross_join(all_qtiles) |>
-    filter(p_event_free >= p_qtile_lb | p_event_free > p_qtile_ub) |>
+    dplyr::filter(p_event_free >= p_qtile_lb | p_event_free > p_qtile_ub) |>
     mutate(n = case_when(
       p_event_free >= p_qtile_lb ~ 1 - (p_qtile_lb / p_event_free),
       TRUE ~ 1 / (10 * p_event_free)
     )) |>
-    group_by(Event, state, p_qtile) |>
+    dplyr::group_by(Event, state, p_qtile) |>
     summarize(n = sum(n)) |>
-    ungroup() |>
+    dplyr::ungroup() |>
     arrange(Event, state, p_qtile)
 
   d_calibration <- list(censored = qtiles_censored, uncensored = qtiles_observed) |>
@@ -869,9 +869,9 @@ compute_one_calibration <- function(pd, pred_pd = NULL, ppsurv = NULL,
   )$as_data_frame(
     covariates = c("subject_id")
   ) |>
-    filter(is_event == 1) |>
-    group_by(subject_id, state) |>
-    filter(time == min(time)) |>
+    dplyr::filter(is_event == 1) |>
+    dplyr::group_by(subject_id, state) |>
+    dplyr::filter(time == min(time)) |>
     transmute(subject_id, state, observed_event_time = time)
   state_decode <- tibble(
     state = pd$get_event_states(),
@@ -891,7 +891,7 @@ compute_one_calibration <- function(pd, pred_pd = NULL, ppsurv = NULL,
       )
   } else if (!is.null(ppsurv)) {
     predicted <- ppsurv |>
-      filter(
+      dplyr::filter(
         subject_id %in% sub_ids_char,
         time %in% target_times
       ) |>
@@ -906,9 +906,9 @@ compute_one_calibration <- function(pd, pred_pd = NULL, ppsurv = NULL,
 
   # get Pr(survival) for each state and target_time
   merged_data <- predicted |>
-    ungroup() |>
+    dplyr::ungroup() |>
     mutate(n_subjects = n_distinct(subject_id)) |>
-    filter(time %in% target_times, time > 0, state > 1) |>
+    dplyr::filter(time %in% target_times, time > 0, state > 1) |>
     left_join(observed_events,
       by = c("subject_id", "state"),
       multiple = "all", relationship = "many-to-one"
@@ -918,9 +918,9 @@ compute_one_calibration <- function(pd, pred_pd = NULL, ppsurv = NULL,
       observed_event_time > time ~ 0,
       observed_event_time <= time ~ 1
     )) |>
-    group_by(time, state) |>
+    dplyr::group_by(time, state) |>
     mutate(psurv_bin = ntile(proportion, n = 10)) |>
-    group_by(time, state, psurv_bin) |>
+    dplyr::group_by(time, state, psurv_bin) |>
     summarize(
       predicted_events = sum(proportion),
       observed_events = sum(event_observed),
@@ -934,13 +934,13 @@ compute_one_calibration <- function(pd, pred_pd = NULL, ppsurv = NULL,
 
   test_stat <- merged_data |>
     distinct(time, state, psurv_bin, test_stat) |>
-    group_by(time, state) |>
+    dplyr::group_by(time, state) |>
     summarise(
       HLstat = sum(test_stat),
       p_value = pchisq(HLstat, 10 - 2, lower.tail = FALSE)
     )
   merged_data |>
-    select(-test_stat, -p, -n) |>
+    dplyr::select(-test_stat, -p, -n) |>
     left_join(test_stat)
 }
 
@@ -971,21 +971,21 @@ write_score_to_file <- function(bs_estimates, params, cache_name,
   params$covariates <- NULL
   run_data <- tibble(!!!params) |>
     mutate(cache_name = cache_name) |>
-    select(!!!run_vars)
+    dplyr::select(!!!run_vars)
 
   # prepare IBS summary per event type
   result_vars <- vars(n_subjects, time, Event, interval, km, msm)
   result_summary <- bs_estimates |>
-    select(Event, method, time, ibs, n_subjects, interval) |>
+    dplyr::select(Event, method, time, ibs, n_subjects, interval) |>
     drop_na() |>
-    filter(time %in% c(max(time), seq(from = 0, to = 3 * 365.25, by = 365.25))) |>
+    dplyr::filter(time %in% c(max(time), seq(from = 0, to = 3 * 365.25, by = 365.25))) |>
     spread(method, ibs) |>
-    select(!!!result_vars)
+    dplyr::select(!!!result_vars)
 
   results <- result_summary |>
     bind_cols(run_data) |>
     mutate(date = lubridate::today()) |>
-    select(date, !!!run_vars, !!!result_vars)
+    dplyr::select(date, !!!run_vars, !!!result_vars)
 
   write_csv(results, file = file, append = append, quote = "all")
 }
@@ -1048,8 +1048,8 @@ km_fit <- function(pd, state_idx, subject_ids) {
   checkmate::assert_number(state_idx)
   covs <- c("subject_id", "first_dose_amount", "dose_adjustment")
   df_obs <- pd$as_data_frame(covariates = covs) |>
-    filter(subject_id %in% subject_ids)
-  te_obs <- time_to_event(df_obs, state_idx) |> select(-path_id)
+    dplyr::filter(subject_id %in% subject_ids)
+  te_obs <- time_to_event(df_obs, state_idx) |> dplyr::select(-path_id)
   te_obs <- add_dose_arm(te_obs, df_obs)
   survival::survfit(survival::Surv(time, observed) ~ dose_arm, te_obs)
 }
@@ -1069,9 +1069,9 @@ km_predict <- function(kmfit, time) {
 add_dose_arm <- function(te_obs, df) {
   df$dose_arm <- paste0(df$dose_adjustment, "-", df$first_dose_amount)
   df <- df |>
-    select(subject_id, dose_arm) |>
-    ungroup() |>
-    group_by(subject_id) |>
+    dplyr::select(subject_id, dose_arm) |>
+    dplyr::ungroup() |>
+    dplyr::group_by(subject_id) |>
     dplyr::slice(1)
   te_obs |> left_join(df, by = "subject_id")
 }
@@ -1081,19 +1081,19 @@ first_events <- function(pd_obs, pd_pred, state_idx, kmfit, subject_ids, tev) {
   # Filter subjects
   covs <- c("subject_id", "dose_adjustment", "first_dose_amount")
   df_obs <- pd_obs$as_data_frame(covariates = covs) |>
-    filter(subject_id %in% subject_ids)
+    dplyr::filter(subject_id %in% subject_ids)
   df_pred <- pd_pred$as_data_frame(covariates = covs) |>
-    filter(subject_id %in% subject_ids)
+    dplyr::filter(subject_id %in% subject_ids)
 
   # Times to first event
-  te_pred <- time_to_event(df_pred, state_idx) |> select(-path_id)
+  te_pred <- time_to_event(df_pred, state_idx) |> dplyr::select(-path_id)
   te_med <- te_pred |>
-    group_by(subject_id) |>
+    dplyr::group_by(subject_id) |>
     summarize(t_msm = mean(time))
   te_prop <- te_pred |>
-    group_by(subject_id) |>
+    dplyr::group_by(subject_id) |>
     summarize(p_msm = mean(observed))
-  te_obs <- time_to_event(df_obs, state_idx) |> select(-path_id)
+  te_obs <- time_to_event(df_obs, state_idx) |> dplyr::select(-path_id)
   te_obs <- add_dose_arm(te_obs, df_obs)
 
   # Kaplan-Maier

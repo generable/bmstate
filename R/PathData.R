@@ -436,7 +436,7 @@ as_time_to_first_event <- function(dat, states, by = c()) {
     mutate(is_event = 1)
   d <- censor |>
     anti_join(events, by = c("path_id", "state")) |>
-    bind_rows(events)
+    dplyr::bind_rows(events)
 }
 
 # Only creates trans_char and not actual integer index yet
@@ -717,7 +717,7 @@ estimate_average_hazard <- function(msfit) {
   msfit$Haz |>
     dplyr::group_by(trans) |>
     summarise(
-      avg_haz = (last(Haz) - first(Haz)) / (last(time) - first(time))
+      avg_haz = (dplyr::last(Haz) - dplyr::first(Haz)) / (dplyr::last(time) - dplyr::first(time))
     )
 }
 

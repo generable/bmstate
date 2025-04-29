@@ -374,7 +374,7 @@ generate_paths_many_subjects <- function(fit, sd, covs,
   df$draw_idx <- as.integer(df$draw_idx)
   df$path_id <- paste0(df$sub_idx, "-", df$draw_idx, "-", df$rep_idx)
   df_link <- df |>
-    select(path_id, draw_idx, rep_idx, sub_idx) |>
+    dplyr::select(path_id, draw_idx, rep_idx, sub_idx) |>
     distinct(path_id, .keep_all = TRUE) |>
     mutate(sub_idx = as.integer(sub_idx)) |>
     left_join(
@@ -474,15 +474,15 @@ predict_paths <- function(fit, stan_dat, pd, t_max_gen = NULL, oos = FALSE,
   if (isTRUE(oos)) {
     subject_df <- pd$subject_df |>
       inner_join(stan_dat$id_map_test, by = "subject_id") |>
-      rename(sub_idx = x_sub)
+      dplyr::rename(sub_idx = x_sub)
   } else {
     subject_df <- pd$subject_df |>
       inner_join(stan_dat$id_map_train, by = "subject_id") |>
-      rename(sub_idx = x_sub)
+      dplyr::rename(sub_idx = x_sub)
   }
   if (!is.null(sub_ids)) {
     subject_df <- subject_df |>
-      filter(subject_id %in% sub_ids)
+      dplyr::filter(subject_id %in% sub_ids)
   }
 
   # paths data
@@ -534,16 +534,16 @@ predict_cf_paths <- function(fit, stan_dat, pd, dose, t_max_gen = NULL, oos = FA
     subject_df <- pd$subject_df |>
       inner_join(stan_dat$id_map_test, by = "subject_id") |>
       mutate(cf_dose = dose) |>
-      rename(sub_idx = x_sub)
+      dplyr::rename(sub_idx = x_sub)
   } else {
     subject_df <- pd$subject_df |>
       inner_join(stan_dat$id_map_train, by = "subject_id") |>
       mutate(cf_dose = dose) |>
-      rename(sub_idx = x_sub)
+      dplyr::rename(sub_idx = x_sub)
   }
   if (!is.null(sub_ids)) {
     subject_df <- subject_df |>
-      filter(subject_id %in% sub_ids)
+      dplyr::filter(subject_id %in% sub_ids)
   }
 
   # paths data
