@@ -61,6 +61,7 @@ plot_bf <- function(sd) {
 
 #' Plot log baseline hazard
 #'
+#' @export
 #' @inheritParams plot_other_beta
 #' @param log_h0_true true baseline hazards
 #' @param sd Stan data list
