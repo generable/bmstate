@@ -62,7 +62,7 @@ stack_list_of_dfs <- function(list_of_dfs) {
     sort()
 
   df <- vals |>
-    set_names() |>
+    rlang::set_names() |>
     purrr::map(~ dplyr::filter(pd_df, `_val` == .x)) |>
     furrr::future_map_dfr(~ p_event(.x, state_names), .id = "_val")
 
@@ -85,7 +85,7 @@ stack_list_of_dfs <- function(list_of_dfs) {
   state_names <- pd$state_names
 
   df <- vals |>
-    set_names() |>
+    rlang::set_names() |>
     purrr::map(~ dplyr::filter(pd_df, `_val` == .x)) |>
     furrr::future_map_dfr(~ p_event(.x, state_names),
       .id = "_val"

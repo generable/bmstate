@@ -88,7 +88,7 @@
     distinct(VAR, !!!surv_vars)
   p_event <- training_observed_events |>
     mutate(one = 1) |>
-    left_join(p_event_groups, by = join_by(!!!surv_vars)) |>
+    left_join(p_event_groups, by = dplyr::join_by(!!!surv_vars)) |>
     dplyr::select(state, subject_id, time, is_event, VAR) |>
     dplyr::group_by(state) |>
     tidyr::nest(event_data = c(subject_id, time, is_event, VAR)) |>
@@ -120,10 +120,10 @@
   # now, project K-M estimates onto test pop, for each subject in surv_vars group
   p_event_per_subject <- test_observed_events |>
     distinct(subject_id, !!!surv_vars) |>
-    left_join(p_event_groups, by = join_by(!!!surv_vars)) |>
+    left_join(p_event_groups, by = dplyr::join_by(!!!surv_vars)) |>
     left_join(p_event, by = c("VAR"), multiple = "all", relationship = "many-to-many") |>
     dplyr::transmute(subject_id, state, time, p_event_free = surv) |>
-    arrange(state, time, subject_id)
+    dplyr::arrange(state, time, subject_id)
 
   dplyr::lst(
     p_event, p_event_per_subject,
@@ -278,7 +278,7 @@ summarize_ppsurv <- function(pd, target_times, by = "subject_id",
     dplyr::ungroup()
 
   res_data$data |>
-    set_names(res_data$grp) |>
+    rlang::set_names(res_data$grp) |>
     furrr::future_map(
       .surv_fun,
       target_times = target_times,
@@ -512,7 +512,7 @@ summarize_ppsurv <- function(pd, target_times, by = "subject_id",
   by <- rlang::syms(by)
   bs_estimate |>
     dplyr::group_by(state, method, Event, !!!by) |>
-    arrange(time) |>
+    dplyr::arrange(time) |>
     mutate(
       interval = lead(time, n = 1, order_by = time) - time,
       ibs = purrr::accumulate(brier_score * interval, sum)
@@ -645,14 +645,17 @@ compute_scores <- function(pd, pred_pd = NULL,
       left_join(
         observed$p_event_per_subject |>
           dplyr::select(time, state, subject_id, p_event_free),
-        by = join_by(time, state, subject_id)
+        by = dplyr::join_by(time, state, subject_id)
       ) |>
       mutate(p_event_free = if_else(is.na(p_event_free), 0, p_event_free)) |>
       dplyr::group_by(state, time) |>
       tidyr::nest(predicted = c(subject_id, p_event_free)) |>
       dplyr::ungroup() |>
       mutate(
-        p_event_free = map(predicted, ~ dplyr::arrange(.x, subject_id) |> pull(p_event_free)),
+        p_event_free = map(
+          predicted,
+          ~ dplyr::arrange(.x, subject_id) |> pull(p_event_free)
+        ),
       ) |>
       dplyr::select(-predicted)
   }
@@ -662,7 +665,7 @@ compute_scores <- function(pd, pred_pd = NULL,
     futile.logger::flog.info("Starting computation of brier score on K-M estimates ...")
     km_scores <-
       km_prediction |>
-      dplyr::inner_join(observed_data_per_state, by = join_by(state)) |>
+      dplyr::inner_join(observed_data_per_state, by = dplyr::join_by(state)) |>
       dplyr::mutate(
         score = furrr::future_pmap_dbl(
           dplyr::lst(
@@ -686,7 +689,7 @@ compute_scores <- function(pd, pred_pd = NULL,
     futile.logger::flog.info("Starting computation of cindex on K-M estimates ...")
     km_scores <-
       km_prediction |>
-      dplyr::inner_join(observed_data_per_state, by = join_by(state)) |>
+      dplyr::inner_join(observed_data_per_state, by = dplyr::join_by(state)) |>
       dplyr::mutate(
         score = furrr::future_pmap_dbl(
           dplyr::lst(
@@ -710,20 +713,20 @@ compute_scores <- function(pd, pred_pd = NULL,
     msm_prediction <- predicted |>
       tidyr::expand(subject_id, time, state, !!!by_syms) |>
       left_join(predicted |> dplyr::select(time, state, subject_id, p_event_free, !!!by_syms),
-        by = join_by(time, state, subject_id, !!!by_syms)
+        by = dplyr::join_by(time, state, subject_id, !!!by_syms)
       ) |>
       mutate(p_event_free = if_else(is.na(p_event_free), 0, p_event_free)) |>
       tidyr::nest(predicted = c(subject_id, p_event_free)) |>
       mutate(
-        predicted = map(predicted, arrange, subject_id),
-        p_event_free = map(predicted, pull, p_event_free)
+        predicted = map(predicted, dplyr::arrange, subject_id),
+        p_event_free = map(predicted, dplyr::pull, p_event_free)
       ) |>
       dplyr::select(-predicted)
 
     if ("brier_score" %in% which) {
       futile.logger::flog.info("Starting computation of brier score for msm data ...")
       msm_scores <- msm_prediction |>
-        inner_join(observed_data_per_state, by = join_by(state)) |>
+        inner_join(observed_data_per_state, by = dplyr::join_by(state)) |>
         dplyr::mutate(
           score = furrr::future_pmap_dbl(
             dplyr::lst(
@@ -743,7 +746,7 @@ compute_scores <- function(pd, pred_pd = NULL,
     if ("cindex" %in% which) {
       futile.logger::flog.info("Starting computation of cindex for msm data ...")
       msm_scores <- msm_prediction |>
-        inner_join(observed_data_per_state, by = join_by(state)) |>
+        inner_join(observed_data_per_state, by = dplyr::join_by(state)) |>
         dplyr::mutate(
           score = furrr::future_pmap_dbl(
             dplyr::lst(
@@ -828,7 +831,7 @@ compute_d_calibration <- function(pd, pred_pd,
     dplyr::group_by(p_qtile, Event, state) |>
     dplyr::tally() |>
     dplyr::ungroup() |>
-    arrange(Event, state, p_qtile)
+    dplyr::arrange(Event, state, p_qtile)
 
   qtiles_censored <- merged_data |>
     dplyr::filter(is_event == 0) |>
@@ -841,7 +844,7 @@ compute_d_calibration <- function(pd, pred_pd,
     dplyr::group_by(Event, state, p_qtile) |>
     summarize(n = sum(n)) |>
     dplyr::ungroup() |>
-    arrange(Event, state, p_qtile)
+    dplyr::arrange(Event, state, p_qtile)
 
   d_calibration <- list(censored = qtiles_censored, uncensored = qtiles_observed) |>
     dplyr::bind_rows(.id = "type")
@@ -1133,7 +1136,7 @@ plot_cindex <- function(ci, name, nrow = NULL, ncol = NULL) {
   for (j in 1:length(ci)) {
     res <- ci[[j]]
     rn <- res[[name]]
-    df <- res$df |> arrange(observed)
+    df <- res$df |> dplyr::arrange(observed)
     st <- paste0("ci = ", round(rn, 4))
     plt <- df |> ggplot(aes(x = time, y = !!sym(ylab), color = observed)) +
       geom_point(alpha = 0.95, size = 0.4)
@@ -1144,7 +1147,7 @@ plot_cindex <- function(ci, name, nrow = NULL, ncol = NULL) {
         legend.position = "none", text = element_text(size = 8)
       )
   }
-  plt <- ggarrange(
+  plt <- ggdplyr::arrange(
     plotlist = plots, legend.grob = get_legend(plots[[1]]),
     nrow = nrow, ncol = ncol
   )
@@ -1158,5 +1161,5 @@ plot_ci_multi <- function(ci) {
   ci_prob <- sapply(ci, function(x) x$ci_prob)
   plt_1 <- plot_cindex(ci, name = "ci_p_km", nrow = 1)
   plt_2 <- plot_cindex(ci, name = "ci_p_msm", nrow = 1)
-  ggarrange(plt_1, plt_2, ncol = 1, nrow = 2)
+  ggdplyr::arrange(plt_1, plt_2, ncol = 1, nrow = 2)
 }
