@@ -41,20 +41,21 @@ create_pathdata <- function(df, covs, ...) {
 #' @field terminal_states Terminal states.
 #' @field initial_states Initial states.
 #' @field censor_states Censoring states.
-#' @field dt TODO
 PathData <- R6::R6Class(
   classname = "PathData",
+  private = list(
+    dt = NULL
+  ),
   public = list(
-    subject_df = NULL, # must have subject_id and all covariates
-    path_df = NULL, # must have
-    link_df = NULL, #
+    subject_df = NULL,
+    path_df = NULL,
+    link_df = NULL,
     covs = NULL,
     state_names = NULL,
     state_types = NULL,
     terminal_states = NULL,
     initial_states = NULL,
     censor_states = NULL,
-    dt = NULL,
 
     #' Initialize
     #' @param subject_df Subjects data frame.
@@ -126,10 +127,12 @@ PathData <- R6::R6Class(
       self$link_df <- link_df
     },
     #' Get names of covariates
+    #' @return a character vector
     covariate_names = function() {
       self$covs
     },
     #' Get path lenghts (among paths that include events)
+    #' @return a data frame of path ids and counts
     lengths = function() {
       self$path_df |>
         filter(is_event == TRUE) |>
@@ -137,12 +140,14 @@ PathData <- R6::R6Class(
         count()
     },
     #' Get number of paths
+    #' @return an integer
     n_paths = function() {
       nrow(self$path_df |>
         group_by(.data$path_id) |>
         count())
     },
     #' Get longest path
+    #' @return a \code{\link{PathData}} object with just one path
     longest_path = function() {
       lens <- self$lengths()
       idx <- which(lens$n == max(lens$n))[1]
@@ -150,23 +155,36 @@ PathData <- R6::R6Class(
       self$filter(unique(df$path_id))
     },
     #' Get indices of event states
+    #' @return integer vector
     get_event_states = function() {
       match(self$get_event_state_names(), self$state_names)
     },
+    #' Get names of states that are events (i.e. not initial and not censor)
+    #'
+    #' @return TODO: has a bug because the initial state can be an event?
     get_event_state_names = function() {
       self$state_names |>
         purrr::discard(~ .x %in% self$initial_states) |>
         purrr::discard(~ .x %in% self$censor_states)
     },
+
+    #' Convert to format used by the 'mstate' package
+    #'
+    #' @param covariates Include covariates?
     as_msdata = function(covariates = FALSE) {
       checkmate::assert_logical(covariates, len = 1)
       pathdata_to_mstate_format(self, covariates)
     },
+    #' Format as time to first event
+    #'
+    #' @param covs covariates to include in output data frame
+    #' @param truncate truncate after terminal events?
     as_time_to_first_event = function(covs = c("subject_id"), truncate = FALSE) {
       df <- self$as_data_frame(covs, truncate = truncate)
       tt_event <- df |>
         as_time_to_first_event(states = self$get_event_states(), by = covs)
     },
+    #' Print info
     print = function() {
       n_path <- self$n_paths()
       covs <- self$covariate_names()
@@ -175,11 +193,25 @@ PathData <- R6::R6Class(
       message(paste0("States = {"), paste0(sn, collapse = ", "), "}")
       message(paste0("Covariates = {"), paste0(covs, collapse = ", "), "}")
     },
+
+    #' Check that a state is valid
+    #'
+    #' @param check_states states to check
+    #' @param state_names all state names
+    #' @param min_len minimum length
     check_valid_state = function(check_states, state_names, min_len) {
       checkmate::assert_character(check_states, min.len = min_len)
       assertthat::assert_that(all(check_states %in% state_names))
       assertthat::assert_that(purrr::none(check_states, duplicated))
     },
+
+    #' Check that states input is valid
+    #'
+    #' @param state_names names of all states
+    #' @param terminal_states names of terminal states
+    #' @param initial_states names of initial states
+    #' @param censor_states names of censoring states
+    #' @param path_df the path data frame
     check_states = function(state_names, terminal_states, initial_states,
                             censor_states, path_df) {
       checkmate::assert_character(state_names, min.len = 1)
@@ -190,6 +222,9 @@ PathData <- R6::R6Class(
       self$check_valid_state(initial_states, state_names, min_len = 0)
       self$check_valid_state(censor_states, state_names, min_len = 1)
     },
+    #' Convert to one long data frame
+    #' @param covariates Which covariates to include?
+    #' @param truncate Truncate after terminal events?
     as_data_frame = function(covariates = NULL, truncate = FALSE) {
       df <- self$path_df
       if (isTRUE(truncate)) {
@@ -206,9 +241,15 @@ PathData <- R6::R6Class(
       stopifnot(nrow(out) == nrow(df))
       out
     },
-    as_transitions = function(only_observed = FALSE) {
-      if (is.null(self$dt)) {
-        self$dt <- dt <- as_transitions(self$as_data_frame(),
+
+    #' Data frame in transitions format
+    #'
+    #' @param only_observed Limit transitions to only the observed ones?
+    #' @param force_rerun Force rerun of the conversion? If \code{FALSE},
+    #' a cached version is used if it exists.
+    as_transitions = function(only_observed = FALSE, force_rerun = FALSE) {
+      if (is.null(private$dt) || force_rerun) {
+        private$dt <- dt <- as_transitions(self$as_data_frame(),
           state_names = self$state_names,
           state_types = self$state_types,
           terminal_states = self$terminal_states,
@@ -217,7 +258,7 @@ PathData <- R6::R6Class(
           covs = self$covariate_names()
         )
       } else {
-        dt <- self$dt
+        dt <- private$dt
       }
       if (only_observed) {
         # Limit possible transitions to only the observed ones

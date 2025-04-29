@@ -31,9 +31,7 @@ columns.}
 
 \item{\code{initial_states}}{Initial states.}
 
-\item{\code{censor_states}}{Censoring states.}
-
-\item{\code{dt}}{TODO
+\item{\code{censor_states}}{Censoring states.
 Initialize}
 }
 \if{html}{\out{</div>}}
@@ -99,12 +97,7 @@ Initialize}
 \item{\code{terminal_states}}{Terminal states.}
 
 \item{\code{censor_states}}{Censoring states.
-Get names of covariates
-Get path lenghts (among paths that include events)
-Get number of paths
-Get longest path
-Get indices of event states
-Step plot of the paths}
+Get names of covariates}
 
 \item{\code{initial_states}}{Initial states.}
 }
@@ -119,6 +112,10 @@ Step plot of the paths}
 \if{html}{\out{<div class="r">}}\preformatted{PathData$covariate_names()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+a character vector
+Get path lenghts (among paths that include events)
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-lengths"></a>}}
@@ -128,6 +125,10 @@ Step plot of the paths}
 \if{html}{\out{<div class="r">}}\preformatted{PathData$lengths()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+a data frame of path ids and counts
+Get number of paths
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-n_paths"></a>}}
@@ -137,6 +138,10 @@ Step plot of the paths}
 \if{html}{\out{<div class="r">}}\preformatted{PathData$n_paths()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+an integer
+Get longest path
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-longest_path"></a>}}
@@ -146,6 +151,10 @@ Step plot of the paths}
 \if{html}{\out{<div class="r">}}\preformatted{PathData$longest_path()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+a \code{\link{PathData}} object with just one path
+Get indices of event states
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-get_event_states"></a>}}
@@ -155,6 +164,10 @@ Step plot of the paths}
 \if{html}{\out{<div class="r">}}\preformatted{PathData$get_event_states()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+integer vector
+Get names of states that are events (i.e. not initial and not censor)
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-get_event_state_names"></a>}}
@@ -164,6 +177,10 @@ Step plot of the paths}
 \if{html}{\out{<div class="r">}}\preformatted{PathData$get_event_state_names()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+TODO: has a bug because the initial state can be an event?
+Convert to format used by the 'mstate' package
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-as_msdata"></a>}}
@@ -173,6 +190,14 @@ Step plot of the paths}
 \if{html}{\out{<div class="r">}}\preformatted{PathData$as_msdata(covariates = FALSE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{covariates}}{Include covariates?
+Format as time to first event}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-as_time_to_first_event"></a>}}
@@ -182,6 +207,17 @@ Step plot of the paths}
 \if{html}{\out{<div class="r">}}\preformatted{PathData$as_time_to_first_event(covs = c("subject_id"), truncate = FALSE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{covs}}{covariates to include in output data frame}
+
+\item{\code{truncate}}{truncate after terminal events?
+Print info
+Check that a state is valid}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-print"></a>}}
@@ -200,6 +236,18 @@ Step plot of the paths}
 \if{html}{\out{<div class="r">}}\preformatted{PathData$check_valid_state(check_states, state_names, min_len)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{check_states}}{states to check}
+
+\item{\code{state_names}}{all state names}
+
+\item{\code{min_len}}{minimum length
+Check that states input is valid}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-check_states"></a>}}
@@ -215,6 +263,22 @@ Step plot of the paths}
 )}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{state_names}}{names of all states}
+
+\item{\code{terminal_states}}{names of terminal states}
+
+\item{\code{initial_states}}{names of initial states}
+
+\item{\code{censor_states}}{names of censoring states}
+
+\item{\code{path_df}}{the path data frame
+Convert to one long data frame}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-as_data_frame"></a>}}
@@ -224,15 +288,36 @@ Step plot of the paths}
 \if{html}{\out{<div class="r">}}\preformatted{PathData$as_data_frame(covariates = NULL, truncate = FALSE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{covariates}}{Which covariates to include?}
+
+\item{\code{truncate}}{Truncate after terminal events?
+Data frame in transitions format}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-as_transitions"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-as_transitions}{}}}
 \subsection{Method \code{as_transitions()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$as_transitions(only_observed = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$as_transitions(only_observed = FALSE, force_rerun = FALSE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{only_observed}}{Limit transitions to only the observed ones?}
+
+\item{\code{force_rerun}}{Force rerun of the conversion? If \code{FALSE},
+a cached version is used if it exists.
+Step plot of the paths}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-plot_paths"></a>}}
