@@ -55,7 +55,7 @@ simulate_multitransition_data <- function(
     fda <- c(15, 30, 60)[sample(3, 1)]
     log_hazard_mult <- rep(0, n_trans)
     for (h in 1:n_trans) {
-      df_beta_true_h <- df_beta_true |> filter(trans_idx == h)
+      df_beta_true_h <- df_beta_true |> dplyr::filter(trans_idx == h)
       log_hazard_mult[h] <- compute_true_hazard_mult(
         sex, age, fda, df_beta_true_h
       )
@@ -240,13 +240,13 @@ simulate_path <- function(h0_true, log_hazard_mult, subject_idx, sys_idx = 1) {
 # Hazard multiplier
 compute_true_hazard_mult <- function(sex, age, fda, df_beta_true) {
   beta_sex <- df_beta_true |>
-    filter(cov_name == "sex") |>
+    dplyr::filter(cov_name == "sex") |>
     dplyr::pull(beta_true)
   beta_age <- df_beta_true |>
-    filter(cov_name == "age") |>
+    dplyr::filter(cov_name == "age") |>
     dplyr::pull(beta_true)
   beta_dose <- df_beta_true |>
-    filter(cov_name == "first_dose_amount") |>
+    dplyr::filter(cov_name == "first_dose_amount") |>
     dplyr::pull(beta_true)
   checkmate::assert_number(beta_sex)
   checkmate::assert_number(beta_age)
@@ -289,12 +289,12 @@ create_sim_pathdata <- function(df, term_state, state_names, covs) {
   # Filter censor events after terminal state
   term_state_idx <- which(state_names == term_state)
   df <- df |>
-    group_by(subject_id) |>
+    dplyr::group_by(subject_id) |>
     mutate(first_termstate_time = ifelse(any(state == term_state_idx),
       min(time[state == term_state_idx]), Inf
     )) |>
-    filter(time <= first_termstate_time) |>
-    select(-first_termstate_time)
+    dplyr::filter(time <= first_termstate_time) |>
+    dplyr::select(-first_termstate_time)
 
   # Create PathData
   create_pathdata(as_tibble(df), covs,

@@ -3,16 +3,16 @@ p_event <- function(paths_df, state_names = NULL) {
   nonevent_states <- c("Censor", "Randomization")
   n_paths <- length(unique(paths_df$path_id))
   paths_df <- paths_df |>
-    arrange(path_id, time) |>
-    group_by(state) |>
-    filter(is_event == 1)
+    dplyr::arrange(path_id, time) |>
+    dplyr::group_by(state) |>
+    dplyr::filter(is_event == 1)
   df_empty <- data.frame(state_char = state_names, state = 1:length(state_names))
   df <- paths_df |>
     summarise(p_paths = dplyr::n_distinct(path_id) / n_paths)
-  df <- df |> filter(state != 0)
+  df <- df |> dplyr::filter(state != 0)
   df <- df_empty |> left_join(df, by = join_by(state))
   df$p_paths[is.na(df$p_paths)] <- 0
-  df |> filter(!(state_char %in% nonevent_states))
+  df |> dplyr::filter(!(state_char %in% nonevent_states))
 }
 
 # Above but for each subject separately
@@ -35,7 +35,7 @@ p_event_by_subject <- function(pd, draw_idx = NULL, rep_idx = NULL) {
   names(list_of_dfs) <- a
   out <- stack_list_of_dfs(list_of_dfs)
   out$subject_id <- out$name
-  out |> select(-name)
+  out |> dplyr::select(-name)
 }
 
 # Stack list of data frames to one data frame
@@ -58,7 +58,7 @@ stack_list_of_dfs <- function(list_of_dfs) {
   state_names <- pd_list[[1]]$state_names
   vals <- pd_df |>
     distinct(`_val`) |>
-    pull(`_val`) |>
+    dplyr::pull(`_val`) |>
     sort()
 
   df <- vals |>
@@ -68,7 +68,7 @@ stack_list_of_dfs <- function(list_of_dfs) {
 
   df |>
     left_join(pd_df |> distinct(`_val`, !!!sym_vars)) |>
-    select(-`_val`)
+    dplyr::select(-`_val`)
 }
 
 # p_event by variable
@@ -80,7 +80,7 @@ stack_list_of_dfs <- function(list_of_dfs) {
     mutate(`_val` = str_c(!!!sym_vars, sep = ":"))
   vals <- pd_df |>
     distinct(`_val`) |>
-    pull(`_val`) |>
+    dplyr::pull(`_val`) |>
     sort()
   state_names <- pd$state_names
 
@@ -93,7 +93,7 @@ stack_list_of_dfs <- function(list_of_dfs) {
 
   df |>
     left_join(pd_df |> distinct(`_val`, !!!sym_vars), by = join_by(`_val`)) |>
-    select(-`_val`)
+    dplyr::select(-`_val`)
 }
 
 # Function for transforming format (counterfactual paths)
@@ -117,7 +117,7 @@ cf_p_event_by_subject_by_rep <- function(list_of_pds, n_repeats) {
     df <- rbind(df, df_j)
   }
   df |>
-    group_by(state_char, cf_dose) |>
+    dplyr::group_by(state_char, cf_dose) |>
     summarize(
       p_mean = mean(p_paths), p_std = sd(p_paths),
       .groups = "drop"
@@ -133,7 +133,7 @@ cf_p_event_by_subject_by_draw <- function(list_of_pds, n_draws) {
     df <- rbind(df, df_j)
   }
   df |>
-    group_by(state_char, cf_dose) |>
+    dplyr::group_by(state_char, cf_dose) |>
     summarize(
       p_mean = mean(p_paths), p_std = sd(p_paths),
       .groups = "drop"
@@ -174,31 +174,31 @@ compute_proportion_up_to_time <- function(data, time_grid, event_states, byvars 
     return(NULL)
   }
   results_pre <- data |>
-    group_by(!!!byvars) |>
+    dplyr::group_by(!!!byvars) |>
     mutate(total_n_paths = dplyr::n_distinct(path_id)) |>
-    ungroup() |>
-    filter(is_event == 1) |>
-    group_by(!!!byvars, state, path_id) |>
+    dplyr::ungroup() |>
+    dplyr::filter(is_event == 1) |>
+    dplyr::group_by(!!!byvars, state, path_id) |>
     # keep first record where path observed in state
-    filter(time == min(time)) |>
-    group_by(!!!byvars, state) |>
-    arrange(time) |>
+    dplyr::filter(time == min(time)) |>
+    dplyr::group_by(!!!byvars, state) |>
+    dplyr::arrange(time) |>
     mutate(
       n_paths = 1,
       n_paths_visited = purrr::accumulate(n_paths, sum),
       p_paths = n_paths_visited / total_n_paths
     ) |>
-    ungroup() |>
+    dplyr::ungroup() |>
     distinct(!!!byvars, time, state, p_paths)
   results <- results_pre |>
     bind_rows(all_groups) |>
-    group_by(!!!byvars, state) |>
-    arrange(time) |>
+    dplyr::group_by(!!!byvars, state) |>
+    dplyr::arrange(time) |>
     tidyr::fill(p_paths, .direction = "down") |>
-    ungroup() |>
+    dplyr::ungroup() |>
     mutate(proportion = if_else(is.na(p_paths), 0, p_paths)) |>
     distinct(!!!byvars, state, time, proportion) |>
-    filter(time %in% time_grid)
+    dplyr::filter(time %in% time_grid)
 
   dplyr::as_tibble(results)
 }
@@ -215,7 +215,7 @@ estimate_noevent_probability <- function(data, time_points) {
 # Could be replaced by PathData$as_time_to_first_event()
 time_to_event <- function(df, state_idx) {
   df |>
-    group_by(path_id, subject_id) |>
+    dplyr::group_by(path_id, subject_id) |>
     summarize(
       time = ifelse(any(state == state_idx),
         min(time[state == state_idx]), max(time)

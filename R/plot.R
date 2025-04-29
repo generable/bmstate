@@ -110,11 +110,11 @@ plot_fun_per_transition <- function(df, sd, legend, name, t_name, all_states,
   df$Transition <- paste0(df$trans_type, ":", trans_names[df$transition])
   if (!is.null(filter_transitions)) {
     df <- df |>
-      filter(Transition %in% filter_transitions)
+      dplyr::filter(Transition %in% filter_transitions)
   }
   if (!is.null(filter_types)) {
     df <- df |>
-      filter(Type %in% filter_types)
+      dplyr::filter(Type %in% filter_types)
   }
   df |>
     ggplot(aes(x = time, y = !!sym(name), fill = Type)) +
@@ -137,7 +137,7 @@ plot_transitions_pd <- function(pd, idx) {
   dat <- pd$df
   all_states <- pd$state_names
   df <- dat |>
-    filter(subject_id == unique(dat$subject_id)[idx]) |>
+    dplyr::filter(subject_id == unique(dat$subject_id)[idx]) |>
     mutate(
       state_char = all_states[state],
       state = factor(state_char, levels = all_states, ordered = T)
@@ -161,7 +161,7 @@ debug_standata <- function(pd, dat_trans, sd, idx, trans_names, all_states,
   dat <- pd$as_data_frame()
   sub_id <- subject_idx_to_id(id_map_train, idx)
   df <- dat |>
-    filter(subject_id == sub_id) |>
+    dplyr::filter(subject_id == sub_id) |>
     mutate(
       state_char = all_states[state],
       state = factor(state_char, levels = all_states, ordered = T)
@@ -250,9 +250,9 @@ plot_effect_beta <- function(a, beta_name, pd, df_true = NULL) {
   a$Transition <- names_long[a$trans_idx]
   a$trans_type <- trans_types[a$trans_idx]
   a$Type <- as.factor(type_names[a$trans_type])
-  a <- a |> group_by(Type)
+  a <- a |> dplyr::group_by(Type)
   plt <- a |>
-    ungroup() |>
+    dplyr::ungroup() |>
     ggplot(aes(
       x = !!sym(beta_name), group = trans_idx, color = Type, fill = Type,
       y = Transition
@@ -288,9 +288,9 @@ plot_effect_beta_group <- function(a, var_name, beta_name, legend, all_states) {
   a$grp <- paste0(a$trans_idx, a[["var_name"]])
   a$Type <- as.factor(type_names[a$trans_type])
   a |>
-    group_by(Type) |>
+    dplyr::group_by(Type) |>
     mutate(type_median = median(!!sym(beta_name))) |>
-    ungroup() |>
+    dplyr::ungroup() |>
     ggplot(aes(
       x = !!sym(beta_name), group = grp, color = Type, fill = Type,
       y = Transition
@@ -331,7 +331,7 @@ plot_inst_haz <- function(log_C, h0, sd, trans_names, draw_idx_hl = 1) {
     x = time, y = inst_haz, group = draw_idx
   )) +
     geom_line(alpha = 0.25) +
-    geom_line(data = df |> filter(hl), color = "red") +
+    geom_line(data = df |> dplyr::filter(hl), color = "red") +
     ylab("Hazard") +
     facet_wrap(. ~ trans_name) +
     scale_y_log10() +
@@ -391,7 +391,7 @@ plot_pred_conc <- function(fit, conc, conc_lasttwo, sd, sd_gq, sub_idx,
       upper = as.vector(quantile(ci_l2, probs = 0.95))
     )
     if (cut) {
-      df_l2 <- df_l2 |> filter(t >= t_ss_end_l2)
+      df_l2 <- df_l2 |> dplyr::filter(t >= t_ss_end_l2)
     }
   }
   df_dat <- data.frame(t = t_obs, conc = conc_obs)
@@ -494,9 +494,9 @@ plot_other_beta <- function(fit, stan_dat, pd,
   a$cov_name <- as.factor(names[a$cov_idx])
   plt_oth <- NULL
   for (j in seq_len(stan_dat$stan_data$N_oth)) {
-    a_nam <- a |> filter(cov_name == names[j])
+    a_nam <- a |> dplyr::filter(cov_name == names[j])
     if (!is.null(df_beta_true)) {
-      df_true <- df_beta_true |> filter(cov_name == names[j])
+      df_true <- df_beta_true |> dplyr::filter(cov_name == names[j])
     } else {
       df_true <- NULL
     }
@@ -741,7 +741,7 @@ create_cindex_plot <- function(pd, paths_gen, paths_gen_oos,
   # Implementation 2
   ci_is2 <- compute_scores(
     pd,
-    ppsurv = ppsurv_subj |> filter(time == t_eval),
+    ppsurv = ppsurv_subj |> dplyr::filter(time == t_eval),
     km_formula = ~dose_arm,
     which = "cindex",
     keep_gt_info = FALSE
@@ -749,7 +749,7 @@ create_cindex_plot <- function(pd, paths_gen, paths_gen_oos,
 
   ci_oos2 <- compute_scores(
     pd,
-    ppsurv = ppsurv_subj_oos |> filter(time == t_eval),
+    ppsurv = ppsurv_subj_oos |> dplyr::filter(time == t_eval),
     sub_ids_char_training = sub_ids_train,
     km_formula = ~dose_arm,
     which = "cindex",
@@ -759,18 +759,18 @@ create_cindex_plot <- function(pd, paths_gen, paths_gen_oos,
   # Comparison table
   ci_is_table <- ci_is_table |>
     left_join(
-      ci_is2 |> select(method, Event, cindex),
+      ci_is2 |> dplyr::select(method, Event, cindex),
       by = join_by(method, Event),
       suffix = c(".v1", ".v2")
     ) |>
-    select(method, Event, cindex.v1, cindex.v2)
+    dplyr::select(method, Event, cindex.v1, cindex.v2)
   ci_oos_table <- ci_oos_table |>
     left_join(
-      ci_oos2 |> select(method, Event, cindex),
+      ci_oos2 |> dplyr::select(method, Event, cindex),
       by = join_by(method, Event),
       suffix = c(".v1", ".v2")
     ) |>
-    select(method, Event, cindex.v1, cindex.v2)
+    dplyr::select(method, Event, cindex.v1, cindex.v2)
 
   # Plot
   plt_ci_is <- annotate_figure(plot_ci_multi(ci_is), top = "In-sample")

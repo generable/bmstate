@@ -16,10 +16,10 @@ create_pathdata <- function(df, covs, ...) {
   df$draw_idx <- 1
   df$rep_idx <- 1
   subject_df <- df |>
-    group_by(subject_id) |>
+    dplyr::group_by(subject_id) |>
     slice(1)
   link_df <- df |>
-    group_by(path_id) |>
+    dplyr::group_by(path_id) |>
     slice(1)
   PathData$new(subject_df, df, link_df, covs = covs, ...)
 }
@@ -135,23 +135,23 @@ PathData <- R6::R6Class(
     #' @return a data frame of path ids and counts
     lengths = function() {
       self$path_df |>
-        filter(is_event == TRUE) |>
-        group_by(path_id) |>
-        count()
+        dplyr::filter(is_event == TRUE) |>
+        dplyr::group_by(path_id) |>
+        dplyr::count()
     },
     #' Get number of paths
     #' @return an integer
     n_paths = function() {
       nrow(self$path_df |>
-        group_by(.data$path_id) |>
-        count())
+        dplyr::group_by(.data$path_id) |>
+        dplyr::count())
     },
     #' Get longest path
     #' @return a \code{\link{PathData}} object with just one path
     longest_path = function() {
       lens <- self$lengths()
       idx <- which(lens$n == max(lens$n))[1]
-      df <- self$path_df |> filter(path_id == lens$path_id[idx])
+      df <- self$path_df |> dplyr::filter(path_id == lens$path_id[idx])
       self$filter(unique(df$path_id))
     },
     #' Get indices of event states
@@ -201,8 +201,8 @@ PathData <- R6::R6Class(
     #' @param min_len minimum length
     check_valid_state = function(check_states, state_names, min_len) {
       checkmate::assert_character(check_states, min.len = min_len)
-      assertthat::assert_that(all(check_states %in% state_names))
-      assertthat::assert_that(purrr::none(check_states, duplicated))
+      stopifnot(all(check_states %in% state_names))
+      stopifnot(purrr::none(check_states, duplicated))
     },
 
     #' Check that states input is valid
@@ -215,7 +215,7 @@ PathData <- R6::R6Class(
     check_states = function(state_names, terminal_states, initial_states,
                             censor_states, path_df) {
       checkmate::assert_character(state_names, min.len = 1)
-      assertthat::assert_that(purrr::none(state_names, duplicated))
+      stopifnot(purrr::none(state_names, duplicated))
       observed_states <- unique(state_names[path_df$state])
       self$check_valid_state(observed_states, state_names, min_len = 1)
       self$check_valid_state(terminal_states, state_names, min_len = 0)
@@ -232,12 +232,14 @@ PathData <- R6::R6Class(
         df <- df |>
           truncate_after_terminal_events(term_states)
       }
-      out <- df |> inner_join(self$link_df, by = "path_id", relationship = "many-to-one")
+      out <- df |>
+        inner_join(self$link_df, by = "path_id", relationship = "many-to-one")
       sub_df <- self$subject_df
       if (!is.null(covariates)) {
-        sub_df <- sub_df |> select(subject_index, one_of(covariates))
+        sub_df <- sub_df |> dplyr::select(subject_index, one_of(covariates))
       }
-      out <- out |> inner_join(sub_df, by = "subject_index", relationship = "many-to-one")
+      out <- out |>
+        inner_join(sub_df, by = "subject_index", relationship = "many-to-one")
       stopifnot(nrow(out) == nrow(df))
       out
     },
@@ -291,7 +293,7 @@ PathData <- R6::R6Class(
       }
       ids <- uid[idx_path]
       df <- df |>
-        filter(path_id %in% ids) |>
+        dplyr::filter(path_id %in% ids) |>
         mutate(
           state_char = self$state_names[state],
           state = factor(state_char, levels = self$state_names, ordered = T)
@@ -299,7 +301,6 @@ PathData <- R6::R6Class(
       ggplot(df, aes(x = time, y = state, group = path_id)) +
         geom_step(direction = "hv", alpha = alpha) +
         labs(x = "Time", y = "State", title = "State paths") +
-        theme_minimal() +
         geom_point(mapping = aes(color = is_event, pch = is_event))
     },
 
@@ -384,23 +385,23 @@ PathData <- R6::R6Class(
     filter = function(path_ids_keep = NULL, subject_ids_keep = NULL,
                       rep_ids_keep = NULL, draw_ids_keep = NULL) {
       subject_df <- self$subject_df |>
-        filter(is.null(subject_ids_keep) | subject_id %in% subject_ids_keep)
+        dplyr::filter(is.null(subject_ids_keep) | subject_id %in% subject_ids_keep)
       link_df <- self$link_df |>
-        filter(
+        dplyr::filter(
           is.null(rep_ids_keep) | rep_idx %in% rep_ids_keep,
           is.null(!!draw_ids_keep) | draw_idx %in% draw_ids_keep,
           subject_index %in% subject_df$subject_index
         )
       path_df <- self$path_df |>
-        filter(
+        dplyr::filter(
           is.null(path_ids_keep) | path_id %in% path_ids_keep,
           path_id %in% link_df$path_id
         )
-      link_df <- link_df |> filter(path_id %in% unique(path_df$path_id))
-      subject_df <- subject_df |> filter(subject_index %in%
+      link_df <- link_df |> dplyr::filter(path_id %in% unique(path_df$path_id))
+      subject_df <- subject_df |> dplyr::filter(subject_index %in%
         unique(link_df$subject_index))
       link_df <- link_df |>
-        left_join(subject_df |> select(subject_index, subject_id),
+        left_join(subject_df |> dplyr::select(subject_index, subject_id),
           by = "subject_index"
         )
       PathData$new(subject_df, path_df, link_df,
@@ -421,17 +422,17 @@ as_time_to_first_event <- function(dat, states, by = c()) {
   by_syms <- rlang::syms(unique(c(by, "path_id")))
   # max time as censor time
   censor <- dat |>
-    group_by(!!!by_syms) |>
+    dplyr::group_by(!!!by_syms) |>
     summarise(time = max(time), .groups = "keep") |>
-    ungroup() |>
+    dplyr::ungroup() |>
     expand_grid(state = states) |>
     mutate(is_event = 0)
   # min event time per state
   events <- dat |>
-    filter(is_event == 1, state %in% states) |>
-    group_by(state, !!!by_syms) |>
+    dplyr::filter(is_event == 1, state %in% states) |>
+    dplyr::group_by(state, !!!by_syms) |>
     summarize(time = min(time), .groups = "keep") |>
-    ungroup() |>
+    dplyr::ungroup() |>
     mutate(is_event = 1)
   d <- censor |>
     anti_join(events, by = c("path_id", "state")) |>
@@ -466,7 +467,7 @@ as_transitions_char <- function(dat, state_names, terminal_states) {
   df <- NULL
   ids <- unique(dat$subject_id)
   for (id in ids) {
-    dat_id <- dat |> filter(subject_id == id)
+    dat_id <- dat |> dplyr::filter(subject_id == id)
     df <- rbind(df, as_transitions_char_single(dat_id, state_names, terminal_states))
   }
 
@@ -484,7 +485,7 @@ as_transitions <- function(dat, state_names, state_types, terminal_states, covs,
   # Create legend first
   r <- tidyr::expand_grid(prev_state = state_names, state = state_names) |>
     mutate(trans_char = format_transition_char(prev_state, state)) |>
-    filter(
+    dplyr::filter(
       !prev_state %in% terminal_states, # no transition from terminal state
       !state %in% initial_states, # no transition into initial states
       !state %in% censor_states, # no transition into or out of censor
@@ -497,7 +498,7 @@ as_transitions <- function(dat, state_names, state_types, terminal_states, covs,
     ) |>
     as.data.frame()
   legend <- r[, c("trans_char", "prev_state", "state", "terminal")] |>
-    filter(!is.na(trans_char))
+    dplyr::filter(!is.na(trans_char))
   legend$transition <- seq_len(nrow(legend))
   trans_names <- legend$trans_char
   # add trans_type
@@ -562,7 +563,7 @@ check_and_sort_paths <- function(df) {
 #' @param id_map Maps numeric id to original id
 subject_df_with_idx <- function(pd, subs, id_map) {
   checkmate::assert_class(pd, "PathData")
-  df <- pd$subject_df |> filter(subject_id %in% subs)
+  df <- pd$subject_df |> dplyr::filter(subject_id %in% subs)
   df$sub_idx <- id_map$x_sub[match(df$subject_id, id_map$subject_id)]
   df
 }
@@ -576,7 +577,7 @@ pathdata_to_mstate_format <- function(pd, covariates = FALSE) {
   PT <- legend_to_PT_matrix(dt$legend)
   TFI <- legend_to_TFI_matrix(dt$legend)
   for (sid in siu) {
-    df_j <- df |> filter(subject_id == sid)
+    df_j <- df |> dplyr::filter(subject_id == sid)
     df_out <- rbind(df_out, to_mstate_format_part1(df_j))
   }
   df_out <- to_mstate_format_part2(df_out, PT, TFI)
@@ -714,7 +715,7 @@ plot_cumhaz_msfit <- function(msfit, legend = NULL) {
 }
 estimate_average_hazard <- function(msfit) {
   msfit$Haz |>
-    group_by(trans) |>
+    dplyr::group_by(trans) |>
     summarise(
       avg_haz = (last(Haz) - first(Haz)) / (last(time) - first(time))
     )
@@ -722,16 +723,16 @@ estimate_average_hazard <- function(msfit) {
 
 truncate_after_terminal_events <- function(df, term_states) {
   term_events <- df |>
-    filter(state %in% !!term_states, is_event == 1) |>
-    group_by(path_id) |>
+    dplyr::filter(state %in% !!term_states, is_event == 1) |>
+    dplyr::group_by(path_id) |>
     summarise(term_time = min(time, na.rm = T)) |>
-    ungroup()
+    dplyr::ungroup()
   no_terms <- df |>
     dplyr::anti_join(term_events, by = "path_id")
   with_terms <- df |>
     inner_join(term_events, by = c("path_id")) |>
-    filter(time <= term_time) |>
-    select(-term_time)
+    dplyr::filter(time <= term_time) |>
+    dplyr::select(-term_time)
   no_terms |>
     dplyr::bind_rows(with_terms)
 }
@@ -758,7 +759,7 @@ summarize_event_prob <- function(pd, target_times, by = c("subject_id")) {
     rgeco:::.tidy_km_strata() |>
     mutate(`vv` = as.integer(vv)) |>
     left_join(surv_df |> distinct(vv, !!!by_syms), by = "vv") |>
-    select(-vv)
+    dplyr::select(-vv)
 }
 
 # Full formula with expanded covariates
@@ -783,7 +784,7 @@ to_single_event <- function(pd, event) {
   path_df_new <- NULL
   for (path in pid) {
     df <- path_df |>
-      filter(path_id == path) |>
+      dplyr::filter(path_id == path) |>
       arrange(time)
     df$row_num <- 1:nrow(df)
     ri <- which(df$state == STATE)
@@ -795,12 +796,12 @@ to_single_event <- function(pd, event) {
       df <- df[c(1, ri[1]), ]
       df$state[2] <- 2
     }
-    path_df_new <- rbind(path_df_new, df |> select(-row_num))
+    path_df_new <- rbind(path_df_new, df |> dplyr::select(-row_num))
   }
 
   state_names <- c("Randomization", event, "Censor")
   link_df <- pd$link_df |> left_join(
-    pd$subject_df |> select(subject_id, subject_index),
+    pd$subject_df |> dplyr::select(subject_id, subject_index),
     by = "subject_index"
   )
   PathData$new(pd$subject_df, path_df_new, link_df,

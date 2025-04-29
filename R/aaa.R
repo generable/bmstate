@@ -44,12 +44,11 @@
 #' @importFrom ggpubr ggarrange get_legend annotate_figure
 #' @importFrom R6 R6Class
 #' @importFrom posterior as_draws_rvars
-#' @importFrom dplyr filter mutate transmute group_by select slice count
-#' @importFrom dplyr summarize summarise arrange first last rename
+#' @importFrom dplyr mutate transmute group_by select slice
+#' @importFrom dplyr summarize summarise arrange
 #' @importFrom dplyr inner_join semi_join left_join anti_join join_by
-#' @importFrom dplyr distinct ungroup dense_rank if_else bind_rows
-#' @importFrom dplyr count add_count pull lead
-#' @importFrom purrr map
+#' @importFrom dplyr distinct dense_rank if_else bind_rows
+#' @importFrom dplyr add_count
 #' @importFrom stringr str_extract str_detect str_wrap str_c
 #' @importFrom survival strata Surv
 #' @importFrom rlang .data
