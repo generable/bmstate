@@ -258,8 +258,6 @@ names(out) <- c("high")
 
 ## Parameter and rate recovery
 
-::: {.panel-tabset}
-
 ### No true effect
 
 ```{r, fig.width=9, fig.height=7.5, message=FALSE, warning=FALSE}
@@ -281,12 +279,8 @@ out$high$true_effect$plt_a
 out$high$true_effect$plt_d
 ```
 
-:::
-
 
 ## Brier scores
-
-::: {.panel-tabset}
 
 ### No true effect
 
@@ -300,12 +294,9 @@ out$high$no_effect$plt_b
 out$high$true_effect$plt_b
 ```
 
-:::
-
 
 ## Concordance index
 
-::: {.panel-tabset}
 
 ### No true effect
 
@@ -319,11 +310,9 @@ out$high$no_effect$plt_c
 out$high$true_effect$plt_c
 ```
 
-:::
 
 ## Hazard multiplier comparison
 
-::: {.panel-tabset}
 
 ```{r, fig.width=7, fig.height=4}
 hazard_mult_recovery <- function(res) {
@@ -378,12 +367,8 @@ plot_hazard_mult_recovery(r0)
 plot_hazard_mult_recovery(r1)
 ```
 
-:::
-
 
 ## Instant hazard comparison
-
-::: {.panel-tabset}
 
 ```{r, fig.width=7, fig.height=4}
 inst_haz_recovery <- function(res, trans_idx) {
@@ -449,7 +434,6 @@ plt <- ggarrange(a, b, c, d, nrow = 1, ncol = 4, labels = c(1, 2, 3, 4))
 plt
 ```
 
-:::
 
 
 # Comparing to mstate
