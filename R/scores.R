@@ -113,7 +113,7 @@
     tidyr::unnest(km_summary) |>
     mutate(VAR = as.integer(VAR))
   stopifnot(p_event |>
-    add_count(state, time, VAR) |>
+    dplyr::add_count(state, time, VAR) |>
     dplyr::filter(n > 1) |>
     nrow() == 0)
 
@@ -788,7 +788,9 @@ compute_d_calibration <- function(pd, pred_pd,
                                   sub_ids_char = NULL,
                                   truncate_at_terminal_events = FALSE) {
   # construct list of subject ids in common across all inputs
-  sub_ids_char <- .common_subjects(pd, pred_pd, sub_ids_char, .label = "D-calibration")
+  sub_ids_char <- .common_subjects(pd, pred_pd, sub_ids_char,
+    .label = "D-calibration"
+  )
 
   observed_events <- pd$as_time_to_first_event(
     truncate = truncate_at_terminal_events
@@ -824,7 +826,7 @@ compute_d_calibration <- function(pd, pred_pd,
     cross_join(all_qtiles) |>
     dplyr::filter(p_event_free <= p_qtile_ub, p_event_free > p_qtile_lb) |>
     dplyr::group_by(p_qtile, Event, state) |>
-    tally() |>
+    dplyr::tally() |>
     dplyr::ungroup() |>
     arrange(Event, state, p_qtile)
 

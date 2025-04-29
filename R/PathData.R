@@ -17,10 +17,10 @@ create_pathdata <- function(df, covs, ...) {
   df$rep_idx <- 1
   subject_df <- df |>
     dplyr::group_by(subject_id) |>
-    slice(1)
+    dplyr::slice(1)
   link_df <- df |>
     dplyr::group_by(path_id) |>
-    slice(1)
+    dplyr::slice(1)
   PathData$new(subject_df, df, link_df, covs = covs, ...)
 }
 

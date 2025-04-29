@@ -403,7 +403,7 @@ create_stan_data <- function(pd, pk, covariates,
   dat_oos <- dt$df |>
     dplyr::filter(subject_id %in% test_sub) |>
     dplyr::group_by(subject_id) |>
-    slice(1) |>
+    dplyr::slice(1) |>
     dplyr::ungroup()
   PT <- legend_to_PT_matrix(dt$legend)
   N_trans <- max(dt$legend$transition)
