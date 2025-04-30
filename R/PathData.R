@@ -383,7 +383,7 @@ PathData <- R6::R6Class(
       df <- self$as_msdata(covariates = TRUE)$msdata
       str <- paste(covs, collapse = " + ")
       form <- paste0("Surv(Tstart, Tstop, status) ~ ", str)
-      survival::coxph(as.formula(form), df, ...)
+      survival::coxph(stats::as.formula(form), df, ...)
     },
 
     #' Filter based on path id, creates new object
@@ -685,7 +685,7 @@ fit_coxph <- function(msdat, formula_rhs = NULL) {
     formula_rhs <- "strata(trans)"
   }
   formula <- paste0("Surv(Tstart, Tstop, status) ~ ", formula_rhs)
-  survival::coxph(as.formula(formula),
+  survival::coxph(stats::as.formula(formula),
     data = msdat, method = "breslow"
   )
 }
@@ -771,7 +771,7 @@ summarize_event_prob <- function(pd, target_times, by = c("subject_id")) {
     time = pp_summary$time,
     strata = pp_summary$strata
   )) |>
-    bind_cols(pstate_cols) |>
+    dplyr::bind_cols(pstate_cols) |>
     rgeco:::.tidy_km_strata() |>
     mutate(`vv` = as.integer(vv)) |>
     left_join(surv_df |> dplyr::distinct(vv, !!!by_syms), by = "vv") |>
@@ -801,7 +801,7 @@ to_single_event <- function(pd, event) {
   for (path in pid) {
     df <- path_df |>
       dplyr::filter(path_id == path) |>
-      arrange(time)
+      dplyr::arrange(time)
     df$row_num <- 1:nrow(df)
     ri <- which(df$state == STATE)
     if (length(ri) == 0) {

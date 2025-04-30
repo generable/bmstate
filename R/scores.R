@@ -913,7 +913,7 @@ compute_one_calibration <- function(pd, pred_pd = NULL, ppsurv = NULL,
   merged_data <- predicted |>
     dplyr::ungroup() |>
     mutate(n_subjects = dplyr::n_distinct(subject_id)) |>
-    dplyrfilter(time %in% target_times, time > 0, state > 1) |>
+    dplyr::filter(time %in% target_times, time > 0, state > 1) |>
     left_join(observed_events,
       by = c("subject_id", "state"),
       multiple = "all", relationship = "many-to-one"
@@ -958,7 +958,7 @@ write_score_to_file <- function(bs_estimates, params, cache_name,
   if (fs::file_exists(file)) {
     append <- TRUE
     if (interactive()) {
-      if (askYesNo("File already exists. Replace?")) {
+      if (utils::askYesNo("File already exists. Replace?")) {
         fs::file_delete(file)
         append <- FALSE
       }
@@ -967,7 +967,7 @@ write_score_to_file <- function(bs_estimates, params, cache_name,
     append <- FALSE
   }
 
-  # prepare run info as a row in a dataframe
+  # prepare run info as a row in a data frame
   run_vars <- vars(
     project, project_version, sample_n, events,
     iter_warmup, iter_sampling,
@@ -982,17 +982,17 @@ write_score_to_file <- function(bs_estimates, params, cache_name,
   result_vars <- vars(n_subjects, time, Event, interval, km, msm)
   result_summary <- bs_estimates |>
     dplyr::select(Event, method, time, ibs, n_subjects, interval) |>
-    drop_na() |>
+    tidyr::drop_na() |>
     dplyr::filter(time %in% c(max(time), seq(from = 0, to = 3 * 365.25, by = 365.25))) |>
-    spread(method, ibs) |>
+    tidyr::spread(method, ibs) |>
     dplyr::select(!!!result_vars)
 
   results <- result_summary |>
-    bind_cols(run_data) |>
+    dplyr::bind_cols(run_data) |>
     mutate(date = lubridate::today()) |>
     dplyr::select(date, !!!run_vars, !!!result_vars)
 
-  write_csv(results, file = file, append = append, quote = "all")
+  readr::write_csv(results, file = file, append = append, quote = "all")
 }
 
 
@@ -1148,7 +1148,7 @@ plot_cindex <- function(ci, name, nrow = NULL, ncol = NULL) {
       )
   }
   plt <- ggpubr::ggarrange(
-    plotlist = plots, legend.grob = get_legend(plots[[1]]),
+    plotlist = plots, legend.grob = ggpubr::get_legend(plots[[1]]),
     nrow = nrow, ncol = ncol
   )
   ggpubr::annotate_figure(plt, top = paste0("Concordance index (", ylab, ")"))

@@ -21,11 +21,13 @@ SystemRequirements: CmdStan >= 2.33.0
 Remotes:
   stan-dev/cmdstanr,
 Imports: 
+    brio,
     checkmate,
     cmdstanr,
     diagram,
     dplyr,
     forcats,
+    fs,
     furrr,
     future,
     ggdist (>= 3.1),
@@ -41,6 +43,7 @@ Imports:
     purrr,
     qgraph,
     R6,
+    readr,
     reshape2,
     rlang,
     splines2,
@@ -50,6 +53,7 @@ Imports:
     survminer,
     tibble,
     tidybayes,
-    tidyr
+    tidyr,
+    utils
 RoxygenNote: 7.3.2
 Config/testthat/edition: 3

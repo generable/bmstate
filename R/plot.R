@@ -14,7 +14,7 @@ plot_lambda <- function(fun, t_min, t_max) {
 
 # Plot helper
 plot_binary_matrix <- function(A, edge = FALSE) {
-  df <- melt(A)
+  df <- reshape2::melt(A)
   # Rename columns for clarity
   colnames(df) <- c("Row", "Column", "Value")
 
@@ -231,7 +231,7 @@ plot_effects_pk <- function(fit, params) {
   p3 <- plot_effect_beta_pk(a, "beta_V2", "cov")
 
   p <- ggpubr::ggarrange(p1, p2, p3, nrow = 1, ncol = 3)
-  annotate_figure(p, top = "Covariate effects in PK model")
+  ggpubr::annotate_figure(p, top = "Covariate effects in PK model")
 }
 
 
@@ -290,7 +290,7 @@ plot_effect_beta_group <- function(a, var_name, beta_name, legend, all_states) {
   a$Type <- as.factor(type_names[a$trans_type])
   a |>
     dplyr::group_by(Type) |>
-    mutate(type_median = median(!!sym(beta_name))) |>
+    mutate(type_median = stats::median(!!sym(beta_name))) |>
     dplyr::ungroup() |>
     ggplot(aes(
       x = !!sym(beta_name), group = grp, color = Type, fill = Type,
@@ -349,15 +349,15 @@ plot_pred_conc <- function(fit, conc, conc_lasttwo, sd, sd_gq, sub_idx,
   }
   sd_gq <- update_stan_data_pk_pred(sd)
   if (oos) {
-    ss_trough <- median(rv(fit, "ss_trough_oos")[sub_idx])
-    ss_peak <- median(rv(fit, "ss_peak_oos")[sub_idx])
-    ss_auc <- median(rv(fit, "ss_auc_oos")[sub_idx])
-    theta_pk <- round(median(rv(fit, "theta_pk_oos"))[1, sub_idx, ], 3)
+    ss_trough <- stats::median(rv(fit, "ss_trough_oos")[sub_idx])
+    ss_peak <- stats::median(rv(fit, "ss_peak_oos")[sub_idx])
+    ss_auc <- stats::median(rv(fit, "ss_auc_oos")[sub_idx])
+    theta_pk <- round(stats::median(rv(fit, "theta_pk_oos"))[1, sub_idx, ], 3)
   } else {
-    ss_trough <- median(rv(fit, "ss_trough")[sub_idx])
-    ss_peak <- median(rv(fit, "ss_peak")[sub_idx])
-    ss_auc <- median(rv(fit, "ss_auc")[sub_idx])
-    theta_pk <- round(median(rv(fit, "theta_pk"))[1, sub_idx, ], 3)
+    ss_trough <- stats::median(rv(fit, "ss_trough")[sub_idx])
+    ss_peak <- stats::median(rv(fit, "ss_peak")[sub_idx])
+    ss_auc <- stats::median(rv(fit, "ss_auc")[sub_idx])
+    theta_pk <- round(stats::median(rv(fit, "theta_pk"))[1, sub_idx, ], 3)
   }
   sub <- paste0("median theta = [", paste(theta_pk, collapse = ", "), "]")
   ci <- conc[sub_idx, ]
@@ -379,17 +379,17 @@ plot_pred_conc <- function(fit, conc, conc_lasttwo, sd, sd_gq, sub_idx,
 
   df <- data.frame(
     t = t,
-    conc = as.vector(median(ci)),
-    lower = as.vector(quantile(ci, probs = 0.05)),
-    upper = as.vector(quantile(ci, probs = 0.95))
+    conc = as.vector(stats::median(ci)),
+    lower = as.vector(stats::quantile(ci, probs = 0.05)),
+    upper = as.vector(stats::quantile(ci, probs = 0.95))
   )
   compare <- !oos
   if (compare) {
     df_l2 <- data.frame(
       t = t,
-      conc = as.vector(median(ci_l2)),
-      lower = as.vector(quantile(ci_l2, probs = 0.05)),
-      upper = as.vector(quantile(ci_l2, probs = 0.95))
+      conc = as.vector(stats::median(ci_l2)),
+      lower = as.vector(stats::quantile(ci_l2, probs = 0.05)),
+      upper = as.vector(stats::quantile(ci_l2, probs = 0.95))
     )
     if (cut) {
       df_l2 <- df_l2 |> dplyr::filter(t >= t_ss_end_l2)
@@ -443,13 +443,13 @@ plot_pred_conc_many <- function(fit, gq, sd, sd_gq, ids_plot, id_map,
     plt_conc[[j]] <- plot_pred_conc(fit, conc, conc_l2, sd, sd_gq, is, oos, cut) +
       labs(caption = paste0("subject_id = ", subject_idx_to_id(id_map, is)))
   }
-  mu_pk <- median(rv(fit, "log_mu_pk"))
-  sig_pk <- median(rv(fit, "log_sig_pk"))
+  mu_pk <- stats::median(rv(fit, "log_mu_pk"))
+  sig_pk <- stats::median(rv(fit, "log_sig_pk"))
   st1 <- paste0("med. log_mu_pk = [", paste(round(mu_pk, 3), collapse = ","), "]")
   st2 <- paste0("med. log_sig_pk = [", paste(round(sig_pk, 3), collapse = ","), "]")
   supertitle <- paste(st1, st2, sep = ", ")
   viz_conc <- ggpubr::ggarrange(plotlist = plt_conc, nrow = nrow, ncol = ncol)
-  annotate_figure(viz_conc, top = supertitle)
+  ggpubr::annotate_figure(viz_conc, top = supertitle)
 }
 
 # Correlation plot
@@ -458,7 +458,7 @@ plot_cor <- function(sd, x, y, name_x, name_y) {
   df$ss_dose <- as.factor(sd$dose_ss)
 
   # Calculate the correlation coefficient
-  correlation <- cor(df$x, df$y)
+  correlation <- stats::cor(df$x, df$y)
 
   # Create the ggplot
   p <- ggplot(df, aes(x = x, y = y, color = ss_dose)) +
@@ -774,7 +774,7 @@ create_cindex_plot <- function(pd, paths_gen, paths_gen_oos,
     dplyr::select(method, Event, cindex.v1, cindex.v2)
 
   # Plot
-  plt_ci_is <- annotate_figure(plot_ci_multi(ci_is), top = "In-sample")
-  plt_ci_oos <- annotate_figure(plot_ci_multi(ci_oos), top = "Out-of-sample")
+  plt_ci_is <- ggpubr::annotate_figure(plot_ci_multi(ci_is), top = "In-sample")
+  plt_ci_oos <- ggpubr::annotate_figure(plot_ci_multi(ci_oos), top = "Out-of-sample")
   dplyr::lst(ci_is_table, ci_oos_table, plt_ci_is, plt_ci_oos)
 }

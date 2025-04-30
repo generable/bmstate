@@ -51,7 +51,7 @@ simulate_multitransition_data <- function(
   for (n in 1:N_subject) {
     pb$tick()
     sex <- n %% 2
-    age <- round(30 + 60 * runif(1))
+    age <- round(30 + 60 * stats::runif(1))
     fda <- c(15, 30, 60)[sample(3, 1)]
     log_hazard_mult <- rep(0, n_trans)
     for (h in 1:n_trans) {

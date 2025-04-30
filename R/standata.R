@@ -11,7 +11,7 @@ place_internal_knots <- function(t_max, num_knots, t_event) {
   message("placing knots")
   message(length(t_event), " events occurred")
   h <- 1 / (num_knots + 1)
-  knots <- quantile(t_event, probs = seq(0, 1, h))
+  knots <- stats::quantile(t_event, probs = seq(0, 1, h))
   knots[2:(length(knots) - 1)]
 }
 
@@ -296,8 +296,8 @@ standata_scaled_covariate <- function(dat, dat_oos, covariates, ssi, ssi_oos) {
     if (is.null(xx)) {
       stop(cn, " not found in dat")
     }
-    x[[j]] <- (xx - mean(xx)) / sd(xx)
-    x_oos[[j]] <- (dat_oos[[cn]] - mean(xx)) / sd(xx)
+    x[[j]] <- (xx - mean(xx)) / stats::sd(xx)
+    x_oos[[j]] <- (dat_oos[[cn]] - mean(xx)) / stats::sd(xx)
   }
 
   # Return
