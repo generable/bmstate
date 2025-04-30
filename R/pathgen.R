@@ -460,7 +460,7 @@ predict_paths <- function(fit, stan_dat, pd, t_max_gen = NULL, oos = FALSE,
     wdir <- tempdir(check = TRUE)
     program_file <- fs::path(wdir, "model.stan")
     brio::write_lines(fit$runset$stan_code(), program_file)
-    mod <- cmdstan_model(program_file)
+    mod <- cmdstanr::cmdstan_model(program_file)
   }
   gq <- mod$generate_quantities(
     fit$draws() |> posterior::thin_draws(thin = thin),
