@@ -213,8 +213,7 @@ Format as time to first event}
 \item{\code{covs}}{covariates to include in output data frame}
 
 \item{\code{truncate}}{truncate after terminal events?
-Print info
-Check that a state is valid}
+Print info}
 }
 \if{html}{\out{</div>}}
 }
@@ -227,6 +226,10 @@ Check that a state is valid}
 \if{html}{\out{<div class="r">}}\preformatted{PathData$print()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+nothing
+Check that a state is valid
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-check_valid_state"></a>}}
@@ -372,6 +375,7 @@ Visualize the transition proportion matrix as a graph
 }
 \subsection{Returns}{
 \code{qgraph} plot
+Fit Cox proportional hazards model
 }
 }
 \if{html}{\out{<hr>}}
@@ -382,6 +386,16 @@ Visualize the transition proportion matrix as a graph
 \if{html}{\out{<div class="r">}}\preformatted{PathData$coxph(covs = NULL, ...)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{covs}}{Covariate names.}
+
+\item{\code{...}}{Arguments passed to \code{survival::coxph}.
+Filter based on path id, creates new object}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-filter"></a>}}
@@ -396,6 +410,19 @@ Visualize the transition proportion matrix as a graph
 )}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{path_ids_keep}}{Path ids to keep}
+
+\item{\code{subject_ids_keep}}{Subject ids to keep}
+
+\item{\code{rep_ids_keep}}{Repetition ids to keep}
+
+\item{\code{draw_ids_keep}}{Draw ids to keep}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-clone"></a>}}

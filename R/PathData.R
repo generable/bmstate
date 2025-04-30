@@ -185,6 +185,8 @@ PathData <- R6::R6Class(
         as_time_to_first_event(states = self$get_event_states(), by = covs)
     },
     #' Print info
+    #'
+    #' @return nothing
     print = function() {
       n_path <- self$n_paths()
       covs <- self$covariate_names()
@@ -364,7 +366,10 @@ PathData <- R6::R6Class(
       )
     },
 
-    # Fit CoxPH model
+    #' Fit Cox proportional hazards model
+    #'
+    #' @param covs Covariate names.
+    #' @param ... Arguments passed to \code{survival::coxph}.
     coxph = function(covs = NULL, ...) {
       if (is.null(covs)) {
         covs <- self$covs
@@ -381,7 +386,12 @@ PathData <- R6::R6Class(
       survival::coxph(as.formula(form), df, ...)
     },
 
-    # Filter based on path id, creates new object
+    #' Filter based on path id, creates new object
+    #'
+    #' @param path_ids_keep Path ids to keep
+    #' @param subject_ids_keep Subject ids to keep
+    #' @param rep_ids_keep Repetition ids to keep
+    #' @param draw_ids_keep Draw ids to keep
     filter = function(path_ids_keep = NULL, subject_ids_keep = NULL,
                       rep_ids_keep = NULL, draw_ids_keep = NULL) {
       subject_df <- self$subject_df |>
