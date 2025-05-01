@@ -36,11 +36,11 @@ create_pathdata <- function(df, covs, ...) {
 #' \code{path_id}, \code{draw_idx}, \code{rep_idx}, and \code{subject_id} as
 #' columns.
 #' @field covs Covariate column names.
-#' @field state_names Names of the states.
-#' @field state_types State types.
-#' @field terminal_states Terminal states.
-#' @field initial_states Initial states.
-#' @field censor_states Censoring states.
+#' @field state_names Names of the states (character vector).
+#' @field state_types State types (integer vector).
+#' @field terminal_states Names of terminal states.
+#' @field null_state Names of null states. These are not events.
+#' @field censor_state Names of censoring states.
 PathData <- R6::R6Class(
   classname = "PathData",
   private = list(
@@ -54,8 +54,8 @@ PathData <- R6::R6Class(
     state_names = NULL,
     state_types = NULL,
     terminal_states = NULL,
-    initial_states = NULL,
-    censor_states = NULL,
+    null_state = NULL,
+    censor_state = NULL,
 
     #' Initialize
     #' @param subject_df Subjects data frame.
@@ -63,18 +63,25 @@ PathData <- R6::R6Class(
     #' @param link_df Link data frame.
     #' @param covs Covariate column names.
     #' @param check_order Check order of paths?
-    #' @param state_names Names of the states.
-    #' @param terminal_states Terminal states.
-    #' @param initial_states Initial states.
-    #' @param censor_states Censoring states.
+    #' @param state_names Names of all states.
+    #' @param terminal_states Names of terminal states.
+    #' @param null_state Name of null state.
+    #' @param censor_state Name of censoring state.
     initialize = function(subject_df, path_df, link_df,
                           state_names, covs = NULL, check_order = TRUE,
-                          terminal_states = c(),
-                          censor_states = state_names[length(state_names)],
-                          initial_states = state_names[1]) {
+                          terminal_states = NULL,
+                          censor_state = "Censor",
+                          null_state = "Randomization") {
       checkmate::assert_class(subject_df, "data.frame")
       checkmate::assert_class(path_df, "data.frame")
       checkmate::assert_class(link_df, "data.frame")
+      checkmate::assert_character(state_names, min.len = 2)
+      checkmate::assert_character(censor_state, len = 1)
+      checkmate::assert_character(null_state)
+      checkmate::assert_character(terminal_states, min.len = 1)
+      checkmate::assert_true(censor_state %in% state_names)
+      checkmate::assert_true(null_state %in% state_names)
+      checkmate::assert_true(all(terminal_states %in% state_names))
       if (check_order) {
         path_df <- check_and_sort_paths(path_df)
       }
@@ -113,12 +120,12 @@ PathData <- R6::R6Class(
       link_df$subject_id <- NULL
       self$check_states(
         state_names = state_names, terminal_states = terminal_states,
-        initial_states = initial_states, censor_states = censor_states,
+        null_state = null_state, censor_state = censor_state,
         path_df = path_df
       )
       self$terminal_states <- terminal_states
-      self$initial_states <- initial_states
-      self$censor_states <- censor_states
+      self$null_state <- null_state
+      self$censor_state <- censor_state
       self$state_names <- state_names
       self$state_types <- seq(from = 0, to = length(state_names))
       self$covs <- covs
@@ -164,8 +171,8 @@ PathData <- R6::R6Class(
     #' @return character vector
     get_event_state_names = function() {
       self$state_names |>
-        purrr::discard(~ .x %in% self$initial_states) |>
-        purrr::discard(~ .x %in% self$censor_states)
+        purrr::discard(~ .x %in% self$null_state) |>
+        purrr::discard(~ .x %in% self$censor_state)
     },
 
     #' Convert to format used by the 'mstate' package
@@ -184,16 +191,27 @@ PathData <- R6::R6Class(
       tt_event <- df |>
         as_time_to_first_event(states = self$get_event_states(), by = covs)
     },
+
+    #' Get names of event states
+    #'
+    #' @return a character vector
+    event_states = function() {
+      setdiff(self$state_names, c(self$censor_state, self$null_state))
+    },
+
     #' Print info
     #'
     #' @return nothing
     print = function() {
       n_path <- self$n_paths()
       covs <- self$covariate_names()
-      sn <- self$state_names
+      sn <- self$event_states()
+
       message(paste0("PathData object with ", n_path, " paths"))
-      message(paste0("States = {"), paste0(sn, collapse = ", "), "}")
-      message(paste0("Covariates = {"), paste0(covs, collapse = ", "), "}")
+      message(paste0(" * Null state = {", self$null_state, "}"))
+      message(paste0(" * Censoring state = {", self$censor_state, "}"))
+      message(paste0(" * Event states = {"), paste0(sn, collapse = ", "), "}")
+      message(paste0(" * Covariates = {"), paste0(covs, collapse = ", "), "}")
     },
 
     #' Check that a state is valid
@@ -211,18 +229,18 @@ PathData <- R6::R6Class(
     #'
     #' @param state_names names of all states
     #' @param terminal_states names of terminal states
-    #' @param initial_states names of initial states
-    #' @param censor_states names of censoring states
+    #' @param null_state name of initial states
+    #' @param censor_state name of censoring states
     #' @param path_df the path data frame
-    check_states = function(state_names, terminal_states, initial_states,
-                            censor_states, path_df) {
+    check_states = function(state_names, terminal_states, null_state,
+                            censor_state, path_df) {
       checkmate::assert_character(state_names, min.len = 1)
       stopifnot(purrr::none(state_names, duplicated))
       observed_states <- unique(state_names[path_df$state])
       self$check_valid_state(observed_states, state_names, min_len = 1)
       self$check_valid_state(terminal_states, state_names, min_len = 0)
-      self$check_valid_state(initial_states, state_names, min_len = 0)
-      self$check_valid_state(censor_states, state_names, min_len = 1)
+      self$check_valid_state(null_state, state_names, min_len = 1)
+      self$check_valid_state(censor_state, state_names, min_len = 1)
     },
     #' Convert to one long data frame
     #' @param covariates Which covariates to include?
@@ -257,8 +275,8 @@ PathData <- R6::R6Class(
           state_names = self$state_names,
           state_types = self$state_types,
           terminal_states = self$terminal_states,
-          censor_states = self$censor_states,
-          initial_states = self$initial_states,
+          censor_state = self$censor_state,
+          null_state = self$null_state,
           covs = self$covariate_names()
         )
       } else {
@@ -314,9 +332,9 @@ PathData <- R6::R6Class(
       prop <- mstate::events(r$msdata)$Proportions
       cn <- colnames(prop)
       idx_noevent <- find_one("no event", cn)
-      colnames(prop)[idx_noevent] <- "Censoring"
+      colnames(prop)[idx_noevent] <- self$censor_state
       prop <- rbind(prop, rep(0, ncol(prop)))
-      rownames(prop)[nrow(prop)] <- "Censoring"
+      rownames(prop)[nrow(prop)] <- self$censor_state
       prop
     },
 
@@ -329,9 +347,9 @@ PathData <- R6::R6Class(
     plot_graph = function(digits = 3, include_censor = FALSE, ...) {
       f <- self$trans_matrix()
       cn <- colnames(f)
-      idx_noevent <- find_one("Censoring", cn)
+      idx_noevent <- find_one(self$censor_state, cn)
       idx_term <- which(colnames(f) %in% self$terminal_states)
-      idx_init <- which(colnames(f) %in% self$initial_states)
+      idx_init <- which(colnames(f) %in% self$null_state)
       N <- length(cn)
       color <- rep("black", N)
       col <- "gray60"
@@ -417,8 +435,8 @@ PathData <- R6::R6Class(
       PathData$new(subject_df, path_df, link_df,
         self$state_names, self$covs,
         terminal_states = self$terminal_states,
-        censor_states = self$censor_states,
-        initial_states = self$initial_states
+        censor_state = self$censor_state,
+        null_state = self$null_state
       )
     }
   )
@@ -488,7 +506,7 @@ as_transitions_char <- function(dat, state_names, terminal_states) {
 
 # Add previous state and remove initial row of each subject
 as_transitions <- function(dat, state_names, state_types, terminal_states, covs,
-                           censor_states, initial_states) {
+                           censor_state, null_state) {
   # Transitions character representation
   dat_trans <- as_transitions_char(dat, state_names, terminal_states)
 
@@ -497,9 +515,9 @@ as_transitions <- function(dat, state_names, state_types, terminal_states, covs,
     mutate(trans_char = format_transition_char(prev_state, state)) |>
     dplyr::filter(
       !prev_state %in% terminal_states, # no transition from terminal state
-      !state %in% initial_states, # no transition into initial states
-      !state %in% censor_states, # no transition into or out of censor
-      !prev_state %in% censor_states
+      !state %in% null_state, # no transition into initial states
+      !state %in% censor_state, # no transition into or out of censor
+      !prev_state %in% censor_state
     ) |>
     mutate(terminal = state %in% terminal_states) |>
     mutate(

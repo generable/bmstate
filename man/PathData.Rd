@@ -23,15 +23,15 @@ columns.}
 
 \item{\code{covs}}{Covariate column names.}
 
-\item{\code{state_names}}{Names of the states.}
+\item{\code{state_names}}{Names of the states (character vector).}
 
-\item{\code{state_types}}{State types.}
+\item{\code{state_types}}{State types (integer vector).}
 
-\item{\code{terminal_states}}{Terminal states.}
+\item{\code{terminal_states}}{Names of terminal states.}
 
-\item{\code{initial_states}}{Initial states.}
+\item{\code{null_state}}{Names of null states. These are not events.}
 
-\item{\code{censor_states}}{Censoring states.
+\item{\code{censor_state}}{Names of censoring states.
 Initialize}
 }
 \if{html}{\out{</div>}}
@@ -48,6 +48,7 @@ Initialize}
 \item \href{#method-PathData-get_event_state_names}{\code{PathData$get_event_state_names()}}
 \item \href{#method-PathData-as_msdata}{\code{PathData$as_msdata()}}
 \item \href{#method-PathData-as_time_to_first_event}{\code{PathData$as_time_to_first_event()}}
+\item \href{#method-PathData-event_states}{\code{PathData$event_states()}}
 \item \href{#method-PathData-print}{\code{PathData$print()}}
 \item \href{#method-PathData-check_valid_state}{\code{PathData$check_valid_state()}}
 \item \href{#method-PathData-check_states}{\code{PathData$check_states()}}
@@ -73,9 +74,9 @@ Initialize}
   state_names,
   covs = NULL,
   check_order = TRUE,
-  terminal_states = c(),
-  censor_states = state_names[length(state_names)],
-  initial_states = state_names[1]
+  terminal_states = NULL,
+  censor_state = "Censor",
+  null_state = "Randomization"
 )}\if{html}{\out{</div>}}
 }
 
@@ -88,18 +89,18 @@ Initialize}
 
 \item{\code{link_df}}{Link data frame.}
 
-\item{\code{state_names}}{Names of the states.}
+\item{\code{state_names}}{Names of all states.}
 
 \item{\code{covs}}{Covariate column names.}
 
 \item{\code{check_order}}{Check order of paths?}
 
-\item{\code{terminal_states}}{Terminal states.}
+\item{\code{terminal_states}}{Names of terminal states.}
 
-\item{\code{censor_states}}{Censoring states.
+\item{\code{censor_state}}{Name of censoring state.
 Get names of covariates}
 
-\item{\code{initial_states}}{Initial states.}
+\item{\code{null_state}}{Name of null state.}
 }
 \if{html}{\out{</div>}}
 }
@@ -213,9 +214,22 @@ Format as time to first event}
 \item{\code{covs}}{covariates to include in output data frame}
 
 \item{\code{truncate}}{truncate after terminal events?
-Print info}
+Get names of event states}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-event_states"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-event_states}{}}}
+\subsection{Method \code{event_states()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$event_states()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+a character vector
+Print info
 }
 }
 \if{html}{\out{<hr>}}
@@ -260,8 +274,8 @@ Check that states input is valid}
 \if{html}{\out{<div class="r">}}\preformatted{PathData$check_states(
   state_names,
   terminal_states,
-  initial_states,
-  censor_states,
+  null_state,
+  censor_state,
   path_df
 )}\if{html}{\out{</div>}}
 }
@@ -273,9 +287,9 @@ Check that states input is valid}
 
 \item{\code{terminal_states}}{names of terminal states}
 
-\item{\code{initial_states}}{names of initial states}
+\item{\code{null_state}}{name of initial states}
 
-\item{\code{censor_states}}{names of censoring states}
+\item{\code{censor_state}}{name of censoring states}
 
 \item{\code{path_df}}{the path data frame
 Convert to one long data frame}

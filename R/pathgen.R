@@ -499,7 +499,8 @@ predict_paths <- function(fit, stan_dat, pd, t_max_gen = NULL, oos = FALSE,
   )
 }
 
-predict_cf_paths <- function(fit, stan_dat, pd, dose, t_max_gen = NULL, oos = FALSE, num_paths = NULL, sub_ids = NULL,
+predict_cf_paths <- function(fit, stan_dat, pd, dose, t_max_gen = NULL,
+                             oos = FALSE, num_paths = NULL, sub_ids = NULL,
                              t_start = 0, init_state = 1, ...) {
   if (!is.null(num_paths)) {
     num_chains <- fit$num_chains()
