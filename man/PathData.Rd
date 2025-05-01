@@ -45,13 +45,10 @@ Initialize}
 \item \href{#method-PathData-n_paths}{\code{PathData$n_paths()}}
 \item \href{#method-PathData-longest_path}{\code{PathData$longest_path()}}
 \item \href{#method-PathData-get_event_states}{\code{PathData$get_event_states()}}
-\item \href{#method-PathData-get_event_state_names}{\code{PathData$get_event_state_names()}}
 \item \href{#method-PathData-as_msdata}{\code{PathData$as_msdata()}}
 \item \href{#method-PathData-as_time_to_first_event}{\code{PathData$as_time_to_first_event()}}
-\item \href{#method-PathData-event_states}{\code{PathData$event_states()}}
+\item \href{#method-PathData-get_event_state_names}{\code{PathData$get_event_state_names()}}
 \item \href{#method-PathData-print}{\code{PathData$print()}}
-\item \href{#method-PathData-check_valid_state}{\code{PathData$check_valid_state()}}
-\item \href{#method-PathData-check_states}{\code{PathData$check_states()}}
 \item \href{#method-PathData-as_data_frame}{\code{PathData$as_data_frame()}}
 \item \href{#method-PathData-as_transitions}{\code{PathData$as_transitions()}}
 \item \href{#method-PathData-plot_paths}{\code{PathData$plot_paths()}}
@@ -167,19 +164,6 @@ Get indices of event states
 
 \subsection{Returns}{
 integer vector
-Get names of states that are events (i.e. not initial and not censor)
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PathData-get_event_state_names"></a>}}
-\if{latex}{\out{\hypertarget{method-PathData-get_event_state_names}{}}}
-\subsection{Method \code{get_event_state_names()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$get_event_state_names()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-character vector
 Convert to format used by the 'mstate' package
 }
 }
@@ -194,10 +178,14 @@ Convert to format used by the 'mstate' package
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{covariates}}{Include covariates?
-Format as time to first event}
+\item{\code{covariates}}{Include covariates?}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A list with elements \code{msdata} and
+\code{legend}
+Format as time to first event
 }
 }
 \if{html}{\out{<hr>}}
@@ -220,11 +208,11 @@ Get names of event states}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PathData-event_states"></a>}}
-\if{latex}{\out{\hypertarget{method-PathData-event_states}{}}}
-\subsection{Method \code{event_states()}}{
+\if{html}{\out{<a id="method-PathData-get_event_state_names"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-get_event_state_names}{}}}
+\subsection{Method \code{get_event_state_names()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$event_states()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$get_event_state_names()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -242,59 +230,7 @@ Print info
 
 \subsection{Returns}{
 nothing
-Check that a state is valid
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PathData-check_valid_state"></a>}}
-\if{latex}{\out{\hypertarget{method-PathData-check_valid_state}{}}}
-\subsection{Method \code{check_valid_state()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$check_valid_state(check_states, state_names, min_len)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{check_states}}{states to check}
-
-\item{\code{state_names}}{all state names}
-
-\item{\code{min_len}}{minimum length
-Check that states input is valid}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PathData-check_states"></a>}}
-\if{latex}{\out{\hypertarget{method-PathData-check_states}{}}}
-\subsection{Method \code{check_states()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$check_states(
-  state_names,
-  terminal_states,
-  null_state,
-  censor_state,
-  path_df
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{state_names}}{names of all states}
-
-\item{\code{terminal_states}}{names of terminal states}
-
-\item{\code{null_state}}{name of initial states}
-
-\item{\code{censor_state}}{name of censoring states}
-
-\item{\code{path_df}}{the path data frame
-Convert to one long data frame}
-}
-\if{html}{\out{</div>}}
+Convert to one long data frame
 }
 }
 \if{html}{\out{<hr>}}
@@ -330,10 +266,14 @@ Data frame in transitions format}
 \item{\code{only_observed}}{Limit transitions to only the observed ones?}
 
 \item{\code{force_rerun}}{Force rerun of the conversion? If \code{FALSE},
-a cached version is used if it exists.
-Step plot of the paths}
+a cached version is used if it exists.}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A list with elements \code{df} (transition data frame) and
+\code{legend}
+Step plot of the paths
 }
 }
 \if{html}{\out{<hr>}}

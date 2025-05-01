@@ -44,7 +44,22 @@ create_pathdata <- function(df, covs, ...) {
 PathData <- R6::R6Class(
   classname = "PathData",
   private = list(
-    dt = NULL
+    dt = NULL,
+    check_valid_state = function(check_states, state_names, min_len) {
+      checkmate::assert_character(check_states, min.len = min_len)
+      stopifnot(all(check_states %in% state_names))
+      stopifnot(purrr::none(check_states, duplicated))
+    },
+    check_states = function(state_names, terminal_states, null_state,
+                            censor_state, path_df) {
+      checkmate::assert_character(state_names, min.len = 1)
+      stopifnot(purrr::none(state_names, duplicated))
+      observed_states <- unique(state_names[path_df$state])
+      private$check_valid_state(observed_states, state_names, min_len = 1)
+      private$check_valid_state(terminal_states, state_names, min_len = 0)
+      private$check_valid_state(null_state, state_names, min_len = 1)
+      private$check_valid_state(censor_state, state_names, min_len = 1)
+    }
   ),
   public = list(
     subject_df = NULL,
@@ -118,7 +133,7 @@ PathData <- R6::R6Class(
       path_df$path_id <- ensure_numeric_factor(path_df$path_id)
       link_df$path_id <- ensure_numeric_factor(link_df$path_id)
       link_df$subject_id <- NULL
-      self$check_states(
+      private$check_states(
         state_names = state_names, terminal_states = terminal_states,
         null_state = null_state, censor_state = censor_state,
         path_df = path_df
@@ -166,18 +181,12 @@ PathData <- R6::R6Class(
     get_event_states = function() {
       match(self$get_event_state_names(), self$state_names)
     },
-    #' Get names of states that are events (i.e. not initial and not censor)
-    #'
-    #' @return character vector
-    get_event_state_names = function() {
-      self$state_names |>
-        purrr::discard(~ .x %in% self$null_state) |>
-        purrr::discard(~ .x %in% self$censor_state)
-    },
 
     #' Convert to format used by the 'mstate' package
     #'
     #' @param covariates Include covariates?
+    #' @return A list with elements \code{msdata} and
+    #' \code{legend}
     as_msdata = function(covariates = FALSE) {
       checkmate::assert_logical(covariates, len = 1)
       pathdata_to_mstate_format(self, covariates)
@@ -188,14 +197,14 @@ PathData <- R6::R6Class(
     #' @param truncate truncate after terminal events?
     as_time_to_first_event = function(covs = c("subject_id"), truncate = FALSE) {
       df <- self$as_data_frame(covs, truncate = truncate)
-      tt_event <- df |>
+      df |>
         as_time_to_first_event(states = self$get_event_states(), by = covs)
     },
 
     #' Get names of event states
     #'
     #' @return a character vector
-    event_states = function() {
+    get_event_state_names = function() {
       setdiff(self$state_names, c(self$censor_state, self$null_state))
     },
 
@@ -205,7 +214,7 @@ PathData <- R6::R6Class(
     print = function() {
       n_path <- self$n_paths()
       covs <- self$covariate_names()
-      sn <- self$event_states()
+      sn <- self$get_event_state_names()
 
       message(paste0("PathData object with ", n_path, " paths"))
       message(paste0(" * Null state = {", self$null_state, "}"))
@@ -214,34 +223,6 @@ PathData <- R6::R6Class(
       message(paste0(" * Covariates = {"), paste0(covs, collapse = ", "), "}")
     },
 
-    #' Check that a state is valid
-    #'
-    #' @param check_states states to check
-    #' @param state_names all state names
-    #' @param min_len minimum length
-    check_valid_state = function(check_states, state_names, min_len) {
-      checkmate::assert_character(check_states, min.len = min_len)
-      stopifnot(all(check_states %in% state_names))
-      stopifnot(purrr::none(check_states, duplicated))
-    },
-
-    #' Check that states input is valid
-    #'
-    #' @param state_names names of all states
-    #' @param terminal_states names of terminal states
-    #' @param null_state name of initial states
-    #' @param censor_state name of censoring states
-    #' @param path_df the path data frame
-    check_states = function(state_names, terminal_states, null_state,
-                            censor_state, path_df) {
-      checkmate::assert_character(state_names, min.len = 1)
-      stopifnot(purrr::none(state_names, duplicated))
-      observed_states <- unique(state_names[path_df$state])
-      self$check_valid_state(observed_states, state_names, min_len = 1)
-      self$check_valid_state(terminal_states, state_names, min_len = 0)
-      self$check_valid_state(null_state, state_names, min_len = 1)
-      self$check_valid_state(censor_state, state_names, min_len = 1)
-    },
     #' Convert to one long data frame
     #' @param covariates Which covariates to include?
     #' @param truncate Truncate after terminal events?
@@ -269,6 +250,8 @@ PathData <- R6::R6Class(
     #' @param only_observed Limit transitions to only the observed ones?
     #' @param force_rerun Force rerun of the conversion? If \code{FALSE},
     #' a cached version is used if it exists.
+    #' @return A list with elements \code{df} (transition data frame) and
+    #' \code{legend}
     as_transitions = function(only_observed = FALSE, force_rerun = FALSE) {
       if (is.null(private$dt) || force_rerun) {
         private$dt <- dt <- as_transitions(self$as_data_frame(),
