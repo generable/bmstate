@@ -445,7 +445,7 @@ as_time_to_first_event <- function(dat, states, by = c()) {
     summarize(time = min(time), .groups = "keep") |>
     dplyr::ungroup() |>
     mutate(is_event = 1)
-  d <- censor |>
+  censor |>
     anti_join(events, by = c("path_id", "state")) |>
     dplyr::bind_rows(events)
 }
