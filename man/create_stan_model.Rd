@@ -6,9 +6,6 @@
 \usage{
 create_stan_model(mixp = FALSE)
 }
-\arguments{
-\item{mixp}{use mixture prior?}
-}
 \value{
 A CmdstanR model
 }

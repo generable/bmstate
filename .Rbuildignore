@@ -13,3 +13,4 @@ pkgdown/
 .gitignore
 ^codecov\.yml$
 dev/
+inst/stan/msm
