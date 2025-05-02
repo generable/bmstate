@@ -11,9 +11,10 @@ Defines states and possible transitions
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{matrix}}{a binary matrix}
+\item{\code{matrix}}{a binary matrix where \code{matrix[i,j]} is 1 if transition
+from state \code{i} to \code{j} is possible}
 
-\item{\code{states}}{a character vector}
+\item{\code{states}}{a character vector of state names}
 }
 \if{html}{\out{</div>}}
 }
@@ -21,6 +22,7 @@ Defines states and possible transitions
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-StateGraph-new}{\code{StateGraph$new()}}
+\item \href{#method-StateGraph-print}{\code{StateGraph$print()}}
 \item \href{#method-StateGraph-clone}{\code{StateGraph$clone()}}
 }
 }
@@ -39,9 +41,22 @@ Create graph
 \item{\code{matrix}}{Binary square matrix that defines the states and possible}
 
 \item{\code{states}}{Names of the states
-transitions}
+transitions
+Print output}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-StateGraph-print"></a>}}
+\if{latex}{\out{\hypertarget{method-StateGraph-print}{}}}
+\subsection{Method \code{print()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{StateGraph$print()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+nothing
 }
 }
 \if{html}{\out{<hr>}}
