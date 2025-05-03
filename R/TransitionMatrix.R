@@ -4,7 +4,7 @@
 #' @field matrix a binary matrix where \code{matrix[i,j]} is 1 if transition
 #' from state \code{i} to \code{j} is possible
 #' @field states a character vector of state names
-StateGraph <- R6::R6Class("StateGraph",
+TransitionMatrix <- R6::R6Class("TransitionMatrix",
 
   # PUBLIC
   public = list(
@@ -31,6 +31,28 @@ StateGraph <- R6::R6Class("StateGraph",
     #' @return nothing
     print = function() {
       print(self$matrix)
+    },
+
+    #' Get states that cannot be transitioned from
+    #'
+    #' @param names Return names of the states? Otherwise returns indices.
+    absorbing_states = function(names = TRUE) {
+      out <- which(rowSums(self$matrix) == 0)
+      if (names) {
+        out <- self$states[out]
+      }
+      out
+    },
+
+    #' Get states that cannot be transitioned to
+    #'
+    #' @param names Return names of the states? Otherwise returns indices.
+    source_states = function(names = TRUE) {
+      out <- which(colSums(s$matrix) == 0)
+      if (names) {
+        out <- self$states[out]
+      }
+      out
     }
   )
 )

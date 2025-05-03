@@ -1,0 +1,11 @@
+test_that("TransitionMatrix init and methods work", {
+  a <- matrix(0, 3, 3)
+  a[1, 2] <- 1
+  a[2, 3] <- 1
+  a[2, 2] <- 1
+  nam <- c("A", "B", "C")
+  s <- TransitionMatrix$new(a, nam)
+  expect_output(s$print())
+  expect_equal(s$source_states(), "A")
+  expect_equal(s$absorbing_states(), "C")
+})
