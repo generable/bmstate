@@ -370,7 +370,7 @@ create_stan_data_intervalidx <- function(t_start, t_end, t_grid, delta_grid) {
 #' Creating Stan data list
 #'
 #' @export
-#' @param P num of prediction points
+#' @param P number of prediction points
 #' @param NK number of internal spline knots
 #' @param pd PD data frame
 #' @param pk PK data frame

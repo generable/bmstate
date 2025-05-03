@@ -19,9 +19,12 @@ Main model class
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-MultistateModel-new}{\code{MultistateModel$new()}}
+\item \href{#method-MultistateModel-get_covariates}{\code{MultistateModel$get_covariates()}}
 \item \href{#method-MultistateModel-get_stan_model}{\code{MultistateModel$get_stan_model()}}
 \item \href{#method-MultistateModel-compile}{\code{MultistateModel$compile()}}
 \item \href{#method-MultistateModel-print}{\code{MultistateModel$print()}}
+\item \href{#method-MultistateModel-create_standata}{\code{MultistateModel$create_standata()}}
+\item \href{#method-MultistateModel-fit}{\code{MultistateModel$fit()}}
 \item \href{#method-MultistateModel-clone}{\code{MultistateModel$clone()}}
 }
 }
@@ -31,7 +34,7 @@ Main model class
 \subsection{Method \code{new()}}{
 Create model
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$new(transmat, compile = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$new(transmat, covariates, P, NK, pk, compile = TRUE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -39,10 +42,29 @@ Create model
 \describe{
 \item{\code{transmat}}{A \code{\link{TransitionMatrix}}.}
 
+\item{\code{covariates}}{A list with elements \code{hazard}, \code{ka},
+\code{CL}, and \code{V2}}
+
+\item{\code{P}}{number of prediction points}
+
+\item{\code{NK}}{number of internal spline knots}
+
+\item{\code{pk}}{should pk model be used?}
+
 \item{\code{compile}}{Should the 'Stan' model code be created and compiled.}
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-get_covariates"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-get_covariates}{}}}
+\subsection{Method \code{get_covariates()}}{
+Get the covariates list.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$get_covariates()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateModel-get_stan_model"></a>}}
@@ -85,6 +107,53 @@ Print the object
 
 \subsection{Returns}{
 nothing
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-create_standata"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-create_standata}{}}}
+\subsection{Method \code{create_standata()}}{
+Create the 'Stan' data list.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$create_standata(pd, prior_only = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{pd}}{A \code{\link{PathData}} object.}
+
+\item{\code{prior_only}}{Sample from prior only?}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A list.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-fit"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-fit}{}}}
+\subsection{Method \code{fit()}}{
+Fit the model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$fit(pd, prior_only = FALSE, ...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{pd}}{A \code{\link{PathData}} object of observed paths.}
+
+\item{\code{prior_only}}{Sample from prior only.}
+
+\item{\code{...}}{Arguments passed to \code{sample} method of the
+'CmdStanR' model.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A \code{\link{MultistateModelFit}} object.
 }
 }
 \if{html}{\out{<hr>}}

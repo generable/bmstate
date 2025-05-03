@@ -4,13 +4,30 @@
 \alias{create_msm}
 \title{Create a model}
 \usage{
-create_msm(matrix, states, compile = TRUE)
+create_msm(
+  matrix,
+  states,
+  covariates,
+  P = 30,
+  NK = 3,
+  pk = FALSE,
+  compile = TRUE
+)
 }
 \arguments{
 \item{matrix}{a binary matrix where \code{matrix[i,j]} is 1 if transition
 from state \code{i} to \code{j} is possible}
 
 \item{states}{a character vector of state names}
+
+\item{covariates}{A list with elements \code{hazard}, \code{ka},
+\code{CL}, and \code{V2}}
+
+\item{P}{number of prediction points}
+
+\item{NK}{number of internal spline knots}
+
+\item{pk}{should pk model be used?}
 
 \item{compile}{compile 'Stan' model?}
 }

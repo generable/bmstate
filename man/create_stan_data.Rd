@@ -37,7 +37,7 @@ create_stan_data(
 
 \item{test_sub}{test subjects}
 
-\item{P}{num of prediction points}
+\item{P}{number of prediction points}
 
 \item{NK}{number of internal spline knots}
 
