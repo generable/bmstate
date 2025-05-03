@@ -55,13 +55,3 @@
 #'
 #'
 "_PACKAGE"
-
-#' Creates the Stan model
-#'
-#' @export
-#' @return A CmdstanR model
-create_stan_model <- function(mixp = FALSE) {
-  fn <- "msm.stan"
-  filepath <- system.file(file.path("stan", fn), package = "bmstate")
-  cmdstanr::cmdstan_model(filepath)
-}

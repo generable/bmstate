@@ -1,7 +1,21 @@
+#' Create a model
+#'
+#' @export
+#' @param matrix a binary matrix where \code{matrix[i,j]} is 1 if transition
+#' from state \code{i} to \code{j} is possible
+#' @param states a character vector of state names
+#' @param compile compile 'Stan' model?
+#' @return A \code{\link{MultistateModel}} object
+create_msm <- function(matrix, states, compile = TRUE) {
+  tm <- TransitionMatrix$new(matrix, states)
+  MultistateModel$new(tm, compile)
+}
+
 #' Main model class
 #'
 #' @export
-MultiStateModel <- R6::R6Class("MultiStateModel",
+#' @field transmat The transition matrix
+MultistateModel <- R6::R6Class("MultistateModel",
 
   # PRIVATE
   private = list(
@@ -10,12 +24,16 @@ MultiStateModel <- R6::R6Class("MultiStateModel",
 
   # PUBLIC
   public = list(
+    transmat = NULL,
 
     #' @description
     #' Create model
     #'
+    #' @param transmat A \code{\link{TransitionMatrix}}.
     #' @param compile Should the 'Stan' model code be created and compiled.
-    initialize = function(compile = TRUE) {
+    initialize = function(transmat, compile = TRUE) {
+      checkmate::assert_class(transmat, "TransitionMatrix")
+      self$transmat <- transmat
       if (compile) {
         self$compile()
       }
@@ -29,30 +47,27 @@ MultiStateModel <- R6::R6Class("MultiStateModel",
     #' @description
     #' Create and compile the 'Stan' model.
     #'
-    #' @param dir Path to directory where to store the \code{.stan} file.
-    #' @return A 'CmdStanR' model.
-    create_MultiStateModel = function(dir = tempdir()) {
-      code <- self$create_stancode(autoformat = FALSE)
-      a <- cmdstanr::write_stan_file(code = code, dir = dir)
-
+    #' @param ... Arguments passed to \code{cmdstan_model}.
+    #' @return The updated model object (invisibly).
+    compile = function(...) {
+      fn <- "msm.stan"
+      filepath <- system.file(file.path("stan", fn), package = "bmstate")
       # silence compile warnings from cmdstan
       utils::capture.output(
         {
-          mod <- cmdstanr::cmdstan_model(a)
+          mod <- cmdstanr::cmdstan_model(filepath, ...)
         },
         type = "message"
       )
-      mod
+      private$stan_model <- mod
+      invisible(self)
     },
 
-    #' @description
-    #' Create and compile the 'Stan' model.
+    #' Print the object
     #'
-    #' @param ... Arguments passed to \code{create_MultiStateModel()}.
-    #' @return The updated model object (invisibly).
-    compile = function(...) {
-      private$stan_model <- self$create_MultiStateModel(...)
-      invisible(self)
+    #' @return nothing
+    print = function() {
+      self$transmat$print()
     }
   )
 )
