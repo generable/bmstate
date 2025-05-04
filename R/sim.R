@@ -38,10 +38,8 @@ simulate_example_data <- function(N = 10, sys_idx = 1, h0_base = 1e-4,
 #' @param h0_true true baseline hazard value (constant)
 #' @param df_beta_true true covariate effects
 #' @param sys_idx index of simulation system
-#' @param state_names names of the states
 simulate_multitransition_data <- function(
-    N_subject, covs, h0_true, df_beta_true, sys_idx = 1,
-    state_names = NULL) {
+    N_subject, covs, h0_true, df_beta_true, sys_idx = 1) {
   checkmate::assert_integerish(N_subject, lower = 1)
   checkmate::assert_integerish(sys_idx, lower = 1, upper = 3)
   df <- NULL
@@ -78,19 +76,17 @@ simulate_multitransition_data <- function(
 
   # Finalize
   term_state <- "Fatality"
-  if (is.null(state_names)) {
-    if (sys_idx == 1) {
-      state_names <- c("Randomization", "Bleed", "Fatality", "Censor")
-    } else if (sys_idx == 2) {
-      state_names <- c("Randomization", "Bleed", "Stroke", "Fatality", "Censor")
-    } else if (sys_idx == 3) {
-      state_names <- c(
-        "Randomization", "Min Bleed", "Maj Bleed", "Non-Isch Stroke",
-        "ICH Bleed", "Fatality", "Censor"
-      )
-    } else {
-      stop("invalid sys_idx")
-    }
+  if (sys_idx == 1) {
+    state_names <- c("Randomization", "Bleed", "Fatality", "Censor")
+  } else if (sys_idx == 2) {
+    state_names <- c("Randomization", "Bleed", "Stroke", "Fatality", "Censor")
+  } else if (sys_idx == 3) {
+    state_names <- c(
+      "Randomization", "Min Bleed", "Maj Bleed", "Non-Isch Stroke",
+      "ICH Bleed", "Fatality", "Censor"
+    )
+  } else {
+    stop("invalid sys_idx")
   }
 
   list(

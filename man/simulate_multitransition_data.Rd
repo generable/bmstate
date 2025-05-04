@@ -9,8 +9,7 @@ simulate_multitransition_data(
   covs,
   h0_true,
   df_beta_true,
-  sys_idx = 1,
-  state_names = NULL
+  sys_idx = 1
 )
 }
 \arguments{
@@ -23,8 +22,6 @@ simulate_multitransition_data(
 \item{df_beta_true}{true covariate effects}
 
 \item{sys_idx}{index of simulation system}
-
-\item{state_names}{names of the states}
 }
 \description{
 Data simulation (multitransition)
