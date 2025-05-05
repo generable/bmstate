@@ -778,3 +778,44 @@ create_cindex_plot <- function(pd, paths_gen, paths_gen_oos,
   plt_ci_oos <- ggpubr::annotate_figure(plot_ci_multi(ci_oos), top = "Out-of-sample")
   dplyr::lst(ci_is_table, ci_oos_table, plt_ci_is, plt_ci_oos)
 }
+
+# Visualize a graph
+transition_matrix_plot <- function(f, terminal_states, censor_state, null_state,
+                                   include_censor, ...) {
+  cn <- colnames(f)
+  idx_noevent <- find_one(censor_state, cn)
+  idx_term <- which(colnames(f) %in% terminal_states)
+  idx_init <- which(colnames(f) %in% null_state)
+  N <- length(cn)
+  color <- rep("black", N)
+  col <- "gray60"
+  col_term <- "firebrick"
+  col_init <- "steelblue2"
+  color[idx_noevent] <- col
+  color[idx_term] <- col_term
+  color[idx_init] <- col_init
+  acol <- matrix("black", nrow(f), ncol(f))
+  acol[, idx_noevent] <- col
+  lcol <- acol
+  lcol[, idx_term] <- col_term
+  lcol[, idx_init] <- col_init
+
+  # Filter
+  idx_keep <- seq_len(N)
+  if (!include_censor) {
+    idx_keep <- setdiff(idx_keep, idx_noevent)
+  }
+
+  f <- f[idx_keep, idx_keep, drop = F]
+  lcol <- lcol[idx_keep, idx_keep, drop = F]
+  acol <- acol[idx_keep, idx_keep, drop = F]
+  color <- color[idx_keep]
+
+  # Create plot
+  qgraph::qgraph(f,
+    edge.labels = TRUE, label.color = color,
+    edge.color = acol,
+    fade = FALSE,
+    ...
+  )
+}

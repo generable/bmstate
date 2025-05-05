@@ -1,9 +1,12 @@
 test_that("PathData methods work", {
-  a <- simulate_example_data(100)
+  a <- simulate_example_data(100, sys_idx = 2)
   pd <- a$pd
-  plt <- pd$plot_paths()
-  expect_s3_class(plt, "ggplot")
+  p1 <- pd$plot_paths()
+  p2 <- pd$plot_graph()
+  p3 <- pd$plot_graph(include_censor = TRUE)
+  expect_s3_class(p1, "ggplot")
+  expect_s3_class(p2, "qgraph")
+  expect_s3_class(p3, "qgraph")
   freq <- pd$trans_matrix()
   expect_true(inherits(freq, "matrix"))
-  expect_true(inherits(pd$plot_graph(), "qgraph"))
 })

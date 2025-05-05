@@ -25,13 +25,11 @@ columns.}
 
 \item{\code{state_names}}{Names of the states (character vector).}
 
-\item{\code{state_types}}{State types (integer vector).}
-
 \item{\code{terminal_states}}{Names of terminal states.}
 
 \item{\code{null_state}}{Names of null states. These are not events.}
 
-\item{\code{censor_state}}{Names of censoring states.
+\item{\code{censor_state}}{Name of the censoring states.
 Initialize}
 }
 \if{html}{\out{</div>}}
@@ -94,8 +92,7 @@ Initialize}
 
 \item{\code{terminal_states}}{Names of terminal states.}
 
-\item{\code{censor_state}}{Name of censoring state.
-Get names of covariates}
+\item{\code{censor_state}}{Name of censoring state.}
 
 \item{\code{null_state}}{Name of null state.}
 }
@@ -106,71 +103,72 @@ Get names of covariates}
 \if{html}{\out{<a id="method-PathData-covariate_names"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-covariate_names}{}}}
 \subsection{Method \code{covariate_names()}}{
+Get names of covariates
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$covariate_names()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 a character vector
-Get path lenghts (among paths that include events)
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-lengths"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-lengths}{}}}
 \subsection{Method \code{lengths()}}{
+Get path lenghts (among paths that include events)
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$lengths()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 a data frame of path ids and counts
-Get number of paths
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-n_paths"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-n_paths}{}}}
 \subsection{Method \code{n_paths()}}{
+Get number of paths
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$n_paths()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 an integer
-Get longest path
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-longest_path"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-longest_path}{}}}
 \subsection{Method \code{longest_path()}}{
+Get longest path
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$longest_path()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 a \code{\link{PathData}} object with just one path
-Get indices of event states
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-get_event_states"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-get_event_states}{}}}
 \subsection{Method \code{get_event_states()}}{
+Get indices of event states
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$get_event_states()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 integer vector
-Convert to format used by the 'mstate' package
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-as_msdata"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-as_msdata}{}}}
 \subsection{Method \code{as_msdata()}}{
+Convert to format used by the 'mstate' package
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$as_msdata(covariates = FALSE)}\if{html}{\out{</div>}}
 }
@@ -185,13 +183,13 @@ Convert to format used by the 'mstate' package
 \subsection{Returns}{
 A list with elements \code{msdata} and
 \code{legend}
-Format as time to first event
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-as_time_to_first_event"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-as_time_to_first_event}{}}}
 \subsection{Method \code{as_time_to_first_event()}}{
+Format as time to first event
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$as_time_to_first_event(covs = c("subject_id"), truncate = FALSE)}\if{html}{\out{</div>}}
 }
@@ -201,8 +199,7 @@ Format as time to first event
 \describe{
 \item{\code{covs}}{covariates to include in output data frame}
 
-\item{\code{truncate}}{truncate after terminal events?
-Get names of event states}
+\item{\code{truncate}}{truncate after terminal events?}
 }
 \if{html}{\out{</div>}}
 }
@@ -211,32 +208,33 @@ Get names of event states}
 \if{html}{\out{<a id="method-PathData-get_event_state_names"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-get_event_state_names}{}}}
 \subsection{Method \code{get_event_state_names()}}{
+Get names of event states
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$get_event_state_names()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 a character vector
-Print info
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-print"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-print}{}}}
 \subsection{Method \code{print()}}{
+Print info
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$print()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 nothing
-Convert to one long data frame
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-as_data_frame"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-as_data_frame}{}}}
 \subsection{Method \code{as_data_frame()}}{
+Convert to one long data frame
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$as_data_frame(covariates = NULL, truncate = FALSE)}\if{html}{\out{</div>}}
 }
@@ -246,8 +244,7 @@ Convert to one long data frame
 \describe{
 \item{\code{covariates}}{Which covariates to include?}
 
-\item{\code{truncate}}{Truncate after terminal events?
-Data frame in transitions format}
+\item{\code{truncate}}{Truncate after terminal events?}
 }
 \if{html}{\out{</div>}}
 }
@@ -256,6 +253,7 @@ Data frame in transitions format}
 \if{html}{\out{<a id="method-PathData-as_transitions"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-as_transitions}{}}}
 \subsection{Method \code{as_transitions()}}{
+Data frame in transitions format
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$as_transitions(only_observed = FALSE, force_rerun = FALSE)}\if{html}{\out{</div>}}
 }
@@ -273,13 +271,13 @@ a cached version is used if it exists.}
 \subsection{Returns}{
 A list with elements \code{df} (transition data frame) and
 \code{legend}
-Step plot of the paths
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-plot_paths"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-plot_paths}{}}}
 \subsection{Method \code{plot_paths()}}{
+Step plot of the paths
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$plot_paths(n_paths = NULL, alpha = 0.5)}\if{html}{\out{</div>}}
 }
@@ -289,8 +287,7 @@ Step plot of the paths
 \describe{
 \item{\code{n_paths}}{Number of paths to subsample for plotting.}
 
-\item{\code{alpha}}{opacity
-Transition proportion matrix}
+\item{\code{alpha}}{opacity}
 }
 \if{html}{\out{</div>}}
 }
@@ -299,19 +296,20 @@ Transition proportion matrix}
 \if{html}{\out{<a id="method-PathData-trans_matrix"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-trans_matrix}{}}}
 \subsection{Method \code{trans_matrix()}}{
+Transition proportion matrix
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$trans_matrix()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 a matrix
-Visualize the transition proportion matrix as a graph
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-plot_graph"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-plot_graph}{}}}
 \subsection{Method \code{plot_graph()}}{
+Visualize the transition proportion matrix as a graph
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$plot_graph(digits = 3, include_censor = FALSE, ...)}\if{html}{\out{</div>}}
 }
@@ -329,13 +327,13 @@ Visualize the transition proportion matrix as a graph
 }
 \subsection{Returns}{
 \code{qgraph} plot
-Fit Cox proportional hazards model
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-coxph"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-coxph}{}}}
 \subsection{Method \code{coxph()}}{
+Fit Cox proportional hazards model
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$coxph(covs = NULL, ...)}\if{html}{\out{</div>}}
 }
@@ -345,8 +343,7 @@ Fit Cox proportional hazards model
 \describe{
 \item{\code{covs}}{Covariate names.}
 
-\item{\code{...}}{Arguments passed to \code{survival::coxph}.
-Filter based on path id, creates new object}
+\item{\code{...}}{Arguments passed to \code{survival::coxph}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -355,6 +352,7 @@ Filter based on path id, creates new object}
 \if{html}{\out{<a id="method-PathData-filter"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-filter}{}}}
 \subsection{Method \code{filter()}}{
+Filter based on path id, creates new object
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$filter(
   path_ids_keep = NULL,

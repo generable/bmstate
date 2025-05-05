@@ -37,10 +37,9 @@ create_pathdata <- function(df, covs, ...) {
 #' columns.
 #' @field covs Covariate column names.
 #' @field state_names Names of the states (character vector).
-#' @field state_types State types (integer vector).
 #' @field terminal_states Names of terminal states.
 #' @field null_state Names of null states. These are not events.
-#' @field censor_state Names of censoring states.
+#' @field censor_state Name of the censoring states.
 PathData <- R6::R6Class(
   classname = "PathData",
   private = list(
@@ -67,7 +66,6 @@ PathData <- R6::R6Class(
     link_df = NULL,
     covs = NULL,
     state_names = NULL,
-    state_types = NULL,
     terminal_states = NULL,
     null_state = NULL,
     censor_state = NULL,
@@ -142,18 +140,18 @@ PathData <- R6::R6Class(
       self$null_state <- null_state
       self$censor_state <- censor_state
       self$state_names <- state_names
-      self$state_types <- seq(from = 0, to = length(state_names))
       self$covs <- covs
       self$subject_df <- subject_df
       self$path_df <- path_df
       self$link_df <- link_df
     },
-    #' Get names of covariates
+
+    #' @description Get names of covariates
     #' @return a character vector
     covariate_names = function() {
       self$covs
     },
-    #' Get path lenghts (among paths that include events)
+    #' @description Get path lenghts (among paths that include events)
     #' @return a data frame of path ids and counts
     lengths = function() {
       self$path_df |>
@@ -161,14 +159,14 @@ PathData <- R6::R6Class(
         dplyr::group_by(path_id) |>
         dplyr::count()
     },
-    #' Get number of paths
+    #' @description Get number of paths
     #' @return an integer
     n_paths = function() {
       nrow(self$path_df |>
         dplyr::group_by(.data$path_id) |>
         dplyr::count())
     },
-    #' Get longest path
+    #' @description Get longest path
     #' @return a \code{\link{PathData}} object with just one path
     longest_path = function() {
       lens <- self$lengths()
@@ -176,13 +174,13 @@ PathData <- R6::R6Class(
       df <- self$path_df |> dplyr::filter(path_id == lens$path_id[idx])
       self$filter(unique(df$path_id))
     },
-    #' Get indices of event states
+    #' @description Get indices of event states
     #' @return integer vector
     get_event_states = function() {
       match(self$get_event_state_names(), self$state_names)
     },
 
-    #' Convert to format used by the 'mstate' package
+    #' @description Convert to format used by the 'mstate' package
     #'
     #' @param covariates Include covariates?
     #' @return A list with elements \code{msdata} and
@@ -191,7 +189,7 @@ PathData <- R6::R6Class(
       checkmate::assert_logical(covariates, len = 1)
       pathdata_to_mstate_format(self, covariates)
     },
-    #' Format as time to first event
+    #' @description Format as time to first event
     #'
     #' @param covs covariates to include in output data frame
     #' @param truncate truncate after terminal events?
@@ -201,14 +199,14 @@ PathData <- R6::R6Class(
         as_time_to_first_event(states = self$get_event_states(), by = covs)
     },
 
-    #' Get names of event states
+    #' @description Get names of event states
     #'
     #' @return a character vector
     get_event_state_names = function() {
       setdiff(self$state_names, c(self$censor_state, self$null_state))
     },
 
-    #' Print info
+    #' @description Print info
     #'
     #' @return nothing
     print = function() {
@@ -223,7 +221,7 @@ PathData <- R6::R6Class(
       message(paste0(" * Covariates = {"), paste0(covs, collapse = ", "), "}")
     },
 
-    #' Convert to one long data frame
+    #' @description Convert to one long data frame
     #' @param covariates Which covariates to include?
     #' @param truncate Truncate after terminal events?
     as_data_frame = function(covariates = NULL, truncate = FALSE) {
@@ -245,7 +243,7 @@ PathData <- R6::R6Class(
       out
     },
 
-    #' Data frame in transitions format
+    #' @description Data frame in transitions format
     #'
     #' @param only_observed Limit transitions to only the observed ones?
     #' @param force_rerun Force rerun of the conversion? If \code{FALSE},
@@ -256,7 +254,7 @@ PathData <- R6::R6Class(
       if (is.null(private$dt) || force_rerun) {
         private$dt <- dt <- as_transitions(self$as_data_frame(),
           state_names = self$state_names,
-          state_types = self$state_types,
+          state_types = seq(from = 0, to = length(self$state_names)),
           terminal_states = self$terminal_states,
           censor_state = self$censor_state,
           null_state = self$null_state,
@@ -280,7 +278,7 @@ PathData <- R6::R6Class(
       dt
     },
 
-    #' Step plot of the paths
+    #' @description Step plot of the paths
     #'
     #' @param n_paths Number of paths to subsample for plotting.
     #' @param alpha opacity
@@ -307,7 +305,7 @@ PathData <- R6::R6Class(
         geom_point(mapping = aes(color = is_event, pch = is_event))
     },
 
-    #' Transition proportion matrix
+    #' @description Transition proportion matrix
     #'
     #' @return a matrix
     trans_matrix = function() {
@@ -321,7 +319,7 @@ PathData <- R6::R6Class(
       prop
     },
 
-    #' Visualize the transition proportion matrix as a graph
+    #' @description Visualize the transition proportion matrix as a graph
     #'
     #' @param digits Max number of digits to show in numbers
     #' @param ... Arguments passed to \code{qgraph}
@@ -329,45 +327,14 @@ PathData <- R6::R6Class(
     #' @return \code{qgraph} plot
     plot_graph = function(digits = 3, include_censor = FALSE, ...) {
       f <- self$trans_matrix()
-      cn <- colnames(f)
-      idx_noevent <- find_one(self$censor_state, cn)
-      idx_term <- which(colnames(f) %in% self$terminal_states)
-      idx_init <- which(colnames(f) %in% self$null_state)
-      N <- length(cn)
-      color <- rep("black", N)
-      col <- "gray60"
-      col_term <- "firebrick"
-      col_init <- "steelblue2"
-      color[idx_noevent] <- col
-      color[idx_term] <- col_term
-      color[idx_init] <- col_init
-      acol <- matrix("black", nrow(f), ncol(f))
-      acol[, idx_noevent] <- col
-      lcol <- acol
-      lcol[, idx_term] <- col_term
-      lcol[, idx_init] <- col_init
-
-      # Filter
-      idx_keep <- seq_len(N)
-      if (!include_censor) {
-        idx_keep <- setdiff(idx_keep, idx_noevent)
-      }
-
-      f <- f[idx_keep, idx_keep, drop = F]
-      lcol <- lcol[idx_keep, idx_keep, drop = F]
-      acol <- acol[idx_keep, idx_keep, drop = F]
-      color <- color[idx_keep]
-
-      # Create plot
-      qgraph::qgraph(f,
-        edge.labels = TRUE, label.color = color,
-        edge.color = acol,
-        fade = FALSE,
-        ...
+      transition_matrix_plot(
+        f, self$terminal_states,
+        self$censor_state, self$null_state,
+        include_censor, ...
       )
     },
 
-    #' Fit Cox proportional hazards model
+    #' @description Fit Cox proportional hazards model
     #'
     #' @param covs Covariate names.
     #' @param ... Arguments passed to \code{survival::coxph}.
@@ -387,7 +354,7 @@ PathData <- R6::R6Class(
       survival::coxph(stats::as.formula(form), df, ...)
     },
 
-    #' Filter based on path id, creates new object
+    #' @description Filter based on path id, creates new object
     #'
     #' @param path_ids_keep Path ids to keep
     #' @param subject_ids_keep Subject ids to keep

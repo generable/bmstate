@@ -77,17 +77,18 @@ simulate_multitransition_data <- function(
   # Finalize
   term_state <- "Fatality"
   if (sys_idx == 1) {
-    state_names <- c("Randomization", "Bleed", "Fatality", "Censor")
+    state_names <- c("Randomization", "Bleed", "Fatality")
   } else if (sys_idx == 2) {
-    state_names <- c("Randomization", "Bleed", "Stroke", "Fatality", "Censor")
+    state_names <- c("Randomization", "Bleed", "Stroke", "Fatality")
   } else if (sys_idx == 3) {
     state_names <- c(
       "Randomization", "Min Bleed", "Maj Bleed", "Non-Isch Stroke",
-      "ICH Bleed", "Fatality", "Censor"
+      "ICH Bleed", "Fatality"
     )
   } else {
     stop("invalid sys_idx")
   }
+  state_names <- c(state_names, "Censor")
 
   list(
     pd = create_sim_pathdata(df, term_state, state_names, covs),
