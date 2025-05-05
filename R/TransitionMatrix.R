@@ -93,10 +93,28 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
     #' @return a \code{data.frame}
     trans_df = function() {
       H <- self$num_trans()
+      TFI <- self$as_transition_index_matrix()
       idx <- seq_len(H)
-      data.frame(
-        trans_idx = idx
+      prev_state <- rep(0, H)
+      target_state <- rep(0, H)
+      for (i in 1:nrow(TFI)) {
+        for (j in 1:ncol(TFI)) {
+          if (TFI[i, j] > 0) {
+            prev_state[TFI[i, j]] <- i
+            target_state[TFI[i, j]] <- j
+          }
+        }
+      }
+      df <- data.frame(
+        trans_idx = idx,
+        prev_state = prev_state,
+        state = target_state
       )
+      df$trans_char <- paste0(
+        self$states[df$prev_state], "->",
+        self$states[df$state]
+      )
+      df
     },
 
     #' @description Visualize the matrix as a graph
@@ -142,3 +160,8 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
     }
   )
 )
+
+
+format_transition_char <- function(s1, s2) {
+  paste0(s1, "->", s2)
+}

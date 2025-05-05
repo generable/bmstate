@@ -372,10 +372,6 @@ PathData <- R6::R6Class(
   )
 )
 
-shorten_name2 <- function(input_string) {
-  input_string
-}
-
 as_time_to_first_event <- function(dat, states, by = c()) {
   by_syms <- rlang::syms(unique(c(by, "path_id")))
   # max time as censor time
@@ -395,92 +391,6 @@ as_time_to_first_event <- function(dat, states, by = c()) {
   censor |>
     anti_join(events, by = c("path_id", "state")) |>
     dplyr::bind_rows(events)
-}
-
-# Only creates trans_char and not actual integer index yet
-as_transitions_char_single <- function(dat, state_names, terminal_states) {
-  R <- nrow(dat)
-  a <- dat[2:R, ]
-  a$prev_state <- dat[1:(R - 1), ]$state
-  s1 <- sapply(state_names[a$prev_state], shorten_name2)
-  s2 <- sapply(state_names[a$state], shorten_name2)
-  if (any(s1 %in% terminal_states)) {
-    incorrect_states <- unique(s1[s1 %in% terminal_states])
-    warning(str_c(
-      "non-terminal record found for state: ", incorrect_states,
-      " (which is marked as a terminal state) for subject ",
-      unique(dat$subject_id), "\n"
-    ))
-  }
-  a$trans_char <- format_transition_char(s1, s2)
-  a
-}
-
-format_transition_char <- function(s1, s2) {
-  paste0(s1, "->", s2)
-}
-
-# Only creates trans_char and not actual integer index yet
-as_transitions_char <- function(dat, state_names, terminal_states) {
-  df <- NULL
-  ids <- unique(dat$subject_id)
-  for (id in ids) {
-    dat_id <- dat |> dplyr::filter(subject_id == id)
-    df <- rbind(df, as_transitions_char_single(dat_id, state_names, terminal_states))
-  }
-
-  # Edit trans_char for intervals that do not end in event
-  df$trans_char[df$is_event == 0] <- NA
-  df
-}
-
-# Add previous state and remove initial row of each subject
-as_transitions <- function(dat, state_names, state_types, terminal_states, covs,
-                           censor_state, null_state) {
-  # Transitions character representation
-  dat_trans <- as_transitions_char(dat, state_names, terminal_states)
-
-  # Create legend first
-  r <- tidyr::expand_grid(prev_state = state_names, state = state_names) |>
-    mutate(trans_char = format_transition_char(prev_state, state)) |>
-    dplyr::filter(
-      !prev_state %in% terminal_states, # no transition from terminal state
-      !state %in% null_state, # no transition into initial states
-      !state %in% censor_state, # no transition into or out of censor
-      !prev_state %in% censor_state
-    ) |>
-    mutate(terminal = state %in% terminal_states) |>
-    mutate(
-      state = as.integer(factor(state, levels = state_names, ordered = T)),
-      prev_state = as.integer(factor(prev_state, levels = state_names, ordered = T))
-    ) |>
-    as.data.frame()
-  legend <- r[, c("trans_char", "prev_state", "state", "terminal")] |>
-    dplyr::filter(!is.na(trans_char))
-  legend$transition <- seq_len(nrow(legend))
-  trans_names <- legend$trans_char
-  # add trans_type
-  target_state_name <- state_names[legend$state]
-  legend$trans_type <- state_types[match(target_state_name, state_names)]
-  # confirm that all transitions in the data are represented in the legend
-  stopifnot(all(na.omit(dat_trans$trans_char) %in% legend$trans_char))
-
-  # Finally add actual transition index to data
-  dat_trans$transition <- match(dat_trans$trans_char, trans_names)
-  dat_trans$transition[which(is.na(dat_trans$transition))] <- 0
-
-  # Order columns and drop unnecessary ones
-  fields <- c(
-    "time", "is_event", "state", "prev_state",
-    "transition", "trans_char", "subject_id"
-  )
-  dat_trans <- dat_trans[, c(fields, covs)]
-
-  # Return
-  list(
-    df = dat_trans,
-    legend = legend
-  )
 }
 
 
