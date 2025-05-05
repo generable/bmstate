@@ -162,6 +162,31 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
 )
 
 
-format_transition_char <- function(s1, s2) {
-  paste0(s1, "->", s2)
+#' Create common transition matrices
+#'
+#' @export
+#' @param state_names Names of the states. The length of this character
+#' vector defines the number of states.
+#' @param sources Indices of source states.
+#' @param terminal Indices of terminal states
+#' @param self_loops Add self-loops to non-terminal and non-source states?
+#' @return A \code{\link{TransitionMatrix}}, where all possible transitions
+#' between non-terminal and non-source states are added, as well as transition
+#' to terminal states from all states.
+full_transmat <- function(state_names = LETTERS[1:4], sources = 1,
+                          terminal = length(state_names), self_loops = TRUE) {
+  N <- length(state_names)
+  checkmate::assert_character(state_names, min.len = 1)
+  checkmate::assert_integerish(sources, lower = 1, upper = N)
+  checkmate::assert_integerish(terminal, lower = 1, upper = N)
+  checkmate::assert_logical(self_loops, len = 1)
+  mat <- matrix(1, N, N)
+  mat[, sources] <- 0
+  mat[terminal, ] <- 0
+  if (!self_loops) {
+    for (n in seq_len(N)) {
+      mat[n, n] <- 0
+    }
+  }
+  TransitionMatrix$new(mat, state_names)
 }

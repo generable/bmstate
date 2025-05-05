@@ -13,3 +13,10 @@ test_that("TransitionMatrix init and methods work", {
   expect_equal(nrow(s$states_df()), 3)
   expect_equal(nrow(s$trans_df()), 3)
 })
+
+test_that("full_transmat() convenience works", {
+  a <- full_transmat()
+  b <- full_transmat(LETTERS[1:3], self_loops = F)
+  expect_equal(nrow(a$trans_df()), 9)
+  expect_equal(nrow(b$trans_df()), 3)
+})

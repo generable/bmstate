@@ -800,6 +800,7 @@ transition_matrix_plot <- function(f, terminal_states, null_state,
     edge.labels = edge_labs, label.color = color,
     edge.color = acol,
     fade = FALSE,
+    layout = "circle",
     ...
   )
 }
