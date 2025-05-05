@@ -5,15 +5,12 @@
 #' \code{matrix[i,j]} is 1 if transition
 #' from state \code{i} to \code{j} is possible
 #' @field states a character vector of state names (length \code{N})
-#' @field censor_state name of a censoring state (not included in the matrix
-#' or the state names)
 TransitionMatrix <- R6::R6Class("TransitionMatrix",
 
   # PUBLIC
   public = list(
     matrix = NULL,
     states = NULL,
-    censor_state = NULL,
 
     #' @description
     #' Create graph
@@ -22,20 +19,16 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
     #' \code{matrix[i,j]} is 1 if transition
     #' from state \code{i} to \code{j} is possible
     #' @param states a character vector of state names (length \code{N})
-    #' @param censor_state name of a censoring state (not included in the matrix
-    #' or the state names)
-    #' transitions
-    initialize = function(matrix, states, censor_state = "Censor") {
+    initialize = function(matrix, states) {
       checkmate::assert_matrix(matrix, min.rows = 1, min.cols = 1)
       checkmate::assert_integerish(matrix, lower = 0, upper = 1)
       checkmate::assert_true(length(states) == nrow(matrix))
       checkmate::assert_true(nrow(matrix) == ncol(matrix))
       self$matrix <- matrix
       self$states <- states
-      self$censor_state <- censor_state
     },
 
-    #' Number of states, not including censor
+    #' Number of states
     #'
     #' @return integer \code{N}
     num_states = function() {
@@ -44,30 +37,59 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
 
     #' @description As a matrix
     #'
-    #' @return An \code{N+1} x \code{N+1} matrix with named columns and rows
+    #' @return An \code{N} x \code{N} matrix with named columns and rows
     as_matrix = function() {
-      r <- self$matrix
-      N <- self$num_states()
-      out <- matrix(0, N + 1, N + 1)
-      out[1:N, 1:N] <- r
-      out[, N + 1] <- 1 # edge from every state to censor
-      out[N + 1, N + 1] <- 0 # no loop from censor to itself
-      colnames(out) <- c(self$states, self$censor_state)
+      out <- self$matrix
+      colnames(out) <- self$states
       rownames(out) <- colnames(out)
       out
     },
 
+    #' @description As a matrix indexing the transitions
+    #'
+    #' @return An \code{N} x \code{N} matrix with named columns and rows
+    as_transition_index_matrix = function() {
+      a <- self$as_matrix()
+      out <- matrix(0, nrow(a), ncol(a))
+      count <- 0
+      for (i in 1:nrow(a)) {
+        for (j in 1:ncol(a)) {
+          if (a[i, j] == 1) {
+            count <- count + 1
+            out[i, j] <- count
+          }
+        }
+      }
+      colnames(out) <- colnames(a)
+      rownames(out) <- rownames(a)
+      out
+    },
+
+    #' @description A data frame of states
+    #'
+    #' @return a \code{data.frame} with columns \code{state_idx} and \code{state}
+    states_df = function() {
+      N <- self$num_states()
+      idx <- seq_len(N)
+      abs <- rep(FALSE, N)
+      src <- rep(FALSE, N)
+      abs[self$absorbing_states(names = FALSE)] <- TRUE
+      src[self$source_states(names = FALSE)] <- TRUE
+      data.frame(
+        state_idx = idx, state = self$states, absorbing = abs,
+        source = src
+      )
+    },
+
     #' @description Visualize the matrix as a graph
     #'
-    #' @param include_censor Include censoring state in the graph?
     #' @param ... Arguments passed to \code{qgraph}
     #' @return \code{qgraph} plot
-    plot = function(include_censor = FALSE, ...) {
-      f <- self$as_matrix()
+    plot = function(...) {
       transition_matrix_plot(
-        f, self$absorbing_states(),
-        self$censor_state, self$source_states(),
-        include_censor,
+        self$as_matrix(),
+        self$absorbing_states(),
+        self$source_states(),
         edge_labs = FALSE, ...
       )
     },

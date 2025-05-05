@@ -16,9 +16,6 @@ Defines states and possible transitions
 from state \code{i} to \code{j} is possible}
 
 \item{\code{states}}{a character vector of state names (length \code{N})}
-
-\item{\code{censor_state}}{name of a censoring state (not included in the matrix
-or the state names)}
 }
 \if{html}{\out{</div>}}
 }
@@ -28,6 +25,8 @@ or the state names)}
 \item \href{#method-TransitionMatrix-new}{\code{TransitionMatrix$new()}}
 \item \href{#method-TransitionMatrix-num_states}{\code{TransitionMatrix$num_states()}}
 \item \href{#method-TransitionMatrix-as_matrix}{\code{TransitionMatrix$as_matrix()}}
+\item \href{#method-TransitionMatrix-as_transition_index_matrix}{\code{TransitionMatrix$as_transition_index_matrix()}}
+\item \href{#method-TransitionMatrix-states_df}{\code{TransitionMatrix$states_df()}}
 \item \href{#method-TransitionMatrix-plot}{\code{TransitionMatrix$plot()}}
 \item \href{#method-TransitionMatrix-print}{\code{TransitionMatrix$print()}}
 \item \href{#method-TransitionMatrix-absorbing_states}{\code{TransitionMatrix$absorbing_states()}}
@@ -41,7 +40,7 @@ or the state names)}
 \subsection{Method \code{new()}}{
 Create graph
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TransitionMatrix$new(matrix, states, censor_state = "Censor")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TransitionMatrix$new(matrix, states)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -51,12 +50,8 @@ Create graph
 \code{matrix[i,j]} is 1 if transition
 from state \code{i} to \code{j} is possible}
 
-\item{\code{states}}{a character vector of state names (length \code{N})}
-
-\item{\code{censor_state}}{name of a censoring state (not included in the matrix
-or the state names)
-transitions
-Number of states, not including censor}
+\item{\code{states}}{a character vector of state names (length \code{N})
+Number of states}
 }
 \if{html}{\out{</div>}}
 }
@@ -83,7 +78,33 @@ As a matrix
 }
 
 \subsection{Returns}{
-An \code{N+1} x \code{N+1} matrix with named columns and rows
+An \code{N} x \code{N} matrix with named columns and rows
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TransitionMatrix-as_transition_index_matrix"></a>}}
+\if{latex}{\out{\hypertarget{method-TransitionMatrix-as_transition_index_matrix}{}}}
+\subsection{Method \code{as_transition_index_matrix()}}{
+As a matrix indexing the transitions
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TransitionMatrix$as_transition_index_matrix()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+An \code{N} x \code{N} matrix with named columns and rows
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TransitionMatrix-states_df"></a>}}
+\if{latex}{\out{\hypertarget{method-TransitionMatrix-states_df}{}}}
+\subsection{Method \code{states_df()}}{
+A data frame of states
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TransitionMatrix$states_df()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+a \code{data.frame} with columns \code{state_idx} and \code{state}
 }
 }
 \if{html}{\out{<hr>}}
@@ -92,14 +113,12 @@ An \code{N+1} x \code{N+1} matrix with named columns and rows
 \subsection{Method \code{plot()}}{
 Visualize the matrix as a graph
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TransitionMatrix$plot(include_censor = FALSE, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TransitionMatrix$plot(...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{include_censor}}{Include censoring state in the graph?}
-
 \item{\code{...}}{Arguments passed to \code{qgraph}}
 }
 \if{html}{\out{</div>}}
