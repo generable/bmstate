@@ -23,13 +23,8 @@ columns.}
 
 \item{\code{covs}}{Covariate column names.}
 
-\item{\code{state_names}}{Names of the states (character vector).}
-
-\item{\code{terminal_states}}{Names of terminal states.}
-
-\item{\code{null_state}}{Names of null states. These are not events.}
-
-\item{\code{censor_state}}{Name of the censoring states.
+\item{\code{tm}}{A \code{\link{TransitionMatrix}} describing the system in which
+the paths belong.
 Initialize}
 }
 \if{html}{\out{</div>}}
@@ -42,6 +37,10 @@ Initialize}
 \item \href{#method-PathData-lengths}{\code{PathData$lengths()}}
 \item \href{#method-PathData-n_paths}{\code{PathData$n_paths()}}
 \item \href{#method-PathData-longest_path}{\code{PathData$longest_path()}}
+\item \href{#method-PathData-censor_state}{\code{PathData$censor_state()}}
+\item \href{#method-PathData-null_state}{\code{PathData$null_state()}}
+\item \href{#method-PathData-state_names}{\code{PathData$state_names()}}
+\item \href{#method-PathData-terminal_states}{\code{PathData$terminal_states()}}
 \item \href{#method-PathData-get_event_states}{\code{PathData$get_event_states()}}
 \item \href{#method-PathData-as_msdata}{\code{PathData$as_msdata()}}
 \item \href{#method-PathData-as_time_to_first_event}{\code{PathData$as_time_to_first_event()}}
@@ -62,17 +61,7 @@ Initialize}
 \if{latex}{\out{\hypertarget{method-PathData-new}{}}}
 \subsection{Method \code{new()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$new(
-  subject_df,
-  path_df,
-  link_df,
-  state_names,
-  covs = NULL,
-  check_order = TRUE,
-  terminal_states = NULL,
-  censor_state = "Censor",
-  null_state = "Randomization"
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$new(subject_df, path_df, link_df, tm, covs = NULL, check_order = TRUE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -84,17 +73,12 @@ Initialize}
 
 \item{\code{link_df}}{Link data frame.}
 
-\item{\code{state_names}}{Names of all states.}
+\item{\code{tm}}{A \code{\link{TransitionMatrix}} describing the system in which
+the paths belong to.}
 
 \item{\code{covs}}{Covariate column names.}
 
 \item{\code{check_order}}{Check order of paths?}
-
-\item{\code{terminal_states}}{Names of terminal states.}
-
-\item{\code{censor_state}}{Name of censoring state.}
-
-\item{\code{null_state}}{Name of null state.}
 }
 \if{html}{\out{</div>}}
 }
@@ -149,6 +133,52 @@ Get longest path
 
 \subsection{Returns}{
 a \code{\link{PathData}} object with just one path
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-censor_state"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-censor_state}{}}}
+\subsection{Method \code{censor_state()}}{
+Get name of censoring state
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$censor_state()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-null_state"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-null_state}{}}}
+\subsection{Method \code{null_state()}}{
+Get name of null state
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$null_state()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-state_names"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-state_names}{}}}
+\subsection{Method \code{state_names()}}{
+Get names of all states, including censor
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$state_names()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+character vector
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-terminal_states"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-terminal_states}{}}}
+\subsection{Method \code{terminal_states()}}{
+Get names of terminal states
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$terminal_states()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+character vector
 }
 }
 \if{html}{\out{<hr>}}
