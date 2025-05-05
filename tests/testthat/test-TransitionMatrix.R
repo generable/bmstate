@@ -11,4 +11,5 @@ test_that("TransitionMatrix init and methods work", {
   p1 <- s$plot()
   expect_s3_class(p1, "qgraph")
   expect_equal(nrow(s$states_df()), 3)
+  expect_equal(nrow(s$trans_df()), 3)
 })

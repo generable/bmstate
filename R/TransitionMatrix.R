@@ -35,6 +35,13 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
       nrow(self$matrix)
     },
 
+    #' Number of transitions
+    #'
+    #' @return integer
+    num_trans = function() {
+      sum(as.vector(self$matrix))
+    },
+
     #' @description As a matrix
     #'
     #' @return An \code{N} x \code{N} matrix with named columns and rows
@@ -67,7 +74,7 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
 
     #' @description A data frame of states
     #'
-    #' @return a \code{data.frame} with columns \code{state_idx} and \code{state}
+    #' @return a \code{data.frame}
     states_df = function() {
       N <- self$num_states()
       idx <- seq_len(N)
@@ -76,8 +83,19 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
       abs[self$absorbing_states(names = FALSE)] <- TRUE
       src[self$source_states(names = FALSE)] <- TRUE
       data.frame(
-        state_idx = idx, state = self$states, absorbing = abs,
+        state_idx = idx, state = self$states, terminal0 = abs,
         source = src
+      )
+    },
+
+    #' @description A data frame of transitions ("legend")
+    #'
+    #' @return a \code{data.frame}
+    trans_df = function() {
+      H <- self$num_trans()
+      idx <- seq_len(H)
+      data.frame(
+        trans_idx = idx
       )
     },
 
@@ -116,7 +134,7 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
     #'
     #' @param names Return names of the states? Otherwise returns indices.
     source_states = function(names = TRUE) {
-      out <- which(colSums(s$matrix) == 0)
+      out <- which(colSums(self$matrix) == 0)
       if (names) {
         out <- self$states[out]
       }

@@ -24,9 +24,11 @@ from state \code{i} to \code{j} is possible}
 \itemize{
 \item \href{#method-TransitionMatrix-new}{\code{TransitionMatrix$new()}}
 \item \href{#method-TransitionMatrix-num_states}{\code{TransitionMatrix$num_states()}}
+\item \href{#method-TransitionMatrix-num_trans}{\code{TransitionMatrix$num_trans()}}
 \item \href{#method-TransitionMatrix-as_matrix}{\code{TransitionMatrix$as_matrix()}}
 \item \href{#method-TransitionMatrix-as_transition_index_matrix}{\code{TransitionMatrix$as_transition_index_matrix()}}
 \item \href{#method-TransitionMatrix-states_df}{\code{TransitionMatrix$states_df()}}
+\item \href{#method-TransitionMatrix-trans_df}{\code{TransitionMatrix$trans_df()}}
 \item \href{#method-TransitionMatrix-plot}{\code{TransitionMatrix$plot()}}
 \item \href{#method-TransitionMatrix-print}{\code{TransitionMatrix$print()}}
 \item \href{#method-TransitionMatrix-absorbing_states}{\code{TransitionMatrix$absorbing_states()}}
@@ -66,6 +68,19 @@ Number of states}
 
 \subsection{Returns}{
 integer \code{N}
+Number of transitions
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TransitionMatrix-num_trans"></a>}}
+\if{latex}{\out{\hypertarget{method-TransitionMatrix-num_trans}{}}}
+\subsection{Method \code{num_trans()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TransitionMatrix$num_trans()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+integer
 }
 }
 \if{html}{\out{<hr>}}
@@ -104,7 +119,20 @@ A data frame of states
 }
 
 \subsection{Returns}{
-a \code{data.frame} with columns \code{state_idx} and \code{state}
+a \code{data.frame}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TransitionMatrix-trans_df"></a>}}
+\if{latex}{\out{\hypertarget{method-TransitionMatrix-trans_df}{}}}
+\subsection{Method \code{trans_df()}}{
+A data frame of transitions ("legend")
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TransitionMatrix$trans_df()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+a \code{data.frame}
 }
 }
 \if{html}{\out{<hr>}}
