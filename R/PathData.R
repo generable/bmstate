@@ -330,7 +330,8 @@ PathData <- R6::R6Class(
       transition_matrix_plot(
         f, self$terminal_states,
         self$censor_state, self$null_state,
-        include_censor, ...
+        include_censor,
+        edge_labs = TRUE, ...
       )
     },
 

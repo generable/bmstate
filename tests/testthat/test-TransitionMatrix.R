@@ -8,4 +8,8 @@ test_that("TransitionMatrix init and methods work", {
   expect_output(s$print())
   expect_equal(s$source_states(), "A")
   expect_equal(s$absorbing_states(), "C")
+  p1 <- s$plot()
+  p2 <- s$plot(include_censor = TRUE)
+  expect_s3_class(p1, "qgraph")
+  expect_s3_class(p2, "qgraph")
 })

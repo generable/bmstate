@@ -781,7 +781,7 @@ create_cindex_plot <- function(pd, paths_gen, paths_gen_oos,
 
 # Visualize a graph
 transition_matrix_plot <- function(f, terminal_states, censor_state, null_state,
-                                   include_censor, ...) {
+                                   include_censor, edge_labs, ...) {
   cn <- colnames(f)
   idx_noevent <- find_one(censor_state, cn)
   idx_term <- which(colnames(f) %in% terminal_states)
@@ -813,7 +813,7 @@ transition_matrix_plot <- function(f, terminal_states, censor_state, null_state,
 
   # Create plot
   qgraph::qgraph(f,
-    edge.labels = TRUE, label.color = color,
+    edge.labels = edge_labs, label.color = color,
     edge.color = acol,
     fade = FALSE,
     ...
