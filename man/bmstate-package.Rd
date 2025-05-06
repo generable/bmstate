@@ -10,31 +10,14 @@ Bayesian multistate modeling using 'Stan'.
 }
 \section{Getting started}{
 
-See the vignettes and the following exported functions and classes
+See the vignettes. You can create a model using \code{\link{create_msm}}.
+The following classes and their documentation can be useful
 
 \itemize{
+ \item \code{\link{MultistateModel}}
+ \item \code{\link{PKModel}}
  \item \code{\link{PathData}}
- \item \code{\link{create_brier_score_plot}}
- \item \code{\link{create_cindex_plot}}
- \item \code{\link{create_stan_data}}
- \item \code{\link{create_stan_model}}
- \item \code{\link{do_split}}
- \item \code{\link{estimate_average_hazard}}
- \item \code{\link{fit_coxph}}
- \item \code{\link{fit_mstate}}
- \item \code{\link{generate_paths_many_subjects}}
- \item \code{\link{get_and_format_log_C_haz_draws}}
- \item \code{\link{get_and_format_log_h0_draws}}
- \item \code{\link{legend_to_PT_matrix}}
- \item \code{\link{legend_to_TFI_matrix}}
- \item \code{\link{plot_cumhaz_msfit}}
- \item \code{\link{plot_h0}}
- \item \code{\link{plot_other_beta}}
- \item \code{\link{plot_p_event}}
- \item \code{\link{plot_p_event_by_dose}}
- \item \code{\link{simulate_example_data}}
- \item \code{\link{subject_df_with_idx}}
- \item \code{\link{summarize_ppsurv}}
+ \item \code{\link{TransitionMatrix}}.
 }
 }
 
