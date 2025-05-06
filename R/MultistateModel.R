@@ -90,6 +90,13 @@ MultistateModel <- R6::R6Class("MultistateModel",
       private$knots
     },
 
+    #' @description Get max time set for the model
+    #'
+    #' @return a number
+    get_tmax = function() {
+      max(self$get_knots())
+    },
+
     #' Print the object
     #'
     #' @return nothing

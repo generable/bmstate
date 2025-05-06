@@ -23,6 +23,7 @@ Main model class
 \item \href{#method-MultistateModel-new}{\code{MultistateModel$new()}}
 \item \href{#method-MultistateModel-set_knots}{\code{MultistateModel$set_knots()}}
 \item \href{#method-MultistateModel-get_knots}{\code{MultistateModel$get_knots()}}
+\item \href{#method-MultistateModel-get_tmax}{\code{MultistateModel$get_tmax()}}
 \item \href{#method-MultistateModel-print}{\code{MultistateModel$print()}}
 \item \href{#method-MultistateModel-covs}{\code{MultistateModel$covs()}}
 \item \href{#method-MultistateModel-get_stan_model}{\code{MultistateModel$get_stan_model()}}
@@ -89,6 +90,19 @@ Get knot locations
 
 \subsection{Returns}{
 a numeric vector
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-get_tmax"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-get_tmax}{}}}
+\subsection{Method \code{get_tmax()}}{
+Get max time set for the model
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$get_tmax()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+a number
 Print the object
 }
 }
