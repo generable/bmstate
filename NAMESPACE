@@ -2,6 +2,7 @@
 
 export(MultistateModel)
 export(MultistateModelFit)
+export(PKModel)
 export(PathData)
 export(TransitionMatrix)
 export(create_brier_score_plot)
