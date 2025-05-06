@@ -9,6 +9,11 @@ test_that("MultistateModel init works", {
   mod <- create_msm(a, states, covs, pk_covs, compile = F)
   expect_true(inherits(mod, "MultistateModel"))
   expect_output(print(mod))
+  expect_error(mod$get_knots())
+
+  t_ev <- stats::runif(100)
+  mod$set_knots(1, t_ev)
+  expect_equal(length(mod$get_knots()), 5)
 })
 
 

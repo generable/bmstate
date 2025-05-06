@@ -34,7 +34,8 @@ MultistateModel <- R6::R6Class("MultistateModel",
   private = list(
     stan_model = NULL,
     NK = NULL,
-    hazard_covariates = NULL
+    hazard_covariates = NULL,
+    knots = NULL
   ),
 
   # PUBLIC
@@ -68,6 +69,44 @@ MultistateModel <- R6::R6Class("MultistateModel",
       }
     },
 
+    #' @description Set knot locations based on event times
+    #'
+    #' @param t_max Max time
+    #' @param t_event Occurred event times
+    set_knots = function(t_max, t_event) {
+      checkmate::assert_number(t_max, lower = 0)
+      checkmate::assert_numeric(t_event, lower = 0, upper = t_max, min.len = 3)
+      tk <- place_internal_knots(t_max, private$NK, t_event)
+      private$knots <- c(0, tk, t_max)
+    },
+
+    #' @description Get knot locations
+    #'
+    #' @return a numeric vector
+    get_knots = function() {
+      if (is.null(private$knots)) {
+        stop("knots have not been set, use $set_knots()")
+      }
+      private$knots
+    },
+
+    #' Print the object
+    #'
+    #' @return nothing
+    print = function() {
+      covs <- self$covs()
+      s <- self$transmat$states
+      x1 <- paste0("A MultistateModel with:")
+      x2 <- paste0(" - States: {", paste0(s, collapse = ", "), "}")
+      x3 <- paste0(" - Hazard covariates: {", paste0(covs, collapse = ", "), "}")
+      x4 <- paste0(" - Internal spline knots: ", private$NK)
+      msg <- paste(x1, x2, x3, x4, "\n", sep = "\n")
+      cat(msg)
+      if (!is.null(self$pk_model)) {
+        print(self$pk_model)
+      }
+    },
+
     #' @description Get the hazard covariates.
     covs = function() {
       private$hazard_covariates
@@ -97,23 +136,6 @@ MultistateModel <- R6::R6Class("MultistateModel",
       invisible(self)
     },
 
-    #' Print the object
-    #'
-    #' @return nothing
-    print = function() {
-      covs <- self$covs()
-      s <- self$transmat$states
-      x1 <- paste0("A MultistateModel with:")
-      x2 <- paste0(" - States: {", paste0(s, collapse = ", "), "}")
-      x3 <- paste0(" - Hazard covariates: {", paste0(covs, collapse = ", "), "}")
-      x4 <- paste0(" - Internal spline knots: ", private$NK)
-      msg <- paste(x1, x2, x3, x4, "\n", sep = "\n")
-      cat(msg)
-      if (!is.null(self$pk_model)) {
-        print(self$pk_model)
-      }
-    },
-
     #' @description
     #' Create the 'Stan' data list.
     #'
@@ -134,9 +156,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' @param ... Arguments passed to \code{sample} method of the
     #' 'CmdStanR' model.
     #' @return A \code{\link{MultistateModelFit}} object.
-    fit = function(pd,
-                   prior_only = FALSE,
-                   ...) {
+    fit = function(pd, prior_only = FALSE, ...) {
       # Get Stan model object
       stan_model <- self$get_stanmodel()
       if (is.null(stan_model)) {
@@ -154,3 +174,19 @@ MultistateModel <- R6::R6Class("MultistateModel",
     }
   )
 )
+
+
+# Evaluate B-spline basis at t
+bspline_basis <- function(t, k, knots, BK) {
+  splines2::bSpline(t,
+    degree = k - 1, knots = knots, intercept = TRUE,
+    Boundary.knots = BK
+  )
+}
+
+# Create internal knots based on event time quantiles
+place_internal_knots <- function(t_max, num_knots, t_event) {
+  h <- 1 / (num_knots + 1)
+  knots <- stats::quantile(t_event, probs = seq(0, 1, h))
+  knots[2:(length(knots) - 1)]
+}

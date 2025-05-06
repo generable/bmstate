@@ -1,20 +1,3 @@
-# Evaluate B-spline basis at t
-bspline_basis <- function(t, k, knots, BK) {
-  splines2::bSpline(t,
-    degree = k - 1, knots = knots, intercept = TRUE,
-    Boundary.knots = BK
-  )
-}
-
-# Create internal knots based on event time quantiles
-place_internal_knots <- function(t_max, num_knots, t_event) {
-  message("placing knots")
-  message(length(t_event), " events occurred")
-  h <- 1 / (num_knots + 1)
-  knots <- stats::quantile(t_event, probs = seq(0, 1, h))
-  knots[2:(length(knots) - 1)]
-}
-
 # Evaluate spline basis functions and their integrals
 # For each interval
 # NK = number of (inner) knots

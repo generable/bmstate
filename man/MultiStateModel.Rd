@@ -21,10 +21,12 @@ Main model class
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-MultistateModel-new}{\code{MultistateModel$new()}}
+\item \href{#method-MultistateModel-set_knots}{\code{MultistateModel$set_knots()}}
+\item \href{#method-MultistateModel-get_knots}{\code{MultistateModel$get_knots()}}
+\item \href{#method-MultistateModel-print}{\code{MultistateModel$print()}}
 \item \href{#method-MultistateModel-covs}{\code{MultistateModel$covs()}}
 \item \href{#method-MultistateModel-get_stan_model}{\code{MultistateModel$get_stan_model()}}
 \item \href{#method-MultistateModel-compile}{\code{MultistateModel$compile()}}
-\item \href{#method-MultistateModel-print}{\code{MultistateModel$print()}}
 \item \href{#method-MultistateModel-create_standata}{\code{MultistateModel$create_standata()}}
 \item \href{#method-MultistateModel-fit}{\code{MultistateModel$fit()}}
 \item \href{#method-MultistateModel-clone}{\code{MultistateModel$clone()}}
@@ -55,6 +57,51 @@ Create model
 \item{\code{P}}{number of prediction points}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-set_knots"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-set_knots}{}}}
+\subsection{Method \code{set_knots()}}{
+Set knot locations based on event times
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$set_knots(t_max, t_event)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{t_max}}{Max time}
+
+\item{\code{t_event}}{Occurred event times}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-get_knots"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-get_knots}{}}}
+\subsection{Method \code{get_knots()}}{
+Get knot locations
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$get_knots()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+a numeric vector
+Print the object
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-print"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-print}{}}}
+\subsection{Method \code{print()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$print()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+nothing
 }
 }
 \if{html}{\out{<hr>}}
@@ -95,19 +142,6 @@ Create and compile the 'Stan' model.
 }
 \subsection{Returns}{
 The updated model object (invisibly).
-Print the object
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModel-print"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModel-print}{}}}
-\subsection{Method \code{print()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$print()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-nothing
 }
 }
 \if{html}{\out{<hr>}}
