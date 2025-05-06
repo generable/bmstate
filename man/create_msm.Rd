@@ -2,38 +2,29 @@
 % Please edit documentation in R/MultistateModel.R
 \name{create_msm}
 \alias{create_msm}
-\title{Create a model}
+\title{Create a multistate model}
 \usage{
-create_msm(
-  matrix,
-  states,
-  covariates,
-  P = 30,
-  NK = 3,
-  pk = FALSE,
-  compile = TRUE
-)
+create_msm(matrix, states, hazard_covs, pk_covs = NULL, NK = 3, compile = TRUE)
 }
 \arguments{
-\item{matrix}{a binary matrix where \code{matrix[i,j]} is 1 if transition
-from state \code{i} to \code{j} is possible}
+\item{matrix}{A binary matrix where \code{matrix[i,j]} is 1 if transition
+from state \code{i} to \code{j} is possible.}
 
-\item{states}{a character vector of state names}
+\item{states}{A character vector of state names.}
 
-\item{covariates}{A list with elements \code{hazard}, \code{ka},
-\code{CL}, and \code{V2}}
+\item{hazard_covs}{Covariates that affect the hazard. A character vector.}
 
-\item{P}{number of prediction points}
+\item{pk_covs}{Covariates that affect the PK parameters. A list with
+elements \code{ka} \code{CL}, and \code{V2}. If \code{NULL}, a PK model
+will not be created.}
 
 \item{NK}{number of internal spline knots}
-
-\item{pk}{should pk model be used?}
 
 \item{compile}{compile 'Stan' model?}
 }
 \value{
-A \code{\link{MultistateModel}} object
+A \code{\link{MultistateModel}} object.
 }
 \description{
-Create a model
+Create a multistate model
 }

@@ -72,7 +72,7 @@ Get the covariates affecting the V_2 parameter.
 \if{html}{\out{<a id="method-PKModel-print"></a>}}
 \if{latex}{\out{\hypertarget{method-PKModel-print}{}}}
 \subsection{Method \code{print()}}{
-Print the object
+Print the object info
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PKModel$print()}\if{html}{\out{</div>}}
 }

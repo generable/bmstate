@@ -39,14 +39,16 @@ PKModel <- R6::R6Class("PKModel",
       private$covariates$V2
     },
 
-    #' @description Print the object
+    #' @description Print the object info
     #'
     #' @return nothing
     print = function() {
-      message("A PKModel with:")
-      message(" - ka covariates: {", paste0(self$ka_covs(), collapse = ", "), "}")
-      message(" - CL covariates: {", paste0(self$CL_covs(), collapse = ", "), "}")
-      message(" - V2 covariates: {", paste0(self$V2_covs(), collapse = ", "), "}")
+      x1 <- "A PKModel with:"
+      x2 <- paste0(" - ka covariates: {", paste0(self$ka_covs(), collapse = ", "), "}")
+      x3 <- paste0(" - CL covariates: {", paste0(self$CL_covs(), collapse = ", "), "}")
+      x4 <- paste0(" - V2 covariates: {", paste0(self$V2_covs(), collapse = ", "), "}")
+      msg <- paste(x1, x2, x3, x4, "\n", sep = "\n")
+      cat(msg)
     },
 
     #' @description Simulate system in steady state

@@ -12,6 +12,8 @@ Main model class
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
 \item{\code{transmat}}{The transition matrix}
+
+\item{\code{pk_model}}{A \code{\link{PKModel}} or NULL}
 }
 \if{html}{\out{</div>}}
 }
@@ -19,7 +21,7 @@ Main model class
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-MultistateModel-new}{\code{MultistateModel$new()}}
-\item \href{#method-MultistateModel-get_covariates}{\code{MultistateModel$get_covariates()}}
+\item \href{#method-MultistateModel-covs}{\code{MultistateModel$covs()}}
 \item \href{#method-MultistateModel-get_stan_model}{\code{MultistateModel$get_stan_model()}}
 \item \href{#method-MultistateModel-compile}{\code{MultistateModel$compile()}}
 \item \href{#method-MultistateModel-print}{\code{MultistateModel$print()}}
@@ -34,7 +36,7 @@ Main model class
 \subsection{Method \code{new()}}{
 Create model
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$new(transmat, covariates, P, NK, pk, compile = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$new(transmat, covariates, NK, pk_model = NULL, compile = TRUE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -42,27 +44,26 @@ Create model
 \describe{
 \item{\code{transmat}}{A \code{\link{TransitionMatrix}}.}
 
-\item{\code{covariates}}{A list with elements \code{hazard}, \code{ka},
-\code{CL}, and \code{V2}}
-
-\item{\code{P}}{number of prediction points}
+\item{\code{covariates}}{The names of the hazard covariates.}
 
 \item{\code{NK}}{number of internal spline knots}
 
-\item{\code{pk}}{should pk model be used?}
+\item{\code{pk_model}}{A \code{\link{PKModel}} or NULL.}
 
 \item{\code{compile}}{Should the 'Stan' model code be created and compiled.}
+
+\item{\code{P}}{number of prediction points}
 }
 \if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModel-get_covariates"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModel-get_covariates}{}}}
-\subsection{Method \code{get_covariates()}}{
-Get the covariates list.
+\if{html}{\out{<a id="method-MultistateModel-covs"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-covs}{}}}
+\subsection{Method \code{covs()}}{
+Get the hazard covariates.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$get_covariates()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$covs()}\if{html}{\out{</div>}}
 }
 
 }
