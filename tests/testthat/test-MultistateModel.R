@@ -37,4 +37,5 @@ test_that("path generation with MultistateModel works", {
   log_w0 <- matrix(-4, N, S)
   log_m <- matrix(0, N, S)
   paths <- mod$simulate(w, log_w0, log_m)
+  expect_equal(ncol(paths), 4)
 })

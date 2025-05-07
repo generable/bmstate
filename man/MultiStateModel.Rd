@@ -238,10 +238,13 @@ Generate a path starting from time 0
 
 \item{\code{init_state}}{Integer index of starting state.}
 
-\item{\code{discretize}}{Discretize times to one time unit?
-Generate transition given state and transition intensity functions}
+\item{\code{discretize}}{Discretize times to one time unit?}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+an array with number of rows equal to the path length
+Generate transition given state and transition intensity functions
 }
 }
 \if{html}{\out{<hr>}}
@@ -277,7 +280,7 @@ Generate transition given state and transition intensity functions}
 Draw an event time from Censored Non-Homogeneous Poisson
 process using the thinning algorithm
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$draw_time_cnhp(w, log_w0, log_m, t_max, t_init)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$draw_time_cnhp(w, log_w0, log_m, t_max, t_init, lambda_ub)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -292,6 +295,8 @@ process using the thinning algorithm
 \item{\code{t_max}}{Max time}
 
 \item{\code{t_init}}{Initial time}
+
+\item{\code{lambda_ub}}{Upper bound of hazard}
 }
 \if{html}{\out{</div>}}
 }

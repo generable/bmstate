@@ -166,20 +166,27 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' @param discretize Discretize times to one time unit?
     #' @return a data frame
     simulate = function(w, log_w0, log_m, init_state = 1, discretize = FALSE) {
+      checkmate::assert_array(w, d = 3)
       n_paths <- dim(w)[1]
+      checkmate::assert_matrix(log_w0, nrows = n_paths)
+      checkmate::assert_matrix(log_m, nrows = n_paths)
+      checkmate::assert_logical(discretize, len = 1)
+      S <- self$transmat$num_states()
+      checkmate::assert_integerish(init_state, len = 1, lower = 1, upper = S)
       pb <- progress::progress_bar$new(total = n_paths)
+      message("Generating ", n_paths, " paths")
+
       # Could be done in parallel
-      out <- list()
+      out <- NULL
       for (j in seq_len(n_paths)) {
         pb$tick()
-        df <- self$generate_path(
-          w[j, ], log_w0[j, ], log_m[j, ], init_state,
-          discretize
+        p <- self$generate_path(
+          w[j, , ], log_w0[j, ], log_m[j, ], init_state, discretize
         )
-        df$path_id <- j
-        out[[j]] <- df
+        p <- cbind(p, rep(j, nrow(p)))
+        out <- rbind(out, p)
       }
-      stack_list_of_dfs(out)
+      out
     },
 
     #' Generate a path starting from time 0
@@ -189,8 +196,15 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' @param log_m A vector of length \code{n_trans}
     #' @param init_state Integer index of starting state.
     #' @param discretize Discretize times to one time unit?
+    #' @return an array with number of rows equal to the path length
     generate_path = function(w, log_w0, log_m,
                              init_state = 1, discretize = FALSE) {
+      checkmate::assert_logical(discretize, len = 1)
+      checkmate::assert_integerish(init_state, len = 1)
+      checkmate::assert_array(w, d = 2)
+      checkmate::assert_numeric(log_w0)
+      checkmate::assert_numeric(log_m)
+
       t_max <- self$get_tmax()
       S <- self$transmat$num_states()
       checkmate::assert_integerish(init_state, len = 1, lower = 1, upper = S)
@@ -234,7 +248,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       is_event[1] <- 0 # initial state is never an event
       is_event[L] <- 0
       states[L] <- states[L - 1]
-      data.frame(time = times, state = states, is_event = is_event)
+      cbind(time = times, state = states, is_event = is_event)
     },
 
     #' Generate transition given state and transition intensity functions
@@ -246,6 +260,12 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' @param log_w0 A vector of length \code{n_trans}
     #' @param log_m A vector of length \code{n_trans}
     generate_transition = function(state, t_init, t_max, w, log_w0, log_m) {
+      checkmate::assert_integerish(state, len = 1)
+      checkmate::assert_number(t_init)
+      checkmate::assert_number(t_max, lower = t_init)
+      checkmate::assert_array(w, d = 2)
+      checkmate::assert_numeric(log_w0)
+      checkmate::assert_numeric(log_m)
       tol <- 1.03
       possible <- self$transmat$possible_transitions_from(state)
       S <- self$transmat$num_trans()
@@ -256,7 +276,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
         return(list(t = t_max, new_state = 0))
       }
       UB <- UB[possible]
-      w <- w[possible, drop = FALSE]
+      w <- w[possible, , drop = FALSE]
       log_w0 <- log_w0[possible]
       log_m <- log_m[possible]
 
@@ -269,7 +289,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       # Loop through possible transitions
       for (j in draw_order) {
         draw <- self$draw_time_cnhp(
-          w[j, ], log_w0[j], log_m[j], t_min_found, t_init
+          w[j, ], log_w0[j], log_m[j], t_min_found, t_init, UB[j]
         )
         if (draw$t < t_min_found) {
           trans_idx <- possible[j]
@@ -302,10 +322,10 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' @param log_m Hazard multiplier (log)
     #' @param t_max Max time
     #' @param t_init Initial time
+    #' @param lambda_ub Upper bound of hazard
     #' @return A number. If drawn event time is going to be larger than t_max,
     #' then t_max is returned
-    draw_time_cnhp = function(w, log_w0, log_m, t_max, t_init) {
-      checkmate::assert_true(t_max > t_init)
+    draw_time_cnhp = function(w, log_w0, log_m, t_max, t_init, lambda_ub) {
       n_tries <- 0
       t <- t_init
       accepted <- FALSE
