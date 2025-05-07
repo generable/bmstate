@@ -26,6 +26,7 @@ Main model class
 \item \href{#method-MultistateModel-get_tmax}{\code{MultistateModel$get_tmax()}}
 \item \href{#method-MultistateModel-print}{\code{MultistateModel$print()}}
 \item \href{#method-MultistateModel-covs}{\code{MultistateModel$covs()}}
+\item \href{#method-MultistateModel-log_baseline_hazard}{\code{MultistateModel$log_baseline_hazard()}}
 \item \href{#method-MultistateModel-get_stan_model}{\code{MultistateModel$get_stan_model()}}
 \item \href{#method-MultistateModel-compile}{\code{MultistateModel$compile()}}
 \item \href{#method-MultistateModel-create_standata}{\code{MultistateModel$create_standata()}}
@@ -127,6 +128,32 @@ Get the hazard covariates.
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModel$covs()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-log_baseline_hazard"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-log_baseline_hazard}{}}}
+\subsection{Method \code{log_baseline_hazard()}}{
+Evaluate log baseline hazard
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$log_baseline_hazard(t, log_w0, w = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{t}}{Output time points.}
+
+\item{\code{log_w0}}{Intercept (log_scale).}
+
+\item{\code{w}}{Spline weights (log scale). If \code{NULL}, will be set to
+a vector of zeros, meaning that the log hazard is constant at
+\code{log_w0}}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+a vector with same length as \code{t}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateModel-get_stan_model"></a>}}

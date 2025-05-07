@@ -35,7 +35,8 @@ MultistateModel <- R6::R6Class("MultistateModel",
     stan_model = NULL,
     NK = NULL,
     hazard_covariates = NULL,
-    knots = NULL
+    knots = NULL,
+    spline_k = 3 # degree
   ),
 
   # PUBLIC
@@ -117,6 +118,32 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' @description Get the hazard covariates.
     covs = function() {
       private$hazard_covariates
+    },
+
+    #' @description Evaluate log baseline hazard
+    #'
+    #' @param t Output time points.
+    #' @param log_w0 Intercept (log_scale).
+    #' @param w Spline weights (log scale). If \code{NULL}, will be set to
+    #' a vector of zeros, meaning that the log hazard is constant at
+    #' \code{log_w0}
+    #' @return a vector with same length as \code{t}
+    log_baseline_hazard = function(t, log_w0, w = NULL) {
+      tm <- self$get_tmax()
+      checkmate::assert_numeric(t, lower = 0, upper = tm)
+      knots <- self$get_knots()
+      L <- length(knots)
+      BK <- knots[c(1, L)]
+      knots <- knots[2:(L - 1)]
+      SBF <- bspline_basis(t, private$spline_k, knots, BK) # shape (N, L+1)
+      M <- ncol(SBF)
+      if (is.null(w)) {
+        w <- rep(0, M)
+      }
+      checkmate::assert_numeric(w, len = M)
+      checkmate::assert_number(log_w0)
+      log_h0 <- SBF %*% w + log_w0
+      as.numeric(log_h0)
     },
 
     #' @description Get the underlying 'Stan' model.
