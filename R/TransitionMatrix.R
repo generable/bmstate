@@ -72,6 +72,13 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
       out
     },
 
+    #' @description Get indices of possible transitions from given state
+    #' @param state Index of state
+    possible_transitions_from = function(state) {
+      row <- self$as_transition_index_matrix()[state, ]
+      row[row > 0]
+    },
+
     #' @description A data frame of states
     #'
     #' @return a \code{data.frame}

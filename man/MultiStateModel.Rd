@@ -27,6 +27,9 @@ Main model class
 \item \href{#method-MultistateModel-print}{\code{MultistateModel$print()}}
 \item \href{#method-MultistateModel-covs}{\code{MultistateModel$covs()}}
 \item \href{#method-MultistateModel-log_baseline_hazard}{\code{MultistateModel$log_baseline_hazard()}}
+\item \href{#method-MultistateModel-simulate}{\code{MultistateModel$simulate()}}
+\item \href{#method-MultistateModel-generate_transition}{\code{MultistateModel$generate_transition()}}
+\item \href{#method-MultistateModel-generate_path}{\code{MultistateModel$generate_path()}}
 \item \href{#method-MultistateModel-get_stan_model}{\code{MultistateModel$get_stan_model()}}
 \item \href{#method-MultistateModel-compile}{\code{MultistateModel$compile()}}
 \item \href{#method-MultistateModel-create_standata}{\code{MultistateModel$create_standata()}}
@@ -153,6 +156,80 @@ a vector of zeros, meaning that the log hazard is constant at
 }
 \subsection{Returns}{
 a vector with same length as \code{t}
+Generate paths
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-simulate"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-simulate}{}}}
+\subsection{Method \code{simulate()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate()}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{w}}{An array of shape \code{n_paths} x \code{n_trans} x
+\code{n_weights}}
+
+\item{\code{log_w0}}{An array of shape \code{n_paths} x \code{n_trans}}
+
+\item{\code{log_m}}{An array of shape \code{n_paths} x \code{n_trans}
+Generate transition given state and transition intensity functions}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-generate_transition"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-generate_transition}{}}}
+\subsection{Method \code{generate_transition()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$generate_transition(
+  state,
+  t_init,
+  t_max,
+  log_h0,
+  m_sub,
+  t_sub,
+  UB = NULL,
+  t_pred = NULL,
+  tol = 1.03
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{state}}{Integer index of current state.}
+
+\item{\code{t_init}}{Current time}
+
+\item{\code{t_max}}{max time}
+
+\item{\code{discretize}}{Discretize times to one time unit?
+Generate a path starting from time 0}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-generate_path"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-generate_path}{}}}
+\subsection{Method \code{generate_path()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$generate_path(init_state = 1, discretize = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{init_state}}{Integer index of starting state.}
+
+\item{\code{discretize}}{Discretize times to one time unit?}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}

@@ -146,6 +146,132 @@ MultistateModel <- R6::R6Class("MultistateModel",
       as.numeric(log_h0)
     },
 
+    #' Generate paths
+    #'
+    #' @param w An array of shape \code{n_paths} x \code{n_trans} x
+    #' \code{n_weights}
+    #' @param log_w0 An array of shape \code{n_paths} x \code{n_trans}
+    #' @param log_m An array of shape \code{n_paths} x \code{n_trans}
+    simulate = function() {
+    },
+
+    #' Generate transition given state and transition intensity functions
+    #'
+    #' @param state Integer index of current state.
+    #' @param t_init Current time
+    #' @param t_max max time
+    #' @param discretize Discretize times to one time unit?
+    generate_transition = function(state, t_init, t_max, log_h0, m_sub, t_sub,
+                                   UB = NULL,
+                                   t_pred = NULL, tol = 1.03) {
+      # Which transition functions are possible?
+      possible <- TFI[state, ]
+      possible <- possible[possible > 0]
+      if (is.null(UB)) {
+        UB <- max_inst_hazard(log_h0, m_sub) * tol
+      }
+      possible <- possible[which(UB[possible] > 1e-9)] # so rare that not even possible
+      if (length(possible) == 0) {
+        # Absorbing state, no transitions possible
+        return(list(t = t_max, new_state = 0))
+      }
+      m_sub <- m_sub[1, possible, , drop = FALSE]
+      UB <- UB[possible]
+      if (is.null(t_pred)) {
+        log_h0 <- log_h0[possible]
+      } else {
+        log_h0 <- log_h0[1, possible, , drop = FALSE]
+      }
+      # Draw event with highest upper bound first because it is most likely
+      # to occur soon and be the minimum
+      draw_order <- sort(UB, decreasing = TRUE, index.return = 1)$ix
+      t_min_found <- t_max
+      trans_idx <- 0
+
+      # Loop through possible transitions
+      for (j in draw_order) {
+        if (!is.null(t_pred)) {
+          h0_trans <- log_h0[1, j, ]
+        } else {
+          h0_trans <- log_h0[[j]]
+        }
+        draw <- draw_time_cnhp(
+          h0_trans, m_sub[1, j, ], t_sub, UB[[j]], t_min_found, t_init, t_pred
+        )
+        if (draw$t < t_min_found) {
+          trans_idx <- possible[j]
+          t_min_found <- draw$t
+        }
+      }
+      if (trans_idx > 0) {
+        new_state <- find_column_with_number(TFI, trans_idx)
+      } else {
+        new_state <- 0
+      }
+
+      # Safeguard against infinite loop
+      dt_min <- 1e-9
+      if (t_min_found - t_init < dt_min) {
+        t_min_found <- t_init + dt_min
+      }
+
+      # Return
+      list(
+        t = t_min_found, new_state = new_state
+      )
+    },
+
+    #' Generate a path starting from time 0
+    #'
+    #' @param init_state Integer index of starting state.
+    #' @param discretize Discretize times to one time unit?
+    generate_path = function(init_state = 1, discretize = FALSE) {
+      t_max <- self$get_tmax()
+      S <- self$transmat$num_states()
+      checkmate::assert_integerish(init_state, len = 1, lower = 1, upper = S)
+      dt <- 1
+
+      # Setup
+      states <- init_state
+      times <- 0
+      j <- 0
+
+      # Generate transitions
+      while (times[j + 1] < t_max) {
+        j <- j + 1
+        t_cur <- times[j]
+
+        # Generate next transition
+        trans <- self$generate_transition(
+          states[j], log_h0, m_sub, t_sub, t_cur, t_max, UB, t_pred
+        )
+        t_next <- trans$t
+
+        # Discretize transition time to end of day
+        if (discretize) {
+          t_next <- dt * ceiling(t_next / dt)
+        }
+
+        # Update time and state
+        times <- c(times, t_next)
+        states <- c(states, trans$new_state)
+        if (j >= 100000) {
+          msg <- paste0(
+            "\nt = ",
+            round(times[j], 2), " -> ", t_max, ": at state ", states[j], "\n ",
+            "Generating a path with over ", j, " transitions, something is wrong\n"
+          )
+          stop(msg)
+        }
+      }
+      L <- length(times)
+      is_event <- rep(1, L)
+      is_event[1] <- 0 # initial state is never an event
+      is_event[L] <- 0
+      states[L] <- states[L - 1]
+      cbind(time = times, state = states, is_event)
+    },
+
     #' @description Get the underlying 'Stan' model.
     get_stan_model = function() {
       private$stan_model

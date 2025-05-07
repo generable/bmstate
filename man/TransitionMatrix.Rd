@@ -27,6 +27,7 @@ from state \code{i} to \code{j} is possible}
 \item \href{#method-TransitionMatrix-num_trans}{\code{TransitionMatrix$num_trans()}}
 \item \href{#method-TransitionMatrix-as_matrix}{\code{TransitionMatrix$as_matrix()}}
 \item \href{#method-TransitionMatrix-as_transition_index_matrix}{\code{TransitionMatrix$as_transition_index_matrix()}}
+\item \href{#method-TransitionMatrix-possible_transitions_from}{\code{TransitionMatrix$possible_transitions_from()}}
 \item \href{#method-TransitionMatrix-states_df}{\code{TransitionMatrix$states_df()}}
 \item \href{#method-TransitionMatrix-trans_df}{\code{TransitionMatrix$trans_df()}}
 \item \href{#method-TransitionMatrix-plot}{\code{TransitionMatrix$plot()}}
@@ -107,6 +108,23 @@ As a matrix indexing the transitions
 
 \subsection{Returns}{
 An \code{N} x \code{N} matrix with named columns and rows
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TransitionMatrix-possible_transitions_from"></a>}}
+\if{latex}{\out{\hypertarget{method-TransitionMatrix-possible_transitions_from}{}}}
+\subsection{Method \code{possible_transitions_from()}}{
+Get indices of possible transitions from given state
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TransitionMatrix$possible_transitions_from(state)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{state}}{Index of state}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
