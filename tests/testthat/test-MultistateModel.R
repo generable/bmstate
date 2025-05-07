@@ -25,10 +25,16 @@ test_that("MultistateModel init and methods work", {
 })
 
 
-test_that("creating MultistateModel from PathData works", {
-  sim <- simulate_example_data(100, sys_idx = 2)
-  pd <- sim$pd
-  # mod <- create_msm(a, nam, covs, compile = F)
-  # expect_true(inherits(mod, "MultistateModel"))
-  # expect_output(print(mod))
+test_that("path generation with MultistateModel works", {
+  tm <- full_transmat(self_loops = FALSE)
+  mod <- MultistateModel$new(tm, "age", 3, NULL, FALSE)
+  tmax <- 3 * 365.25
+  mod$set_knots(tmax, seq(0, tmax - 1, length.out = 1000))
+  N <- 100
+  S <- tm$num_trans()
+  L <- 6
+  w <- array(0.1 * rnorm(N * S * L), dim = c(N, S, L))
+  log_w0 <- matrix(-4, N, S)
+  log_m <- matrix(0, N, S)
+  paths <- mod$simulate(w, log_w0, log_m)
 })

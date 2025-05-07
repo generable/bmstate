@@ -23,7 +23,7 @@ columns.}
 
 \item{\code{covs}}{Covariate column names.}
 
-\item{\code{tm}}{A \code{\link{TransitionMatrix}} describing the system in which
+\item{\code{transmat}}{A \code{\link{TransitionMatrix}} describing the system in which
 the paths belong.
 Initialize}
 }
@@ -61,19 +61,30 @@ Initialize}
 \if{latex}{\out{\hypertarget{method-PathData-new}{}}}
 \subsection{Method \code{new()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$new(subject_df, path_df, link_df, tm, covs = NULL, check_order = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$new(
+  subject_df,
+  path_df,
+  link_df,
+  transmat,
+  covs = NULL,
+  check_order = TRUE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{subject_df}}{Subjects data frame.}
+\item{\code{subject_df}}{Data frame with one row per subject. Must have
+\code{subject_id} and all covariates as columns.}
 
-\item{\code{path_df}}{Paths data frame.}
+\item{\code{path_df}}{Data frame of actual paths. Must have \code{path_id},
+\code{state}, \code{time}, and \code{is_event} as columns.}
 
-\item{\code{link_df}}{Link data frame.}
+\item{\code{link_df}}{Links the path and subject data frames. Must have
+\code{path_id}, \code{draw_idx}, \code{rep_idx}, and \code{subject_id} as
+columns.}
 
-\item{\code{tm}}{A \code{\link{TransitionMatrix}} describing the system in which
+\item{\code{transmat}}{A \code{\link{TransitionMatrix}} describing the system in which
 the paths belong to.}
 
 \item{\code{covs}}{Covariate column names.}

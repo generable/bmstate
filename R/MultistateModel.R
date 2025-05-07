@@ -162,7 +162,79 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' \code{n_weights}
     #' @param log_w0 An array of shape \code{n_paths} x \code{n_trans}
     #' @param log_m An array of shape \code{n_paths} x \code{n_trans}
-    simulate = function() {
+    #' @param init_state Integer index of starting state.
+    #' @param discretize Discretize times to one time unit?
+    #' @return a data frame
+    simulate = function(w, log_w0, log_m, init_state = 1, discretize = FALSE) {
+      n_paths <- dim(w)[1]
+      pb <- progress::progress_bar$new(total = n_paths)
+      # Could be done in parallel
+      out <- list()
+      for (j in seq_len(n_paths)) {
+        pb$tick()
+        df <- self$generate_path(
+          w[j, ], log_w0[j, ], log_m[j, ], init_state,
+          discretize
+        )
+        df$path_id <- j
+        out[[j]] <- df
+      }
+      stack_list_of_dfs(out)
+    },
+
+    #' Generate a path starting from time 0
+    #'
+    #' @param w An array of shape \code{n_trans} x \code{n_weights}
+    #' @param log_w0 A vector of length \code{n_trans}
+    #' @param log_m A vector of length \code{n_trans}
+    #' @param init_state Integer index of starting state.
+    #' @param discretize Discretize times to one time unit?
+    generate_path = function(w, log_w0, log_m,
+                             init_state = 1, discretize = FALSE) {
+      t_max <- self$get_tmax()
+      S <- self$transmat$num_states()
+      checkmate::assert_integerish(init_state, len = 1, lower = 1, upper = S)
+      dt <- 1
+
+      # Setup
+      states <- init_state
+      times <- 0
+      j <- 0
+
+      # Generate transitions
+      while (times[j + 1] < t_max) {
+        j <- j + 1
+        t_cur <- times[j]
+
+        # Generate next transition
+        trans <- self$generate_transition(
+          states[j], t_cur, t_max, w, log_w0, log_m
+        )
+        t_next <- trans$t
+
+        # Discretize transition time to end of day
+        if (discretize) {
+          t_next <- dt * ceiling(t_next / dt)
+        }
+
+        # Update time and state
+        times <- c(times, t_next)
+        states <- c(states, trans$new_state)
+        if (j >= 100000) {
+          msg <- paste0(
+            "\nt = ",
+            round(times[j], 2), " -> ", t_max, ": at state ", states[j], "\n ",
+            "Generating a path with over ", j, " transitions, something is wrong\n"
+          )
+          stop(msg)
+        }
+      }
+      L <- length(times)
+      is_event <- rep(1, L)
+      is_event[1] <- 0 # initial state is never an event
+      is_event[L] <- 0
+      states[L] <- states[L - 1]
+      data.frame(time = times, state = states, is_event = is_event)
     },
 
     #' Generate transition given state and transition intensity functions
@@ -220,61 +292,6 @@ MultistateModel <- R6::R6Class("MultistateModel",
       list(
         t = t_min_found, new_state = new_state
       )
-    },
-
-    #' Generate a path starting from time 0
-    #'
-    #' @param init_state Integer index of starting state.
-    #' @param w An array of shape \code{n_trans} x \code{n_weights}
-    #' @param log_w0 A vector of length \code{n_trans}
-    #' @param log_m A vector of length \code{n_trans}
-    #' @param discretize Discretize times to one time unit?
-    generate_path = function(w, log_w0, log_m,
-                             init_state = 1, discretize = FALSE) {
-      t_max <- self$get_tmax()
-      S <- self$transmat$num_states()
-      checkmate::assert_integerish(init_state, len = 1, lower = 1, upper = S)
-      dt <- 1
-
-      # Setup
-      states <- init_state
-      times <- 0
-      j <- 0
-
-      # Generate transitions
-      while (times[j + 1] < t_max) {
-        j <- j + 1
-        t_cur <- times[j]
-
-        # Generate next transition
-        trans <- self$generate_transition(
-          states[j], t_cur, t_max, w, log_w0, log_m
-        )
-        t_next <- trans$t
-
-        # Discretize transition time to end of day
-        if (discretize) {
-          t_next <- dt * ceiling(t_next / dt)
-        }
-
-        # Update time and state
-        times <- c(times, t_next)
-        states <- c(states, trans$new_state)
-        if (j >= 100000) {
-          msg <- paste0(
-            "\nt = ",
-            round(times[j], 2), " -> ", t_max, ": at state ", states[j], "\n ",
-            "Generating a path with over ", j, " transitions, something is wrong\n"
-          )
-          stop(msg)
-        }
-      }
-      L <- length(times)
-      is_event <- rep(1, L)
-      is_event[1] <- 0 # initial state is never an event
-      is_event[L] <- 0
-      states[L] <- states[L - 1]
-      cbind(time = times, state = states, is_event)
     },
 
     #' @description Draw an event time from Censored Non-Homogeneous Poisson

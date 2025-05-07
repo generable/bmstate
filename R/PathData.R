@@ -36,7 +36,7 @@ create_pathdata <- function(df, covs, ...) {
 #' \code{path_id}, \code{draw_idx}, \code{rep_idx}, and \code{subject_id} as
 #' columns.
 #' @field covs Covariate column names.
-#' @field tm A \code{\link{TransitionMatrix}} describing the system in which
+#' @field transmat A \code{\link{TransitionMatrix}} describing the system in which
 #' the paths belong.
 PathData <- R6::R6Class(
   classname = "PathData",
@@ -48,22 +48,26 @@ PathData <- R6::R6Class(
     path_df = NULL,
     link_df = NULL,
     covs = NULL,
-    tm = NULL,
+    transmat = NULL,
 
     #' Initialize
-    #' @param subject_df Subjects data frame.
-    #' @param path_df Paths data frame.
-    #' @param link_df Link data frame.
+    #' @param subject_df Data frame with one row per subject. Must have
+    #' \code{subject_id} and all covariates as columns.
+    #' @param path_df Data frame of actual paths. Must have \code{path_id},
+    #' \code{state}, \code{time}, and \code{is_event} as columns.
+    #' @param link_df Links the path and subject data frames. Must have
+    #' \code{path_id}, \code{draw_idx}, \code{rep_idx}, and \code{subject_id} as
+    #' columns.
     #' @param covs Covariate column names.
     #' @param check_order Check order of paths?
-    #' @param tm A \code{\link{TransitionMatrix}} describing the system in which
+    #' @param transmat A \code{\link{TransitionMatrix}} describing the system in which
     #' the paths belong to.
     initialize = function(subject_df, path_df, link_df,
-                          tm, covs = NULL, check_order = TRUE) {
+                          transmat, covs = NULL, check_order = TRUE) {
       checkmate::assert_class(subject_df, "data.frame")
       checkmate::assert_class(path_df, "data.frame")
       checkmate::assert_class(link_df, "data.frame")
-      checkmate::assert_class(tm, "TransitionMatrix")
+      checkmate::assert_class(transmat, "TransitionMatrix")
       if (check_order) {
         path_df <- check_and_sort_paths(path_df)
       }
@@ -100,7 +104,7 @@ PathData <- R6::R6Class(
       path_df$path_id <- ensure_numeric_factor(path_df$path_id)
       link_df$path_id <- ensure_numeric_factor(link_df$path_id)
       link_df$subject_id <- NULL
-      self$tm <- tm
+      self$transmat <- transmat
       self$covs <- covs
       self$subject_df <- subject_df
       self$path_df <- path_df
@@ -137,21 +141,21 @@ PathData <- R6::R6Class(
     },
     #' @description Get name of censoring state
     censor_state = function() {
-      self$tm$censor_state
+      self$transmat$censor_state
     },
     #' @description Get name of null state
     null_state = function() {
-      self$tm$source_states()
+      self$transmat$source_states()
     },
     #' @description Get names of all states, including censor
     #' @return character vector
     state_names = function() {
-      c(self$tm$states, self$censor_state())
+      c(self$transmat$states, self$censor_state())
     },
     #' @description Get names of terminal states
     #' @return character vector
     terminal_states = function() {
-      self$tm$terminal_states()
+      self$transmat$terminal_states()
     },
     #' @description Get indices of event states
     #' @return integer vector
@@ -324,7 +328,7 @@ PathData <- R6::R6Class(
         rm <- c(
           "individual_id", "pk_post_dose", "pk_pre_dose", "country_num",
           "crcl", "weight", "dose_arm", "first_dose_amount",
-          "dose_adjustment"
+          "dose_adjustransmatent"
         )
         covs <- setdiff(covs, rm)
       }
@@ -450,8 +454,8 @@ pathdata_to_mstate_format <- function(pd, covariates = FALSE) {
   }
   df_out <- to_mstate_format_part2(df_out, PT, TFI)
   rownames(df_out) <- NULL
-  tmat <- TFI_to_mstate_transmat(TFI, pd$state_names)
-  attr(df_out, "trans") <- tmat
+  transmatat <- TFI_to_mstate_transmat(TFI, pd$state_names)
+  attr(df_out, "trans") <- transmatat
   class(df_out) <- c("msdata", "data.frame")
   if (covariates) {
     sdf <- pd$subject_df |> mutate(id = subject_id)

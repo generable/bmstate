@@ -29,8 +29,8 @@ Main model class
 \item \href{#method-MultistateModel-log_baseline_hazard}{\code{MultistateModel$log_baseline_hazard()}}
 \item \href{#method-MultistateModel-log_inst_hazard}{\code{MultistateModel$log_inst_hazard()}}
 \item \href{#method-MultistateModel-simulate}{\code{MultistateModel$simulate()}}
-\item \href{#method-MultistateModel-generate_transition}{\code{MultistateModel$generate_transition()}}
 \item \href{#method-MultistateModel-generate_path}{\code{MultistateModel$generate_path()}}
+\item \href{#method-MultistateModel-generate_transition}{\code{MultistateModel$generate_transition()}}
 \item \href{#method-MultistateModel-draw_time_cnhp}{\code{MultistateModel$draw_time_cnhp()}}
 \item \href{#method-MultistateModel-get_stan_model}{\code{MultistateModel$get_stan_model()}}
 \item \href{#method-MultistateModel-compile}{\code{MultistateModel$compile()}}
@@ -189,7 +189,7 @@ Generate paths}
 \if{latex}{\out{\hypertarget{method-MultistateModel-simulate}{}}}
 \subsection{Method \code{simulate()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate(w, log_w0, log_m, init_state = 1, discretize = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -200,37 +200,17 @@ Generate paths}
 
 \item{\code{log_w0}}{An array of shape \code{n_paths} x \code{n_trans}}
 
-\item{\code{log_m}}{An array of shape \code{n_paths} x \code{n_trans}
-Generate transition given state and transition intensity functions}
+\item{\code{log_m}}{An array of shape \code{n_paths} x \code{n_trans}}
+
+\item{\code{init_state}}{Integer index of starting state.}
+
+\item{\code{discretize}}{Discretize times to one time unit?}
 }
 \if{html}{\out{</div>}}
 }
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModel-generate_transition"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModel-generate_transition}{}}}
-\subsection{Method \code{generate_transition()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$generate_transition(state, t_init, t_max, w, log_w0, log_m)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{state}}{Integer index of current state.}
-
-\item{\code{t_init}}{Current time}
-
-\item{\code{t_max}}{max time}
-
-\item{\code{w}}{An array of shape \code{n_trans} x \code{n_weights}}
-
-\item{\code{log_w0}}{A vector of length \code{n_trans}}
-
-\item{\code{log_m}}{A vector of length \code{n_trans}
-Generate a path starting from time 0}
-}
-\if{html}{\out{</div>}}
+\subsection{Returns}{
+a data frame
+Generate a path starting from time 0
 }
 }
 \if{html}{\out{<hr>}}
@@ -258,7 +238,34 @@ Generate a path starting from time 0}
 
 \item{\code{init_state}}{Integer index of starting state.}
 
-\item{\code{discretize}}{Discretize times to one time unit?}
+\item{\code{discretize}}{Discretize times to one time unit?
+Generate transition given state and transition intensity functions}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-generate_transition"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-generate_transition}{}}}
+\subsection{Method \code{generate_transition()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$generate_transition(state, t_init, t_max, w, log_w0, log_m)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{state}}{Integer index of current state.}
+
+\item{\code{t_init}}{Current time}
+
+\item{\code{t_max}}{max time}
+
+\item{\code{w}}{An array of shape \code{n_trans} x \code{n_weights}}
+
+\item{\code{log_w0}}{A vector of length \code{n_trans}}
+
+\item{\code{log_m}}{A vector of length \code{n_trans}}
 }
 \if{html}{\out{</div>}}
 }
