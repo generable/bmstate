@@ -75,8 +75,19 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
     #' @description Get indices of possible transitions from given state
     #' @param state Index of state
     possible_transitions_from = function(state) {
+      S <- self$num_states()
+      checkmate::assert_integerish(state, len = 1, lower = 1, upper = S)
       row <- self$as_transition_index_matrix()[state, ]
-      row[row > 0]
+      as.numeric(row[row > 0])
+    },
+
+    #' Get target state of a transition
+    #'
+    #' @param trans_idx Index of the transition
+    target_state = function(trans_idx) {
+      H <- self$num_trans()
+      checkmate::assert_integerish(trans_idx, len = 1, lower = 1, upper = H)
+      self$trans_df()$state[trans_idx]
     },
 
     #' @description A data frame of states

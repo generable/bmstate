@@ -28,6 +28,7 @@ from state \code{i} to \code{j} is possible}
 \item \href{#method-TransitionMatrix-as_matrix}{\code{TransitionMatrix$as_matrix()}}
 \item \href{#method-TransitionMatrix-as_transition_index_matrix}{\code{TransitionMatrix$as_transition_index_matrix()}}
 \item \href{#method-TransitionMatrix-possible_transitions_from}{\code{TransitionMatrix$possible_transitions_from()}}
+\item \href{#method-TransitionMatrix-target_state}{\code{TransitionMatrix$target_state()}}
 \item \href{#method-TransitionMatrix-states_df}{\code{TransitionMatrix$states_df()}}
 \item \href{#method-TransitionMatrix-trans_df}{\code{TransitionMatrix$trans_df()}}
 \item \href{#method-TransitionMatrix-plot}{\code{TransitionMatrix$plot()}}
@@ -122,7 +123,24 @@ Get indices of possible transitions from given state
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{state}}{Index of state}
+\item{\code{state}}{Index of state
+Get target state of a transition}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TransitionMatrix-target_state"></a>}}
+\if{latex}{\out{\hypertarget{method-TransitionMatrix-target_state}{}}}
+\subsection{Method \code{target_state()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TransitionMatrix$target_state(trans_idx)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{trans_idx}}{Index of the transition}
 }
 \if{html}{\out{</div>}}
 }

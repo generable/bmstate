@@ -394,38 +394,7 @@ generate_paths_many_subjects <- function(fit, sd, covs,
 }
 
 
-# Draw an event time from Censored Non-Homogeneous Poisson process using the
-# thinning algorithm
-# If drawn event time is going to be larger than t_max, then t_max is returned
-draw_time_cnhp <- function(log_h0, m_sub, t_sub, lambda_ub, t_max,
-                           t_init = 0, t_pred) {
-  n_tries <- 0
-  t <- t_init
-  accepted <- FALSE
-  while (!accepted) {
-    n_tries <- n_tries + 1
-    u1 <- stats::runif(1)
-    t <- t - 1 / lambda_ub * log(u1)
-    if (t > t_max) {
-      return(list(t = t_max, n_tries = n_tries, censor = TRUE))
-    }
-    lambda_t <- evaluate_inst_hazard(t, log_h0, m_sub, t_sub, t_pred)
-    if (lambda_t > lambda_ub) {
-      msg <- "lambda(t) was larger than its supposed upper bound"
-      msg <- paste0(
-        msg, "\nt = ", t, ", t_init = ", t_init,
-        ", \nlambda(t) = ", lambda_t, ", UB = ", lambda_ub
-      )
-      stop(msg)
-    }
-    p <- lambda_t / lambda_ub
-    u2 <- stats::runif(1)
-    if (u2 <= p) {
-      accepted <- TRUE
-    }
-  }
-  return(list(t = t, n_tries = n_tries, censor = FALSE))
-}
+
 
 # CF dosing
 create_counterfactual_dose_data <- function(sd, dose_ss, prior_z = FALSE) {

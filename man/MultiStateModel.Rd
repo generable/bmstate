@@ -27,9 +27,11 @@ Main model class
 \item \href{#method-MultistateModel-print}{\code{MultistateModel$print()}}
 \item \href{#method-MultistateModel-covs}{\code{MultistateModel$covs()}}
 \item \href{#method-MultistateModel-log_baseline_hazard}{\code{MultistateModel$log_baseline_hazard()}}
+\item \href{#method-MultistateModel-log_inst_hazard}{\code{MultistateModel$log_inst_hazard()}}
 \item \href{#method-MultistateModel-simulate}{\code{MultistateModel$simulate()}}
 \item \href{#method-MultistateModel-generate_transition}{\code{MultistateModel$generate_transition()}}
 \item \href{#method-MultistateModel-generate_path}{\code{MultistateModel$generate_path()}}
+\item \href{#method-MultistateModel-draw_time_cnhp}{\code{MultistateModel$draw_time_cnhp()}}
 \item \href{#method-MultistateModel-get_stan_model}{\code{MultistateModel$get_stan_model()}}
 \item \href{#method-MultistateModel-compile}{\code{MultistateModel$compile()}}
 \item \href{#method-MultistateModel-create_standata}{\code{MultistateModel$create_standata()}}
@@ -156,7 +158,30 @@ a vector of zeros, meaning that the log hazard is constant at
 }
 \subsection{Returns}{
 a vector with same length as \code{t}
-Generate paths
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-log_inst_hazard"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-log_inst_hazard}{}}}
+\subsection{Method \code{log_inst_hazard()}}{
+Evaluate log instant hazard
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$log_inst_hazard(t, w, log_w0, log_m)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{t}}{Time point(s)}
+
+\item{\code{w}}{Spline basis function weights (vector)}
+
+\item{\code{log_w0}}{Intercept (log)}
+
+\item{\code{log_m}}{Hazard multiplier (log)
+Generate paths}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -186,17 +211,7 @@ Generate transition given state and transition intensity functions}
 \if{latex}{\out{\hypertarget{method-MultistateModel-generate_transition}{}}}
 \subsection{Method \code{generate_transition()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$generate_transition(
-  state,
-  t_init,
-  t_max,
-  log_h0,
-  m_sub,
-  t_sub,
-  UB = NULL,
-  t_pred = NULL,
-  tol = 1.03
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$generate_transition(state, t_init, t_max, w, log_w0, log_m)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -208,7 +223,11 @@ Generate transition given state and transition intensity functions}
 
 \item{\code{t_max}}{max time}
 
-\item{\code{discretize}}{Discretize times to one time unit?
+\item{\code{w}}{An array of shape \code{n_trans} x \code{n_weights}}
+
+\item{\code{log_w0}}{A vector of length \code{n_trans}}
+
+\item{\code{log_m}}{A vector of length \code{n_trans}
 Generate a path starting from time 0}
 }
 \if{html}{\out{</div>}}
@@ -219,17 +238,59 @@ Generate a path starting from time 0}
 \if{latex}{\out{\hypertarget{method-MultistateModel-generate_path}{}}}
 \subsection{Method \code{generate_path()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$generate_path(init_state = 1, discretize = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$generate_path(
+  w,
+  log_w0,
+  log_m,
+  init_state = 1,
+  discretize = FALSE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
+\item{\code{w}}{An array of shape \code{n_trans} x \code{n_weights}}
+
+\item{\code{log_w0}}{A vector of length \code{n_trans}}
+
+\item{\code{log_m}}{A vector of length \code{n_trans}}
+
 \item{\code{init_state}}{Integer index of starting state.}
 
 \item{\code{discretize}}{Discretize times to one time unit?}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-draw_time_cnhp"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-draw_time_cnhp}{}}}
+\subsection{Method \code{draw_time_cnhp()}}{
+Draw an event time from Censored Non-Homogeneous Poisson
+process using the thinning algorithm
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$draw_time_cnhp(w, log_w0, log_m, t_max, t_init)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{w}}{Spline basis function weights (vector)}
+
+\item{\code{log_w0}}{Intercept (log)}
+
+\item{\code{log_m}}{Hazard multiplier (log)}
+
+\item{\code{t_max}}{Max time}
+
+\item{\code{t_init}}{Initial time}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A number. If drawn event time is going to be larger than t_max,
+then t_max is returned
 }
 }
 \if{html}{\out{<hr>}}

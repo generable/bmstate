@@ -146,6 +146,16 @@ MultistateModel <- R6::R6Class("MultistateModel",
       as.numeric(log_h0)
     },
 
+    #' @description Evaluate log instant hazard
+    #'
+    #' @param t Time point(s)
+    #' @param w Spline basis function weights (vector)
+    #' @param log_w0 Intercept (log)
+    #' @param log_m Hazard multiplier (log)
+    log_inst_hazard = function(t, w, log_w0, log_m) {
+      log_m + self$log_baseline_hazard(t, log_w0, w)
+    },
+
     #' Generate paths
     #'
     #' @param w An array of shape \code{n_paths} x \code{n_trans} x
@@ -160,28 +170,24 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' @param state Integer index of current state.
     #' @param t_init Current time
     #' @param t_max max time
-    #' @param discretize Discretize times to one time unit?
-    generate_transition = function(state, t_init, t_max, log_h0, m_sub, t_sub,
-                                   UB = NULL,
-                                   t_pred = NULL, tol = 1.03) {
-      # Which transition functions are possible?
-      possible <- TFI[state, ]
-      possible <- possible[possible > 0]
-      if (is.null(UB)) {
-        UB <- max_inst_hazard(log_h0, m_sub) * tol
-      }
-      possible <- possible[which(UB[possible] > 1e-9)] # so rare that not even possible
+    #' @param w An array of shape \code{n_trans} x \code{n_weights}
+    #' @param log_w0 A vector of length \code{n_trans}
+    #' @param log_m A vector of length \code{n_trans}
+    generate_transition = function(state, t_init, t_max, w, log_w0, log_m) {
+      tol <- 1.03
+      possible <- self$transmat$possible_transitions_from(state)
+      S <- self$transmat$num_trans()
+      UB <- rep(1, S) # TODO: better upper bound
+      possible <- possible[which(UB[possible] > 1e-9)] # so rare that not possible
       if (length(possible) == 0) {
         # Absorbing state, no transitions possible
         return(list(t = t_max, new_state = 0))
       }
-      m_sub <- m_sub[1, possible, , drop = FALSE]
       UB <- UB[possible]
-      if (is.null(t_pred)) {
-        log_h0 <- log_h0[possible]
-      } else {
-        log_h0 <- log_h0[1, possible, , drop = FALSE]
-      }
+      w <- w[possible, drop = FALSE]
+      log_w0 <- log_w0[possible]
+      log_m <- log_m[possible]
+
       # Draw event with highest upper bound first because it is most likely
       # to occur soon and be the minimum
       draw_order <- sort(UB, decreasing = TRUE, index.return = 1)$ix
@@ -190,13 +196,8 @@ MultistateModel <- R6::R6Class("MultistateModel",
 
       # Loop through possible transitions
       for (j in draw_order) {
-        if (!is.null(t_pred)) {
-          h0_trans <- log_h0[1, j, ]
-        } else {
-          h0_trans <- log_h0[[j]]
-        }
-        draw <- draw_time_cnhp(
-          h0_trans, m_sub[1, j, ], t_sub, UB[[j]], t_min_found, t_init, t_pred
+        draw <- self$draw_time_cnhp(
+          w[j, ], log_w0[j], log_m[j], t_min_found, t_init
         )
         if (draw$t < t_min_found) {
           trans_idx <- possible[j]
@@ -204,7 +205,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
         }
       }
       if (trans_idx > 0) {
-        new_state <- find_column_with_number(TFI, trans_idx)
+        new_state <- self$transmat$target_state(trans_idx)
       } else {
         new_state <- 0
       }
@@ -224,8 +225,12 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' Generate a path starting from time 0
     #'
     #' @param init_state Integer index of starting state.
+    #' @param w An array of shape \code{n_trans} x \code{n_weights}
+    #' @param log_w0 A vector of length \code{n_trans}
+    #' @param log_m A vector of length \code{n_trans}
     #' @param discretize Discretize times to one time unit?
-    generate_path = function(init_state = 1, discretize = FALSE) {
+    generate_path = function(w, log_w0, log_m,
+                             init_state = 1, discretize = FALSE) {
       t_max <- self$get_tmax()
       S <- self$transmat$num_states()
       checkmate::assert_integerish(init_state, len = 1, lower = 1, upper = S)
@@ -243,7 +248,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
 
         # Generate next transition
         trans <- self$generate_transition(
-          states[j], log_h0, m_sub, t_sub, t_cur, t_max, UB, t_pred
+          states[j], t_cur, t_max, w, log_w0, log_m
         )
         t_next <- trans$t
 
@@ -270,6 +275,46 @@ MultistateModel <- R6::R6Class("MultistateModel",
       is_event[L] <- 0
       states[L] <- states[L - 1]
       cbind(time = times, state = states, is_event)
+    },
+
+    #' @description Draw an event time from Censored Non-Homogeneous Poisson
+    #' process using the thinning algorithm
+    #'
+    #' @param w Spline basis function weights (vector)
+    #' @param log_w0 Intercept (log)
+    #' @param log_m Hazard multiplier (log)
+    #' @param t_max Max time
+    #' @param t_init Initial time
+    #' @return A number. If drawn event time is going to be larger than t_max,
+    #' then t_max is returned
+    draw_time_cnhp = function(w, log_w0, log_m, t_max, t_init) {
+      checkmate::assert_true(t_max > t_init)
+      n_tries <- 0
+      t <- t_init
+      accepted <- FALSE
+      while (!accepted) {
+        n_tries <- n_tries + 1
+        u1 <- stats::runif(1)
+        t <- t - 1 / lambda_ub * log(u1)
+        if (t > t_max) {
+          return(list(t = t_max, n_tries = n_tries, censor = TRUE))
+        }
+        lambda_t <- exp(self$log_inst_hazard(t, w, log_w0, log_m))
+        if (lambda_t > lambda_ub) {
+          msg <- "lambda(t) was larger than its supposed upper bound"
+          msg <- paste0(
+            msg, "\nt = ", t, ", t_init = ", t_init,
+            ", \nlambda(t) = ", lambda_t, ", UB = ", lambda_ub
+          )
+          stop(msg)
+        }
+        p <- lambda_t / lambda_ub
+        u2 <- stats::runif(1)
+        if (u2 <= p) {
+          accepted <- TRUE
+        }
+      }
+      return(list(t = t, n_tries = n_tries, censor = FALSE))
     },
 
     #' @description Get the underlying 'Stan' model.
