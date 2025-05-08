@@ -186,7 +186,9 @@ MultistateModel <- R6::R6Class("MultistateModel",
         p <- cbind(p, rep(j, nrow(p)))
         out <- rbind(out, p)
       }
-      out
+      df <- data.frame(out)
+      colnames(df)[4] <- "path_id"
+      df
     },
 
     #' Generate a path starting from time 0
