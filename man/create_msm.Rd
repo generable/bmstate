@@ -4,13 +4,10 @@
 \alias{create_msm}
 \title{Create a multistate model}
 \usage{
-create_msm(matrix, states, hazard_covs, pk_covs = NULL, compile = TRUE)
+create_msm(tm, hazard_covs, pk_covs = NULL, compile = TRUE)
 }
 \arguments{
-\item{matrix}{A binary matrix where \code{matrix[i,j]} is 1 if transition
-from state \code{i} to \code{j} is possible.}
-
-\item{states}{A character vector of state names.}
+\item{tm}{A \code{\link{TransitionMatrix}}}
 
 \item{hazard_covs}{Covariates that affect the hazard. A character vector.}
 

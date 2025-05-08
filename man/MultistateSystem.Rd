@@ -18,14 +18,11 @@ A multistate system with proportional spline hazards
 \item \href{#method-MultistateSystem-get_knots}{\code{MultistateSystem$get_knots()}}
 \item \href{#method-MultistateSystem-num_knots}{\code{MultistateSystem$num_knots()}}
 \item \href{#method-MultistateSystem-get_tmax}{\code{MultistateSystem$get_tmax()}}
-\item \href{#method-MultistateSystem-get_num_weights}{\code{MultistateSystem$get_num_weights()}}
+\item \href{#method-MultistateSystem-num_weights}{\code{MultistateSystem$num_weights()}}
 \item \href{#method-MultistateSystem-print}{\code{MultistateSystem$print()}}
 \item \href{#method-MultistateSystem-log_baseline_hazard}{\code{MultistateSystem$log_baseline_hazard()}}
 \item \href{#method-MultistateSystem-log_inst_hazard}{\code{MultistateSystem$log_inst_hazard()}}
 \item \href{#method-MultistateSystem-simulate}{\code{MultistateSystem$simulate()}}
-\item \href{#method-MultistateSystem-generate_path}{\code{MultistateSystem$generate_path()}}
-\item \href{#method-MultistateSystem-generate_transition}{\code{MultistateSystem$generate_transition()}}
-\item \href{#method-MultistateSystem-draw_time_cnhp}{\code{MultistateSystem$draw_time_cnhp()}}
 \item \href{#method-MultistateSystem-clone}{\code{MultistateSystem$clone()}}
 }
 }
@@ -127,11 +124,11 @@ Get number of spline weight parameters
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateSystem-get_num_weights"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateSystem-get_num_weights}{}}}
-\subsection{Method \code{get_num_weights()}}{
+\if{html}{\out{<a id="method-MultistateSystem-num_weights"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateSystem-num_weights}{}}}
+\subsection{Method \code{num_weights()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$get_num_weights()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$num_weights()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -227,99 +224,6 @@ Generate paths}
 }
 \subsection{Returns}{
 a data frame
-Generate a path starting from time 0
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateSystem-generate_path"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateSystem-generate_path}{}}}
-\subsection{Method \code{generate_path()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$generate_path(
-  w,
-  log_w0,
-  log_m,
-  init_state = 1,
-  discretize = FALSE
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{w}}{An array of shape \code{n_trans} x \code{n_weights}}
-
-\item{\code{log_w0}}{A vector of length \code{n_trans}}
-
-\item{\code{log_m}}{A vector of length \code{n_trans}}
-
-\item{\code{init_state}}{Integer index of starting state.}
-
-\item{\code{discretize}}{Discretize times to one time unit?}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-an array with number of rows equal to the path length
-Generate transition given state and transition intensity functions
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateSystem-generate_transition"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateSystem-generate_transition}{}}}
-\subsection{Method \code{generate_transition()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$generate_transition(state, t_init, t_max, w, log_w0, log_m)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{state}}{Integer index of current state.}
-
-\item{\code{t_init}}{Current time}
-
-\item{\code{t_max}}{max time}
-
-\item{\code{w}}{An array of shape \code{n_trans} x \code{n_weights}}
-
-\item{\code{log_w0}}{A vector of length \code{n_trans}}
-
-\item{\code{log_m}}{A vector of length \code{n_trans}}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateSystem-draw_time_cnhp"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateSystem-draw_time_cnhp}{}}}
-\subsection{Method \code{draw_time_cnhp()}}{
-Draw an event time from Censored Non-Homogeneous Poisson
-process using the thinning algorithm
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$draw_time_cnhp(w, log_w0, log_m, t_max, t_init, lambda_ub)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{w}}{Spline basis function weights (vector)}
-
-\item{\code{log_w0}}{Intercept (log)}
-
-\item{\code{log_m}}{Hazard multiplier (log)}
-
-\item{\code{t_max}}{Max time}
-
-\item{\code{t_init}}{Initial time}
-
-\item{\code{lambda_ub}}{Upper bound of hazard}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A number. If drawn event time is going to be larger than t_max,
-then t_max is returned
 }
 }
 \if{html}{\out{<hr>}}

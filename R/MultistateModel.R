@@ -1,18 +1,15 @@
 #' Create a multistate model
 #'
 #' @export
-#' @param matrix A binary matrix where \code{matrix[i,j]} is 1 if transition
-#' from state \code{i} to \code{j} is possible.
-#' @param states A character vector of state names.
+#' @param tm A \code{\link{TransitionMatrix}}
 #' @param hazard_covs Covariates that affect the hazard. A character vector.
 #' @param pk_covs Covariates that affect the PK parameters. A list with
 #' elements \code{ka} \code{CL}, and \code{V2}. If \code{NULL}, a PK model
 #' will not be created.
 #' @param compile compile 'Stan' model?
 #' @return A \code{\link{MultistateModel}} object.
-create_msm <- function(matrix, states, hazard_covs, pk_covs = NULL,
+create_msm <- function(tm, hazard_covs, pk_covs = NULL,
                        compile = TRUE) {
-  tm <- TransitionMatrix$new(matrix, states)
   mss <- MultistateSystem$new(tm)
   if (!is.null(pk_covs)) {
     pk <- PKModel$new(pk_covs)
@@ -71,7 +68,6 @@ MultistateModel <- R6::R6Class("MultistateModel",
       checkmate::assert_number(t_max, lower = 0)
       checkmate::assert_numeric(t_event, lower = 0, upper = t_max, min.len = 3)
       tk <- place_internal_knots(t_max, num_knots - 2, t_event)
-      print(tk)
       knots <- c(0, tk, t_max)
       self$system$set_knots(knots)
     },
