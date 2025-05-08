@@ -11,7 +11,7 @@ Main model class
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{transmat}}{The transition matrix}
+\item{\code{system}}{A \code{\link{MultistateSystem}}}
 
 \item{\code{pk_model}}{A \code{\link{PKModel}} or NULL}
 }
@@ -22,16 +22,9 @@ Main model class
 \itemize{
 \item \href{#method-MultistateModel-new}{\code{MultistateModel$new()}}
 \item \href{#method-MultistateModel-set_knots}{\code{MultistateModel$set_knots()}}
-\item \href{#method-MultistateModel-get_knots}{\code{MultistateModel$get_knots()}}
-\item \href{#method-MultistateModel-get_tmax}{\code{MultistateModel$get_tmax()}}
+\item \href{#method-MultistateModel-get_states}{\code{MultistateModel$get_states()}}
 \item \href{#method-MultistateModel-print}{\code{MultistateModel$print()}}
 \item \href{#method-MultistateModel-covs}{\code{MultistateModel$covs()}}
-\item \href{#method-MultistateModel-log_baseline_hazard}{\code{MultistateModel$log_baseline_hazard()}}
-\item \href{#method-MultistateModel-log_inst_hazard}{\code{MultistateModel$log_inst_hazard()}}
-\item \href{#method-MultistateModel-simulate}{\code{MultistateModel$simulate()}}
-\item \href{#method-MultistateModel-generate_path}{\code{MultistateModel$generate_path()}}
-\item \href{#method-MultistateModel-generate_transition}{\code{MultistateModel$generate_transition()}}
-\item \href{#method-MultistateModel-draw_time_cnhp}{\code{MultistateModel$draw_time_cnhp()}}
 \item \href{#method-MultistateModel-get_stan_model}{\code{MultistateModel$get_stan_model()}}
 \item \href{#method-MultistateModel-compile}{\code{MultistateModel$compile()}}
 \item \href{#method-MultistateModel-create_standata}{\code{MultistateModel$create_standata()}}
@@ -45,23 +38,19 @@ Main model class
 \subsection{Method \code{new()}}{
 Create model
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$new(transmat, covariates, NK, pk_model = NULL, compile = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$new(system, covariates, pk_model = NULL, compile = TRUE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{transmat}}{A \code{\link{TransitionMatrix}}.}
+\item{\code{system}}{A \code{\link{MultistateSystem}}}
 
 \item{\code{covariates}}{The names of the hazard covariates.}
-
-\item{\code{NK}}{number of internal spline knots}
 
 \item{\code{pk_model}}{A \code{\link{PKModel}} or NULL.}
 
 \item{\code{compile}}{Should the 'Stan' model code be created and compiled.}
-
-\item{\code{P}}{number of prediction points}
 }
 \if{html}{\out{</div>}}
 }
@@ -72,7 +61,7 @@ Create model
 \subsection{Method \code{set_knots()}}{
 Set knot locations based on event times
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$set_knots(t_max, t_event)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$set_knots(t_max, t_event, num_knots)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -81,36 +70,22 @@ Set knot locations based on event times
 \item{\code{t_max}}{Max time}
 
 \item{\code{t_event}}{Occurred event times}
+
+\item{\code{num_knots}}{Total number of knots}
 }
 \if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModel-get_knots"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModel-get_knots}{}}}
-\subsection{Method \code{get_knots()}}{
-Get knot locations
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$get_knots()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-a numeric vector
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModel-get_tmax"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModel-get_tmax}{}}}
-\subsection{Method \code{get_tmax()}}{
-Get max time set for the model
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$get_tmax()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-a number
+\if{html}{\out{<a id="method-MultistateModel-get_states"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-get_states}{}}}
+\subsection{Method \code{get_states()}}{
+Get names of the states
 Print the object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$get_states()}\if{html}{\out{</div>}}
 }
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateModel-print"></a>}}
@@ -133,177 +108,6 @@ Get the hazard covariates.
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModel$covs()}\if{html}{\out{</div>}}
 }
 
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModel-log_baseline_hazard"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModel-log_baseline_hazard}{}}}
-\subsection{Method \code{log_baseline_hazard()}}{
-Evaluate log baseline hazard
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$log_baseline_hazard(t, log_w0, w = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{t}}{Output time points.}
-
-\item{\code{log_w0}}{Intercept (log_scale).}
-
-\item{\code{w}}{Spline weights (log scale). If \code{NULL}, will be set to
-a vector of zeros, meaning that the log hazard is constant at
-\code{log_w0}}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-a vector with same length as \code{t}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModel-log_inst_hazard"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModel-log_inst_hazard}{}}}
-\subsection{Method \code{log_inst_hazard()}}{
-Evaluate log instant hazard
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$log_inst_hazard(t, w, log_w0, log_m)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{t}}{Time point(s)}
-
-\item{\code{w}}{Spline basis function weights (vector)}
-
-\item{\code{log_w0}}{Intercept (log)}
-
-\item{\code{log_m}}{Hazard multiplier (log)
-Generate paths}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModel-simulate"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModel-simulate}{}}}
-\subsection{Method \code{simulate()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate(w, log_w0, log_m, init_state = 1, discretize = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{w}}{An array of shape \code{n_paths} x \code{n_trans} x
-\code{n_weights}}
-
-\item{\code{log_w0}}{An array of shape \code{n_paths} x \code{n_trans}}
-
-\item{\code{log_m}}{An array of shape \code{n_paths} x \code{n_trans}}
-
-\item{\code{init_state}}{Integer index of starting state.}
-
-\item{\code{discretize}}{Discretize times to one time unit?}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-a data frame
-Generate a path starting from time 0
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModel-generate_path"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModel-generate_path}{}}}
-\subsection{Method \code{generate_path()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$generate_path(
-  w,
-  log_w0,
-  log_m,
-  init_state = 1,
-  discretize = FALSE
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{w}}{An array of shape \code{n_trans} x \code{n_weights}}
-
-\item{\code{log_w0}}{A vector of length \code{n_trans}}
-
-\item{\code{log_m}}{A vector of length \code{n_trans}}
-
-\item{\code{init_state}}{Integer index of starting state.}
-
-\item{\code{discretize}}{Discretize times to one time unit?}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-an array with number of rows equal to the path length
-Generate transition given state and transition intensity functions
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModel-generate_transition"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModel-generate_transition}{}}}
-\subsection{Method \code{generate_transition()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$generate_transition(state, t_init, t_max, w, log_w0, log_m)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{state}}{Integer index of current state.}
-
-\item{\code{t_init}}{Current time}
-
-\item{\code{t_max}}{max time}
-
-\item{\code{w}}{An array of shape \code{n_trans} x \code{n_weights}}
-
-\item{\code{log_w0}}{A vector of length \code{n_trans}}
-
-\item{\code{log_m}}{A vector of length \code{n_trans}}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModel-draw_time_cnhp"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModel-draw_time_cnhp}{}}}
-\subsection{Method \code{draw_time_cnhp()}}{
-Draw an event time from Censored Non-Homogeneous Poisson
-process using the thinning algorithm
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$draw_time_cnhp(w, log_w0, log_m, t_max, t_init, lambda_ub)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{w}}{Spline basis function weights (vector)}
-
-\item{\code{log_w0}}{Intercept (log)}
-
-\item{\code{log_m}}{Hazard multiplier (log)}
-
-\item{\code{t_max}}{Max time}
-
-\item{\code{t_init}}{Initial time}
-
-\item{\code{lambda_ub}}{Upper bound of hazard}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A number. If drawn event time is going to be larger than t_max,
-then t_max is returned
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateModel-get_stan_model"></a>}}

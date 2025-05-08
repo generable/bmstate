@@ -12,14 +12,14 @@ test_that("MultistateModel init and methods work", {
   expect_error(mod$get_knots())
 
   t_ev <- stats::runif(100)
-  mod$set_knots(1, t_ev)
-  expect_equal(length(mod$get_knots()), 5)
-
-  w <- rnorm(6)
+  mod$set_knots(1, t_ev, 6)
+  expect_equal(length(mod$system$get_knots()), 6)
+  K <- mod$system$get_num_weights()
+  w <- rnorm(K)
   w0 <- -4
   ttt <- seq(0, 1, by = 0.01)
-  bh1 <- mod$log_baseline_hazard(ttt, w0)
-  bh2 <- mod$log_baseline_hazard(ttt, w0, w)
+  bh1 <- mod$system$log_baseline_hazard(ttt, w0)
+  bh2 <- mod$system$log_baseline_hazard(ttt, w0, w)
   expect_true(all(bh1 == w0))
   expect_true(length(bh2) == length(ttt))
 })

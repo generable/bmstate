@@ -4,7 +4,7 @@
 \alias{create_msm}
 \title{Create a multistate model}
 \usage{
-create_msm(matrix, states, hazard_covs, pk_covs = NULL, NK = 3, compile = TRUE)
+create_msm(matrix, states, hazard_covs, pk_covs = NULL, compile = TRUE)
 }
 \arguments{
 \item{matrix}{A binary matrix where \code{matrix[i,j]} is 1 if transition
@@ -17,8 +17,6 @@ from state \code{i} to \code{j} is possible.}
 \item{pk_covs}{Covariates that affect the PK parameters. A list with
 elements \code{ka} \code{CL}, and \code{V2}. If \code{NULL}, a PK model
 will not be created.}
-
-\item{NK}{number of internal spline knots}
 
 \item{compile}{compile 'Stan' model?}
 }
