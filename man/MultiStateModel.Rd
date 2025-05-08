@@ -25,6 +25,7 @@ Main model class
 \item \href{#method-MultistateModel-get_states}{\code{MultistateModel$get_states()}}
 \item \href{#method-MultistateModel-print}{\code{MultistateModel$print()}}
 \item \href{#method-MultistateModel-covs}{\code{MultistateModel$covs()}}
+\item \href{#method-MultistateModel-simulate_subjects}{\code{MultistateModel$simulate_subjects()}}
 \item \href{#method-MultistateModel-get_stan_model}{\code{MultistateModel$get_stan_model()}}
 \item \href{#method-MultistateModel-compile}{\code{MultistateModel$compile()}}
 \item \href{#method-MultistateModel-create_standata}{\code{MultistateModel$create_standata()}}
@@ -108,6 +109,23 @@ Get the hazard covariates.
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModel$covs()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-simulate_subjects"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-simulate_subjects}{}}}
+\subsection{Method \code{simulate_subjects()}}{
+Simulate subject data.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate_subjects(N_subject = 100)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{N_subject}}{number of subjects}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateModel-get_stan_model"></a>}}

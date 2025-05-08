@@ -97,6 +97,20 @@ MultistateModel <- R6::R6Class("MultistateModel",
       private$hazard_covariates
     },
 
+    #' @description Simulate subject data.
+    #' @param N_subject number of subjects
+    simulate_subjects = function(N_subject = 100) {
+      subject_id <- paste0("sim-", seq_len(N_subject))
+      covs <- self$covs()
+      N_covs <- length(covs)
+      A <- matrix(rnorm(N_subject * N_covs), N_subject, N_covs)
+      df <- data.frame(A)
+      colnames(df) <- covs
+      df$subject_id <- subject_id
+      df$subject_idx <- seq_len(N_subject)
+      df
+    },
+
     #' @description Get the underlying 'Stan' model.
     get_stan_model = function() {
       private$stan_model
