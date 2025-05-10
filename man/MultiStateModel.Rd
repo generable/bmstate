@@ -27,6 +27,8 @@ Main model class
 \item \href{#method-MultistateModel-covs}{\code{MultistateModel$covs()}}
 \item \href{#method-MultistateModel-simulate_subjects}{\code{MultistateModel$simulate_subjects()}}
 \item \href{#method-MultistateModel-simulate_events}{\code{MultistateModel$simulate_events()}}
+\item \href{#method-MultistateModel-target_states}{\code{MultistateModel$target_states()}}
+\item \href{#method-MultistateModel-simulate_log_hazard_multipliers}{\code{MultistateModel$simulate_log_hazard_multipliers()}}
 \item \href{#method-MultistateModel-get_stan_model}{\code{MultistateModel$get_stan_model()}}
 \item \href{#method-MultistateModel-compile}{\code{MultistateModel$compile()}}
 \item \href{#method-MultistateModel-create_standata}{\code{MultistateModel$create_standata()}}
@@ -149,6 +151,41 @@ Simulate events data.
 }
 \subsection{Returns}{
 a \code{tibble}
+Get indices of states that are not source states
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-target_states"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-target_states}{}}}
+\subsection{Method \code{target_states()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$target_states()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+integer
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-simulate_log_hazard_multipliers"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-simulate_log_hazard_multipliers}{}}}
+\subsection{Method \code{simulate_log_hazard_multipliers()}}{
+Simulate log hazard multipliers
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate_log_hazard_multipliers(df_subjects, beta)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{df_subjects}}{The subjects data frame}
+
+\item{\code{beta}}{Matrix of shape \code{num_target_states} x \code{num_covs}}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+a matrix of size \code{num_subjects} x \code{num_trans}
 }
 }
 \if{html}{\out{<hr>}}

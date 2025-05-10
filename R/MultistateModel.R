@@ -129,6 +129,44 @@ MultistateModel <- R6::R6Class("MultistateModel",
       as_tibble(paths)
     },
 
+    #' Get indices of states that are not source states
+    #'
+    #' @return integer
+    target_states = function() {
+      df <- self$system$tm()$states_df() |> dplyr::filter(!.data$source)
+      df$state_idx
+    },
+
+    #' @description Simulate log hazard multipliers
+    #'
+    #' @param df_subjects The subjects data frame
+    #' @param beta Matrix of shape \code{num_target_states} x \code{num_covs}
+    #' @return a matrix of size \code{num_subjects} x \code{num_trans}
+    simulate_log_hazard_multipliers = function(df_subjects, beta) {
+      ts <- self$target_states()
+      x <- self$covs()
+      B <- length(ts)
+      K <- length(x)
+      checkmate::assert_matrix(beta, nrows = B, ncols = K)
+      N <- nrow(df_subjects)
+      S <- self$system$num_trans()
+      out <- matrix(0, N, S)
+      tf <- mod$system$tm()$trans_df()
+      X <- df_subjects |> dplyr::select(x)
+      for (s in seq_len(S)) {
+        target_state <- tf$state[s]
+        idx_in_beta <- which(ts == target_state)
+        if (length(idx_in_beta) != 1) {
+          stop("error")
+        }
+        beta_s <- beta[idx_in_beta, ]
+        for (n in seq_len(N)) {
+          out[n, s] <- sum(as.numeric(X[n, ]) * beta_s)
+        }
+      }
+      out
+    },
+
     #' @description Get the underlying 'Stan' model.
     get_stan_model = function() {
       private$stan_model
