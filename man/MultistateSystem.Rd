@@ -12,13 +12,15 @@ A multistate system with proportional spline hazards
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-MultistateSystem-new}{\code{MultistateSystem$new()}}
-\item \href{#method-MultistateSystem-set_knots}{\code{MultistateSystem$set_knots()}}
+\item \href{#method-MultistateSystem-num_states}{\code{MultistateSystem$num_states()}}
+\item \href{#method-MultistateSystem-num_trans}{\code{MultistateSystem$num_trans()}}
+\item \href{#method-MultistateSystem-num_weights}{\code{MultistateSystem$num_weights()}}
+\item \href{#method-MultistateSystem-num_knots}{\code{MultistateSystem$num_knots()}}
 \item \href{#method-MultistateSystem-tm}{\code{MultistateSystem$tm()}}
 \item \href{#method-MultistateSystem-knots_not_set}{\code{MultistateSystem$knots_not_set()}}
+\item \href{#method-MultistateSystem-set_knots}{\code{MultistateSystem$set_knots()}}
 \item \href{#method-MultistateSystem-get_knots}{\code{MultistateSystem$get_knots()}}
-\item \href{#method-MultistateSystem-num_knots}{\code{MultistateSystem$num_knots()}}
 \item \href{#method-MultistateSystem-get_tmax}{\code{MultistateSystem$get_tmax()}}
-\item \href{#method-MultistateSystem-num_weights}{\code{MultistateSystem$num_weights()}}
 \item \href{#method-MultistateSystem-print}{\code{MultistateSystem$print()}}
 \item \href{#method-MultistateSystem-log_baseline_hazard}{\code{MultistateSystem$log_baseline_hazard()}}
 \item \href{#method-MultistateSystem-log_inst_hazard}{\code{MultistateSystem$log_inst_hazard()}}
@@ -44,20 +46,55 @@ Create model
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateSystem-set_knots"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateSystem-set_knots}{}}}
-\subsection{Method \code{set_knots()}}{
-Set spline knot locations
+\if{html}{\out{<a id="method-MultistateSystem-num_states"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateSystem-num_states}{}}}
+\subsection{Method \code{num_states()}}{
+Get number of states
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$set_knots(locations)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$num_states()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{locations}}{A numeric vector}
+\subsection{Returns}{
+integer
 }
-\if{html}{\out{</div>}}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateSystem-num_trans"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateSystem-num_trans}{}}}
+\subsection{Method \code{num_trans()}}{
+Get number of transitions
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$num_trans()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+integer
+Get number of spline weight parameters
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateSystem-num_weights"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateSystem-num_weights}{}}}
+\subsection{Method \code{num_weights()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$num_weights()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+an integer (\code{num_knots} - 2) + \code{self$spline_k}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateSystem-num_knots"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateSystem-num_knots}{}}}
+\subsection{Method \code{num_knots()}}{
+Get number of spline knots
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$num_knots()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+integer, zero if knots have not been set
 }
 }
 \if{html}{\out{<hr>}}
@@ -84,6 +121,23 @@ a logical
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateSystem-set_knots"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateSystem-set_knots}{}}}
+\subsection{Method \code{set_knots()}}{
+Set spline knot locations
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$set_knots(locations)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{locations}}{A numeric vector}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateSystem-get_knots"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateSystem-get_knots}{}}}
 \subsection{Method \code{get_knots()}}{
@@ -97,19 +151,6 @@ a numeric vector
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateSystem-num_knots"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateSystem-num_knots}{}}}
-\subsection{Method \code{num_knots()}}{
-Get number of spline knots
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$num_knots()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-integer, zero if knots have not been set
-}
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateSystem-get_tmax"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateSystem-get_tmax}{}}}
 \subsection{Method \code{get_tmax()}}{
@@ -120,19 +161,6 @@ Get max time set for the model
 
 \subsection{Returns}{
 a number
-Get number of spline weight parameters
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateSystem-num_weights"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateSystem-num_weights}{}}}
-\subsection{Method \code{num_weights()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$num_weights()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-an integer (\code{num_knots} - 2) + \code{self$spline_k}
 Print the object
 }
 }
@@ -203,7 +231,7 @@ Generate paths}
 \if{latex}{\out{\hypertarget{method-MultistateSystem-simulate}{}}}
 \subsection{Method \code{simulate()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$simulate(w, log_w0, log_m, init_state = 1, discretize = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$simulate(w, log_w0, log_m, init_state = 1, dt = 0)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -218,7 +246,10 @@ Generate paths}
 
 \item{\code{init_state}}{Integer index of starting state.}
 
-\item{\code{discretize}}{Discretize times to one time unit?}
+\item{\code{dt}}{Discretization interval. Events can be observed only on
+intervals of length \code{dt}. Each drawn event is observed at the
+end of the discretization interval. If \code{dt = 0} (default), the
+no discretization is performed and the event times are observed exactly.}
 }
 \if{html}{\out{</div>}}
 }

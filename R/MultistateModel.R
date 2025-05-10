@@ -98,7 +98,9 @@ MultistateModel <- R6::R6Class("MultistateModel",
     },
 
     #' @description Simulate subject data.
+    #'
     #' @param N_subject number of subjects
+    #' @return a \code{tibble}
     simulate_subjects = function(N_subject = 100) {
       subject_id <- paste0("sim-", seq_len(N_subject))
       covs <- self$covs()
@@ -108,7 +110,23 @@ MultistateModel <- R6::R6Class("MultistateModel",
       colnames(df) <- covs
       df$subject_id <- subject_id
       df$subject_idx <- seq_len(N_subject)
-      df
+      as_tibble(df)
+    },
+
+    #' @description Simulate events data.
+    #'
+    #' @param df_subjects The subjects data frame
+    #' @return a \code{tibble}
+    simulate_events = function(df_subjects) {
+      dt <- 1
+      N <- nrow(df_subjects)
+      S <- self$system$num_trans()
+      L <- self$system$num_weights()
+      w <- array(0.1 * rnorm(N * S * L), dim = c(N, S, L))
+      log_w0 <- matrix(-4, N, S)
+      log_m <- matrix(0, N, S)
+      paths <- mod$system$simulate(w, log_w0, log_m, dt = dt)
+      as_tibble(paths)
     },
 
     #' @description Get the underlying 'Stan' model.

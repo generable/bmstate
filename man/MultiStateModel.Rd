@@ -26,6 +26,7 @@ Main model class
 \item \href{#method-MultistateModel-print}{\code{MultistateModel$print()}}
 \item \href{#method-MultistateModel-covs}{\code{MultistateModel$covs()}}
 \item \href{#method-MultistateModel-simulate_subjects}{\code{MultistateModel$simulate_subjects()}}
+\item \href{#method-MultistateModel-simulate_events}{\code{MultistateModel$simulate_events()}}
 \item \href{#method-MultistateModel-get_stan_model}{\code{MultistateModel$get_stan_model()}}
 \item \href{#method-MultistateModel-compile}{\code{MultistateModel$compile()}}
 \item \href{#method-MultistateModel-create_standata}{\code{MultistateModel$create_standata()}}
@@ -125,6 +126,29 @@ Simulate subject data.
 \item{\code{N_subject}}{number of subjects}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+a \code{tibble}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-simulate_events"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-simulate_events}{}}}
+\subsection{Method \code{simulate_events()}}{
+Simulate events data.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate_events(df_subjects)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{df_subjects}}{The subjects data frame}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+a \code{tibble}
 }
 }
 \if{html}{\out{<hr>}}

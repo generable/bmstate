@@ -25,7 +25,6 @@ test_that("MultistateModel init and methods work", {
   expect_true(length(bh2) == length(ttt))
 })
 
-
 test_that("path generation via MultistateSystem works", {
   tm <- full_transmat(self_loops = TRUE)
   mod <- create_msm(tm, "age", NULL, FALSE)
@@ -48,4 +47,5 @@ test_that("data simulation via MultistateModel works", {
   mod$set_knots(tmax, seq(0, tmax - 1, length.out = 1000), 3)
   df <- mod$simulate_subjects()
   expect_equal(ncol(df), 3)
+  p <- mod$simulate_events(df)
 })

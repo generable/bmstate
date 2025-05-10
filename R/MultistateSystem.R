@@ -10,10 +10,7 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
     transmat = NULL,
 
     # Generate a path starting from time 0
-    generate_path = function(w, log_w0, log_m, t_max,
-                             init_state = 1, discretize = FALSE) {
-      dt <- 1
-
+    generate_path = function(w, log_w0, log_m, t_max, init_state, dt) {
       # Setup
       states <- init_state
       times <- 0
@@ -30,8 +27,8 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
         )
         t_next <- trans$t
 
-        # Discretize transition time to end of day
-        if (discretize) {
+        # Discretize transition time to end of this dt interval
+        if (dt > 0) {
           t_next <- dt * ceiling(t_next / dt)
         }
 
@@ -150,12 +147,37 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
       private$transmat <- transmat
     },
 
-    #' @description Set spline knot locations
+    #' @description Get number of states
     #'
-    #' @param locations A numeric vector
-    set_knots = function(locations) {
-      checkmate::assert_numeric(locations, min.len = 2)
-      private$knots <- locations
+    #' @return integer
+    num_states = function() {
+      self$tm()$num_states()
+    },
+
+    #' @description Get number of transitions
+    #'
+    #' @return integer
+    num_trans = function() {
+      self$tm()$num_trans()
+    },
+
+    #' Get number of spline weight parameters
+    #' @return an integer (\code{num_knots} - 2) + \code{self$spline_k}
+    num_weights = function() {
+      if (self$knots_not_set()) {
+        stop("knots have not been set, use $set_knots()")
+      }
+      self$num_knots() - 2 + private$spline_k
+    },
+
+    #' @description Get number of spline knots
+    #'
+    #' @return integer, zero if knots have not been set
+    num_knots = function() {
+      if (self$knots_not_set()) {
+        return(0)
+      }
+      length(private$knots)
     },
 
     #' @description Get transition matrix
@@ -170,6 +192,14 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
       is.null(private$knots)
     },
 
+    #' @description Set spline knot locations
+    #'
+    #' @param locations A numeric vector
+    set_knots = function(locations) {
+      checkmate::assert_numeric(locations, min.len = 2)
+      private$knots <- locations
+    },
+
     #' @description Get knot locations
     #'
     #' @return a numeric vector
@@ -180,30 +210,11 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
       private$knots
     },
 
-    #' @description Get number of spline knots
-    #'
-    #' @return integer, zero if knots have not been set
-    num_knots = function() {
-      if (self$knots_not_set()) {
-        return(0)
-      }
-      length(private$knots)
-    },
-
     #' @description Get max time set for the model
     #'
     #' @return a number
     get_tmax = function() {
       max(self$get_knots())
-    },
-
-    #' Get number of spline weight parameters
-    #' @return an integer (\code{num_knots} - 2) + \code{self$spline_k}
-    num_weights = function() {
-      if (self$knots_not_set()) {
-        stop("knots have not been set, use $set_knots()")
-      }
-      self$num_knots() - 2 + private$spline_k
     },
 
     #' Print the object
@@ -255,16 +266,19 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
     #' @param log_w0 An array of shape \code{n_paths} x \code{n_trans}
     #' @param log_m An array of shape \code{n_paths} x \code{n_trans}
     #' @param init_state Integer index of starting state.
-    #' @param discretize Discretize times to one time unit?
+    #' @param dt Discretization interval. Events can be observed only on
+    #' intervals of length \code{dt}. Each drawn event is observed at the
+    #' end of the discretization interval. If \code{dt = 0} (default), the
+    #' no discretization is performed and the event times are observed exactly.
     #' @return a data frame
-    simulate = function(w, log_w0, log_m, init_state = 1, discretize = FALSE) {
+    simulate = function(w, log_w0, log_m, init_state = 1, dt = 0) {
       checkmate::assert_array(w, d = 3)
       n_paths <- dim(w)[1]
       checkmate::assert_true(dim(w)[3] == self$num_weights())
       checkmate::assert_matrix(log_w0, nrows = n_paths)
       checkmate::assert_matrix(log_m, nrows = n_paths)
-      checkmate::assert_logical(discretize, len = 1)
-      S <- private$transmat$num_states()
+      checkmate::assert_number(dt, lower = 0)
+      S <- self$num_states()
       checkmate::assert_integerish(init_state, len = 1, lower = 1, upper = S)
       pb <- progress::progress_bar$new(total = n_paths)
       message("Generating ", n_paths, " paths")
@@ -275,7 +289,7 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
       for (j in seq_len(n_paths)) {
         pb$tick()
         p <- private$generate_path(
-          w[j, , ], log_w0[j, ], log_m[j, ], t_max, init_state, discretize
+          w[j, , ], log_w0[j, ], log_m[j, ], t_max, init_state, dt
         )
         p <- cbind(p, rep(j, nrow(p)))
         out <- rbind(out, p)
