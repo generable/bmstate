@@ -25,10 +25,10 @@ Main model class
 \item \href{#method-MultistateModel-get_states}{\code{MultistateModel$get_states()}}
 \item \href{#method-MultistateModel-print}{\code{MultistateModel$print()}}
 \item \href{#method-MultistateModel-covs}{\code{MultistateModel$covs()}}
+\item \href{#method-MultistateModel-simulate_data}{\code{MultistateModel$simulate_data()}}
 \item \href{#method-MultistateModel-simulate_subjects}{\code{MultistateModel$simulate_subjects()}}
 \item \href{#method-MultistateModel-simulate_events}{\code{MultistateModel$simulate_events()}}
 \item \href{#method-MultistateModel-target_states}{\code{MultistateModel$target_states()}}
-\item \href{#method-MultistateModel-simulate_log_hazard_multipliers}{\code{MultistateModel$simulate_log_hazard_multipliers()}}
 \item \href{#method-MultistateModel-get_stan_model}{\code{MultistateModel$get_stan_model()}}
 \item \href{#method-MultistateModel-compile}{\code{MultistateModel$compile()}}
 \item \href{#method-MultistateModel-create_standata}{\code{MultistateModel$create_standata()}}
@@ -114,6 +114,32 @@ Get the hazard covariates.
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-simulate_data"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-simulate_data}{}}}
+\subsection{Method \code{simulate_data()}}{
+Simulate data using the multistate model.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate_data(N_subject = 100, beta = NULL, log_w0 = -4)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{N_subject}}{number of subjects}
+
+\item{\code{beta}}{Covariate effects on each transition type.
+Matrix of shape \code{num_target_states} x \code{num_covs}.
+If \code{NULL}, a matrix of zeros is used.}
+
+\item{\code{log_w0}}{Baseline hazard rate for all transitions}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+a \code{tibble}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateModel-simulate_subjects"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateModel-simulate_subjects}{}}}
 \subsection{Method \code{simulate_subjects()}}{
@@ -139,13 +165,20 @@ a \code{tibble}
 \subsection{Method \code{simulate_events()}}{
 Simulate events data.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate_events(df_subjects)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate_events(df_subjects, beta, log_w0, w_scale = 0.1)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{df_subjects}}{The subjects data frame}
+
+\item{\code{beta}}{Matrix of shape \code{num_target_states} x \code{num_covs}}
+
+\item{\code{log_w0}}{Baseline log hazard rate, vector with length
+\code{num_trans}}
+
+\item{\code{w_scale}}{scale of spline weights variation}
 }
 \if{html}{\out{</div>}}
 }
@@ -164,28 +197,6 @@ Get indices of states that are not source states
 
 \subsection{Returns}{
 integer
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModel-simulate_log_hazard_multipliers"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModel-simulate_log_hazard_multipliers}{}}}
-\subsection{Method \code{simulate_log_hazard_multipliers()}}{
-Simulate log hazard multipliers
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate_log_hazard_multipliers(df_subjects, beta)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{df_subjects}}{The subjects data frame}
-
-\item{\code{beta}}{Matrix of shape \code{num_target_states} x \code{num_covs}}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-a matrix of size \code{num_subjects} x \code{num_trans}
 }
 }
 \if{html}{\out{<hr>}}

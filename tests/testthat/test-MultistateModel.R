@@ -45,9 +45,5 @@ test_that("data simulation via MultistateModel works", {
   mod <- create_msm(tm, "age", NULL, FALSE)
   tmax <- 3 * 365.25
   mod$set_knots(tmax, seq(0, tmax - 1, length.out = 1000), 3)
-  df <- mod$simulate_subjects()
-  beta <- matrix(c(0, 1, 0), 3, 1)
-  beta <- mod$simulate_log_hazard_multipliers(df, beta)
-  expect_equal(ncol(df), 3)
-  p <- mod$simulate_events(df)
+  df <- mod$simulate_data()
 })

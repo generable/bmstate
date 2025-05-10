@@ -29,7 +29,31 @@ MultistateModel <- R6::R6Class("MultistateModel",
   # PRIVATE
   private = list(
     stan_model = NULL,
-    hazard_covariates = NULL
+    hazard_covariates = NULL,
+    simulate_log_hazard_multipliers = function(df_subjects, beta) {
+      ts <- self$target_states()
+      x <- self$covs()
+      B <- length(ts)
+      K <- length(x)
+      checkmate::assert_matrix(beta, nrows = B, ncols = K)
+      N <- nrow(df_subjects)
+      S <- self$system$num_trans()
+      out <- matrix(0, N, S)
+      tf <- mod$system$tm()$trans_df()
+      X <- df_subjects |> dplyr::select(x)
+      for (s in seq_len(S)) {
+        target_state <- tf$state[s]
+        idx_in_beta <- which(ts == target_state)
+        if (length(idx_in_beta) != 1) {
+          stop("error")
+        }
+        beta_s <- beta[idx_in_beta, ]
+        for (n in seq_len(N)) {
+          out[n, s] <- sum(as.numeric(X[n, ]) * beta_s)
+        }
+      }
+      out
+    }
   ),
 
   # PUBLIC
@@ -97,6 +121,26 @@ MultistateModel <- R6::R6Class("MultistateModel",
       private$hazard_covariates
     },
 
+    #' @description Simulate data using the multistate model.
+    #'
+    #' @param N_subject number of subjects
+    #' @param beta Covariate effects on each transition type.
+    #' Matrix of shape \code{num_target_states} x \code{num_covs}.
+    #' If \code{NULL}, a matrix of zeros is used.
+    #' @param log_w0 Baseline hazard rate for all transitions
+    #' @return a \code{tibble}
+    simulate_data = function(N_subject = 100, beta = NULL, log_w0 = -4) {
+      df_sub <- self$simulate_subjects(N_subject)
+      checkmate::assert_number(log_w0)
+      log_w0_vec <- rep(log_w0, self$system$num_trans())
+      if (is.null(beta)) {
+        L <- length(self$target_states())
+        K <- length(self$covs())
+        beta <- matrix(0, L, K)
+      }
+      self$simulate_events(df_sub, beta, log_w0_vec)
+    },
+
     #' @description Simulate subject data.
     #'
     #' @param N_subject number of subjects
@@ -116,15 +160,21 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' @description Simulate events data.
     #'
     #' @param df_subjects The subjects data frame
+    #' @param beta Matrix of shape \code{num_target_states} x \code{num_covs}
+    #' @param log_w0 Baseline log hazard rate, vector with length
+    #' \code{num_trans}
+    #' @param w_scale scale of spline weights variation
     #' @return a \code{tibble}
-    simulate_events = function(df_subjects) {
+    simulate_events = function(df_subjects, beta, log_w0, w_scale = 0.1) {
       dt <- 1
       N <- nrow(df_subjects)
       S <- self$system$num_trans()
       L <- self$system$num_weights()
-      w <- array(0.1 * rnorm(N * S * L), dim = c(N, S, L))
-      log_w0 <- matrix(-4, N, S)
-      log_m <- matrix(0, N, S)
+      checkmate::assert_numeric(log_w0, len = S)
+      checkmate::assert_number(w_scale, lower = 0)
+      w <- array(w_scale * rnorm(N * S * L), dim = c(N, S, L))
+      log_w0 <- matrix(rep(log_w0, N), N, S, byrow = TRUE)
+      log_m <- private$simulate_log_hazard_multipliers(df_subjects, beta)
       paths <- mod$system$simulate(w, log_w0, log_m, dt = dt)
       as_tibble(paths)
     },
@@ -137,35 +187,6 @@ MultistateModel <- R6::R6Class("MultistateModel",
       df$state_idx
     },
 
-    #' @description Simulate log hazard multipliers
-    #'
-    #' @param df_subjects The subjects data frame
-    #' @param beta Matrix of shape \code{num_target_states} x \code{num_covs}
-    #' @return a matrix of size \code{num_subjects} x \code{num_trans}
-    simulate_log_hazard_multipliers = function(df_subjects, beta) {
-      ts <- self$target_states()
-      x <- self$covs()
-      B <- length(ts)
-      K <- length(x)
-      checkmate::assert_matrix(beta, nrows = B, ncols = K)
-      N <- nrow(df_subjects)
-      S <- self$system$num_trans()
-      out <- matrix(0, N, S)
-      tf <- mod$system$tm()$trans_df()
-      X <- df_subjects |> dplyr::select(x)
-      for (s in seq_len(S)) {
-        target_state <- tf$state[s]
-        idx_in_beta <- which(ts == target_state)
-        if (length(idx_in_beta) != 1) {
-          stop("error")
-        }
-        beta_s <- beta[idx_in_beta, ]
-        for (n in seq_len(N)) {
-          out[n, s] <- sum(as.numeric(X[n, ]) * beta_s)
-        }
-      }
-      out
-    },
 
     #' @description Get the underlying 'Stan' model.
     get_stan_model = function() {
