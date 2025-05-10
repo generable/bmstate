@@ -15,6 +15,7 @@ One-compartment PK Model
 \item \href{#method-PKModel-ka_covs}{\code{PKModel$ka_covs()}}
 \item \href{#method-PKModel-CL_covs}{\code{PKModel$CL_covs()}}
 \item \href{#method-PKModel-V2_covs}{\code{PKModel$V2_covs()}}
+\item \href{#method-PKModel-format_params}{\code{PKModel$format_params()}}
 \item \href{#method-PKModel-print}{\code{PKModel$print()}}
 \item \href{#method-PKModel-simulate_ss}{\code{PKModel$simulate_ss()}}
 \item \href{#method-PKModel-clone}{\code{PKModel$clone()}}
@@ -67,6 +68,25 @@ Get the covariates affecting the V_2 parameter.
 \if{html}{\out{<div class="r">}}\preformatted{PKModel$V2_covs()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PKModel-format_params"></a>}}
+\if{latex}{\out{\hypertarget{method-PKModel-format_params}{}}}
+\subsection{Method \code{format_params()}}{
+Format list of input PK parameters to standardized format.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PKModel$format_params(beta_pk = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{beta_pk}}{A list of max three elements}
+
+\item{\code{return}}{A list with three elements}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PKModel-print"></a>}}

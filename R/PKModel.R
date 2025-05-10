@@ -39,6 +39,33 @@ PKModel <- R6::R6Class("PKModel",
       private$covariates$V2
     },
 
+    #' @description Format list of input PK parameters to standardized format.
+    #'
+    #' @param beta_pk A list of max three elements
+    #' @param return A list with three elements
+    format_params = function(beta_pk = NULL) {
+      if (is.null(beta_pk)) {
+        beta_pk <- list(ka = NULL, CL = NULL, V2 = NULL)
+      }
+      checkmate::assert_list(beta_pk)
+      if (is.null(beta_pk$ka)) {
+        x <- self$ka_covs()
+        beta_pk$ka <- rep(0, length(x))
+      }
+      if (is.null(beta_pk$CL)) {
+        x <- self$CL_covs()
+        beta_pk$CL <- rep(0, length(x))
+      }
+      if (is.null(beta_pk$V2)) {
+        x <- self$V2_covs()
+        beta_pk$V2 <- rep(0, length(x))
+      }
+      names(beta_pk$ka) <- self$ka_covs()
+      names(beta_pk$CL) <- self$CL_covs()
+      names(beta_pk$V2) <- self$V2_covs()
+      beta_pk
+    },
+
     #' @description Print the object info
     #'
     #' @return nothing

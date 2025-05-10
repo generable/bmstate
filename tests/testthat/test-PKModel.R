@@ -7,4 +7,6 @@ test_that("PKModel init and methods work", {
   t <- seq(0, 100, by = 1)
   conc <- a$simulate_ss(t, theta, 100, 24)
   expect_equal(length(conc), length(t))
+  r <- a$format_params()
+  expect_equal(names(r), c("ka", "CL", "V2"))
 })

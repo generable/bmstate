@@ -23,6 +23,7 @@ Main model class
 \item \href{#method-MultistateModel-new}{\code{MultistateModel$new()}}
 \item \href{#method-MultistateModel-set_knots}{\code{MultistateModel$set_knots()}}
 \item \href{#method-MultistateModel-get_states}{\code{MultistateModel$get_states()}}
+\item \href{#method-MultistateModel-has_pk}{\code{MultistateModel$has_pk()}}
 \item \href{#method-MultistateModel-print}{\code{MultistateModel$print()}}
 \item \href{#method-MultistateModel-covs}{\code{MultistateModel$covs()}}
 \item \href{#method-MultistateModel-simulate_data}{\code{MultistateModel$simulate_data()}}
@@ -50,7 +51,8 @@ Create model
 \describe{
 \item{\code{system}}{A \code{\link{MultistateSystem}}}
 
-\item{\code{covariates}}{The names of the hazard covariates.}
+\item{\code{covariates}}{The names of the hazard covariates (excluding possible
+exposure estimated from PK model).}
 
 \item{\code{pk_model}}{A \code{\link{PKModel}} or NULL.}
 
@@ -85,9 +87,19 @@ Set knot locations based on event times
 \if{latex}{\out{\hypertarget{method-MultistateModel-get_states}{}}}
 \subsection{Method \code{get_states()}}{
 Get names of the states
-Print the object
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModel$get_states()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-has_pk"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-has_pk}{}}}
+\subsection{Method \code{has_pk()}}{
+Is there a PK submodel?
+Print the object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$has_pk()}\if{html}{\out{</div>}}
 }
 
 }
@@ -119,17 +131,26 @@ Get the hazard covariates.
 \subsection{Method \code{simulate_data()}}{
 Simulate data using the multistate model.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate_data(N_subject = 100, beta = NULL, log_w0 = -4)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate_data(
+  N_subject = 100,
+  beta_haz = NULL,
+  beta_pk = NULL,
+  log_w0 = -4
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{N_subject}}{number of subjects}
+\item{\code{N_subject}}{Number of subjects.}
 
-\item{\code{beta}}{Covariate effects on each transition type.
-Matrix of shape \code{num_target_states} x \code{num_covs}.
-If \code{NULL}, a matrix of zeros is used.}
+\item{\code{beta_haz}}{Covariate effects on each transition type.
+A matrix of shape \code{num_target_states} x \code{num_covs}.
+If \code{NULL}, a data frame of zeros is used.}
+
+\item{\code{beta_pk}}{Covariate effects on PK parameters. A named list with
+three elements, each being a vector. If any element is \code{NULL},
+a vector of zeros is used.}
 
 \item{\code{log_w0}}{Baseline hazard rate for all transitions}
 }
@@ -165,7 +186,13 @@ a \code{tibble}
 \subsection{Method \code{simulate_events()}}{
 Simulate events data.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate_events(df_subjects, beta, log_w0, w_scale = 0.1)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate_events(
+  df_subjects,
+  beta_haz,
+  beta_pk,
+  log_w0,
+  w_scale = 0.1
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -173,7 +200,9 @@ Simulate events data.
 \describe{
 \item{\code{df_subjects}}{The subjects data frame}
 
-\item{\code{beta}}{Matrix of shape \code{num_target_states} x \code{num_covs}}
+\item{\code{beta_haz}}{Matrix of shape \code{num_target_states} x \code{num_covs}}
+
+\item{\code{beta_pk}}{todo}
 
 \item{\code{log_w0}}{Baseline log hazard rate, vector with length
 \code{num_trans}}

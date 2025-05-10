@@ -30,7 +30,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
   private = list(
     stan_model = NULL,
     hazard_covariates = NULL,
-    simulate_log_hazard_multipliers = function(df_subjects, beta) {
+    simulate_log_hazard_multipliers = function(df_subjects, beta_haz) {
       ts <- self$target_states()
       x <- self$covs()
       B <- length(ts)
@@ -65,11 +65,13 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' Create model
     #'
     #' @param system A \code{\link{MultistateSystem}}
-    #' @param covariates The names of the hazard covariates.
+    #' @param covariates The names of the hazard covariates (excluding possible
+    #' exposure estimated from PK model).
     #' @param pk_model A \code{\link{PKModel}} or NULL.
     #' @param compile Should the 'Stan' model code be created and compiled.
     initialize = function(system, covariates, pk_model = NULL, compile = TRUE) {
       checkmate::assert_character(covariates)
+      checkmate::assert_true(("ss_auc" %in% covariates)) # special name
       checkmate::assert_class(system, "MultistateSystem")
       if (!is.null(pk_model)) {
         checkmate::assert_class(pk_model, "PKModel")
@@ -101,6 +103,11 @@ MultistateModel <- R6::R6Class("MultistateModel",
       self$system$tm()$states
     },
 
+    #' @description Is there a PK submodel?
+    has_pk = function() {
+      !is.null(self$pk_model)
+    },
+
     #' Print the object
     #'
     #' @return nothing
@@ -111,34 +118,46 @@ MultistateModel <- R6::R6Class("MultistateModel",
       msg <- paste(x1, x2, "\n", sep = "\n")
       cat(msg)
       print(self$system)
-      if (!is.null(self$pk_model)) {
+      if (self$has_pk()) {
         print(self$pk_model)
       }
     },
 
     #' @description Get the hazard covariates.
     covs = function() {
-      private$hazard_covariates
+      x <- private$hazard_covariates
+      if (self$has_pk()) {
+        x <- c(x, "ss_auc")
+      }
     },
 
     #' @description Simulate data using the multistate model.
     #'
-    #' @param N_subject number of subjects
-    #' @param beta Covariate effects on each transition type.
-    #' Matrix of shape \code{num_target_states} x \code{num_covs}.
-    #' If \code{NULL}, a matrix of zeros is used.
+    #' @param N_subject Number of subjects.
+    #' @param beta_haz Covariate effects on each transition type.
+    #' A matrix of shape \code{num_target_states} x \code{num_covs}.
+    #' If \code{NULL}, a data frame of zeros is used.
+    #' @param beta_pk Covariate effects on PK parameters. A named list with
+    #' three elements, each being a vector. If any element is \code{NULL},
+    #' a vector of zeros is used.
     #' @param log_w0 Baseline hazard rate for all transitions
     #' @return a \code{\link{PathData}} object
-    simulate_data = function(N_subject = 100, beta = NULL, log_w0 = -4) {
+    simulate_data = function(N_subject = 100, beta_haz = NULL,
+                             beta_pk = NULL, log_w0 = -4) {
       sub_df <- self$simulate_subjects(N_subject)
       checkmate::assert_number(log_w0)
       log_w0_vec <- rep(log_w0, self$system$num_trans())
-      if (is.null(beta)) {
+      if (is.null(beta_haz)) {
         L <- length(self$target_states())
         K <- length(self$covs())
         beta <- matrix(0, L, K)
       }
-      path_df <- self$simulate_events(sub_df, beta, log_w0_vec)
+      beta_pk <- self$pk$format_params(beta_pk)
+      pk_dat <- NULL
+      if (self$has_pk) {
+        pk_dat <- self$pk$simulate_data(beta_pk)
+      }
+      path_df <- self$simulate_events(sub_df, beta_haz, log_w0_vec)
       N <- nrow(sub_df)
       link_df <- data.frame(
         path_id = seq_len(N),
@@ -168,12 +187,13 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' @description Simulate events data.
     #'
     #' @param df_subjects The subjects data frame
-    #' @param beta Matrix of shape \code{num_target_states} x \code{num_covs}
+    #' @param beta_haz Matrix of shape \code{num_target_states} x \code{num_covs}
+    #' @param beta_pk todo
     #' @param log_w0 Baseline log hazard rate, vector with length
     #' \code{num_trans}
     #' @param w_scale scale of spline weights variation
     #' @return a \code{tibble}
-    simulate_events = function(df_subjects, beta, log_w0, w_scale = 0.1) {
+    simulate_events = function(df_subjects, beta_haz, beta_pk, log_w0, w_scale = 0.1) {
       dt <- 1
       N <- nrow(df_subjects)
       S <- self$system$num_trans()
@@ -182,7 +202,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       checkmate::assert_number(w_scale, lower = 0)
       w <- array(w_scale * rnorm(N * S * L), dim = c(N, S, L))
       log_w0 <- matrix(rep(log_w0, N), N, S, byrow = TRUE)
-      log_m <- private$simulate_log_hazard_multipliers(df_subjects, beta)
+      log_m <- private$simulate_log_hazard_multipliers(df_subjects, beta_haz, beta_pk)
       paths <- self$system$simulate(w, log_w0, log_m, dt = dt)
       as_tibble(paths)
     },
