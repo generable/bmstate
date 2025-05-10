@@ -39,7 +39,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       N <- nrow(df_subjects)
       S <- self$system$num_trans()
       out <- matrix(0, N, S)
-      tf <- mod$system$tm()$trans_df()
+      tf <- self$system$tm()$trans_df()
       X <- df_subjects |> dplyr::select(x)
       for (s in seq_len(S)) {
         target_state <- tf$state[s]
@@ -128,9 +128,9 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' Matrix of shape \code{num_target_states} x \code{num_covs}.
     #' If \code{NULL}, a matrix of zeros is used.
     #' @param log_w0 Baseline hazard rate for all transitions
-    #' @return a \code{tibble}
+    #' @return a \code{\link{PathData}} object
     simulate_data = function(N_subject = 100, beta = NULL, log_w0 = -4) {
-      df_sub <- self$simulate_subjects(N_subject)
+      sub_df <- self$simulate_subjects(N_subject)
       checkmate::assert_number(log_w0)
       log_w0_vec <- rep(log_w0, self$system$num_trans())
       if (is.null(beta)) {
@@ -138,7 +138,15 @@ MultistateModel <- R6::R6Class("MultistateModel",
         K <- length(self$covs())
         beta <- matrix(0, L, K)
       }
-      self$simulate_events(df_sub, beta, log_w0_vec)
+      path_df <- self$simulate_events(sub_df, beta, log_w0_vec)
+      N <- nrow(sub_df)
+      link_df <- data.frame(
+        path_id = seq_len(N),
+        subject_id = sub_df$subject_id
+      )
+      link_df$rep_idx <- rep(1, N)
+      link_df$draw_idx <- rep(1, N)
+      PathData$new(sub_df, path_df, link_df, self$system$tm(), self$covs())
     },
 
     #' @description Simulate subject data.
@@ -175,7 +183,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       w <- array(w_scale * rnorm(N * S * L), dim = c(N, S, L))
       log_w0 <- matrix(rep(log_w0, N), N, S, byrow = TRUE)
       log_m <- private$simulate_log_hazard_multipliers(df_subjects, beta)
-      paths <- mod$system$simulate(w, log_w0, log_m, dt = dt)
+      paths <- self$system$simulate(w, log_w0, log_m, dt = dt)
       as_tibble(paths)
     },
 

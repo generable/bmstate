@@ -136,7 +136,7 @@ If \code{NULL}, a matrix of zeros is used.}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-a \code{tibble}
+a \code{\link{PathData}} object
 }
 }
 \if{html}{\out{<hr>}}

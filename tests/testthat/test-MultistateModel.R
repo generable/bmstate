@@ -45,5 +45,8 @@ test_that("data simulation via MultistateModel works", {
   mod <- create_msm(tm, "age", NULL, FALSE)
   tmax <- 3 * 365.25
   mod$set_knots(tmax, seq(0, tmax - 1, length.out = 1000), 3)
-  df <- mod$simulate_data()
+  N_sub <- 84
+  pd <- mod$simulate_data(N_sub = N_sub)
+  expect_true(inherits(pd, "PathData"))
+  expect_equal(pd$n_paths(), N_sub)
 })
