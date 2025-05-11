@@ -4,7 +4,7 @@
 \alias{simulate_example_data}
 \title{Simulate example data}
 \usage{
-simulate_example_data(N = 10, beta_haz = NULL, beta_pk = NULL, log_w0 = 1e-04)
+simulate_example_data(N = 10, beta_haz = NULL, beta_pk = NULL, log_w0 = -4)
 }
 \arguments{
 \item{N}{number of subjects}
