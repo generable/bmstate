@@ -1,5 +1,5 @@
 test_that("PathData methods work", {
-  a <- simulate_example_data(100, sys_idx = 2)
+  a <- simulate_example_data(100)
   pd <- a$pd
   p1 <- pd$plot_paths()
   p2 <- pd$plot_graph()

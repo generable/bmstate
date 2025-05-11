@@ -54,6 +54,7 @@ Imports:
     tibble,
     tidybayes,
     tidyr,
+    tidyselect,
     utils
 RoxygenNote: 7.3.2
 Config/testthat/edition: 3

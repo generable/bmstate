@@ -40,7 +40,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       S <- self$system$num_trans()
       out <- matrix(0, N, S)
       tf <- self$system$tm()$trans_df()
-      X <- df_subjects |> dplyr::select(x)
+      X <- df_subjects |> dplyr::select(tidyselect::all_of(x))
       for (s in seq_len(S)) {
         target_state <- tf$state[s]
         idx_in_beta <- which(ts == target_state)
@@ -166,7 +166,9 @@ MultistateModel <- R6::R6Class("MultistateModel",
         beta_haz <- matrix(0, L, K)
       }
       pk_dat <- self$simulate_pk_data(sub_df, beta_pk)
-      sub_df <- sub_df |> dplyr::left_join(pk_dat, by = "subject_idx")
+      if (self$has_pk()) {
+        sub_df <- sub_df |> dplyr::left_join(pk_dat, by = "subject_idx")
+      }
       path_df <- self$simulate_events(sub_df, beta_haz, log_w0_vec)
       N <- nrow(sub_df)
       link_df <- data.frame(
