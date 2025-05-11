@@ -66,12 +66,14 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #'
     #' @param system A \code{\link{MultistateSystem}}
     #' @param covariates The names of the hazard covariates (excluding possible
-    #' exposure estimated from PK model).
+    #' exposure estimated from PK model). Do not use reserved names \code{ss_auc}
+    #' or \code{dose}.
     #' @param pk_model A \code{\link{PKModel}} or NULL.
     #' @param compile Should the 'Stan' model code be created and compiled.
     initialize = function(system, covariates, pk_model = NULL, compile = TRUE) {
       checkmate::assert_character(covariates)
       checkmate::assert_true(!("ss_auc" %in% covariates)) # special name
+      checkmate::assert_true(!("dose" %in% covariates)) # special name
       checkmate::assert_class(system, "MultistateSystem")
       if (!is.null(pk_model)) {
         checkmate::assert_class(pk_model, "PKModel")
@@ -123,13 +125,23 @@ MultistateModel <- R6::R6Class("MultistateModel",
       }
     },
 
-    #' @description Get the hazard covariates.
+    #' @description Get the hazard covariates (including steady-state exposure
+    #' if PK model is included).
     covs = function() {
       x <- private$hazard_covariates
       if (self$has_pk()) {
         x <- c(x, "ss_auc")
       }
-      x
+      unique(x)
+    },
+
+    #' @description Get all covariates that need to be given as data.
+    data_covs = function() {
+      x <- private$hazard_covariates
+      if (self$has_pk()) {
+        x <- c(x, self$pk_model$covs())
+      }
+      unique(x)
     },
 
     #' @description Simulate data using the multistate model.
@@ -153,13 +165,10 @@ MultistateModel <- R6::R6Class("MultistateModel",
         K <- length(self$covs())
         beta_haz <- matrix(0, L, K)
       }
-      pk_dat <- NULL
-      if (self$has_pk()) {
-        beta_pk <- self$pk_model$format_params(beta_pk)
-        sub_df$dose <- c(15, 30, 60)[sample.int(3, N_subject, replace = TRUE)]
-        pk_dat <- self$pk_model$simulate_data(sub_df, beta_pk)
-      }
-      path_df <- self$simulate_events(sub_df, beta_haz, beta_pk, log_w0_vec)
+      pk_dat <- self$simulate_pk_data(sub_df, beta_pk)
+      pkd <- pk_dat |> dplyr::select(.data$subject_idx, .data$ss_auc)
+      sub_df <- sub_df |> dplyr::left_join(pkd, by = "subject_idx")
+      path_df <- self$simulate_events(sub_df, beta_haz, log_w0_vec)
       N <- nrow(sub_df)
       link_df <- data.frame(
         path_id = seq_len(N),
@@ -170,16 +179,29 @@ MultistateModel <- R6::R6Class("MultistateModel",
       PathData$new(sub_df, path_df, link_df, self$system$tm(), self$covs())
     },
 
+    #' @description Simulate PK data.
+    #'
+    #' @param df_subjects The subjects data frame
+    #' @param beta_pk TODO
+    #' @return a \code{data.frame} object
+    simulate_pk_data = function(df_subjects, beta_pk = NULL) {
+      pk_dat <- NULL
+      if (self$has_pk()) {
+        beta_pk <- self$pk_model$format_params(beta_pk)
+        pk_dat <- self$pk_model$simulate_data(df_subjects, beta_pk)
+      }
+      pk_dat
+    },
+
     #' @description Simulate events data.
     #'
     #' @param df_subjects The subjects data frame
     #' @param beta_haz Matrix of shape \code{num_target_states} x \code{num_covs}
-    #' @param beta_pk TODO
     #' @param log_w0 Baseline log hazard rate, vector with length
     #' \code{num_trans}
     #' @param w_scale scale of spline weights variation
     #' @return a \code{tibble}
-    simulate_events = function(df_subjects, beta_haz, beta_pk, log_w0, w_scale = 0.1) {
+    simulate_events = function(df_subjects, beta_haz, log_w0, w_scale = 0.1) {
       dt <- 1
       N <- nrow(df_subjects)
       S <- self$system$num_trans()
@@ -195,17 +217,23 @@ MultistateModel <- R6::R6Class("MultistateModel",
 
     #' @description Simulate subject data.
     #'
-    #' @param N_subject number of subjects
+    #' @param N_subject Number of subjects.
+    #' @param doses Possible doses. Only has effect if a PK submodel exists.
     #' @return a \code{tibble}
-    simulate_subjects = function(N_subject = 100) {
+    simulate_subjects = function(N_subject = 100, doses = c(15, 30, 60)) {
+      checkmate::assert_numeric(doses, min.len = 1, lower = 0)
       subject_id <- paste0("sim-", seq_len(N_subject))
-      covs <- self$covs()
+      covs <- self$data_covs()
       N_covs <- length(covs)
       A <- matrix(rnorm(N_subject * N_covs), N_subject, N_covs)
       df <- data.frame(A)
       colnames(df) <- covs
       df$subject_id <- subject_id
       df$subject_idx <- seq_len(N_subject)
+      if (self$has_pk()) {
+        n_groups <- length(doses)
+        df$dose <- doses[sample.int(n_groups, N_subject, replace = TRUE)]
+      }
       as_tibble(df)
     },
 

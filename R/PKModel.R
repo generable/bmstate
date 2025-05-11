@@ -39,6 +39,13 @@ PKModel <- R6::R6Class("PKModel",
       private$covariates$V2
     },
 
+    #' @description Get names of all unique covariates
+    #'
+    covs = function() {
+      x <- c(self$ka_covs(), self$CL_covs(), self$V2_covs())
+      unique(x)
+    },
+
     #' @description Print the object info
     #'
     #' @return nothing
@@ -77,6 +84,17 @@ PKModel <- R6::R6Class("PKModel",
       conc
     },
 
+    #' @description Compute steady-state area under curve over one dosing interval
+    #'
+    #' @param theta parameter values
+    #' @param dose dose
+    #' @return A numeric value
+    compute_ss_auc = function(theta, dose) {
+      checkmate::assert_number(theta$CL, lower = 0)
+      checkmate::assert_number(dose, lower = 0)
+      dose / theta$CL
+    },
+
     #' @description Simulate data with many subjects
     #'
     #' @param df_subjects Data frame with one row for each subject
@@ -105,12 +123,16 @@ PKModel <- R6::R6Class("PKModel",
         t_post <- idx_meas * tau + 0.2 * runif(1) * tau
         tt <- c(t_pre, t_post)
         conc <- self$simulate_ss(tt, theta_n, row$dose, tau)
-        conc_noisy <- stats::rlnorm(1, meanlog = log(conc), sdlog = sigma)
-        out <- c(row$subject_id, tt, conc_noisy)
+        ss_auc <- self$compute_ss_auc(theta_n, row$dose)
+        conc_noisy <- stats::rlnorm(2, meanlog = log(conc), sdlog = sigma)
+        out <- c(row$subject_idx, tt, conc_noisy, ss_auc)
         df_out <- rbind(df_out, out)
       }
       df_out <- data.frame(df_out)
-      colnames(df_out) <- c("subject_id", "t_pre", "t_post", "conc_pre", "conc_post")
+      colnames(df_out) <- c(
+        "subject_id", "t_pre", "t_post", "conc_pre", "conc_post",
+        "ss_auc"
+      )
       df_out
     },
 
@@ -119,7 +141,6 @@ PKModel <- R6::R6Class("PKModel",
     #' @param beta_pk A list of max three elements
     #' @param return A list with three elements
     format_params = function(beta_pk = NULL) {
-      cat("ASD")
       if (is.null(beta_pk)) {
         beta_pk <- list(ka = NULL, CL = NULL, V2 = NULL)
       }

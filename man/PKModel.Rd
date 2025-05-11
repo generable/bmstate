@@ -15,8 +15,10 @@ One-compartment PK Model
 \item \href{#method-PKModel-ka_covs}{\code{PKModel$ka_covs()}}
 \item \href{#method-PKModel-CL_covs}{\code{PKModel$CL_covs()}}
 \item \href{#method-PKModel-V2_covs}{\code{PKModel$V2_covs()}}
+\item \href{#method-PKModel-covs}{\code{PKModel$covs()}}
 \item \href{#method-PKModel-print}{\code{PKModel$print()}}
 \item \href{#method-PKModel-simulate_ss}{\code{PKModel$simulate_ss()}}
+\item \href{#method-PKModel-compute_ss_auc}{\code{PKModel$compute_ss_auc()}}
 \item \href{#method-PKModel-simulate_data}{\code{PKModel$simulate_data()}}
 \item \href{#method-PKModel-format_params}{\code{PKModel$format_params()}}
 \item \href{#method-PKModel-clone}{\code{PKModel$clone()}}
@@ -71,6 +73,16 @@ Get the covariates affecting the V_2 parameter.
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PKModel-covs"></a>}}
+\if{latex}{\out{\hypertarget{method-PKModel-covs}{}}}
+\subsection{Method \code{covs()}}{
+Get names of all unique covariates
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PKModel$covs()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PKModel-print"></a>}}
 \if{latex}{\out{\hypertarget{method-PKModel-print}{}}}
 \subsection{Method \code{print()}}{
@@ -108,6 +120,28 @@ Simulate system in steady state
 \subsection{Returns}{
 A vector with the same length as \code{t}, representing the
 concentration in the central compartment.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PKModel-compute_ss_auc"></a>}}
+\if{latex}{\out{\hypertarget{method-PKModel-compute_ss_auc}{}}}
+\subsection{Method \code{compute_ss_auc()}}{
+Compute steady-state area under curve over one dosing interval
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PKModel$compute_ss_auc(theta, dose)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{theta}}{parameter values}
+
+\item{\code{dose}}{dose}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A numeric value
 }
 }
 \if{html}{\out{<hr>}}

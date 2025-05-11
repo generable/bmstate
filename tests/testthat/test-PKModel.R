@@ -9,4 +9,5 @@ test_that("PKModel init and methods work", {
   expect_equal(length(conc), length(t))
   r <- a$format_params()
   expect_equal(names(r), c("ka", "CL", "V2"))
+  expect_equal(a$covs(), c("age", "weight"))
 })

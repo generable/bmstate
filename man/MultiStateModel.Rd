@@ -26,7 +26,9 @@ Main model class
 \item \href{#method-MultistateModel-has_pk}{\code{MultistateModel$has_pk()}}
 \item \href{#method-MultistateModel-print}{\code{MultistateModel$print()}}
 \item \href{#method-MultistateModel-covs}{\code{MultistateModel$covs()}}
+\item \href{#method-MultistateModel-data_covs}{\code{MultistateModel$data_covs()}}
 \item \href{#method-MultistateModel-simulate_data}{\code{MultistateModel$simulate_data()}}
+\item \href{#method-MultistateModel-simulate_pk_data}{\code{MultistateModel$simulate_pk_data()}}
 \item \href{#method-MultistateModel-simulate_events}{\code{MultistateModel$simulate_events()}}
 \item \href{#method-MultistateModel-simulate_subjects}{\code{MultistateModel$simulate_subjects()}}
 \item \href{#method-MultistateModel-target_states}{\code{MultistateModel$target_states()}}
@@ -52,7 +54,8 @@ Create model
 \item{\code{system}}{A \code{\link{MultistateSystem}}}
 
 \item{\code{covariates}}{The names of the hazard covariates (excluding possible
-exposure estimated from PK model).}
+exposure estimated from PK model). Do not use reserved names \code{ss_auc}
+or \code{dose}.}
 
 \item{\code{pk_model}}{A \code{\link{PKModel}} or NULL.}
 
@@ -119,9 +122,20 @@ nothing
 \if{html}{\out{<a id="method-MultistateModel-covs"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateModel-covs}{}}}
 \subsection{Method \code{covs()}}{
-Get the hazard covariates.
+Get the hazard covariates (including steady-state exposure
+if PK model is included).
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModel$covs()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-data_covs"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-data_covs}{}}}
+\subsection{Method \code{data_covs()}}{
+Get all covariates that need to be given as data.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$data_covs()}\if{html}{\out{</div>}}
 }
 
 }
@@ -161,18 +175,34 @@ a \code{\link{PathData}} object
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-simulate_pk_data"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-simulate_pk_data}{}}}
+\subsection{Method \code{simulate_pk_data()}}{
+Simulate PK data.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate_pk_data(df_subjects, beta_pk = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{df_subjects}}{The subjects data frame}
+
+\item{\code{beta_pk}}{TODO}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+a \code{data.frame} object
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateModel-simulate_events"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateModel-simulate_events}{}}}
 \subsection{Method \code{simulate_events()}}{
 Simulate events data.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate_events(
-  df_subjects,
-  beta_haz,
-  beta_pk,
-  log_w0,
-  w_scale = 0.1
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate_events(df_subjects, beta_haz, log_w0, w_scale = 0.1)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -181,8 +211,6 @@ Simulate events data.
 \item{\code{df_subjects}}{The subjects data frame}
 
 \item{\code{beta_haz}}{Matrix of shape \code{num_target_states} x \code{num_covs}}
-
-\item{\code{beta_pk}}{TODO}
 
 \item{\code{log_w0}}{Baseline log hazard rate, vector with length
 \code{num_trans}}
@@ -201,13 +229,15 @@ a \code{tibble}
 \subsection{Method \code{simulate_subjects()}}{
 Simulate subject data.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate_subjects(N_subject = 100)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate_subjects(N_subject = 100, doses = c(15, 30, 60))}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{N_subject}}{number of subjects}
+\item{\code{N_subject}}{Number of subjects.}
+
+\item{\code{doses}}{Possible doses. Only has effect if a PK submodel exists.}
 }
 \if{html}{\out{</div>}}
 }

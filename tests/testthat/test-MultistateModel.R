@@ -50,3 +50,23 @@ test_that("data simulation via MultistateModel works", {
   expect_true(inherits(pd, "PathData"))
   expect_equal(pd$n_paths(), N_sub)
 })
+
+test_that("MultistateModel with PK submodel works", {
+  tm <- full_transmat(state_names = c("Rand", "Bleed", "Death"))
+  covs <- c("sex", "age")
+  pk_covs <- list(
+    ka = "age",
+    CL = "CrCL",
+    V2 = c("weight", "sex")
+  )
+  mod <- create_msm(tm, covs, pk_covs, FALSE)
+  expect_equal(mod$covs(), c("sex", "age", "ss_auc"))
+  expect_equal(mod$data_covs(), c("sex", "age", "CrCL", "weight"))
+  tmax <- 3 * 365.25
+  mod$set_knots(tmax, seq(0, tmax - 1, length.out = 1000), 3)
+  a <- mod$simulate_subjects()
+  r <- mod$simulate_pk_data(a)
+  expect_equal(ncol(a), 7)
+  expect_true("dose" %in% colnames(a))
+  pd <- mod$simulate_data(100)
+})
