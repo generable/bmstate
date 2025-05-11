@@ -73,6 +73,7 @@ PathData <- R6::R6Class(
       }
       if (!is.null(covs)) {
         checkmate::assert_character(covs)
+        covs <- setdiff(covs, "subject_id")
       }
       if (!("draw_idx" %in% colnames(link_df))) {
         link_df$draw_idx <- 1

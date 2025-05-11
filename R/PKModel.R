@@ -130,9 +130,10 @@ PKModel <- R6::R6Class("PKModel",
       }
       df_out <- data.frame(df_out)
       colnames(df_out) <- c(
-        "subject_id", "t_pre", "t_post", "conc_pre", "conc_post",
+        "subject_idx", "t_pre", "t_post", "conc_pre", "conc_post",
         "ss_auc"
       )
+      rownames(df_out) <- NULL
       df_out
     },
 

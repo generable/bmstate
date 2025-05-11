@@ -166,8 +166,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
         beta_haz <- matrix(0, L, K)
       }
       pk_dat <- self$simulate_pk_data(sub_df, beta_pk)
-      pkd <- pk_dat |> dplyr::select(.data$subject_idx, .data$ss_auc)
-      sub_df <- sub_df |> dplyr::left_join(pkd, by = "subject_idx")
+      sub_df <- sub_df |> dplyr::left_join(pk_dat, by = "subject_idx")
       path_df <- self$simulate_events(sub_df, beta_haz, log_w0_vec)
       N <- nrow(sub_df)
       link_df <- data.frame(
@@ -176,7 +175,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       )
       link_df$rep_idx <- rep(1, N)
       link_df$draw_idx <- rep(1, N)
-      PathData$new(sub_df, path_df, link_df, self$system$tm(), self$covs())
+      PathData$new(sub_df, path_df, link_df, self$system$tm(), colnames(sub_df))
     },
 
     #' @description Simulate PK data.
@@ -244,7 +243,6 @@ MultistateModel <- R6::R6Class("MultistateModel",
       df <- self$system$tm()$states_df() |> dplyr::filter(!.data$source)
       df$state_idx
     },
-
 
     #' @description Get the underlying 'Stan' model.
     get_stan_model = function() {
