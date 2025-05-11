@@ -15,9 +15,10 @@ One-compartment PK Model
 \item \href{#method-PKModel-ka_covs}{\code{PKModel$ka_covs()}}
 \item \href{#method-PKModel-CL_covs}{\code{PKModel$CL_covs()}}
 \item \href{#method-PKModel-V2_covs}{\code{PKModel$V2_covs()}}
-\item \href{#method-PKModel-format_params}{\code{PKModel$format_params()}}
 \item \href{#method-PKModel-print}{\code{PKModel$print()}}
 \item \href{#method-PKModel-simulate_ss}{\code{PKModel$simulate_ss()}}
+\item \href{#method-PKModel-simulate_data}{\code{PKModel$simulate_data()}}
+\item \href{#method-PKModel-format_params}{\code{PKModel$format_params()}}
 \item \href{#method-PKModel-clone}{\code{PKModel$clone()}}
 }
 }
@@ -70,25 +71,6 @@ Get the covariates affecting the V_2 parameter.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PKModel-format_params"></a>}}
-\if{latex}{\out{\hypertarget{method-PKModel-format_params}{}}}
-\subsection{Method \code{format_params()}}{
-Format list of input PK parameters to standardized format.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PKModel$format_params(beta_pk = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{beta_pk}}{A list of max three elements}
-
-\item{\code{return}}{A list with three elements}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PKModel-print"></a>}}
 \if{latex}{\out{\hypertarget{method-PKModel-print}{}}}
 \subsection{Method \code{print()}}{
@@ -126,6 +108,51 @@ Simulate system in steady state
 \subsection{Returns}{
 A vector with the same length as \code{t}, representing the
 concentration in the central compartment.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PKModel-simulate_data"></a>}}
+\if{latex}{\out{\hypertarget{method-PKModel-simulate_data}{}}}
+\subsection{Method \code{simulate_data()}}{
+Simulate data with many subjects
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PKModel$simulate_data(df_subjects, beta_pk = NULL, tau = 24, sigma = 0.1)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{df_subjects}}{Data frame with one row for each subject}
+
+\item{\code{beta_pk}}{Covariate effects}
+
+\item{\code{tau}}{Dosing interval}
+
+\item{\code{sigma}}{Noise magnitude}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Data frame with one row for each subject
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PKModel-format_params"></a>}}
+\if{latex}{\out{\hypertarget{method-PKModel-format_params}{}}}
+\subsection{Method \code{format_params()}}{
+Format list of input PK parameters to standardized format.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PKModel$format_params(beta_pk = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{beta_pk}}{A list of max three elements}
+
+\item{\code{return}}{A list with three elements}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}

@@ -27,8 +27,8 @@ Main model class
 \item \href{#method-MultistateModel-print}{\code{MultistateModel$print()}}
 \item \href{#method-MultistateModel-covs}{\code{MultistateModel$covs()}}
 \item \href{#method-MultistateModel-simulate_data}{\code{MultistateModel$simulate_data()}}
-\item \href{#method-MultistateModel-simulate_subjects}{\code{MultistateModel$simulate_subjects()}}
 \item \href{#method-MultistateModel-simulate_events}{\code{MultistateModel$simulate_events()}}
+\item \href{#method-MultistateModel-simulate_subjects}{\code{MultistateModel$simulate_subjects()}}
 \item \href{#method-MultistateModel-target_states}{\code{MultistateModel$target_states()}}
 \item \href{#method-MultistateModel-get_stan_model}{\code{MultistateModel$get_stan_model()}}
 \item \href{#method-MultistateModel-compile}{\code{MultistateModel$compile()}}
@@ -161,26 +161,6 @@ a \code{\link{PathData}} object
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModel-simulate_subjects"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModel-simulate_subjects}{}}}
-\subsection{Method \code{simulate_subjects()}}{
-Simulate subject data.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate_subjects(N_subject = 100)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{N_subject}}{number of subjects}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-a \code{tibble}
-}
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateModel-simulate_events"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateModel-simulate_events}{}}}
 \subsection{Method \code{simulate_events()}}{
@@ -202,12 +182,32 @@ Simulate events data.
 
 \item{\code{beta_haz}}{Matrix of shape \code{num_target_states} x \code{num_covs}}
 
-\item{\code{beta_pk}}{todo}
+\item{\code{beta_pk}}{TODO}
 
 \item{\code{log_w0}}{Baseline log hazard rate, vector with length
 \code{num_trans}}
 
 \item{\code{w_scale}}{scale of spline weights variation}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+a \code{tibble}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-simulate_subjects"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-simulate_subjects}{}}}
+\subsection{Method \code{simulate_subjects()}}{
+Simulate subject data.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate_subjects(N_subject = 100)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{N_subject}}{number of subjects}
 }
 \if{html}{\out{</div>}}
 }

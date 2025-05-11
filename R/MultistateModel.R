@@ -30,7 +30,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
   private = list(
     stan_model = NULL,
     hazard_covariates = NULL,
-    simulate_log_hazard_multipliers = function(df_subjects, beta_haz) {
+    simulate_log_hazard_multipliers = function(df_subjects, beta) {
       ts <- self$target_states()
       x <- self$covs()
       B <- length(ts)
@@ -71,7 +71,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' @param compile Should the 'Stan' model code be created and compiled.
     initialize = function(system, covariates, pk_model = NULL, compile = TRUE) {
       checkmate::assert_character(covariates)
-      checkmate::assert_true(("ss_auc" %in% covariates)) # special name
+      checkmate::assert_true(!("ss_auc" %in% covariates)) # special name
       checkmate::assert_class(system, "MultistateSystem")
       if (!is.null(pk_model)) {
         checkmate::assert_class(pk_model, "PKModel")
@@ -129,6 +129,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       if (self$has_pk()) {
         x <- c(x, "ss_auc")
       }
+      x
     },
 
     #' @description Simulate data using the multistate model.
@@ -150,14 +151,15 @@ MultistateModel <- R6::R6Class("MultistateModel",
       if (is.null(beta_haz)) {
         L <- length(self$target_states())
         K <- length(self$covs())
-        beta <- matrix(0, L, K)
+        beta_haz <- matrix(0, L, K)
       }
-      beta_pk <- self$pk$format_params(beta_pk)
       pk_dat <- NULL
-      if (self$has_pk) {
-        pk_dat <- self$pk$simulate_data(beta_pk)
+      if (self$has_pk()) {
+        beta_pk <- self$pk_model$format_params(beta_pk)
+        sub_df$dose <- c(15, 30, 60)[sample.int(3, N_subject, replace = TRUE)]
+        pk_dat <- self$pk_model$simulate_data(sub_df, beta_pk)
       }
-      path_df <- self$simulate_events(sub_df, beta_haz, log_w0_vec)
+      path_df <- self$simulate_events(sub_df, beta_haz, beta_pk, log_w0_vec)
       N <- nrow(sub_df)
       link_df <- data.frame(
         path_id = seq_len(N),
@@ -166,6 +168,29 @@ MultistateModel <- R6::R6Class("MultistateModel",
       link_df$rep_idx <- rep(1, N)
       link_df$draw_idx <- rep(1, N)
       PathData$new(sub_df, path_df, link_df, self$system$tm(), self$covs())
+    },
+
+    #' @description Simulate events data.
+    #'
+    #' @param df_subjects The subjects data frame
+    #' @param beta_haz Matrix of shape \code{num_target_states} x \code{num_covs}
+    #' @param beta_pk TODO
+    #' @param log_w0 Baseline log hazard rate, vector with length
+    #' \code{num_trans}
+    #' @param w_scale scale of spline weights variation
+    #' @return a \code{tibble}
+    simulate_events = function(df_subjects, beta_haz, beta_pk, log_w0, w_scale = 0.1) {
+      dt <- 1
+      N <- nrow(df_subjects)
+      S <- self$system$num_trans()
+      L <- self$system$num_weights()
+      checkmate::assert_numeric(log_w0, len = S)
+      checkmate::assert_number(w_scale, lower = 0)
+      w <- array(w_scale * rnorm(N * S * L), dim = c(N, S, L))
+      log_w0 <- matrix(rep(log_w0, N), N, S, byrow = TRUE)
+      log_m <- private$simulate_log_hazard_multipliers(df_subjects, beta_haz)
+      paths <- self$system$simulate(w, log_w0, log_m, dt = dt)
+      as_tibble(paths)
     },
 
     #' @description Simulate subject data.
@@ -182,29 +207,6 @@ MultistateModel <- R6::R6Class("MultistateModel",
       df$subject_id <- subject_id
       df$subject_idx <- seq_len(N_subject)
       as_tibble(df)
-    },
-
-    #' @description Simulate events data.
-    #'
-    #' @param df_subjects The subjects data frame
-    #' @param beta_haz Matrix of shape \code{num_target_states} x \code{num_covs}
-    #' @param beta_pk todo
-    #' @param log_w0 Baseline log hazard rate, vector with length
-    #' \code{num_trans}
-    #' @param w_scale scale of spline weights variation
-    #' @return a \code{tibble}
-    simulate_events = function(df_subjects, beta_haz, beta_pk, log_w0, w_scale = 0.1) {
-      dt <- 1
-      N <- nrow(df_subjects)
-      S <- self$system$num_trans()
-      L <- self$system$num_weights()
-      checkmate::assert_numeric(log_w0, len = S)
-      checkmate::assert_number(w_scale, lower = 0)
-      w <- array(w_scale * rnorm(N * S * L), dim = c(N, S, L))
-      log_w0 <- matrix(rep(log_w0, N), N, S, byrow = TRUE)
-      log_m <- private$simulate_log_hazard_multipliers(df_subjects, beta_haz, beta_pk)
-      paths <- self$system$simulate(w, log_w0, log_m, dt = dt)
-      as_tibble(paths)
     },
 
     #' Get indices of states that are not source states

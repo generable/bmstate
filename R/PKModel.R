@@ -39,33 +39,6 @@ PKModel <- R6::R6Class("PKModel",
       private$covariates$V2
     },
 
-    #' @description Format list of input PK parameters to standardized format.
-    #'
-    #' @param beta_pk A list of max three elements
-    #' @param return A list with three elements
-    format_params = function(beta_pk = NULL) {
-      if (is.null(beta_pk)) {
-        beta_pk <- list(ka = NULL, CL = NULL, V2 = NULL)
-      }
-      checkmate::assert_list(beta_pk)
-      if (is.null(beta_pk$ka)) {
-        x <- self$ka_covs()
-        beta_pk$ka <- rep(0, length(x))
-      }
-      if (is.null(beta_pk$CL)) {
-        x <- self$CL_covs()
-        beta_pk$CL <- rep(0, length(x))
-      }
-      if (is.null(beta_pk$V2)) {
-        x <- self$V2_covs()
-        beta_pk$V2 <- rep(0, length(x))
-      }
-      names(beta_pk$ka) <- self$ka_covs()
-      names(beta_pk$CL) <- self$CL_covs()
-      names(beta_pk$V2) <- self$V2_covs()
-      beta_pk
-    },
-
     #' @description Print the object info
     #'
     #' @return nothing
@@ -102,6 +75,71 @@ PKModel <- R6::R6Class("PKModel",
       tt <- t %% tau
       conc <- me * exp(-ke * tt) - ma * exp(-ka * tt)
       conc
+    },
+
+    #' @description Simulate data with many subjects
+    #'
+    #' @param df_subjects Data frame with one row for each subject
+    #' @param beta_pk Covariate effects
+    #' @param tau Dosing interval
+    #' @param sigma Noise magnitude
+    #' @return Data frame with one row for each subject
+    simulate_data = function(df_subjects, beta_pk = NULL, tau = 24,
+                             sigma = 0.1) {
+      checkmate::assert_class(df_subjects, "data.frame")
+      checkmate::assert_true("dose" %in% colnames(df_subjects))
+      checkmate::assert_number(tau, lower = 0)
+      checkmate::assert_number(sigma, lower = 0)
+      beta_pk <- self$format_params(beta_pk)
+      N <- nrow(df_subjects)
+      df_out <- NULL
+      for (n in seq_len(N)) {
+        row <- df_subjects[n, ]
+        theta_n <- list(
+          ka = exp(-2 + sum(row[, self$ka_covs()] * beta_pk$ka)),
+          CL = exp(-2 + sum(row[, self$CL_covs()] * beta_pk$CL)),
+          V2 = exp(-2 + sum(row[, self$V2_covs()] * beta_pk$V2))
+        )
+        idx_meas <- 6 + sample.int(6, 1)
+        t_pre <- idx_meas * tau - 0.05 * runif(1) * tau
+        t_post <- idx_meas * tau + 0.2 * runif(1) * tau
+        tt <- c(t_pre, t_post)
+        conc <- self$simulate_ss(tt, theta_n, row$dose, tau)
+        conc_noisy <- stats::rlnorm(1, meanlog = log(conc), sdlog = sigma)
+        out <- c(row$subject_id, tt, conc_noisy)
+        df_out <- rbind(df_out, out)
+      }
+      df_out <- data.frame(df_out)
+      colnames(df_out) <- c("subject_id", "t_pre", "t_post", "conc_pre", "conc_post")
+      df_out
+    },
+
+    #' @description Format list of input PK parameters to standardized format.
+    #'
+    #' @param beta_pk A list of max three elements
+    #' @param return A list with three elements
+    format_params = function(beta_pk = NULL) {
+      cat("ASD")
+      if (is.null(beta_pk)) {
+        beta_pk <- list(ka = NULL, CL = NULL, V2 = NULL)
+      }
+      checkmate::assert_list(beta_pk)
+      if (is.null(beta_pk$ka)) {
+        x <- self$ka_covs()
+        beta_pk$ka <- rep(0, length(x))
+      }
+      if (is.null(beta_pk$CL)) {
+        x <- self$CL_covs()
+        beta_pk$CL <- rep(0, length(x))
+      }
+      if (is.null(beta_pk$V2)) {
+        x <- self$V2_covs()
+        beta_pk$V2 <- rep(0, length(x))
+      }
+      names(beta_pk$ka) <- self$ka_covs()
+      names(beta_pk$CL) <- self$CL_covs()
+      names(beta_pk$V2) <- self$V2_covs()
+      beta_pk
     }
   )
 )
