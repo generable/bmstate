@@ -167,7 +167,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       }
       pk_dat <- self$simulate_pk_data(sub_df, beta_pk)
       if (self$has_pk()) {
-        sub_df <- sub_df |> dplyr::left_join(pk_dat, by = "subject_idx")
+        sub_df <- sub_df |> dplyr::left_join(pk_dat, by = "subject_id")
       }
       path_df <- self$simulate_events(sub_df, beta_haz, log_w0_vec)
       N <- nrow(sub_df)
@@ -223,14 +223,12 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' @return a \code{tibble}
     simulate_subjects = function(N_subject = 100, doses = c(15, 30, 60)) {
       checkmate::assert_numeric(doses, min.len = 1, lower = 0)
-      subject_id <- paste0("sim-", seq_len(N_subject))
       covs <- self$data_covs()
       N_covs <- length(covs)
       A <- matrix(rnorm(N_subject * N_covs), N_subject, N_covs)
       df <- data.frame(A)
       colnames(df) <- covs
-      df$subject_id <- subject_id
-      df$subject_idx <- seq_len(N_subject)
+      df$subject_id <- sim_subject_ids(N_subject)
       if (self$has_pk()) {
         n_groups <- length(doses)
         df$dose <- doses[sample.int(n_groups, N_subject, replace = TRUE)]

@@ -36,8 +36,8 @@ create_pathdata <- function(df, covs, ...) {
 #' \code{path_id}, \code{draw_idx}, \code{rep_idx}, and \code{subject_id} as
 #' columns.
 #' @field covs Covariate column names.
-#' @field transmat A \code{\link{TransitionMatrix}} describing the system in which
-#' the paths belong.
+#' @field transmat A \code{\link{TransitionMatrix}} describing the system in to
+#' which the paths belong.
 PathData <- R6::R6Class(
   classname = "PathData",
   private = list(
@@ -60,8 +60,8 @@ PathData <- R6::R6Class(
     #' columns.
     #' @param covs Covariate column names.
     #' @param check_order Check order of paths?
-    #' @param transmat A \code{\link{TransitionMatrix}} describing the system in which
-    #' the paths belong to.
+    #' @param transmat A \code{\link{TransitionMatrix}} describing the system to
+    #' which the paths belong.
     initialize = function(subject_df, path_df, link_df,
                           transmat, covs = NULL, check_order = TRUE) {
       checkmate::assert_class(subject_df, "data.frame")

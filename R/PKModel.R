@@ -125,15 +125,13 @@ PKModel <- R6::R6Class("PKModel",
         conc <- self$simulate_ss(tt, theta_n, row$dose, tau)
         ss_auc <- self$compute_ss_auc(theta_n, row$dose)
         conc_noisy <- stats::rlnorm(2, meanlog = log(conc), sdlog = sigma)
-        out <- c(row$subject_idx, tt, conc_noisy, ss_auc)
+        out <- c(tt, conc_noisy, ss_auc)
         df_out <- rbind(df_out, out)
       }
       df_out <- data.frame(df_out)
-      colnames(df_out) <- c(
-        "subject_idx", "t_pre", "t_post", "conc_pre", "conc_post",
-        "ss_auc"
-      )
+      colnames(df_out) <- c("t_pre", "t_post", "conc_pre", "conc_post", "ss_auc")
       rownames(df_out) <- NULL
+      df_out$subject_id <- df_subjects$subject_id
       df_out
     },
 

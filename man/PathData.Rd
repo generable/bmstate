@@ -23,8 +23,8 @@ columns.}
 
 \item{\code{covs}}{Covariate column names.}
 
-\item{\code{transmat}}{A \code{\link{TransitionMatrix}} describing the system in which
-the paths belong.
+\item{\code{transmat}}{A \code{\link{TransitionMatrix}} describing the system in to
+which the paths belong.
 Initialize}
 }
 \if{html}{\out{</div>}}
@@ -84,8 +84,8 @@ Initialize}
 \code{path_id}, \code{draw_idx}, \code{rep_idx}, and \code{subject_id} as
 columns.}
 
-\item{\code{transmat}}{A \code{\link{TransitionMatrix}} describing the system in which
-the paths belong to.}
+\item{\code{transmat}}{A \code{\link{TransitionMatrix}} describing the system to
+which the paths belong.}
 
 \item{\code{covs}}{Covariate column names.}
 
