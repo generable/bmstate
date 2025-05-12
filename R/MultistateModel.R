@@ -212,7 +212,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       w <- array(w_scale * rnorm(N * S * L), dim = c(N, S, L))
       log_w0 <- matrix(rep(log_w0, N), N, S, byrow = TRUE)
       log_m <- private$simulate_log_hazard_multipliers(df_subjects, beta_haz)
-      paths <- self$system$simulate(w, log_w0, log_m, dt = dt)
+      paths <- self$system$simulate(w, log_w0, log_m)
       as_tibble(paths)
     },
 

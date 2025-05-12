@@ -78,7 +78,8 @@ Initialize}
 \code{subject_id} and all covariates as columns.}
 
 \item{\code{path_df}}{Data frame of actual paths. Must have \code{path_id},
-\code{state}, \code{time}, and \code{is_event} as columns.}
+\code{state}, \code{time}, \code{is_event}, and \code{trans_idx} as
+columns.}
 
 \item{\code{link_df}}{Links the path and subject data frames. Must have
 \code{path_id}, \code{draw_idx}, \code{rep_idx}, and \code{subject_id} as

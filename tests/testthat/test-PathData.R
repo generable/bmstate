@@ -1,6 +1,5 @@
 test_that("PathData methods work", {
-  a <- simulate_example_data(100)
-  pd <- a$pd
+  pd <- simulate_example_data(100)
   p1 <- pd$plot_paths()
   p2 <- pd$plot_graph()
   p3 <- pd$plot_graph(include_censor = TRUE)

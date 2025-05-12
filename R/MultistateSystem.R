@@ -10,10 +10,11 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
     transmat = NULL,
 
     # Generate a path starting from time 0
-    generate_path = function(w, log_w0, log_m, t_max, init_state, dt) {
+    generate_path = function(w, log_w0, log_m, t_max, init_state) {
       # Setup
       states <- init_state
       times <- 0
+      tidx <- 0
       j <- 0
 
       # Generate transitions
@@ -27,13 +28,9 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
         )
         t_next <- trans$t
 
-        # Discretize transition time to end of this dt interval
-        if (dt > 0) {
-          t_next <- dt * ceiling(t_next / dt)
-        }
-
         # Update time and state
         times <- c(times, t_next)
+        tidx <- c(tidx, trans$idx)
         states <- c(states, trans$new_state)
         if (j >= 100000) {
           msg <- paste0(
@@ -47,9 +44,9 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
       L <- length(times)
       is_event <- rep(1, L)
       is_event[1] <- 0 # initial state is never an event
-      is_event[L] <- 0
+      is_event[L] <- 0 # last state is never an event (tmax reached)
       states[L] <- states[L - 1]
-      cbind(time = times, state = states, is_event = is_event)
+      cbind(time = times, state = states, is_event = is_event, trans_idx = tidx)
     },
 
     # Generate transition given state and transition intensity functions
@@ -61,7 +58,7 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
       possible <- possible[which(UB[possible] > 1e-9)] # so rare that not possible
       if (length(possible) == 0) {
         # Absorbing state, no transitions possible
-        return(list(t = t_max, new_state = 0))
+        return(list(t = t_max, new_state = 0, idx = 0))
       }
       UB <- UB[possible]
       w <- w[possible, , drop = FALSE]
@@ -98,13 +95,14 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
 
       # Return
       list(
-        t = t_min_found, new_state = new_state
+        t = t_min_found, new_state = new_state, idx = trans_idx
       )
     },
 
     # Draw an event time from Censored Non-Homogeneous Poisson
     # process using the thinning algorithm
     draw_time_cnhp = function(w, log_w0, log_m, t_max, t_init, lambda_ub) {
+      checkmate::assert_number(lambda_ub, lower = 0)
       n_tries <- 0
       t <- t_init
       accepted <- FALSE
@@ -266,18 +264,13 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
     #' @param log_w0 An array of shape \code{n_paths} x \code{n_trans}
     #' @param log_m An array of shape \code{n_paths} x \code{n_trans}
     #' @param init_state Integer index of starting state.
-    #' @param dt Discretization interval. Events can be observed only on
-    #' intervals of length \code{dt}. Each drawn event is observed at the
-    #' end of the discretization interval. If \code{dt = 0} (default), the
-    #' no discretization is performed and the event times are observed exactly.
     #' @return a data frame
-    simulate = function(w, log_w0, log_m, init_state = 1, dt = 0) {
+    simulate = function(w, log_w0, log_m, init_state = 1) {
       checkmate::assert_array(w, d = 3)
       n_paths <- dim(w)[1]
       checkmate::assert_true(dim(w)[3] == self$num_weights())
       checkmate::assert_matrix(log_w0, nrows = n_paths)
       checkmate::assert_matrix(log_m, nrows = n_paths)
-      checkmate::assert_number(dt, lower = 0)
       S <- self$num_states()
       checkmate::assert_integerish(init_state, len = 1, lower = 1, upper = S)
       pb <- progress::progress_bar$new(total = n_paths)
@@ -289,13 +282,13 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
       for (j in seq_len(n_paths)) {
         pb$tick()
         p <- private$generate_path(
-          w[j, , ], log_w0[j, ], log_m[j, ], t_max, init_state, dt
+          w[j, , ], log_w0[j, ], log_m[j, ], t_max, init_state
         )
         p <- cbind(p, rep(j, nrow(p)))
         out <- rbind(out, p)
       }
       df <- data.frame(out)
-      colnames(df)[4] <- "path_id"
+      colnames(df)[ncol(df)] <- "path_id"
       df
     }
   )

@@ -231,7 +231,7 @@ Generate paths}
 \if{latex}{\out{\hypertarget{method-MultistateSystem-simulate}{}}}
 \subsection{Method \code{simulate()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$simulate(w, log_w0, log_m, init_state = 1, dt = 0)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$simulate(w, log_w0, log_m, init_state = 1)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -245,11 +245,6 @@ Generate paths}
 \item{\code{log_m}}{An array of shape \code{n_paths} x \code{n_trans}}
 
 \item{\code{init_state}}{Integer index of starting state.}
-
-\item{\code{dt}}{Discretization interval. Events can be observed only on
-intervals of length \code{dt}. Each drawn event is observed at the
-end of the discretization interval. If \code{dt = 0} (default), the
-no discretization is performed and the event times are observed exactly.}
 }
 \if{html}{\out{</div>}}
 }
