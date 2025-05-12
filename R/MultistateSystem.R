@@ -42,11 +42,19 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
         }
       }
       L <- length(times)
+      is_censor <- rep(0, L)
+      is_censor[L] <- 1 # last time point is always censoring time
       is_event <- rep(1, L)
       is_event[1] <- 0 # initial state is never an event
-      is_event[L] <- 0 # last state is never an event (tmax reached)
+      is_event[L] <- 0 # last state is never an event (it is censoring time)
       states[L] <- states[L - 1]
-      cbind(time = times, state = states, is_event = is_event, trans_idx = tidx)
+      cbind(
+        time = times,
+        state = states,
+        is_event = is_event,
+        is_censor = is_censor,
+        trans_idx = tidx
+      )
     },
 
     # Generate transition given state and transition intensity functions

@@ -37,8 +37,8 @@ PathData <- R6::R6Class(
     #' @param subject_df Data frame with one row per subject. Must have
     #' \code{subject_id} and all covariates as columns.
     #' @param path_df Data frame of actual paths. Must have \code{path_id},
-    #' \code{state}, \code{time}, \code{is_event}, and \code{trans_idx} as
-    #' columns.
+    #' \code{state}, \code{time}, \code{is_event}, \code{is_censor}
+    #' and \code{trans_idx} as columns.
     #' @param link_df Links the path and subject data frames. Must have
     #' \code{path_id}, \code{draw_idx}, \code{rep_idx}, and \code{subject_id} as
     #' columns.
@@ -68,7 +68,7 @@ PathData <- R6::R6Class(
         link_df$rep_idx <- as.factor(link_df$rep_idx)
       }
       cols1 <- c("subject_id", covs)
-      cols2 <- c("path_id", "state", "time", "is_event", "trans_idx")
+      cols2 <- c("path_id", "state", "time", "is_event", "is_censor", "trans_idx")
       cols3 <- c("path_id", "draw_idx", "rep_idx", "subject_id")
       check_columns(subject_df, cols1)
       check_columns(path_df, cols2)
