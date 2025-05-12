@@ -297,22 +297,11 @@ Convert to one long data frame
 \subsection{Method \code{as_transitions()}}{
 Data frame in transitions format
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$as_transitions(only_observed = FALSE, force_rerun = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$as_transitions()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{only_observed}}{Limit transitions to only the observed ones?}
-
-\item{\code{force_rerun}}{Force rerun of the conversion? If \code{FALSE},
-a cached version is used if it exists.}
-}
-\if{html}{\out{</div>}}
-}
 \subsection{Returns}{
-A list with elements \code{df} (transition data frame) and
-\code{legend}
+A \code{data.frame}
 }
 }
 \if{html}{\out{<hr>}}

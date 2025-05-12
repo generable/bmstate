@@ -214,37 +214,11 @@ PathData <- R6::R6Class(
 
     #' @description Data frame in transitions format
     #'
-    #' @param only_observed Limit transitions to only the observed ones?
-    #' @param force_rerun Force rerun of the conversion? If \code{FALSE},
-    #' a cached version is used if it exists.
-    #' @return A list with elements \code{df} (transition data frame) and
-    #' \code{legend}
-    as_transitions = function(only_observed = FALSE, force_rerun = FALSE) {
-      if (is.null(private$dt) || force_rerun) {
-        private$dt <- dt <- as_transitions(self$as_data_frame(),
-          state_names = self$state_names,
-          state_types = seq(from = 0, to = length(self$state_names)),
-          terminal_states = self$terminal_states,
-          censor_state = self$censor_state,
-          null_state = self$null_state,
-          covs = self$covariate_names()
-        )
-      } else {
-        dt <- private$dt
-      }
-      if (only_observed) {
-        # Limit possible transitions to only the observed ones
-        obs <- unique(dt$df$transition)
-        idx_obs <- which(dt$legend$transition %in% obs)
-        n_trans <- length(idx_obs)
-        dt$legend <- dt$legend[idx_obs, ]
-        dt$legend$transition <- seq_len(n_trans)
-        dt$df$transition <- match(
-          dt$df$trans_char, dt$legend$trans_char,
-          nomatch = 0
-        )
-      }
-      dt
+    #' @return A \code{data.frame}
+    as_transitions = function() {
+      self$path_df |>
+        dplyr::filter(.data$trans_idx != 0) |>
+        dplyr::select("path_id", "time", "trans_idx")
     },
 
     #' @description Step plot of the paths
