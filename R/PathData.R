@@ -190,14 +190,15 @@ PathData <- R6::R6Class(
     },
 
     #' @description Convert to one long data frame
+    #'
     #' @param covariates Which covariates to include?
     #' @param truncate Truncate after terminal events?
     as_data_frame = function(covariates = NULL, truncate = FALSE) {
       df <- self$path_df
       if (isTRUE(truncate)) {
-        term_states <- which(self$state_names %in% self$terminal_states)
+        term_state_idx <- self$transmat$absorbing_states(names = FALSE)
         df <- df |>
-          truncate_after_terminal_events(term_states)
+          truncate_after_terminal_events(term_state_idx)
       }
       out <- df |>
         inner_join(self$link_df, by = "path_id", relationship = "many-to-one")
@@ -584,21 +585,7 @@ estimate_average_hazard <- function(msfit) {
     )
 }
 
-truncate_after_terminal_events <- function(df, term_states) {
-  term_events <- df |>
-    dplyr::filter(state %in% !!term_states, is_event == 1) |>
-    dplyr::group_by(path_id) |>
-    summarise(term_time = min(time, na.rm = T)) |>
-    dplyr::ungroup()
-  no_terms <- df |>
-    dplyr::anti_join(term_events, by = "path_id")
-  with_terms <- df |>
-    inner_join(term_events, by = c("path_id")) |>
-    dplyr::filter(time <= term_time) |>
-    dplyr::select(-term_time)
-  no_terms |>
-    dplyr::bind_rows(with_terms)
-}
+
 
 summarize_event_prob <- function(pd, target_times, by = c("subject_id")) {
   by_syms <- rlang::syms(by)
