@@ -321,7 +321,7 @@ A list with elements \code{df} (transition data frame) and
 \subsection{Method \code{plot_paths()}}{
 Step plot of the paths
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$plot_paths(n_paths = NULL, alpha = 0.5)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$plot_paths(n_paths = NULL, alpha = 0.5, truncate = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -330,6 +330,8 @@ Step plot of the paths
 \item{\code{n_paths}}{Number of paths to subsample for plotting.}
 
 \item{\code{alpha}}{opacity}
+
+\item{\code{truncate}}{truncate after terminal events?}
 }
 \if{html}{\out{</div>}}
 }

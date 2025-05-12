@@ -251,9 +251,11 @@ PathData <- R6::R6Class(
     #'
     #' @param n_paths Number of paths to subsample for plotting.
     #' @param alpha opacity
-    plot_paths = function(n_paths = NULL, alpha = 0.5) {
-      df <- self$as_data_frame()
+    #' @param truncate truncate after terminal events?
+    plot_paths = function(n_paths = NULL, alpha = 0.5, truncate = FALSE) {
+      df <- self$as_data_frame(truncate = truncate)
       df$is_event <- as.factor(df$is_event)
+      sn <- self$state_names()
       uid <- unique(df$path_id)
       N <- length(uid)
       if (is.null(n_paths)) {
@@ -263,15 +265,15 @@ PathData <- R6::R6Class(
       }
       ids <- uid[idx_path]
       df <- df |>
-        dplyr::filter(path_id %in% ids) |>
+        dplyr::filter(.data$path_id %in% ids) |>
         mutate(
-          state_char = self$state_names[state],
-          state = factor(state_char, levels = self$state_names, ordered = T)
+          state_char = sn[state],
+          state = factor(state_char, levels = sn, ordered = T)
         )
-      ggplot(df, aes(x = time, y = state, group = path_id)) +
+      ggplot(df, aes(x = .data$time, y = .data$state, group = .data$path_id)) +
         geom_step(direction = "hv", alpha = alpha) +
         labs(x = "Time", y = "State", title = "State paths") +
-        geom_point(mapping = aes(color = is_event, pch = is_event))
+        geom_point(mapping = aes(color = .data$is_event, pch = .data$is_event))
     },
 
     #' @description Transition proportion matrix
