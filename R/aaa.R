@@ -48,7 +48,7 @@
 #' @param beta_pk see the documentation of \code{\link{MultistateModel}}
 #' @param log_w0 see the documentation of \code{\link{MultistateModel}}
 simulate_example_data <- function(N = 10, beta_haz = NULL,
-                                  beta_pk = NULL, log_w0 = -4) {
+                                  beta_pk = NULL, log_w0 = -6) {
   covs <- c("sex", "age")
   pk_covs <- list(
     ka = "age",

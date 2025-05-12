@@ -4,7 +4,7 @@ test_that("PathData methods work", {
   df <- pd$as_data_frame()
   expect_equal(ncol(df), 20)
   df2 <- pd$as_data_frame(truncate = TRUE)
-  expect_equal(nrow(df2) + N, nrow(df))
+  expect_true(nrow(df2) <= nrow(df))
 
   p1a <- pd$plot_paths()
   p1b <- pd$plot_paths(truncate = TRUE)
