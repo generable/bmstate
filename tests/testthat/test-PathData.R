@@ -1,5 +1,5 @@
 test_that("PathData methods work", {
-  N <- 100
+  N <- 1000
   pd <- simulate_example_data(N)
   expect_output(print(pd))
 

@@ -59,10 +59,13 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
 
     # Generate transition given state and transition intensity functions
     generate_transition = function(state, t_init, t_max, w, log_w0, log_m) {
-      tol <- 1.03
+      tol <- 1.05
       possible <- private$transmat$possible_transitions_from(state)
-      S <- private$transmat$num_trans()
-      UB <- rep(1, S) # TODO: better upper bound
+      J <- private$transmat$num_trans()
+      UB <- rep(0, J)
+      for (j in seq_len(J)) {
+        UB[j] <- tol * self$max_inst_hazard(t_init, t_max, w[j, ], log_w0[j], log_m[j])
+      }
       possible <- possible[which(UB[possible] > 1e-9)] # so rare that not possible
       if (length(possible) == 0) {
         # Absorbing state, no transitions possible
@@ -263,6 +266,19 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
     #' @param log_m Hazard multiplier (log)
     log_inst_hazard = function(t, w, log_w0, log_m) {
       log_m + self$log_baseline_hazard(t, log_w0, w)
+    },
+
+    #' @description Max instant hazard on interval (t1, t2)
+    #'
+    #' @param t1 Start time point
+    #' @param t2 End time point
+    #' @param w Spline basis function weights (vector)
+    #' @param log_w0 Intercept (log)
+    #' @param log_m Hazard multiplier (log)
+    max_inst_hazard = function(t1, t2, w, log_w0, log_m) {
+      ttt <- seq(t1, t2, length.out = 100)
+      log_haz <- log_m + self$log_baseline_hazard(ttt, log_w0, w)
+      return(exp(max(log_haz)))
     },
 
     #' Generate paths

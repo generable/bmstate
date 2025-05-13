@@ -24,6 +24,7 @@ A multistate system with proportional spline hazards
 \item \href{#method-MultistateSystem-print}{\code{MultistateSystem$print()}}
 \item \href{#method-MultistateSystem-log_baseline_hazard}{\code{MultistateSystem$log_baseline_hazard()}}
 \item \href{#method-MultistateSystem-log_inst_hazard}{\code{MultistateSystem$log_inst_hazard()}}
+\item \href{#method-MultistateSystem-max_inst_hazard}{\code{MultistateSystem$max_inst_hazard()}}
 \item \href{#method-MultistateSystem-simulate}{\code{MultistateSystem$simulate()}}
 \item \href{#method-MultistateSystem-clone}{\code{MultistateSystem$clone()}}
 }
@@ -215,6 +216,31 @@ Evaluate log instant hazard
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{t}}{Time point(s)}
+
+\item{\code{w}}{Spline basis function weights (vector)}
+
+\item{\code{log_w0}}{Intercept (log)}
+
+\item{\code{log_m}}{Hazard multiplier (log)}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateSystem-max_inst_hazard"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateSystem-max_inst_hazard}{}}}
+\subsection{Method \code{max_inst_hazard()}}{
+Max instant hazard on interval (t1, t2)
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$max_inst_hazard(t1, t2, w, log_w0, log_m)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{t1}}{Start time point}
+
+\item{\code{t2}}{End time point}
 
 \item{\code{w}}{Spline basis function weights (vector)}
 
