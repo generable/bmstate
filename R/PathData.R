@@ -43,18 +43,15 @@ PathData <- R6::R6Class(
     #' \code{path_id}, \code{draw_idx}, \code{rep_idx}, and \code{subject_id} as
     #' columns.
     #' @param covs Covariate column names.
-    #' @param check_order Check order of paths?
     #' @param transmat A \code{\link{TransitionMatrix}} describing the system to
     #' which the paths belong.
     initialize = function(subject_df, path_df, link_df,
-                          transmat, covs = NULL, check_order = TRUE) {
+                          transmat, covs = NULL) {
       checkmate::assert_class(subject_df, "data.frame")
       checkmate::assert_class(path_df, "data.frame")
       checkmate::assert_class(link_df, "data.frame")
       checkmate::assert_class(transmat, "TransitionMatrix")
-      if (check_order) {
-        path_df <- check_and_sort_paths(path_df)
-      }
+      path_df <- path_df |> dplyr::arrange(.data$path_id, .data$time)
       if (!is.null(covs)) {
         checkmate::assert_character(covs)
         covs <- setdiff(covs, "subject_id")
@@ -194,7 +191,7 @@ PathData <- R6::R6Class(
         df <- df |>
           truncate_after_terminal_events(term_state_idx)
       }
-      df %>% dplyr::arrange(.data$path_id, .data$time)
+      df |> dplyr::arrange(.data$path_id, .data$time)
     },
 
     #' @description Convert to one long data frame
@@ -413,35 +410,6 @@ as_time_to_first_event <- function(dat, states, by = c()) {
     dplyr::bind_rows(events)
 }
 
-
-# Function to check and sort paths based on time
-check_and_sort_paths <- function(df) {
-  # Initialize a flag to track if any sorting is needed
-  needs_sorting <- FALSE
-
-  # Iterate over each unique path id
-  unique_paths <- unique(df$path_id)
-
-  for (path_id in unique_paths) {
-    # Get the rows for this path id
-    path_rows <- df[df$path_id == path_id, ]
-
-    # Check if the rows are sorted by time
-    if (!all(order(path_rows$time) == seq_along(path_rows$time))) {
-      # If not sorted, sort the rows by time
-      df[df$path_id == path_id, ] <- path_rows[order(path_rows$time), ]
-      # Set the flag to TRUE
-      needs_sorting <- TRUE
-      # Print a warning message
-      warning(paste(
-        "Rows for path_id", path_id,
-        "were not ordered by time and have been sorted."
-      ))
-    }
-  }
-
-  return(df)
-}
 
 #' Get subject df with numeric subject index
 #'

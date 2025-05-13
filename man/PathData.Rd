@@ -64,14 +64,7 @@ Initialize}
 \if{latex}{\out{\hypertarget{method-PathData-new}{}}}
 \subsection{Method \code{new()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$new(
-  subject_df,
-  path_df,
-  link_df,
-  transmat,
-  covs = NULL,
-  check_order = TRUE
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$new(subject_df, path_df, link_df, transmat, covs = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -92,8 +85,6 @@ columns.}
 which the paths belong.}
 
 \item{\code{covs}}{Covariate column names.}
-
-\item{\code{check_order}}{Check order of paths?}
 }
 \if{html}{\out{</div>}}
 }
