@@ -252,7 +252,10 @@ PathData <- R6::R6Class(
     #' @param truncate Remove rows after terminal events first?
     #' @return A \code{data.frame}
     as_transitions_alt = function(covariates = NULL, truncate = FALSE) {
-      dt <- self$as_transitions(covariates = covariates)
+      dt <- self$as_transitions(
+        covariates = covariates,
+        truncate = truncate
+      )
       dt$Tstart <- dt$time_prev
       dt$Tstop <- dt$time
       dt$time <- dt$Tstop - dt$Tstart
