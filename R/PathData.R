@@ -499,23 +499,21 @@ estimate_average_hazard <- function(msfit) {
 # Creates the additional rows corresponding to each transition
 # that is at risk
 to_mstate_format <- function(df, transmat) {
-  N <- nrow(df)
-  df_out <- NULL
-  for (n in seq_len(N)) {
-    row <- df[n, ]
-    possible_targets <- transmat$at_risk(row$from)
-    remaining_targets <- setdiff(possible_targets, row$to)
-    add <- row
-    for (target in remaining_targets) {
-      r <- row
-      r$to <- target
-      r$status <- 0
-      add <- rbind(add, r)
-    }
-    df_out <- rbind(df_out, add)
-  }
-  df_out
+  df |>
+    dplyr::rowwise() |>
+    dplyr::mutate(
+      possible_targets = list(transmat$at_risk(from)),
+      remaining_targets = list(setdiff(possible_targets, to)),
+      all_targets = list(c(to, remaining_targets)),
+      status_all = list(c(status, rep(0, length(remaining_targets))))
+    ) |>
+    dplyr::select(-"to", -"status", -"possible_targets", -"remaining_targets") |>
+    tidyr::unnest(c(all_targets, status_all)) |>
+    dplyr::rename(to = all_targets, status = status_all) |>
+    dplyr::ungroup()
 }
+
+
 
 
 summarize_event_prob <- function(pd, target_times, by = c("subject_id")) {
