@@ -262,6 +262,7 @@ PathData <- R6::R6Class(
       dt$Tstop <- dt$time
       dt$time <- dt$Tstop - dt$Tstart
       dt$status <- dt$is_event
+      dt$trans <- dt$trans_idx
       dt |> dplyr::select(-c("is_event", "time_prev", "trans_idx"))
     },
 
@@ -307,16 +308,15 @@ PathData <- R6::R6Class(
     },
 
     #' @description Transition proportion matrix
-    #'
-    #' @return a matrix
-    prop_matrix = function() {
-      r <- self$as_msdata()
-      prop <- mstate::events(r$msdata)$Proportions
-      cn <- colnames(prop)
-      idx_noevent <- find_one("no event", cn)
-      colnames(prop)[idx_noevent] <- self$censor_state
-      prop <- rbind(prop, rep(0, ncol(prop)))
-      rownames(prop)[nrow(prop)] <- self$censor_state
+    #' @param include_censor Include censoring (no event) proportion in the
+    #' matrix
+    #' @return a \code{table}
+    prop_matrix = function(include_censor = TRUE) {
+      ms <- self$as_msdata()
+      prop <- mstate::events(ms)$Proportions
+      if (isFALSE(include_censor)) {
+        prop <- prop[, 1:(ncol(prop) - 1)]
+      }
       prop
     },
 
@@ -324,15 +324,16 @@ PathData <- R6::R6Class(
     #'
     #' @param digits Max number of digits to show in numbers
     #' @param ... Arguments passed to \code{qgraph}
-    #' @param include_censor Include censoring state in the graph?
     #' @return \code{qgraph} plot
-    plot_graph = function(digits = 3, include_censor = FALSE, ...) {
-      f <- self$trans_matrix()
+    plot_graph = function(digits = 3, ...) {
+      f <- self$prop_matrix(include_censor = FALSE)
+      f <- matrix(f, ncol = ncol(f), dimnames = dimnames(f))
       transition_matrix_plot(
-        f, self$terminal_states,
-        self$censor_state, self$null_state,
-        include_censor,
-        edge_labs = TRUE, ...
+        f,
+        self$terminal_states(),
+        self$null_state(),
+        edge_labs = TRUE,
+        ...
       )
     },
 
@@ -429,22 +430,6 @@ subject_df_with_idx <- function(pd, subs, id_map) {
   df
 }
 
-
-# Creates the additional rows corresponding to each transition
-# that is at risk
-to_mstate_format <- function(df, transmat) {
-  TFI <- transmat$as_transition_index_matrix()
-
-  N <- nrow(df)
-  df_out <- NULL
-  for (n in 1:N) {
-    row <- df[n, ]
-    possible_targets <- transmat$at_risk(row$from)
-    remaining_targets <- setdiff(possible_targets, row$to)
-  }
-  df_out
-}
-
 #' Fit Cox PH model using Breslow method
 #'
 #' @export
@@ -510,6 +495,27 @@ estimate_average_hazard <- function(msfit) {
     )
 }
 
+
+# Creates the additional rows corresponding to each transition
+# that is at risk
+to_mstate_format <- function(df, transmat) {
+  N <- nrow(df)
+  df_out <- NULL
+  for (n in seq_len(N)) {
+    row <- df[n, ]
+    possible_targets <- transmat$at_risk(row$from)
+    remaining_targets <- setdiff(possible_targets, row$to)
+    add <- row
+    for (target in remaining_targets) {
+      r <- row
+      r$to <- target
+      r$status <- 0
+      add <- rbind(add, r)
+    }
+    df_out <- rbind(df_out, add)
+  }
+  df_out
+}
 
 
 summarize_event_prob <- function(pd, target_times, by = c("subject_id")) {

@@ -11,10 +11,6 @@ test_that("PathData methods work", {
   df3 <- pd$as_data_frame(truncate = TRUE)
   expect_true(nrow(df3) <= nrow(df1))
 
-  # Plot paths
-  p1a <- pd$plot_paths()
-  p1b <- pd$plot_paths(truncate = TRUE)
-
   # As transitions
   dt1 <- pd$as_transitions()
   dt2 <- pd$as_transitions("age")
@@ -24,14 +20,15 @@ test_that("PathData methods work", {
   # As msdata
   dtt <- pd$as_transitions_alt(truncate = TRUE)
   ms <- pd$as_msdata()
+  expect_true(inherits(ms, "msdata"))
 
+  # Plots
+  p1a <- pd$plot_paths()
+  p1b <- pd$plot_paths(truncate = TRUE)
   expect_s3_class(p1a, "ggplot")
   expect_s3_class(p1b, "ggplot")
   p2 <- pd$plot_graph()
-  p3 <- pd$plot_graph(include_censor = TRUE)
-
   expect_s3_class(p2, "qgraph")
-  expect_s3_class(p3, "qgraph")
-  freq <- pd$trans_matrix()
-  expect_true(inherits(freq, "matrix"))
+  prop <- pd$prop_matrix()
+  expect_true(inherits(prop, "table"))
 })

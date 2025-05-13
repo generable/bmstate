@@ -389,11 +389,19 @@ Step plot of the paths
 \subsection{Method \code{prop_matrix()}}{
 Transition proportion matrix
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$prop_matrix()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$prop_matrix(include_censor = TRUE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{include_censor}}{Include censoring (no event) proportion in the
+matrix}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
-a matrix
+a \code{table}
 }
 }
 \if{html}{\out{<hr>}}
@@ -402,15 +410,13 @@ a matrix
 \subsection{Method \code{plot_graph()}}{
 Visualize the transition proportion matrix as a graph
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$plot_graph(digits = 3, include_censor = FALSE, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$plot_graph(digits = 3, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{digits}}{Max number of digits to show in numbers}
-
-\item{\code{include_censor}}{Include censoring state in the graph?}
 
 \item{\code{...}}{Arguments passed to \code{qgraph}}
 }
