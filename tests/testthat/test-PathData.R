@@ -8,6 +8,10 @@ test_that("PathData methods work", {
 
   p1a <- pd$plot_paths()
   p1b <- pd$plot_paths(truncate = TRUE)
+  dt <- pd$as_transitions()
+  expect_true(all(c("from", "to") %in% colnames(dt)))
+
+
   expect_s3_class(p1a, "ggplot")
   expect_s3_class(p1b, "ggplot")
   p2 <- pd$plot_graph()

@@ -218,13 +218,19 @@ PathData <- R6::R6Class(
     as_transitions = function() {
       pdf <- self$path_df
       pdf$time_prev <- c(0, pdf$time[1:(nrow(pdf) - 1)])
+      pdf$keep <- as.numeric((pdf$trans_idx > 0) | (pdf$is_censor == 1))
       tdf <- self$transmat$trans_df()
+      prev_states <- c(NA, tdf$prev_state)
+      states <- c(NA, tdf$state)
       out <- pdf |>
-        dplyr::filter(.data$trans_idx != 0) |>
-        dplyr::select("path_id", "time", "time_prev", "trans_idx")
-      out$from <- tdf$prev_state[pdf$trans_idx]
-      out$to <- tdf$state[pdf$trans_idx]
-      out
+        dplyr::filter(.data$keep == 1) |>
+        dplyr::select("path_id", "time", "time_prev", "trans_idx", "is_censor", "state")
+      out$from <- prev_states[out$trans_idx + 1]
+      out$to <- states[out$trans_idx + 1]
+      idx_censor <- which(out$is_censor == 1)
+      out$from[idx_censor] <- out$state[idx_censor]
+      out$to[idx_censor] <- out$state[idx_censor]
+      out |> dplyr::select(-"state")
     },
 
     #' @description Step plot of the paths
