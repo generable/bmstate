@@ -23,7 +23,7 @@ truncate_after_terminal_events <- function(df, term_state_inds) {
   with_terms <- df |>
     inner_join(term_events, by = c("path_id")) |>
     dplyr::filter(.data$time <= term_time) |>
-    dplyr::select(-.data$term_time)
+    dplyr::select(-"term_time")
   no_terms |>
     dplyr::bind_rows(with_terms)
 }
