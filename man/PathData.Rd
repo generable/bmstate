@@ -42,15 +42,15 @@ Initialize}
 \item \href{#method-PathData-state_names}{\code{PathData$state_names()}}
 \item \href{#method-PathData-terminal_states}{\code{PathData$terminal_states()}}
 \item \href{#method-PathData-get_event_states}{\code{PathData$get_event_states()}}
-\item \href{#method-PathData-as_msdata}{\code{PathData$as_msdata()}}
 \item \href{#method-PathData-as_time_to_first_event}{\code{PathData$as_time_to_first_event()}}
 \item \href{#method-PathData-get_event_state_names}{\code{PathData$get_event_state_names()}}
 \item \href{#method-PathData-print}{\code{PathData$print()}}
 \item \href{#method-PathData-as_data_frame}{\code{PathData$as_data_frame()}}
 \item \href{#method-PathData-full_link}{\code{PathData$full_link()}}
 \item \href{#method-PathData-as_transitions}{\code{PathData$as_transitions()}}
+\item \href{#method-PathData-as_msdata}{\code{PathData$as_msdata()}}
 \item \href{#method-PathData-plot_paths}{\code{PathData$plot_paths()}}
-\item \href{#method-PathData-trans_matrix}{\code{PathData$trans_matrix()}}
+\item \href{#method-PathData-prop_matrix}{\code{PathData$prop_matrix()}}
 \item \href{#method-PathData-plot_graph}{\code{PathData$plot_graph()}}
 \item \href{#method-PathData-coxph}{\code{PathData$coxph()}}
 \item \href{#method-PathData-filter}{\code{PathData$filter()}}
@@ -208,27 +208,6 @@ integer vector
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PathData-as_msdata"></a>}}
-\if{latex}{\out{\hypertarget{method-PathData-as_msdata}{}}}
-\subsection{Method \code{as_msdata()}}{
-Convert to format used by the 'mstate' package
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$as_msdata(covariates = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{covariates}}{Include covariates?}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A list with elements \code{msdata} and
-\code{legend}
-}
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-as_time_to_first_event"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-as_time_to_first_event}{}}}
 \subsection{Method \code{as_time_to_first_event()}}{
@@ -334,6 +313,26 @@ A \code{data.frame}
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-as_msdata"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-as_msdata}{}}}
+\subsection{Method \code{as_msdata()}}{
+Convert to format used by the 'mstate' package
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$as_msdata(covariates = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{covariates}}{Which covariates to include?}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+An \code{msdata} object
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-plot_paths"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-plot_paths}{}}}
 \subsection{Method \code{plot_paths()}}{
@@ -355,12 +354,12 @@ Step plot of the paths
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PathData-trans_matrix"></a>}}
-\if{latex}{\out{\hypertarget{method-PathData-trans_matrix}{}}}
-\subsection{Method \code{trans_matrix()}}{
+\if{html}{\out{<a id="method-PathData-prop_matrix"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-prop_matrix}{}}}
+\subsection{Method \code{prop_matrix()}}{
 Transition proportion matrix
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$trans_matrix()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$prop_matrix()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{

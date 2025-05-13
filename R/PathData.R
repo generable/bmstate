@@ -148,15 +148,6 @@ PathData <- R6::R6Class(
       match(self$get_event_state_names(), self$state_names())
     },
 
-    #' @description Convert to format used by the 'mstate' package
-    #'
-    #' @param covariates Include covariates?
-    #' @return A list with elements \code{msdata} and
-    #' \code{legend}
-    as_msdata = function(covariates = FALSE) {
-      checkmate::assert_logical(covariates, len = 1)
-      pathdata_to_mstate_format(self, covariates)
-    },
     #' @description Format as time to first event
     #'
     #' @param covs covariates to include in output data frame
@@ -228,15 +219,31 @@ PathData <- R6::R6Class(
       states <- c(NA, tdf$state)
       out <- pdf |>
         dplyr::filter(.data$keep == 1) |>
-        dplyr::select("path_id", "time", "time_prev", "trans_idx", "is_censor", "state")
+        dplyr::select(
+          "path_id", "time", "time_prev", "trans_idx", "is_censor",
+          "state", "is_event"
+        )
       out$from <- prev_states[out$trans_idx + 1]
       out$to <- states[out$trans_idx + 1]
       idx_censor <- which(out$is_censor == 1)
       out$from[idx_censor] <- out$state[idx_censor]
       out$to[idx_censor] <- out$state[idx_censor]
-      out <- out |> dplyr::select(-"state")
+      out <- out |> dplyr::select(-c("state", "is_censor"))
       fl <- self$full_link(covariates)
       out |> dplyr::left_join(fl, by = "path_id")
+    },
+
+    #' @description Convert to format used by the 'mstate' package
+    #'
+    #' @param covariates Which covariates to include?
+    #' @return An \code{msdata} object
+    as_msdata = function(covariates = NULL) {
+      dt <- self$as_transitions(covariates = covariates)
+      dt$Tstart <- dt$time_prev
+      dt$Tstop <- dt$time
+      dt$time <- dt$Tstop - dt$Tstart
+      dt$status <- dt$is_event
+      dt |> dplyr::select(-c("is_event", "time_prev", "trans_idx"))
     },
 
     #' @description Step plot of the paths
@@ -271,7 +278,7 @@ PathData <- R6::R6Class(
     #' @description Transition proportion matrix
     #'
     #' @return a matrix
-    trans_matrix = function() {
+    prop_matrix = function() {
       r <- self$as_msdata()
       prop <- mstate::events(r$msdata)$Proportions
       cn <- colnames(prop)
@@ -420,53 +427,6 @@ subject_df_with_idx <- function(pd, subs, id_map) {
   df
 }
 
-# To transition format used by mstate (msdata)
-pathdata_to_mstate_format <- function(pd, covariates = FALSE) {
-  dt <- pd$as_transitions()
-  df <- dt$df
-  siu <- unique(df$subject_id)
-  df_out <- NULL
-  PT <- legend_to_PT_matrix(dt$legend)
-  TFI <- legend_to_TFI_matrix(dt$legend)
-  for (sid in siu) {
-    df_j <- df |> dplyr::filter(subject_id == sid)
-    df_out <- rbind(df_out, to_mstate_format_part1(df_j))
-  }
-  df_out <- to_mstate_format_part2(df_out, PT, TFI)
-  rownames(df_out) <- NULL
-  transmatat <- TFI_to_mstate_transmat(TFI, pd$state_names)
-  attr(df_out, "trans") <- transmatat
-  class(df_out) <- c("msdata", "data.frame")
-  if (covariates) {
-    sdf <- pd$subject_df |> mutate(id = subject_id)
-    df_out <- df_out |> left_join(sdf, by = "id")
-  }
-  list(
-    msdata = df_out,
-    legend = dt$legend
-  )
-}
-
-# First pass in transforming transitions format to mstate format (msdata)
-# For one subject, creates the columns needed for mstate format
-to_mstate_format_part1 <- function(df_sub) {
-  df <- data.frame(
-    id = df_sub$subject_id,
-    from = df_sub$prev_state,
-    to = df_sub$state,
-    trans = df_sub$transition
-  )
-  K <- nrow(df)
-  Tstart <- rep(0, K)
-  if (K > 1) {
-    Tstart[2:K] <- df_sub$time[1:(K - 1)]
-  }
-  df$Tstart <- Tstart
-  df$Tstop <- df_sub$time
-  df$time <- df$Tstop - df$Tstart
-  df$status <- df_sub$is_event
-  df
-}
 
 # Second pass in transforming transitions format to mstate format (msdata)
 # Creates the additional rows corresponding to each transition
