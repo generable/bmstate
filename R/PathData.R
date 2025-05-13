@@ -192,7 +192,7 @@ PathData <- R6::R6Class(
     #' @description Convert to one long data frame
     #'
     #' @param covariates Which covariates to include?
-    #' @param truncate Truncate after terminal events?
+    #' @param truncate Remove rows after terminal events?
     as_data_frame = function(covariates = NULL, truncate = FALSE) {
       df <- self$path_df
       if (isTRUE(truncate)) {
@@ -200,22 +200,26 @@ PathData <- R6::R6Class(
         df <- df |>
           truncate_after_terminal_events(term_state_idx)
       }
-      out <- df |>
-        inner_join(self$link_df, by = "path_id", relationship = "many-to-one")
-      sub_df <- self$subject_df
-      if (!is.null(covariates)) {
-        sub_df <- sub_df |> dplyr::select(subject_index, one_of(covariates))
-      }
-      out <- out |>
-        inner_join(sub_df, by = "subject_index", relationship = "many-to-one")
-      stopifnot(nrow(out) == nrow(df))
-      out
+      fl <- self$full_link(covariates)
+      df |> dplyr::left_join(fl, by = "path_id")
+    },
+
+    #' @description Full link data frame
+    #'
+    #' @param covariates Which covariates to include
+    #' @return A \code{data.frame} with same number of rows as \code{link_df},
+    #' including also the covariate columns and \code{subject_index}
+    full_link = function(covariates = NULL) {
+      x <- self$subject_df[, c("subject_index", covariates)]
+      self$link_df[, c("subject_index", "path_id")] |>
+        dplyr::left_join(x, by = "subject_index")
     },
 
     #' @description Data frame in transitions format
     #'
+    #' @param covariates Which covariates to include?
     #' @return A \code{data.frame}
-    as_transitions = function() {
+    as_transitions = function(covariates = NULL) {
       pdf <- self$path_df
       pdf$time_prev <- c(0, pdf$time[1:(nrow(pdf) - 1)])
       pdf$keep <- as.numeric((pdf$trans_idx > 0) | (pdf$is_censor == 1))
@@ -230,7 +234,9 @@ PathData <- R6::R6Class(
       idx_censor <- which(out$is_censor == 1)
       out$from[idx_censor] <- out$state[idx_censor]
       out$to[idx_censor] <- out$state[idx_censor]
-      out |> dplyr::select(-"state")
+      out <- out |> dplyr::select(-"state")
+      fl <- self$full_link(covariates)
+      out |> dplyr::left_join(fl, by = "path_id")
     },
 
     #' @description Step plot of the paths

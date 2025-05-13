@@ -47,6 +47,7 @@ Initialize}
 \item \href{#method-PathData-get_event_state_names}{\code{PathData$get_event_state_names()}}
 \item \href{#method-PathData-print}{\code{PathData$print()}}
 \item \href{#method-PathData-as_data_frame}{\code{PathData$as_data_frame()}}
+\item \href{#method-PathData-full_link}{\code{PathData$full_link()}}
 \item \href{#method-PathData-as_transitions}{\code{PathData$as_transitions()}}
 \item \href{#method-PathData-plot_paths}{\code{PathData$plot_paths()}}
 \item \href{#method-PathData-trans_matrix}{\code{PathData$trans_matrix()}}
@@ -286,9 +287,30 @@ Convert to one long data frame
 \describe{
 \item{\code{covariates}}{Which covariates to include?}
 
-\item{\code{truncate}}{Truncate after terminal events?}
+\item{\code{truncate}}{Remove rows after terminal events?}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-full_link"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-full_link}{}}}
+\subsection{Method \code{full_link()}}{
+Full link data frame
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$full_link(covariates = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{covariates}}{Which covariates to include}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A \code{data.frame} with same number of rows as \code{link_df},
+including also the covariate columns and \code{subject_index}
 }
 }
 \if{html}{\out{<hr>}}
@@ -297,9 +319,16 @@ Convert to one long data frame
 \subsection{Method \code{as_transitions()}}{
 Data frame in transitions format
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$as_transitions()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$as_transitions(covariates = NULL)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{covariates}}{Which covariates to include?}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
 A \code{data.frame}
 }

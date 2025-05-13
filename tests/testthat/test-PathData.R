@@ -1,15 +1,19 @@
 test_that("PathData methods work", {
   N <- 100
   pd <- simulate_example_data(N)
-  df <- pd$as_data_frame()
-  expect_equal(ncol(df), 20)
-  df2 <- pd$as_data_frame(truncate = TRUE)
-  expect_true(nrow(df2) <= nrow(df))
+  df1 <- pd$as_data_frame()
+  df2 <- pd$as_data_frame(covariates = pd$covariate_names())
+  expect_true(ncol(df2) > ncol(df1))
+  expect_equal(nrow(df1), nrow(df2))
+  df3 <- pd$as_data_frame(truncate = TRUE)
+  expect_true(nrow(df3) <= nrow(df1))
 
   p1a <- pd$plot_paths()
   p1b <- pd$plot_paths(truncate = TRUE)
-  dt <- pd$as_transitions()
-  expect_true(all(c("from", "to") %in% colnames(dt)))
+  dt1 <- pd$as_transitions()
+  dt2 <- pd$as_transitions("age")
+  expect_true(all(c("from", "to") %in% colnames(dt1)))
+  expect_true(ncol(dt1) + 1 == ncol(dt2))
 
 
   expect_s3_class(p1a, "ggplot")
