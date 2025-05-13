@@ -32,7 +32,11 @@ test_that("PathData methods work", {
   prop <- pd$prop_matrix()
   expect_true(inherits(prop, "table"))
 
-  # Cox PH fit
-  cp <- pd$coxph(c("age", "sex"))
+  # Frequentist fits
+  cp <- pd$fit_coxph(c("age", "sex"))
   expect_true(inherits(cp, "coxph"))
+  msf <- pd$fit_mstate()
+  leg <- pd$transmat$trans_df()
+  plt <- msfit_plot_cumhaz(msf, leg)
+  expect_s3_class(plt, "ggplot")
 })

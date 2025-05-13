@@ -341,11 +341,21 @@ PathData <- R6::R6Class(
     #'
     #' @param covariates Covariates to include.
     #' @param ... Arguments passed to \code{survival::coxph}.
-    coxph = function(covariates = NULL, ...) {
+    fit_coxph = function(covariates = NULL, ...) {
       msdat <- self$as_msdata(covariates = covariates)
       terms <- c("strata(trans)", covariates)
       str <- paste(terms, collapse = " + ")
       fit_coxph(msdat, formula_rhs = str, ...)
+    },
+
+    #' @description Fit frequentist 'mstate' model
+    #'
+    #' @param covariates Covariates to include.
+    #' @param ... Arguments passed to \code{survival::coxph}.
+    fit_mstate = function(covariates = NULL, ...) {
+      msdat <- self$as_msdata(covariates = covariates)
+      cph <- self$fit_coxph(covariates, ...)
+      mstate::msfit(object = cph, variance = FALSE, trans = attr(msdat, "trans"))
     },
 
     #' @description Filter based on path id, creates new object
@@ -423,7 +433,6 @@ subject_df_with_idx <- function(pd, subs, id_map) {
 
 #' Fit Cox PH model using Breslow method
 #'
-#' @export
 #' @param msdat \code{msdata} object
 #' @param formula_rhs Formula right hand side that is appended to
 #' \code{Surv(Tstart, Tstop, status) ~ }. If \code{NULL} (default), then
@@ -439,36 +448,23 @@ fit_coxph <- function(msdat, formula_rhs = NULL) {
   )
 }
 
-#' Fit 'mstate' model
-#'
-#' @export
-#' @param msdat \code{msdata} object
-#' @param formula formula
-fit_mstate <- function(msdat, formula = NULL) {
-  cph <- fit_coxph(msdat, formula)
-  mstate::msfit(object = cph, variance = FALSE, trans = attr(msdat, "trans"))
-}
-fit_basehaz <- function(msdat, ...) {
-  cph <- fit_coxph(msdat)
-  survival::basehaz(cph, ...)
-}
-
 #' Plot cumulative hazard of 'msfit'
 #'
 #' @export
 #' @param msfit An \code{msfit} object
 #' @param legend transition name legend
-plot_cumhaz_msfit <- function(msfit, legend = NULL) {
+msfit_plot_cumhaz <- function(msfit, legend = NULL) {
   df <- msfit$Haz
   if (!is.null(legend)) {
-    leg <- legend[, c("transition", "trans_char")]
+    leg <- legend[, c("trans_idx", "trans_char")]
+    leg$trans <- leg$trans_idx
     df$transition <- df$trans
-    df <- df |> left_join(leg, by = "transition")
+    df <- df |> left_join(leg, by = "trans")
     df$trans <- paste0(df$transition, ": ", df$trans_char)
   } else {
     df$trans <- as.factor(df$trans)
   }
-  ggplot(df, aes(x = time, y = Haz, color = trans)) +
+  ggplot(df, aes(x = .data$time, y = .data$Haz, color = .data$trans)) +
     geom_line() +
     ylab("Cumulative Hazard")
 }
@@ -477,7 +473,7 @@ plot_cumhaz_msfit <- function(msfit, legend = NULL) {
 #'
 #' @export
 #' @param msfit An \code{msfit} object
-estimate_average_hazard <- function(msfit) {
+msfit_average_hazard <- function(msfit) {
   msfit$Haz |>
     dplyr::group_by(trans) |>
     summarise(

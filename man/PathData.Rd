@@ -53,7 +53,8 @@ Initialize}
 \item \href{#method-PathData-plot_paths}{\code{PathData$plot_paths()}}
 \item \href{#method-PathData-prop_matrix}{\code{PathData$prop_matrix()}}
 \item \href{#method-PathData-plot_graph}{\code{PathData$plot_graph()}}
-\item \href{#method-PathData-coxph}{\code{PathData$coxph()}}
+\item \href{#method-PathData-fit_coxph}{\code{PathData$fit_coxph()}}
+\item \href{#method-PathData-fit_mstate}{\code{PathData$fit_mstate()}}
 \item \href{#method-PathData-filter}{\code{PathData$filter()}}
 \item \href{#method-PathData-clone}{\code{PathData$clone()}}
 }
@@ -427,12 +428,31 @@ Visualize the transition proportion matrix as a graph
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PathData-coxph"></a>}}
-\if{latex}{\out{\hypertarget{method-PathData-coxph}{}}}
-\subsection{Method \code{coxph()}}{
+\if{html}{\out{<a id="method-PathData-fit_coxph"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-fit_coxph}{}}}
+\subsection{Method \code{fit_coxph()}}{
 Fit Cox proportional hazards model
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$coxph(covariates = NULL, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$fit_coxph(covariates = NULL, ...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{covariates}}{Covariates to include.}
+
+\item{\code{...}}{Arguments passed to \code{survival::coxph}.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-fit_mstate"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-fit_mstate}{}}}
+\subsection{Method \code{fit_mstate()}}{
+Fit frequentist 'mstate' model
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$fit_mstate(covariates = NULL, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
