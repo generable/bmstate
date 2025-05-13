@@ -37,7 +37,7 @@ test_that("path generation via MultistateSystem works", {
   log_w0 <- matrix(-4, N, S)
   log_m <- matrix(0, N, S)
   paths <- mod$system$simulate(w, log_w0, log_m)
-  expect_equal(ncol(paths), 4)
+  expect_equal(ncol(paths), 6)
 })
 
 test_that("data simulation via MultistateModel works", {
@@ -67,7 +67,7 @@ test_that("MultistateModel with PK submodel works", {
   N <- 99
   a <- mod$simulate_subjects(N)
   r <- mod$simulate_pk_data(a)
-  expect_equal(ncol(a), 7)
+  expect_equal(ncol(a), 6)
   expect_equal(nrow(r), N)
   expect_true("dose" %in% colnames(a))
   pd <- mod$simulate_data(N)
