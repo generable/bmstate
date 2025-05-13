@@ -339,22 +339,13 @@ PathData <- R6::R6Class(
 
     #' @description Fit Cox proportional hazards model
     #'
-    #' @param covs Covariate names.
+    #' @param covariates Covariates to include.
     #' @param ... Arguments passed to \code{survival::coxph}.
-    coxph = function(covs = NULL, ...) {
-      if (is.null(covs)) {
-        covs <- self$covs
-        rm <- c(
-          "individual_id", "pk_post_dose", "pk_pre_dose", "country_num",
-          "crcl", "weight", "dose_arm", "first_dose_amount",
-          "dose_adjustransmatent"
-        )
-        covs <- setdiff(covs, rm)
-      }
-      df <- self$as_msdata(covariates = TRUE)$msdata
-      str <- paste(covs, collapse = " + ")
-      form <- paste0("Surv(Tstart, Tstop, status) ~ ", str)
-      survival::coxph(stats::as.formula(form), df, ...)
+    coxph = function(covariates = NULL, ...) {
+      msdat <- self$as_msdata(covariates = covariates)
+      terms <- c("strata(trans)", covariates)
+      str <- paste(terms, collapse = " + ")
+      fit_coxph(msdat, formula_rhs = str, ...)
     },
 
     #' @description Filter based on path id, creates new object

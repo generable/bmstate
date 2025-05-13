@@ -2,7 +2,7 @@ test_that("entire workflow works", {
   # Options
   options <- list(
     N_subject = 200,
-    covariates = c("sex", "first_dose_amount", "age"),
+    covariates = c("sex", "dose", "age"),
     iter_warmup = 60,
     iter_sampling = 30,
     chains = 1,
@@ -16,6 +16,7 @@ test_that("entire workflow works", {
   h0_base <- 1e-3
 
   # Create model
+  tm <- illnessdeath_transmat()
   mod <- create_stan_model()
   expect_true(inherits(mod, "CmdStanModel"))
 

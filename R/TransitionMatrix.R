@@ -229,3 +229,13 @@ full_transmat <- function(state_names = LETTERS[1:4], sources = 1,
   }
   TransitionMatrix$new(mat, state_names)
 }
+
+#' Illness-death model transition matrix
+#'
+#' @export
+#' @return A \code{\link{TransitionMatrix}}
+illnessdeath_transmat <- function(state_names =
+                                    c("Randomization", "Illness", "Death")) {
+  checkmate::assert_character(state_names, len = 3)
+  full_transmat(state_names, self_loops = F)
+}

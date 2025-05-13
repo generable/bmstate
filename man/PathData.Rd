@@ -432,13 +432,13 @@ Visualize the transition proportion matrix as a graph
 \subsection{Method \code{coxph()}}{
 Fit Cox proportional hazards model
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$coxph(covs = NULL, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$coxph(covariates = NULL, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{covs}}{Covariate names.}
+\item{\code{covariates}}{Covariates to include.}
 
 \item{\code{...}}{Arguments passed to \code{survival::coxph}.}
 }

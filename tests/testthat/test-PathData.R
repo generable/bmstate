@@ -31,4 +31,8 @@ test_that("PathData methods work", {
   expect_s3_class(p2, "qgraph")
   prop <- pd$prop_matrix()
   expect_true(inherits(prop, "table"))
+
+  # Cox PH fit
+  cp <- pd$coxph(c("age", "sex"))
+  expect_true(inherits(cp, "coxph"))
 })
