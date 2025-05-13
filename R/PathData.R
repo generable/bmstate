@@ -98,6 +98,7 @@ PathData <- R6::R6Class(
     covariate_names = function() {
       self$covs
     },
+
     #' @description Get path lengths (among paths that include events)
     #' @param truncate Remove rows after terminal events first?
     #' @return a data frame of path ids and counts
@@ -107,6 +108,7 @@ PathData <- R6::R6Class(
         dplyr::group_by(path_id) |>
         dplyr::count()
     },
+
     #' @description Get number of paths
     #' @return an integer
     n_paths = function() {
@@ -124,25 +126,28 @@ PathData <- R6::R6Class(
       df <- self$get_path_df(FALSE) |> dplyr::filter(path_id == lens$path_id[idx])
       self$filter(unique(df$path_id))
     },
-    #' @description Get name of censoring state
-    censor_state = function() {
-      self$transmat$censor_state
-    },
+
     #' @description Get name of null state
     null_state = function() {
       self$transmat$source_states()
     },
-    #' @description Get names of all states, including censor
+
+    #' @description Get names of all states
+    #'
     #' @return character vector
     state_names = function() {
-      c(self$transmat$states, self$censor_state())
+      self$transmat$states
     },
+
     #' @description Get names of terminal states
+    #'
     #' @return character vector
     terminal_states = function() {
-      self$transmat$terminal_states()
+      self$transmat$absorbing_states()
     },
+
     #' @description Get indices of event states
+    #'
     #' @return integer vector
     get_event_states = function() {
       match(self$get_event_state_names(), self$state_names())
@@ -162,7 +167,7 @@ PathData <- R6::R6Class(
     #'
     #' @return a character vector
     get_event_state_names = function() {
-      setdiff(self$state_names(), c(self$censor_state(), self$null_state()))
+      setdiff(self$state_names(), self$null_state())
     },
 
     #' @description Print info
@@ -172,12 +177,12 @@ PathData <- R6::R6Class(
       n_path <- self$n_paths()
       covs <- self$covariate_names()
       sn <- self$get_event_state_names()
-
-      message(paste0("PathData object with ", n_path, " paths"))
-      message(paste0(" * Null state = {", self$null_state(), "}"))
-      message(paste0(" * Censoring state = {", self$censor_state(), "}"))
-      message(paste0(" * Event states = {"), paste0(sn, collapse = ", "), "}")
-      message(paste0(" * Covariates = {"), paste0(covs, collapse = ", "), "}")
+      x1 <- paste0("PathData object with ", n_path, " paths")
+      x2 <- paste0(" * Null state = {", self$null_state(), "}")
+      x3 <- paste0(" * Event states = {", paste0(sn, collapse = ", "), "}")
+      x4 <- paste0(" * Covariates = {", paste0(covs, collapse = ", "), "}")
+      msg <- paste(x1, x2, x3, x4, "\n", sep = "\n")
+      cat(msg)
     },
 
     #' @description Get path data frame

@@ -1,6 +1,7 @@
 test_that("PathData methods work", {
   N <- 100
   pd <- simulate_example_data(N)
+  expect_output(print(pd))
 
   # As data frame
   df1 <- pd$as_data_frame()

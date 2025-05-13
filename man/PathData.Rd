@@ -37,7 +37,6 @@ Initialize}
 \item \href{#method-PathData-lengths}{\code{PathData$lengths()}}
 \item \href{#method-PathData-n_paths}{\code{PathData$n_paths()}}
 \item \href{#method-PathData-longest_path}{\code{PathData$longest_path()}}
-\item \href{#method-PathData-censor_state}{\code{PathData$censor_state()}}
 \item \href{#method-PathData-null_state}{\code{PathData$null_state()}}
 \item \href{#method-PathData-state_names}{\code{PathData$state_names()}}
 \item \href{#method-PathData-terminal_states}{\code{PathData$terminal_states()}}
@@ -149,16 +148,6 @@ a \code{\link{PathData}} object with just one path
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PathData-censor_state"></a>}}
-\if{latex}{\out{\hypertarget{method-PathData-censor_state}{}}}
-\subsection{Method \code{censor_state()}}{
-Get name of censoring state
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$censor_state()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-null_state"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-null_state}{}}}
 \subsection{Method \code{null_state()}}{
@@ -172,7 +161,7 @@ Get name of null state
 \if{html}{\out{<a id="method-PathData-state_names"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-state_names}{}}}
 \subsection{Method \code{state_names()}}{
-Get names of all states, including censor
+Get names of all states
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$state_names()}\if{html}{\out{</div>}}
 }
