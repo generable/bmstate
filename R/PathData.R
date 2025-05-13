@@ -101,10 +101,11 @@ PathData <- R6::R6Class(
     covariate_names = function() {
       self$covs
     },
-    #' @description Get path lenghts (among paths that include events)
+    #' @description Get path lengths (among paths that include events)
+    #' @param truncate Remove rows after terminal events first?
     #' @return a data frame of path ids and counts
-    lengths = function() {
-      self$path_df |>
+    lengths = function(truncate = FALSE) {
+      self$get_path_df(truncate) |>
         dplyr::filter(is_event == TRUE) |>
         dplyr::group_by(path_id) |>
         dplyr::count()
@@ -112,16 +113,18 @@ PathData <- R6::R6Class(
     #' @description Get number of paths
     #' @return an integer
     n_paths = function() {
-      nrow(self$path_df |>
+      nrow(self$get_path_df() |>
         dplyr::group_by(.data$path_id) |>
         dplyr::count())
     },
+
     #' @description Get longest path
+    #'
     #' @return a \code{\link{PathData}} object with just one path
     longest_path = function() {
-      lens <- self$lengths()
+      lens <- self$lengths(FALSE)
       idx <- which(lens$n == max(lens$n))[1]
-      df <- self$path_df |> dplyr::filter(path_id == lens$path_id[idx])
+      df <- self$get_path_df(FALSE) |> dplyr::filter(path_id == lens$path_id[idx])
       self$filter(unique(df$path_id))
     },
     #' @description Get name of censoring state
@@ -180,18 +183,27 @@ PathData <- R6::R6Class(
       message(paste0(" * Covariates = {"), paste0(covs, collapse = ", "), "}")
     },
 
-    #' @description Convert to one long data frame
+    #' @description Get path data frame
     #'
-    #' @param covariates Which covariates to include?
     #' @param truncate Remove rows after terminal events?
-    as_data_frame = function(covariates = NULL, truncate = FALSE) {
+    get_path_df = function(truncate = FALSE) {
+      checkmate::assert_logical(truncate, len = 1)
       df <- self$path_df
       if (isTRUE(truncate)) {
         term_state_idx <- self$transmat$absorbing_states(names = FALSE)
         df <- df |>
           truncate_after_terminal_events(term_state_idx)
       }
+      df %>% dplyr::arrange(.data$path_id, .data$time)
+    },
+
+    #' @description Convert to one long data frame
+    #'
+    #' @param covariates Which covariates to include?
+    #' @param truncate Remove rows after terminal events?
+    as_data_frame = function(covariates = NULL, truncate = FALSE) {
       fl <- self$full_link(covariates)
+      df <- self$get_path_df(truncate)
       df |> dplyr::left_join(fl, by = "path_id")
     },
 
@@ -209,9 +221,10 @@ PathData <- R6::R6Class(
     #' @description Data frame in transitions format
     #'
     #' @param covariates Which covariates to include?
+    #' @param truncate Remove rows after terminal events first?
     #' @return A \code{data.frame}
-    as_transitions = function(covariates = NULL) {
-      pdf <- self$path_df
+    as_transitions = function(covariates = NULL, truncate = FALSE) {
+      pdf <- self$get_path_df(truncate)
       pdf$time_prev <- c(0, pdf$time[1:(nrow(pdf) - 1)])
       pdf$keep <- as.numeric((pdf$trans_idx > 0) | (pdf$is_censor == 1))
       tdf <- self$transmat$trans_df()
@@ -233,17 +246,30 @@ PathData <- R6::R6Class(
       out |> dplyr::left_join(fl, by = "path_id")
     },
 
-    #' @description Convert to format used by the 'mstate' package
+    #' @description Data frame in alternative transitions format
     #'
     #' @param covariates Which covariates to include?
-    #' @return An \code{msdata} object
-    as_msdata = function(covariates = NULL) {
+    #' @param truncate Remove rows after terminal events first?
+    #' @return A \code{data.frame}
+    as_transitions_alt = function(covariates = NULL, truncate = FALSE) {
       dt <- self$as_transitions(covariates = covariates)
       dt$Tstart <- dt$time_prev
       dt$Tstop <- dt$time
       dt$time <- dt$Tstop - dt$Tstart
       dt$status <- dt$is_event
       dt |> dplyr::select(-c("is_event", "time_prev", "trans_idx"))
+    },
+
+    #' @description Convert to format used by the 'mstate' package
+    #'
+    #' @param covariates Which covariates to include?
+    #' @return An \code{msdata} object
+    as_msdata = function(covariates = NULL) {
+      dt <- self$as_transitions_alt(covariates, truncate = TRUE)
+      df_out <- to_mstate_format(dt, self$transmat)
+      attr(df_out, "trans") <- self$transmat$as_mstate_transmat()
+      class(df_out) <- c("msdata", "data.frame")
+      df_out
     },
 
     #' @description Step plot of the paths
@@ -341,7 +367,7 @@ PathData <- R6::R6Class(
           is.null(!!draw_ids_keep) | draw_idx %in% draw_ids_keep,
           subject_index %in% subject_df$subject_index
         )
-      path_df <- self$path_df |>
+      path_df <- self$get_path_df(FALSE) |>
         dplyr::filter(
           is.null(path_ids_keep) | path_id %in% path_ids_keep,
           path_id %in% link_df$path_id
@@ -428,50 +454,19 @@ subject_df_with_idx <- function(pd, subs, id_map) {
 }
 
 
-# Second pass in transforming transitions format to mstate format (msdata)
 # Creates the additional rows corresponding to each transition
 # that is at risk
-to_mstate_format_part2 <- function(df, PT, TFI) {
+to_mstate_format <- function(df, transmat) {
+  TFI <- transmat$as_transition_index_matrix()
+
   N <- nrow(df)
   df_out <- NULL
   for (n in 1:N) {
     row <- df[n, ]
-    possible_trans <- which(as.numeric(PT[, row$from]) == 1)
-    J <- length(possible_trans)
-    possible_targets <- rep(0, J)
-    for (j in seq_len(J)) {
-      possible_targets[j] <- find_column_with_number(TFI, possible_trans[j])
-    }
-
-    if (row$status == 0) {
-      rows <- NULL
-      possible_targets_remaining <- possible_targets
-    } else {
-      rows <- row
-      possible_targets_remaining <- setdiff(possible_targets, row$to)
-    }
-
-    J <- length(possible_targets_remaining)
-
-    for (j in seq_len(J)) {
-      row_rep <- row
-      row_rep$to <- possible_targets_remaining[j]
-      row_rep$trans <- TFI[row_rep$from, row_rep$to]
-      row_rep$status <- 0
-      rows <- rbind(rows, row_rep)
-    }
-    df_out <- rbind(df_out, rows)
+    possible_targets <- transmat$at_risk(row$from)
+    remaining_targets <- setdiff(possible_targets, row$to)
   }
   df_out
-}
-
-# TFI matrix to format used by mstate
-TFI_to_mstate_transmat <- function(TFI, state_names) {
-  sn <- state_names[1:(length(state_names) - 1)]
-  TFI[TFI == 0] <- NA
-  colnames(TFI) <- sn
-  rownames(TFI) <- sn
-  TFI
 }
 
 #' Fit Cox PH model using Breslow method

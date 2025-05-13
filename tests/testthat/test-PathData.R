@@ -21,6 +21,7 @@ test_that("PathData methods work", {
   expect_true(ncol(dt1) + 1 == ncol(dt2))
 
   # As msdata
+  dtt <- pd$as_transitions_alt(truncate = TRUE)
   ms <- pd$as_msdata()
 
   expect_s3_class(p1a, "ggplot")

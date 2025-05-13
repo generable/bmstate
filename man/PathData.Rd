@@ -45,9 +45,11 @@ Initialize}
 \item \href{#method-PathData-as_time_to_first_event}{\code{PathData$as_time_to_first_event()}}
 \item \href{#method-PathData-get_event_state_names}{\code{PathData$get_event_state_names()}}
 \item \href{#method-PathData-print}{\code{PathData$print()}}
+\item \href{#method-PathData-get_path_df}{\code{PathData$get_path_df()}}
 \item \href{#method-PathData-as_data_frame}{\code{PathData$as_data_frame()}}
 \item \href{#method-PathData-full_link}{\code{PathData$full_link()}}
 \item \href{#method-PathData-as_transitions}{\code{PathData$as_transitions()}}
+\item \href{#method-PathData-as_transitions_alt}{\code{PathData$as_transitions_alt()}}
 \item \href{#method-PathData-as_msdata}{\code{PathData$as_msdata()}}
 \item \href{#method-PathData-plot_paths}{\code{PathData$plot_paths()}}
 \item \href{#method-PathData-prop_matrix}{\code{PathData$prop_matrix()}}
@@ -113,11 +115,18 @@ a character vector
 \if{html}{\out{<a id="method-PathData-lengths"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-lengths}{}}}
 \subsection{Method \code{lengths()}}{
-Get path lenghts (among paths that include events)
+Get path lengths (among paths that include events)
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$lengths()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$lengths(truncate = FALSE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{truncate}}{Remove rows after terminal events first?}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
 a data frame of path ids and counts
 }
@@ -253,6 +262,23 @@ nothing
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-get_path_df"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-get_path_df}{}}}
+\subsection{Method \code{get_path_df()}}{
+Get path data frame
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$get_path_df(truncate = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{truncate}}{Remove rows after terminal events?}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-as_data_frame"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-as_data_frame}{}}}
 \subsection{Method \code{as_data_frame()}}{
@@ -298,13 +324,37 @@ including also the covariate columns and \code{subject_index}
 \subsection{Method \code{as_transitions()}}{
 Data frame in transitions format
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$as_transitions(covariates = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$as_transitions(covariates = NULL, truncate = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{covariates}}{Which covariates to include?}
+
+\item{\code{truncate}}{Remove rows after terminal events first?}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A \code{data.frame}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-as_transitions_alt"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-as_transitions_alt}{}}}
+\subsection{Method \code{as_transitions_alt()}}{
+Data frame in alternative transitions format
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$as_transitions_alt(covariates = NULL, truncate = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{covariates}}{Which covariates to include?}
+
+\item{\code{truncate}}{Remove rows after terminal events first?}
 }
 \if{html}{\out{</div>}}
 }

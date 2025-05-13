@@ -27,8 +27,10 @@ from state \code{i} to \code{j} is possible}
 \item \href{#method-TransitionMatrix-num_trans}{\code{TransitionMatrix$num_trans()}}
 \item \href{#method-TransitionMatrix-as_matrix}{\code{TransitionMatrix$as_matrix()}}
 \item \href{#method-TransitionMatrix-as_transition_index_matrix}{\code{TransitionMatrix$as_transition_index_matrix()}}
+\item \href{#method-TransitionMatrix-as_mstate_transmat}{\code{TransitionMatrix$as_mstate_transmat()}}
 \item \href{#method-TransitionMatrix-possible_transitions_from}{\code{TransitionMatrix$possible_transitions_from()}}
 \item \href{#method-TransitionMatrix-target_state}{\code{TransitionMatrix$target_state()}}
+\item \href{#method-TransitionMatrix-at_risk}{\code{TransitionMatrix$at_risk()}}
 \item \href{#method-TransitionMatrix-states_df}{\code{TransitionMatrix$states_df()}}
 \item \href{#method-TransitionMatrix-trans_df}{\code{TransitionMatrix$trans_df()}}
 \item \href{#method-TransitionMatrix-plot}{\code{TransitionMatrix$plot()}}
@@ -112,6 +114,19 @@ An \code{N} x \code{N} matrix with named columns and rows
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TransitionMatrix-as_mstate_transmat"></a>}}
+\if{latex}{\out{\hypertarget{method-TransitionMatrix-as_mstate_transmat}{}}}
+\subsection{Method \code{as_mstate_transmat()}}{
+Transition index matrix to format used by 'mstate'
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TransitionMatrix$as_mstate_transmat()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+a matrix
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TransitionMatrix-possible_transitions_from"></a>}}
 \if{latex}{\out{\hypertarget{method-TransitionMatrix-possible_transitions_from}{}}}
 \subsection{Method \code{possible_transitions_from()}}{
@@ -140,9 +155,29 @@ Get target state of a transition}
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{trans_idx}}{Index of the transition}
+\item{\code{trans_idx}}{Index of the transition
+Get states that are at risk when at given state}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TransitionMatrix-at_risk"></a>}}
+\if{latex}{\out{\hypertarget{method-TransitionMatrix-at_risk}{}}}
+\subsection{Method \code{at_risk()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TransitionMatrix$at_risk(state)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{state}}{index of current state}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+indices of states at risk
 }
 }
 \if{html}{\out{<hr>}}

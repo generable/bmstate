@@ -72,6 +72,15 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
       out
     },
 
+    #' @description Transition index matrix to format used by 'mstate'
+    #'
+    #' @return a matrix
+    as_mstate_transmat = function() {
+      TFI <- self$as_transition_index_matrix()
+      TFI[TFI == 0] <- NA
+      TFI
+    },
+
     #' @description Get indices of possible transitions from given state
     #' @param state Index of state
     possible_transitions_from = function(state) {
@@ -88,6 +97,18 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
       H <- self$num_trans()
       checkmate::assert_integerish(trans_idx, len = 1, lower = 1, upper = H)
       self$trans_df()$state[trans_idx]
+    },
+
+    #' Get states that are at risk when at given state
+    #'
+    #' @param state index of current state
+    #' @return indices of states at risk
+    at_risk = function(state) {
+      possible_trans <- self$possible_transitions_from(state)
+      if (length(possible_trans) == 0) {
+        return(integer(0))
+      }
+      self$trans_df()[possible_trans, ]$state
     },
 
     #' @description A data frame of states
