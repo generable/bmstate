@@ -386,11 +386,10 @@ PathData <- R6::R6Class(
         left_join(subject_df |> dplyr::select(subject_index, subject_id),
           by = "subject_index"
         )
-      PathData$new(subject_df, path_df, link_df,
-        self$state_names, self$covs,
-        terminal_states = self$terminal_states,
-        censor_state = self$censor_state,
-        null_state = self$null_state
+      PathData$new(
+        subject_df, path_df, link_df,
+        self$transmat,
+        self$covs
       )
     }
   )
