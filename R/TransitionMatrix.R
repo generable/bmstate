@@ -201,7 +201,7 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
 )
 
 
-#' Create common transition matrices
+#' Create "full" transition matrix
 #'
 #' @export
 #' @param state_names Names of the states. The length of this character
@@ -212,7 +212,7 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
 #' @return A \code{\link{TransitionMatrix}}, where all possible transitions
 #' between non-terminal and non-source states are added, as well as transition
 #' to terminal states from all states.
-full_transmat <- function(state_names = LETTERS[1:4], sources = 1,
+transmat_full <- function(state_names = LETTERS[1:4], sources = 1,
                           terminal = length(state_names), self_loops = TRUE) {
   N <- length(state_names)
   checkmate::assert_character(state_names, min.len = 1)
@@ -230,12 +230,35 @@ full_transmat <- function(state_names = LETTERS[1:4], sources = 1,
   TransitionMatrix$new(mat, state_names)
 }
 
+#' Create a competing risks transition matrix
+#'
+#' @export
+#' @param state_names Names of the states. The length of this character
+#' vector defines the number of states.
+#' @return A \code{\link{TransitionMatrix}}.
+transmat_comprisk <- function(state_names = LETTERS[1:4]) {
+  N <- length(state_names)
+  checkmate::assert_character(state_names, min.len = 3)
+  mat <- matrix(0, N, N)
+  mat[1, 2:(ncol(mat))] <- 1
+  TransitionMatrix$new(mat, state_names)
+}
+
+#' Basic alive-dead survival model transition matrix
+#'
+#' @export
+#' @return A \code{\link{TransitionMatrix}}
+transmat_survival <- function(state_names = c("Alive", "Dead")) {
+  checkmate::assert_character(state_names, len = 2)
+  transmat_full(state_names, self_loops = F)
+}
+
 #' Illness-death model transition matrix
 #'
 #' @export
 #' @return A \code{\link{TransitionMatrix}}
-illnessdeath_transmat <- function(state_names =
+transmat_illnessdeath <- function(state_names =
                                     c("Randomization", "Illness", "Death")) {
   checkmate::assert_character(state_names, len = 3)
-  full_transmat(state_names, self_loops = F)
+  transmat_full(state_names, self_loops = F)
 }

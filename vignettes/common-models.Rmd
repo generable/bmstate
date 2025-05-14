@@ -1,0 +1,48 @@
+---
+title: "Common multistate models"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Common multistate models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(bmstate)
+xxx <- seq(0, 1000)
+NK <- 5
+N_sub <- 300
+```
+
+# Basic survival model
+
+## TransitionMatrix
+
+```{r}
+tm <- transmat_survival()
+print(tm)
+tm$plot()
+```
+
+## MultistateModel
+
+```{r}
+mod <- create_msm(tm, "age")
+mod$set_knots(max(xxx), xxx, NK)
+print(mod)
+```
+
+## Simulation
+
+```{r}
+pd <- mod$simulate_data(N_sub)
+```
+
+
