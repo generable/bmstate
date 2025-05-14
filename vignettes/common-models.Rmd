@@ -20,36 +20,44 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(bmstate)
+library(ggplot2)
+theme_set(theme_bw())
 N_sub <- 300
 ```
 
 # Basic survival model
 
-First we create a `TransitionMatrix`
+First we create a `TransitionMatrix`. The transition matrix is a directed
+graph encoded by a binary matrix.
 
-```{r}
+```{r, fig.width=5}
 tm <- transmat_survival()
 print(tm)
 tm$plot()
 ```
 
-Then we create a `MultistateModel`
+Then we create a `MultistateModel` using this graph.
 
 ```{r}
-mod <- create_msm(tm)
+tmax <- 3 * 365.25
+mod <- create_msm(tm, tmax = tmax)
 print(mod)
 ```
-Now we can simulate events.
 
-```{r}
-lambda <- 1e-3
+Now we can simulate events with known constant hazard rate `lambda`. For this
+model, we are simulating from a homogeneous Poisson process with rate $\lambda$,
+meaning that the event times should follow an exponential distribution with
+mean $\frac{1}{\lambda}$.
+
+```{r, fig.width=5}
+lambda <- 1e-2
 pd <- mod$simulate_data(N_sub, w0 = lambda)
 pd$plot_paths()
 pd$plot_graph()
 ```
 
-
-```{r}
+We plot the distribution of event times and the theoretical mean (red line).
+```{r, fig.width=5}
 times <- pd$as_transitions(truncate = TRUE)$time
-plot_time_dist(times)
+plot_time_dist(times) + geom_vline(xintercept = 1 / lambda, color = "firebrick")
 ```

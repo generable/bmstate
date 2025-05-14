@@ -93,7 +93,7 @@ plot_time_dist <- function(t) {
     geom_vline(
       mapping = NULL,
       xintercept = mean(t),
-      color = "firebrick",
+      color = "gray20",
       lty = 2
     )
 }
