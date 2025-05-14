@@ -4,10 +4,10 @@
 \alias{create_msm}
 \title{Create a multistate model}
 \usage{
-create_msm(tm, hazard_covs, pk_covs = NULL, compile = TRUE)
+create_msm(tm, hazard_covs = NULL, pk_covs = NULL, compile = TRUE)
 }
 \arguments{
-\item{tm}{A \code{\link{TransitionMatrix}}}
+\item{tm}{A \code{\link{TransitionMatrix}}.}
 
 \item{hazard_covs}{Covariates that affect the hazard. A character vector.}
 

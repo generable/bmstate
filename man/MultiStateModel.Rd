@@ -47,7 +47,7 @@ Create model
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModel$new(
   system,
-  covariates,
+  covariates = NULL,
   pk_model = NULL,
   compile = TRUE,
   tmax = 1000,
@@ -61,8 +61,8 @@ Create model
 \item{\code{system}}{A \code{\link{MultistateSystem}}}
 
 \item{\code{covariates}}{The names of the hazard covariates (excluding possible
-exposure estimated from PK model). Do not use reserved names \code{ss_auc}
-or \code{dose}.}
+exposure estimated from PK model). Do not use reserved names
+\code{ss_auc} or \code{dose}.}
 
 \item{\code{pk_model}}{A \code{\link{PKModel}} or NULL.}
 
@@ -70,7 +70,7 @@ or \code{dose}.}
 
 \item{\code{tmax}}{Max time.}
 
-\item{\code{num_knots}}{Number of knots.}
+\item{\code{num_knots}}{Total number of spline knots.}
 }
 \if{html}{\out{</div>}}
 }

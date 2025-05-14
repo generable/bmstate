@@ -32,7 +32,7 @@ tm$plot()
 ## MultistateModel
 
 ```{r}
-mod <- create_msm(tm, "age")
+mod <- create_msm(tm)
 print(mod)
 ```
 

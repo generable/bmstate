@@ -1,14 +1,14 @@
 #' Create a multistate model
 #'
 #' @export
-#' @param tm A \code{\link{TransitionMatrix}}
+#' @param tm A \code{\link{TransitionMatrix}}.
 #' @param hazard_covs Covariates that affect the hazard. A character vector.
 #' @param pk_covs Covariates that affect the PK parameters. A list with
 #' elements \code{ka} \code{CL}, and \code{V2}. If \code{NULL}, a PK model
 #' will not be created.
 #' @param compile compile 'Stan' model?
 #' @return A \code{\link{MultistateModel}} object.
-create_msm <- function(tm, hazard_covs, pk_covs = NULL,
+create_msm <- function(tm, hazard_covs = NULL, pk_covs = NULL,
                        compile = TRUE) {
   mss <- MultistateSystem$new(tm)
   if (!is.null(pk_covs)) {
@@ -66,15 +66,15 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #'
     #' @param system A \code{\link{MultistateSystem}}
     #' @param covariates The names of the hazard covariates (excluding possible
-    #' exposure estimated from PK model). Do not use reserved names \code{ss_auc}
-    #' or \code{dose}.
+    #' exposure estimated from PK model). Do not use reserved names
+    #' \code{ss_auc} or \code{dose}.
     #' @param pk_model A \code{\link{PKModel}} or NULL.
     #' @param compile Should the 'Stan' model code be created and compiled.
     #' @param tmax Max time.
-    #' @param num_knots Number of knots.
-    initialize = function(system, covariates, pk_model = NULL, compile = TRUE,
-                          tmax = 1000, num_knots = 5) {
-      checkmate::assert_character(covariates)
+    #' @param num_knots Total number of spline knots.
+    initialize = function(system, covariates = NULL, pk_model = NULL,
+                          compile = TRUE, tmax = 1000, num_knots = 5) {
+      checkmate::assert_character(covariates, null.ok = TRUE)
       checkmate::assert_true(!("ss_auc" %in% covariates)) # special name
       checkmate::assert_true(!("dose" %in% covariates)) # special name
       checkmate::assert_class(system, "MultistateSystem")
