@@ -1,5 +1,7 @@
 ---
 title: "Common multistate models"
+author: Juho Timonen
+date: 14th April 2025
 output: 
   rmarkdown::html_vignette:
     toc: true 
@@ -40,7 +42,7 @@ Then we create a `MultistateModel` using this graph.
 
 ```{r}
 tmax <- 3 * 365.25
-mod <- create_msm(tm, tmax = tmax)
+mod <- create_msm(tm, tmax = tmax, compile = FALSE)
 print(mod)
 ```
 
@@ -71,15 +73,9 @@ The transition matrix is for a competing risks model can be created like so.
 tm <- transmat_comprisk()
 print(tm)
 tm$plot()
+mod <- create_msm(tm, tmax = tmax, compile = FALSE)
 ```
 
-Then we create a `MultistateModel` using this graph.
-
-```{r}
-tmax <- 3 * 365.25
-mod <- create_msm(tm, tmax = tmax)
-print(mod)
-```
 This model has 3 possible transitions. 
 Now we can simulate events with known constant hazard rates `lambda_1`, 
 `lambda_2`, `lambda_3`. For this
@@ -110,5 +106,42 @@ is the combined hazard rate. We plot the empirical distribution and the theoreti
 ```{r, fig.width=5}
 times <- pd$as_transitions(truncate = TRUE)$time
 plot_time_dist(times) + geom_vline(xintercept = 1 / sum(w0), color = "firebrick")
+```
+
+# Illness-death model
+
+The illness-death model is another common multistate model.
+
+```{r, fig.width=5}
+tm <- transmat_illnessdeath()
+print(tm)
+tm$plot()
+mod <- create_msm(tm, compile = FALSE)
+pd <- mod$simulate_data(N_sub, w0 = 1e-2)
+pd$plot_paths()
+pd$plot_graph()
+```
+
+
+# General multistate models
+
+General multistate models can have multiple terminal states and various
+transitions.
+
+```{r, fig.width=5}
+tm <- transmat_full(state_names = LETTERS[1:5], sources = 1, terminal = c(4, 5))
+print(tm)
+tm$plot()
+mod <- create_msm(tm, compile = FALSE)
+pd <- mod$simulate_data(N_sub, w0 = 1e-3)
+pd$plot_paths()
+pd$plot_graph()
+```
+
+Some of the paths may not reach a terminal state
+before `t_max`, meaning they get censored (no event)
+
+```{r, fig.width=5}
+pd$prop_matrix()
 ```
 

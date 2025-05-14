@@ -216,7 +216,6 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' @param w_scale scale of spline weights variation
     #' @return a \code{tibble}
     simulate_events = function(df_subjects, beta_haz, log_w0, w_scale = 0.1) {
-      print(log_w0)
       dt <- 1
       N <- nrow(df_subjects)
       S <- self$system$num_trans()
