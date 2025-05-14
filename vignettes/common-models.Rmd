@@ -50,5 +50,6 @@ pd$plot_graph()
 
 
 ```{r}
-plot_time_dist(pd$as_transitions()$time)
+times <- pd$as_transitions(truncate = TRUE)$time
+plot_time_dist(times)
 ```

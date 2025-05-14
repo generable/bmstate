@@ -88,6 +88,7 @@ do_split <- function(pd, p_test = 0.25) {
 #' @export
 #' @param t a vector of event times
 plot_time_dist <- function(t) {
+  checkmate::assert_numeric(t)
   ggplot(data.frame(Time = t), aes(x = .data$Time)) +
     ggdist::stat_halfeye() +
     geom_vline(
