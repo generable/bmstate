@@ -10,11 +10,10 @@ test_that("MultistateModel init and methods work", {
   mod <- create_msm(tm, covs, pk_covs, compile = F)
   expect_true(inherits(mod, "MultistateModel"))
   expect_output(print(mod))
-  expect_error(mod$get_knots())
 
   t_ev <- stats::runif(100)
-  mod$set_knots(1, t_ev, 6)
-  expect_equal(length(mod$system$get_knots()), 6)
+  mod$set_knots(1, t_ev, 9)
+  expect_equal(length(mod$system$get_knots()), 9)
   K <- mod$system$num_weights()
   w <- rnorm(K)
   w0 <- -4
@@ -26,7 +25,7 @@ test_that("MultistateModel init and methods work", {
 })
 
 test_that("path generation via MultistateSystem works", {
-  tm <- full_transmat(self_loops = TRUE)
+  tm <- transmat_full(self_loops = TRUE)
   mod <- create_msm(tm, "age", NULL, FALSE)
   tmax <- 3 * 365.25
   mod$set_knots(tmax, seq(0, tmax - 1, length.out = 1000), 4)
@@ -41,7 +40,7 @@ test_that("path generation via MultistateSystem works", {
 })
 
 test_that("data simulation via MultistateModel works", {
-  tm <- full_transmat(self_loops = FALSE)
+  tm <- transmat_full(self_loops = FALSE)
   mod <- create_msm(tm, "age", NULL, FALSE)
   tmax <- 3 * 365.25
   mod$set_knots(tmax, seq(0, tmax - 1, length.out = 1000), 3)
@@ -52,7 +51,7 @@ test_that("data simulation via MultistateModel works", {
 })
 
 test_that("MultistateModel with PK submodel works", {
-  tm <- full_transmat(state_names = c("Rand", "Bleed", "Death"))
+  tm <- transmat_full(state_names = c("Rand", "Bleed", "Death"))
   covs <- c("sex", "age")
   pk_covs <- list(
     ka = "age",

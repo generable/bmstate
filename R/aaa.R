@@ -55,7 +55,7 @@ simulate_example_data <- function(N = 10, beta_haz = NULL,
     CL = "CrCL",
     V2 = c("weight", "sex")
   )
-  tm <- full_transmat(self_loops = FALSE)
+  tm <- transmat_full(self_loops = FALSE)
   mod <- create_msm(tm, covs, pk_covs, FALSE)
 
   tmax <- 3 * 365.25

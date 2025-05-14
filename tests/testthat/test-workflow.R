@@ -16,7 +16,7 @@ test_that("entire workflow works", {
   h0_base <- 1e-3
 
   # Create model
-  tm <- illnessdeath_transmat()
+  tm <- transmat_illnessdeath()
   mod <- create_msm(tm, options$covariates)
   expect_true(inherits(mod, "CmdStanModel"))
 
