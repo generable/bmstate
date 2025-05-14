@@ -11,6 +11,11 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
 
     # Generate a path starting from time 0
     generate_path = function(w, log_w0, log_m, t_max, init_state) {
+      if (is.vector(w)) {
+        w <- matrix(w, nrow = 1)
+      }
+      checkmate::assert_array(w, d = 2)
+
       # Setup
       states <- init_state
       times <- 0

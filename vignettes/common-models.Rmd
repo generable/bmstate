@@ -40,6 +40,9 @@ print(mod)
 
 ```{r}
 pd <- mod$simulate_data(N_sub)
+pd$plot_paths()
+pd$plot_graph()
 ```
+
 
 
