@@ -61,3 +61,54 @@ We plot the distribution of event times and the theoretical mean (red line).
 times <- pd$as_transitions(truncate = TRUE)$time
 plot_time_dist(times) + geom_vline(xintercept = 1 / lambda, color = "firebrick")
 ```
+
+
+# Competing risks model
+
+The transition matrix is for a competing risks model can be created like so.
+
+```{r, fig.width=5}
+tm <- transmat_comprisk()
+print(tm)
+tm$plot()
+```
+
+Then we create a `MultistateModel` using this graph.
+
+```{r}
+tmax <- 3 * 365.25
+mod <- create_msm(tm, tmax = tmax)
+print(mod)
+```
+This model has 3 possible transitions. 
+Now we can simulate events with known constant hazard rates `lambda_1`, 
+`lambda_2`, `lambda_3`. For this
+model, we are simulating from independent homogeneous Poisson processes with 
+rates $\lambda_i$, meaning that the transition probabilities should be
+$$
+P(i) = \frac{\lambda_i}{\sum_{j=1}^ 3 \lambda_j}.
+$$
+
+```{r, fig.width=5}
+lambda <- 1e-2
+w0 <- c(lambda, 2 * lambda, 3 * lambda)
+print(w0 / sum(w0))
+```
+
+```{r, fig.width=5}
+pd <- mod$simulate_data(N_sub, w0 = w0)
+pd$plot_paths()
+pd$plot_graph()
+```
+
+The distribution of event times should be exponentially distributed with
+mean $\frac{1}{\lambda_0}$ where
+$$
+\lambda_0 = \sum_{j=1}^ 3 \lambda_j
+$$
+is the combined hazard rate. We plot the empirical distribution and the theoretical mean (red line).
+```{r, fig.width=5}
+times <- pd$as_transitions(truncate = TRUE)$time
+plot_time_dist(times) + geom_vline(xintercept = 1 / sum(w0), color = "firebrick")
+```
+

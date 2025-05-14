@@ -164,10 +164,15 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' @return a \code{\link{PathData}} object
     simulate_data = function(N_subject = 100, beta_haz = NULL,
                              beta_pk = NULL, w0 = 1e-3) {
+      H <- self$system$num_trans()
       sub_df <- self$simulate_subjects(N_subject)
-      checkmate::assert_number(w0, lower = 0)
+      checkmate::assert_numeric(w0, lower = 0)
+      if (length(w0) > 1) {
+        checkmate::assert_numeric(w0, len = H)
+      } else {
+        w0 <- rep(w0, H)
+      }
       log_w0 <- log(w0)
-      log_w0_vec <- rep(log_w0, self$system$num_trans())
       if (is.null(beta_haz)) {
         L <- length(self$target_states())
         K <- length(self$covs())
@@ -177,7 +182,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       if (self$has_pk()) {
         sub_df <- sub_df |> dplyr::left_join(pk_dat, by = "subject_id")
       }
-      path_df <- self$simulate_events(sub_df, beta_haz, log_w0_vec)
+      path_df <- self$simulate_events(sub_df, beta_haz, log_w0)
       N <- nrow(sub_df)
       link_df <- data.frame(
         path_id = seq_len(N),
@@ -211,6 +216,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' @param w_scale scale of spline weights variation
     #' @return a \code{tibble}
     simulate_events = function(df_subjects, beta_haz, log_w0, w_scale = 0.1) {
+      print(log_w0)
       dt <- 1
       N <- nrow(df_subjects)
       S <- self$system$num_trans()
