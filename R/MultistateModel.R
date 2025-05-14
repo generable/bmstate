@@ -70,7 +70,10 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' or \code{dose}.
     #' @param pk_model A \code{\link{PKModel}} or NULL.
     #' @param compile Should the 'Stan' model code be created and compiled.
-    initialize = function(system, covariates, pk_model = NULL, compile = TRUE) {
+    #' @param tmax Max time.
+    #' @param num_knots Number of knots.
+    initialize = function(system, covariates, pk_model = NULL, compile = TRUE,
+                          tmax = 1000, num_knots = 5) {
       checkmate::assert_character(covariates)
       checkmate::assert_true(!("ss_auc" %in% covariates)) # special name
       checkmate::assert_true(!("dose" %in% covariates)) # special name
@@ -81,6 +84,9 @@ MultistateModel <- R6::R6Class("MultistateModel",
       private$hazard_covariates <- covariates
       self$pk_model <- pk_model
       self$system <- system
+      checkmate::assert_number(tmax, lower = 0)
+      checkmate::assert_integerish(num_knots, lower = 3, upper = 20)
+      self$set_knots(tmax, seq(0, tmax, length.out = 100), num_knots)
       if (compile) {
         self$compile()
       }

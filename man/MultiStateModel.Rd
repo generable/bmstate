@@ -45,7 +45,14 @@ Main model class
 \subsection{Method \code{new()}}{
 Create model
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$new(system, covariates, pk_model = NULL, compile = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$new(
+  system,
+  covariates,
+  pk_model = NULL,
+  compile = TRUE,
+  tmax = 1000,
+  num_knots = 5
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -60,6 +67,10 @@ or \code{dose}.}
 \item{\code{pk_model}}{A \code{\link{PKModel}} or NULL.}
 
 \item{\code{compile}}{Should the 'Stan' model code be created and compiled.}
+
+\item{\code{tmax}}{Max time.}
+
+\item{\code{num_knots}}{Number of knots.}
 }
 \if{html}{\out{</div>}}
 }
