@@ -1,3 +1,9 @@
+# Default event distribution
+default_event_distribution <- function(t_max) {
+  x <- seq(0, t_max, length.out = 100)
+  max(x) * x^2 / (max(x^2))
+}
+
 # Find index of x in vector y, expecting exactly one match
 find_one <- function(x, y) {
   idx <- which(y == x)

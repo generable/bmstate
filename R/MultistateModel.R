@@ -86,7 +86,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       self$system <- system
       checkmate::assert_number(tmax, lower = 0)
       checkmate::assert_integerish(num_knots, lower = 3, upper = 20)
-      self$set_knots(tmax, seq(0, tmax, length.out = 100), num_knots)
+      self$set_knots(tmax, default_event_distribution(tmax), num_knots)
       if (compile) {
         self$compile()
       }
