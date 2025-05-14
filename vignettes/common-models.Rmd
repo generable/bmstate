@@ -42,8 +42,8 @@ print(mod)
 Now we can simulate events.
 
 ```{r}
-log_haz <- 1e-4
-pd <- mod$simulate_data(N_sub, log_w0 = log_haz)
+lambda <- 1e-3
+pd <- mod$simulate_data(N_sub, w0 = lambda)
 pd$plot_paths()
 pd$plot_graph()
 ```

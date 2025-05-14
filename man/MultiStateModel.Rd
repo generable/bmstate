@@ -160,7 +160,7 @@ Simulate data using the multistate model.
   N_subject = 100,
   beta_haz = NULL,
   beta_pk = NULL,
-  log_w0 = -4
+  w0 = 0.001
 )}\if{html}{\out{</div>}}
 }
 
@@ -177,7 +177,7 @@ If \code{NULL}, a data frame of zeros is used.}
 three elements, each being a vector. If any element is \code{NULL},
 a vector of zeros is used.}
 
-\item{\code{log_w0}}{Baseline hazard rate for all transitions}
+\item{\code{w0}}{Baseline hazard rate for all transitions}
 }
 \if{html}{\out{</div>}}
 }

@@ -21,9 +21,7 @@ test_that("entire workflow works", {
   expect_true(inherits(mod, "CmdStanModel"))
 
   # Simulate data
-  x <- seq(0, 1000)
-  mod$set_knots(1000, x, 5)
-  pd <- mod$simulate_data(options$N_subject, log_w0 = -8)
+  pd <- mod$simulate_data(options$N_subject)
 
   split <- do_split(pd)
   expect_true(inherits(pd, "PathData"))

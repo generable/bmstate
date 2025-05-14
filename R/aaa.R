@@ -46,9 +46,9 @@
 #' @param N number of subjects
 #' @param beta_haz see the documentation of \code{\link{MultistateModel}}
 #' @param beta_pk see the documentation of \code{\link{MultistateModel}}
-#' @param log_w0 see the documentation of \code{\link{MultistateModel}}
+#' @param w0 see the documentation of \code{\link{MultistateModel}}
 simulate_example_data <- function(N = 10, beta_haz = NULL,
-                                  beta_pk = NULL, log_w0 = -6) {
+                                  beta_pk = NULL, w0 = 1e-3) {
   covs <- c("sex", "age")
   pk_covs <- list(
     ka = "age",
@@ -56,10 +56,9 @@ simulate_example_data <- function(N = 10, beta_haz = NULL,
     V2 = c("weight", "sex")
   )
   tm <- transmat_full(self_loops = FALSE)
-  mod <- create_msm(tm, covs, pk_covs, FALSE)
   tmax <- 3 * 365.25
-  mod$set_knots(tmax, seq(0, tmax - 1, length.out = 1000), 3)
-  mod$simulate_data(N, beta_haz, beta_pk, log_w0)
+  mod <- create_msm(tm, covs, pk_covs, FALSE, tmax = tmax)
+  mod$simulate_data(N, beta_haz, beta_pk, w0)
 }
 
 

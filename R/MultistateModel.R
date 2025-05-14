@@ -7,16 +7,17 @@
 #' elements \code{ka} \code{CL}, and \code{V2}. If \code{NULL}, a PK model
 #' will not be created.
 #' @param compile compile 'Stan' model?
+#' @param ... Arguments passed to \code{\link{MultistateModel}} init
 #' @return A \code{\link{MultistateModel}} object.
 create_msm <- function(tm, hazard_covs = NULL, pk_covs = NULL,
-                       compile = TRUE) {
+                       compile = TRUE, ...) {
   mss <- MultistateSystem$new(tm)
   if (!is.null(pk_covs)) {
     pk <- PKModel$new(pk_covs)
   } else {
     pk <- NULL
   }
-  MultistateModel$new(mss, hazard_covs, pk, compile)
+  MultistateModel$new(mss, hazard_covs, pk, compile, ...)
 }
 
 #' Main model class
@@ -159,12 +160,13 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' @param beta_pk Covariate effects on PK parameters. A named list with
     #' three elements, each being a vector. If any element is \code{NULL},
     #' a vector of zeros is used.
-    #' @param log_w0 Baseline hazard rate for all transitions
+    #' @param w0 Baseline hazard rate for all transitions
     #' @return a \code{\link{PathData}} object
     simulate_data = function(N_subject = 100, beta_haz = NULL,
-                             beta_pk = NULL, log_w0 = -4) {
+                             beta_pk = NULL, w0 = 1e-3) {
       sub_df <- self$simulate_subjects(N_subject)
-      checkmate::assert_number(log_w0)
+      checkmate::assert_number(w0, lower = 0)
+      log_w0 <- log(w0)
       log_w0_vec <- rep(log_w0, self$system$num_trans())
       if (is.null(beta_haz)) {
         L <- length(self$target_states())
