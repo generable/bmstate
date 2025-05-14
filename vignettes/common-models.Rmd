@@ -1,6 +1,10 @@
 ---
 title: "Common multistate models"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    toc: true 
+    toc_depth: 3
+    number_sections: true
 vignette: >
   %\VignetteIndexEntry{Common multistate models}
   %\VignetteEngine{knitr::rmarkdown}
@@ -21,7 +25,7 @@ N_sub <- 300
 
 # Basic survival model
 
-## TransitionMatrix
+First we create a `TransitionMatrix`
 
 ```{r}
 tm <- transmat_survival()
@@ -29,20 +33,22 @@ print(tm)
 tm$plot()
 ```
 
-## MultistateModel
+Then we create a `MultistateModel`
 
 ```{r}
 mod <- create_msm(tm)
 print(mod)
 ```
-
-## Simulation
+Now we can simulate events.
 
 ```{r}
-pd <- mod$simulate_data(N_sub)
+log_haz <- 1e-4
+pd <- mod$simulate_data(N_sub, log_w0 = log_haz)
 pd$plot_paths()
 pd$plot_graph()
 ```
 
 
-
+```{r}
+plot_time_dist(pd$as_transitions()$time)
+```

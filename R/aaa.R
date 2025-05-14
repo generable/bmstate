@@ -57,7 +57,6 @@ simulate_example_data <- function(N = 10, beta_haz = NULL,
   )
   tm <- transmat_full(self_loops = FALSE)
   mod <- create_msm(tm, covs, pk_covs, FALSE)
-
   tmax <- 3 * 365.25
   mod$set_knots(tmax, seq(0, tmax - 1, length.out = 1000), 3)
   mod$simulate_data(N, beta_haz, beta_pk, log_w0)
@@ -82,4 +81,19 @@ do_split <- function(pd, p_test = 0.25) {
     test_sub = test_sub,
     train_sub = train_sub
   )
+}
+
+#' Plot event time distribution
+#'
+#' @export
+#' @param t a vector of event times
+plot_time_dist <- function(t) {
+  ggplot(data.frame(Time = t), aes(x = .data$Time)) +
+    ggdist::stat_halfeye() +
+    geom_vline(
+      mapping = NULL,
+      xintercept = mean(t),
+      color = "firebrick",
+      lty = 2
+    )
 }
