@@ -61,6 +61,27 @@ simulate_example_data <- function(N = 10, beta_haz = NULL,
   mod$simulate_data(N, beta_haz, beta_pk, w0)
 }
 
+#' Example simulation setup
+#'
+#' @export
+#' @param beta_age effect of age on death rate
+#' @param beta_dose effect of dose on illness rate
+#' @return a list containing a model and true betas
+example_sim_setup_illnessdeath <- function(beta_dose = -0.5, beta_age = 0.5) {
+  checkmate::assert_number(beta_dose)
+  checkmate::assert_number(beta_age)
+  covariates <- c("sex", "dose_amt", "age")
+  tm <- transmat_illnessdeath()
+  bh_true <- matrix(0, 2, 3)
+  colnames(bh_true) <- covariates
+  rownames(bh_true) <- tm$states[2:3]
+  bh_true[2, 3] <- beta_age
+  bh_true[1, 2] <- beta_dose
+  list(
+    model = create_msm(tm, covariates),
+    beta_haz = bh_true
+  )
+}
 
 #' Train-test split
 #'

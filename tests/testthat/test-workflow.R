@@ -2,7 +2,6 @@ test_that("entire workflow works", {
   # Options
   options <- list(
     N_subject = 200,
-    covariates = c("sex", "dose_amt", "age"),
     iter_warmup = 60,
     iter_sampling = 30,
     chains = 1,
@@ -12,16 +11,11 @@ test_that("entire workflow works", {
   NR <- 2
 
   # Setup
-  effect_sizes <- c(0.5, 0.5, 0)
   h0_base <- 1e-3
-
-  # Create model
-  tm <- transmat_illnessdeath()
-  mod <- create_msm(tm, options$covariates)
-  expect_true(inherits(mod, "CmdStanModel"))
+  setup <- example_sim_setup_illnessdeath()
 
   # Simulate data
-  pd <- mod$simulate_data(options$N_subject)
+  pd <- setup$mod$simulate_data(options$N_subject, beta_haz = setup$beta_haz)
 
   split <- do_split(pd)
   expect_true(inherits(pd, "PathData"))
