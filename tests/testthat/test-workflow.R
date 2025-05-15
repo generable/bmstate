@@ -1,7 +1,7 @@
 test_that("entire workflow works", {
   # Options
   options <- list(
-    N_subject = 200,
+    N_subject = 1000,
     iter_warmup = 60,
     iter_sampling = 30,
     chains = 1,
@@ -13,14 +13,20 @@ test_that("entire workflow works", {
   # Setup
   h0_base <- 1e-3
   setup <- example_sim_setup_illnessdeath()
+  mod <- setup$model
 
   # Simulate data
-  pd <- setup$mod$simulate_data(options$N_subject, beta_haz = setup$beta_haz)
+  pd <- mod$simulate_data(options$N_subject, beta_haz = setup$beta_haz)
 
+  # Split
   split <- do_split(pd)
   expect_true(inherits(pd, "PathData"))
   expect_equal(pd$n_paths(), options$N_subject)
   expect_equal(pd$longest_path()$n_paths(), 1)
+
+  # CoxPH fit
+  cph <- pd$fit_coxph(covariates = mod$covs())
+  msf <- pd$fit_mstate(covariates = mod$covs())
 
   # Stan data
   stan_dat <- create_stan_data(
