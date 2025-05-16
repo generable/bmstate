@@ -26,7 +26,7 @@ test_that("entire workflow works", {
 
   # CoxPH fit
   cph <- pd$train$fit_coxph(covariates = mod$covs())
-  msf <- pd$train$fit_mstate(covariates = mod$covs())
+  msf <- pd$train$fit_mstate()
 
   # Stan data
   stan_dat <- create_stan_data(mod, pd$train)

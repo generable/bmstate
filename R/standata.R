@@ -28,15 +28,10 @@ create_stan_data <- function(model, pd, dosing = NULL, prior_only = FALSE) {
     }
     at_risk[tm$at_risk(dat$from[n]), n] <- 1
   }
-  ttype <- dplyr::dense_rank(tm$trans_df()$state)
-
-  prior_cols <- which(grepl(colnames(dat), pattern = "prior_"))
-  D_history <- length(prior_cols)
-  history <- dat[, prior_cols]
+  ttype <- tm$trans_df()$trans_type
 
   # Average event rates
-  pd_train <- pd$filter(subject_ids_keep = train_sub)
-  df_ttype <- average_haz_per_ttype(pd_train, dt)
+  df_ttype <- average_haz_per_ttype(pd, tm)
 
   # Collect
   out <- list(
@@ -47,18 +42,10 @@ create_stan_data <- function(model, pd, dosing = NULL, prior_only = FALSE) {
     transition = transition,
     ttype = ttype,
     N_trans_types = max(ttype),
-    N_country = max(dat$country_num),
-    x_his = history,
-    D_his = D_history,
-    I_sub = as.numeric("sub" %in% covariates),
-    I_cnt = as.numeric("cnt" %in% covariates),
-    I_avg = as.numeric("avg" %in% covariates),
+    I_auc = as.numeric("auc" %in% covariates),
     x_cnt = dat$country_num,
     x_cnt_oos = dat_oos$country_num,
-    x_fda = dat$first_dose_amount,
-    x_fda_oos = dat_oos$first_dose_amount,
-    z_mode_is = 2,
-    z_mode_oos = 1
+    x_fda = dat$first_dose_amount
   )
 
   # Spline basis
@@ -465,15 +452,14 @@ create_stan_data_intervalidx <- function(t_start, t_end, t_grid, delta_grid) {
 }
 
 
-
 # Average hazard per transition type, ignoring transitions that didnt
 # occur
-average_haz_per_ttype <- function(pd, dt) {
-  msdata <- pd$as_msdata()$msdata
-  msfit <- fit_mstate(msdata)
-  h0 <- estimate_average_hazard(msfit) |> dplyr::arrange(trans)
-  df_ttype <- dt$legend |> dplyr::select(transition, trans_type)
-  df_ttype$trans <- df_ttype$transition
+average_haz_per_ttype <- function(pd, transmat) {
+  msfit <- pd$fit_mstate()
+  h0 <- msfit_average_hazard(msfit) |> dplyr::arrange(.data$trans)
+  df_trans <- transmat$trans_df()
+  df_ttype <- df_trans |> dplyr::select(transition, trans_type)
+  df_ttype$trans <- df_ttype$trans_idx
   h0 <- h0 |> left_join(df_ttype, by = "trans")
   df_mean_log_h0 <- h0 |>
     dplyr::filter(avg_haz > 0) |>
@@ -481,7 +467,7 @@ average_haz_per_ttype <- function(pd, dt) {
     mutate(log_haz = log(avg_haz)) |>
     summarize(log_h0_avg = mean(log_haz)) |>
     dplyr::arrange(trans_type)
-  df_ttype <- df_ttype |> left_join(df_mean_log_h0, by = "trans_type")
+  df_ttype |> left_join(df_mean_log_h0, by = "trans_type")
 }
 
 # Edit Stan data, sort of computes which() for the binary vectors of each

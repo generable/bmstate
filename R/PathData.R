@@ -361,7 +361,11 @@ PathData <- R6::R6Class(
     fit_mstate = function(covariates = NULL, ...) {
       msdat <- self$as_msdata(covariates = covariates)
       cph <- self$fit_coxph(covariates, ...)
-      mstate::msfit(object = cph, variance = FALSE, trans = attr(msdat, "trans"))
+      msdat$strata <- msdat$trans
+      mstate::msfit(
+        object = cph, newdata = msdat, variance = FALSE,
+        trans = attr(msdat, "trans")
+      )
     },
 
     #' @description Filter based on path id, creates new object
@@ -491,21 +495,55 @@ msfit_average_hazard <- function(msfit) {
 # Creates the additional rows corresponding to each transition
 # that is at risk
 to_mstate_format <- function(df, transmat) {
-  df |>
-    dplyr::rowwise() |>
-    dplyr::mutate(
-      possible_targets = list(transmat$at_risk(from)),
-      remaining_targets = list(setdiff(possible_targets, to)),
-      all_targets = list(c(to, remaining_targets)),
-      status_all = list(c(status, rep(0, length(remaining_targets))))
-    ) |>
-    dplyr::select(-"to", -"status", -"possible_targets", -"remaining_targets") |>
-    tidyr::unnest(c(all_targets, status_all)) |>
-    dplyr::rename(to = all_targets, status = status_all) |>
-    dplyr::ungroup()
+  N <- nrow(df)
+  df_out <- NULL
+  TFI <- transmat$as_transition_index_matrix()
+  for (n in 1:N) {
+    row <- df[n, ]
+    possible_targets <- transmat$at_risk(row$from)
+
+    if (row$status == 0) {
+      rows <- NULL
+      possible_targets_remaining <- possible_targets
+    } else {
+      rows <- row
+      possible_targets_remaining <- setdiff(possible_targets, row$to)
+    }
+
+    J <- length(possible_targets_remaining)
+
+    for (j in seq_len(J)) {
+      row_rep <- row
+      row_rep$to <- possible_targets_remaining[j]
+      row_rep$trans <- TFI[row_rep$from, row_rep$to]
+      row_rep$status <- 0
+      rows <- rbind(rows, row_rep)
+    }
+    df_out <- rbind(df_out, rows)
+  }
+  df_out
 }
 
 
+# Helper (slow?)
+set_trans_based_on_from_and_to <- function(dt, transmat) {
+  df <- transmat$trans_df()
+  R <- nrow(dt)
+  new_trans <- rep(0, R)
+  for (r in seq_len(R)) {
+    i1 <- which(df$prev_state == dt[r, ]$from)
+    i2 <- which(df$state == dt[r, ]$to)
+    idx <- base::intersect(i1, i2)
+    if (length(idx) != 1) {
+      print(dt[r, ])
+      print(idx)
+      stop("error in set_trans_based_on_from_and_to")
+    }
+    new_trans[r] <- idx
+  }
+  dt$trans <- new_trans
+  dt
+}
 
 
 summarize_event_prob <- function(pd, target_times, by = c("subject_id")) {

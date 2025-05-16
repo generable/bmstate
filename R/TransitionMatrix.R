@@ -153,6 +153,7 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
         self$states[df$prev_state], "->",
         self$states[df$state]
       )
+      df$trans_type <- dplyr::dense_rank(df$state)
       df
     },
 
