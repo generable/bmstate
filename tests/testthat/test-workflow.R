@@ -19,17 +19,17 @@ test_that("entire workflow works", {
   pd <- mod$simulate_data(options$N_subject, beta_haz = setup$beta_haz)
 
   # Split
-  split <- do_split(pd)
-  expect_true(inherits(pd, "PathData"))
-  expect_equal(split$pd_test$n_paths(), options$N_subject * 0.25)
-  expect_equal(split$pd_train$pd$longest_path()$n_paths(), 1)
+  pd <- do_split(pd)
+  expect_true(inherits(pd$test, "PathData"))
+  expect_equal(pd$test$n_paths(), options$N_subject * 0.25)
+  expect_equal(pd$train$longest_path()$n_paths(), 1)
 
   # CoxPH fit
-  cph <- pd$fit_coxph(covariates = mod$covs())
-  msf <- pd$fit_mstate(covariates = mod$covs())
+  cph <- pd$train$fit_coxph(covariates = mod$covs())
+  msf <- pd$test$fit_mstate(covariates = mod$covs())
 
   # Stan data
-  stan_dat <- create_stan_data(mod, pd)
+  stan_dat <- create_stan_data(mod, pd$train)
   sd <- stan_dat$stan_data
 
   # Fit the model
