@@ -6,27 +6,29 @@
 create_stan_data <- function(model, pd, dosing = NULL, prior_only = FALSE) {
   checkmate::assert_class(model, "MultistateModel")
   checkmate::assert_class(pd, "PathData")
-  check_equal_transmats(model$system$tm(), pd$transmat)
+  tm <- pd$transmat
+  check_equal_transmats(tm, model$system$tm())
+
   checkmate::assert_logical(prior_only, len = 1)
-  dt <- pd$as_transitions()
-  N_obs <- nrow(dat)
   if (!is.null(dosing)) {
     checkmate::assert_class(dosing, "data.frame")
     stopifnot(!all(duplicated(dosing$subject_id)))
   }
 
   # Transition and at-risk indicators
-  transition <- matrix(0, N_trans, N_obs)
-  at_risk <- matrix(0, N_trans, N_obs)
-  for (n in seq_len(N_obs)) {
-    tval <- dat$transition[n]
+  dat <- pd$as_transitions()
+  N_int <- nrow(dat)
+  N_trans <- tm$num_trans()
+  transition <- matrix(0, N_trans, N_int)
+  at_risk <- matrix(0, N_trans, N_int)
+  for (n in seq_len(N_int)) {
+    tval <- dat$trans_idx[n]
     if (tval > 0) {
       transition[tval, n] <- 1
     }
-    possible <- PT[, dat$prev_state[n]]
-    at_risk[which(possible == 1), n] <- 1
+    at_risk[tm$at_risk(dat$from[n]), n] <- 1
   }
-  ttype <- dt$legend$trans_type
+  ttype <- dplyr::dense_rank(tm$trans_df()$state)
 
   prior_cols <- which(grepl(colnames(dat), pattern = "prior_"))
   D_history <- length(prior_cols)
@@ -39,7 +41,7 @@ create_stan_data <- function(model, pd, dosing = NULL, prior_only = FALSE) {
   # Collect
   out <- list(
     mu_w0 = df_ttype$log_h0_avg,
-    N_obs = N_obs,
+    N_int = N_int,
     N_trans = N_trans,
     at_risk = at_risk,
     transition = transition,
@@ -125,7 +127,7 @@ create_stan_data_spline <- function(dat, sd, k, P, NK, PT, t_max) {
   print(knots)
   BK <- c(0, t_max)
   M <- length(knots) + k
-  N <- sd$N_obs
+  N <- sd$N_int
   SBF <- array(0, dim = c(N, M))
   SBF_pred <- bspline_basis(t_pred, k, knots, BK)
   P <- length(t_pred)
@@ -135,7 +137,7 @@ create_stan_data_spline <- function(dat, sd, k, P, NK, PT, t_max) {
   ids <- unique(dat$subject_id) # keeps order ?
   N_sub <- length(ids)
   pb <- progress::progress_bar$new(total = N_sub)
-  n_obs <- 0
+  N_int <- 0
 
   # This creates also the integer subject ids (x_sub)
   x_sub <- rep(0, N)
@@ -148,17 +150,17 @@ create_stan_data_spline <- function(dat, sd, k, P, NK, PT, t_max) {
     id_map <- rbind(id_map, data.frame(n, ids[n]))
     R <- nrow(df_n)
     for (r in 1:R) {
-      n_obs <- n_obs + 1
+      N_int <- N_int + 1
       t_cur <- df_n$time[r]
       t_prev <- 0 # assume first interval for each subject starts from 0
       if (r > 1) {
         t_prev <- df_n$time[r - 1]
       }
       ms <- bspline_basis(t_cur, k, knots, BK)
-      t_end[n_obs] <- t_cur
-      t_start[n_obs] <- t_prev
-      SBF[n_obs, ] <- ms
-      x_sub[n_obs] <- n
+      t_end[N_int] <- t_cur
+      t_start[N_int] <- t_prev
+      SBF[N_int, ] <- ms
+      x_sub[N_int] <- n
     }
   }
   colnames(id_map) <- c("x_sub", "subject_id")
@@ -434,12 +436,12 @@ create_stan_data_covariates <- function(dat, dat_oos, covariates,
 
 # Create additional Stan data, interval information
 create_stan_data_intervalidx <- function(t_start, t_end, t_grid, delta_grid) {
-  N_obs <- length(t_start)
+  N_int <- length(t_start)
   N_grid <- length(t_grid)
-  t_start_idx_m1 <- rep(0, N_obs)
-  t_end_idx <- rep(0, N_obs)
-  cm <- rep(0, N_obs)
-  for (n in 1:N_obs) {
+  t_start_idx_m1 <- rep(0, N_int)
+  t_end_idx <- rep(0, N_int)
+  cm <- rep(0, N_int)
+  for (n in 1:N_int) {
     is <- 1 + sum(t_grid < t_start[n]) # start index of interval in grid
     ie <- sum(t_grid < t_end[n]) # end index of interval in grid
 
