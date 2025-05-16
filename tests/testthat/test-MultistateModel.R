@@ -7,7 +7,7 @@ test_that("MultistateModel init and methods work", {
   tm <- TransitionMatrix$new(a, states)
   covs <- c("CrCL")
   pk_covs <- list(ka = "age", CL = "sex", V2 = "weight")
-  mod <- create_msm(tm, covs, pk_covs, compile = F)
+  mod <- create_msm(tm, covs, pk_covs)
   expect_true(inherits(mod, "MultistateModel"))
   expect_output(print(mod))
 
@@ -26,7 +26,7 @@ test_that("MultistateModel init and methods work", {
 
 test_that("path generation via MultistateSystem works", {
   tm <- transmat_full(self_loops = TRUE)
-  mod <- create_msm(tm, "age", NULL, FALSE)
+  mod <- create_msm(tm, "age", NULL)
   tmax <- 3 * 365.25
   mod$set_knots(tmax, seq(0, tmax - 1, length.out = 1000), 4)
   N <- 100
@@ -41,7 +41,7 @@ test_that("path generation via MultistateSystem works", {
 
 test_that("data simulation via MultistateModel works", {
   tm <- transmat_full(self_loops = FALSE)
-  mod <- create_msm(tm, "age", NULL, FALSE)
+  mod <- create_msm(tm, "age", NULL)
   tmax <- 3 * 365.25
   mod$set_knots(tmax, seq(0, tmax - 1, length.out = 1000), 3)
   N_sub <- 84
@@ -58,7 +58,7 @@ test_that("MultistateModel with PK submodel works", {
     CL = "CrCL",
     V2 = c("weight", "sex")
   )
-  mod <- create_msm(tm, covs, pk_covs, FALSE)
+  mod <- create_msm(tm, covs, pk_covs)
   expect_equal(mod$covs(), c("sex", "age", "ss_auc"))
   expect_equal(mod$data_covs(), c("sex", "age", "CrCL", "weight"))
   tmax <- 3 * 365.25

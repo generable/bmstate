@@ -42,7 +42,7 @@ Then we create a `MultistateModel` using this graph.
 
 ```{r}
 tmax <- 3 * 365.25
-mod <- create_msm(tm, tmax = tmax, compile = FALSE)
+mod <- create_msm(tm, tmax = tmax)
 print(mod)
 ```
 
@@ -73,7 +73,7 @@ The transition matrix is for a competing risks model can be created like so.
 tm <- transmat_comprisk()
 print(tm)
 tm$plot()
-mod <- create_msm(tm, tmax = tmax, compile = FALSE)
+mod <- create_msm(tm, tmax = tmax)
 ```
 
 This model has 3 possible transitions. 
@@ -116,7 +116,7 @@ The illness-death model is another common multistate model.
 tm <- transmat_illnessdeath()
 print(tm)
 tm$plot()
-mod <- create_msm(tm, compile = FALSE)
+mod <- create_msm(tm)
 pd <- mod$simulate_data(N_sub, w0 = 1e-2)
 pd$plot_paths()
 pd$plot_graph()
@@ -132,7 +132,7 @@ transitions.
 tm <- transmat_full(state_names = LETTERS[1:5], sources = 1, terminal = c(4, 5))
 print(tm)
 tm$plot()
-mod <- create_msm(tm, compile = FALSE)
+mod <- create_msm(tm)
 pd <- mod$simulate_data(N_sub, w0 = 1e-3)
 pd$plot_paths()
 pd$plot_graph()
