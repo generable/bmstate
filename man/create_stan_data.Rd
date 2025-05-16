@@ -4,7 +4,7 @@
 \alias{create_stan_data}
 \title{Creating Stan data list}
 \usage{
-create_stan_data(model, pd, dosing = NULL, split = NULL, prior_only = FALSE)
+create_stan_data(model, pd, dosing = NULL, prior_only = FALSE)
 }
 \arguments{
 \item{model}{A \code{\link{MultistateModel}} object.}
@@ -12,9 +12,6 @@ create_stan_data(model, pd, dosing = NULL, split = NULL, prior_only = FALSE)
 \item{pd}{A \code{\link{PathData}} object of observed paths.}
 
 \item{dosing}{Dosing data frame.}
-
-\item{split}{Train-test split. See \code{\link{do_split}}. If \code{NULL},
-all subjects are training data.}
 
 \item{prior_only}{Sample from prior only.}
 }

@@ -29,7 +29,7 @@ test_that("entire workflow works", {
   msf <- pd$fit_mstate(covariates = mod$covs())
 
   # Stan data
-  stan_dat <- create_stan_data(mod, pd, split = split)
+  stan_dat <- create_stan_data(mod, pd)
   sd <- stan_dat$stan_data
 
   # Fit the model

@@ -3,8 +3,7 @@
 #' @export
 #' @inheritParams fit_model
 #' @return A list of data for Stan.
-create_stan_data <- function(model, pd, dosing = NULL, split = NULL,
-                             prior_only = FALSE) {
+create_stan_data <- function(model, pd, dosing = NULL, prior_only = FALSE) {
   checkmate::assert_class(model, "MultistateModel")
   checkmate::assert_class(pd, "PathData")
   checkmate::assert_logical(prior_only, len = 1)
