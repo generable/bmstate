@@ -88,7 +88,7 @@ example_sim_setup_illnessdeath <- function(beta_dose = -0.5, beta_age = 0.5) {
 #' @export
 #' @param pd A \code{\link{PathData}} object
 #' @param p_test Proportion of test subjects
-#' @return a list with test and train subject indices
+#' @return a list with test and train \code{\link{PathData}} objects
 do_split <- function(pd, p_test = 0.25) {
   checkmate::assert_class(pd, "PathData")
   checkmate::assert_number(p_test, lower = 0, upper = 1)
@@ -97,9 +97,10 @@ do_split <- function(pd, p_test = 0.25) {
   i_test <- sample.int(N_sub, round(N_sub * p_test))
   test_sub <- all_sub[i_test]
   train_sub <- setdiff(all_sub, test_sub)
+  sdf <- pd$subject_df
   list(
-    test_sub = test_sub,
-    train_sub = train_sub
+    test = pd$filter(subject_ids_keep = sdf$subject_id[test_sub]),
+    train = pd$filter(subject_ids_keep = sdf$subject_id[train_sub])
   )
 }
 

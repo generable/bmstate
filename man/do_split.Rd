@@ -12,7 +12,7 @@ do_split(pd, p_test = 0.25)
 \item{p_test}{Proportion of test subjects}
 }
 \value{
-a list with test and train subject indices
+a list with test and train \code{\link{PathData}} objects
 }
 \description{
 Train-test split

@@ -86,6 +86,12 @@ PathData <- R6::R6Class(
       path_df$path_id <- ensure_numeric_factor(path_df$path_id)
       link_df$path_id <- ensure_numeric_factor(link_df$path_id)
       link_df$subject_id <- NULL
+
+      # Ensure order
+      link_df <- link_df |> dplyr::arrange(.data$path_id)
+      subject_df <- subject_df |> dplyr::arrange(.data$subject_index)
+
+      # Set fields
       self$transmat <- transmat
       self$covs <- covs
       self$subject_df <- subject_df

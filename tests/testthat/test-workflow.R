@@ -21,8 +21,8 @@ test_that("entire workflow works", {
   # Split
   split <- do_split(pd)
   expect_true(inherits(pd, "PathData"))
-  expect_equal(pd$n_paths(), options$N_subject)
-  expect_equal(pd$longest_path()$n_paths(), 1)
+  expect_equal(split$pd_test$n_paths(), options$N_subject * 0.25)
+  expect_equal(split$pd_train$pd$longest_path()$n_paths(), 1)
 
   # CoxPH fit
   cph <- pd$fit_coxph(covariates = mod$covs())
