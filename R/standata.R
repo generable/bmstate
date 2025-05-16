@@ -1,3 +1,124 @@
+#' Creating Stan data list
+#'
+#' @export
+#' @inheritParams fit_model
+#' @return A list of data for Stan.
+create_stan_data <- function(model, pd, dosing = NULL, split = NULL,
+                             prior_only = FALSE) {
+  checkmate::assert_class(model, "MultistateModel")
+  checkmate::assert_class(pd, "PathData")
+  checkmate::assert_logical(prior_only, len = 1)
+  dt <- pd$as_transitions()
+
+  dat <- dt$df |> dplyr::filter(subject_id %in% train_sub)
+  dat_oos <- dt$df |>
+    dplyr::filter(subject_id %in% test_sub) |>
+    dplyr::group_by(subject_id) |>
+    dplyr::slice(1) |>
+    dplyr::ungroup()
+  PT <- legend_to_PT_matrix(dt$legend)
+  N_trans <- max(dt$legend$transition)
+  N_obs <- nrow(dat)
+  if (!is.null(pk)) {
+    stopifnot(!all(duplicated(pk$subject_id)))
+  }
+
+  # Transition and at-risk indicators
+  transition <- matrix(0, N_trans, N_obs)
+  at_risk <- matrix(0, N_trans, N_obs)
+  for (n in seq_len(N_obs)) {
+    tval <- dat$transition[n]
+    if (tval > 0) {
+      transition[tval, n] <- 1
+    }
+    possible <- PT[, dat$prev_state[n]]
+    at_risk[which(possible == 1), n] <- 1
+  }
+  ttype <- dt$legend$trans_type
+
+  prior_cols <- which(grepl(colnames(dat), pattern = "prior_"))
+  D_history <- length(prior_cols)
+  history <- dat[, prior_cols]
+
+  # Average event rates
+  pd_train <- pd$filter(subject_ids_keep = train_sub)
+  df_ttype <- average_haz_per_ttype(pd_train, dt)
+
+  # Collect
+  out <- list(
+    mu_w0 = df_ttype$log_h0_avg,
+    N_obs = N_obs,
+    N_trans = N_trans,
+    at_risk = at_risk,
+    transition = transition,
+    ttype = ttype,
+    N_trans_types = max(ttype),
+    N_country = max(dat$country_num),
+    x_his = history,
+    D_his = D_history,
+    I_sub = as.numeric("sub" %in% covariates),
+    I_cnt = as.numeric("cnt" %in% covariates),
+    I_avg = as.numeric("avg" %in% covariates),
+    x_cnt = dat$country_num,
+    x_cnt_oos = dat_oos$country_num,
+    x_fda = dat$first_dose_amount,
+    x_fda_oos = dat_oos$first_dose_amount,
+    z_mode_is = 2,
+    z_mode_oos = 1
+  )
+
+  # Spline basis
+  k_spline <- 3
+  NK <- NK # num of internal knots
+  int_dat <- create_stan_data_spline(dat, out, k_spline, P, NK, PT, t_max)
+  out <- c(out, int_dat$stan_data)
+  id_map_train <- int_dat$id_map
+
+  # Oos
+  idm_oos <- create_stan_data_idmap(dat_oos)
+  out_add <- list(
+    x_sub_oos = idm_oos$stan_data$x_sub,
+    sub_start_idx_oos = idm_oos$stan_data$sub_start_idx,
+    N_sub_oos = idm_oos$stan_data$N_sub
+  )
+  id_map_test <- idm_oos$id_map
+  out <- c(out, out_add)
+
+  # Other covariates and pk covariates
+  oth <- create_stan_data_covariates(
+    dat, dat_oos, covariates, ka_covariates, CL_covariates, V2_covariates,
+    out$sub_start_idx,
+    out$sub_start_idx_oos
+  )
+  out <- c(out, oth$stan_data)
+
+  # Another way to format the transitions and at risk matrices
+  # needed for vectorizing likelihood
+  out <- c(out, which_format_for_stan(transition, "trans"))
+  out <- c(out, which_format_for_stan(at_risk, "risk"))
+
+  # PK data
+  out <- c(out, create_stan_data_pk(pk, out, id_map_train, id_map_test))
+  out <- c(out, create_stan_data_time_since_last_pk(out))
+
+  # Likelihood flags
+  out$omit_lik_hazard <- as.integer(prior_only)
+  out$omit_lik_pk <- as.integer(prior_only)
+  out$do_pk <- as.integer(do_pk)
+
+  # Add t_int if needed by some model versions
+  out$t_int <- out$t_end - out$t_start
+
+  # Return
+  list(
+    stan_data = out,
+    id_map_train = id_map_train,
+    id_map_test = id_map_test,
+    x_oth_names = oth$x_oth_names
+  )
+}
+
+
 # Evaluate spline basis functions and their integrals
 # For each interval
 # NK = number of (inner) knots
@@ -350,145 +471,6 @@ create_stan_data_intervalidx <- function(t_start, t_end, t_grid, delta_grid) {
 }
 
 
-#' Creating Stan data list
-#'
-#' @export
-#' @param P number of prediction points
-#' @param NK number of internal spline knots
-#' @param pd PD data frame
-#' @param pk PK data frame
-#' @param covariates hazard covariates
-#' @param ka_covariates covariates that affect ka in PK model
-#' @param CL_covariates covariates that affect CL in PK model
-#' @param V2_covariates covariates that affect V2 in PK model
-#' @param train_sub training subjects
-#' @param test_sub test subjects
-#' @param t_max max time of interest
-#' @param do_pk should pk model be used
-#' @param prior_only ignore likelihood?
-#' @return A list of data for Stan.
-create_stan_data <- function(pd, pk, covariates,
-                             ka_covariates,
-                             CL_covariates,
-                             V2_covariates,
-                             train_sub, test_sub,
-                             P = 30, NK = 3, t_max = NULL,
-                             do_pk = TRUE,
-                             prior_only = FALSE) {
-  checkmate::assert_logical(prior_only)
-  checkmate::assert_logical(do_pk)
-  checkmate::assert_class(pd, "PathData")
-  checkmate::assert_integerish(P, lower = 1, len = 1)
-  checkmate::assert_integerish(NK, lower = 1, len = 1)
-  dt <- pd$as_transitions()
-
-  dat <- dt$df |> dplyr::filter(subject_id %in% train_sub)
-  dat_oos <- dt$df |>
-    dplyr::filter(subject_id %in% test_sub) |>
-    dplyr::group_by(subject_id) |>
-    dplyr::slice(1) |>
-    dplyr::ungroup()
-  PT <- legend_to_PT_matrix(dt$legend)
-  N_trans <- max(dt$legend$transition)
-  N_obs <- nrow(dat)
-  if (!is.null(pk)) {
-    stopifnot(!all(duplicated(pk$subject_id)))
-  }
-
-  # Transition and at-risk indicators
-  transition <- matrix(0, N_trans, N_obs)
-  at_risk <- matrix(0, N_trans, N_obs)
-  for (n in seq_len(N_obs)) {
-    tval <- dat$transition[n]
-    if (tval > 0) {
-      transition[tval, n] <- 1
-    }
-    possible <- PT[, dat$prev_state[n]]
-    at_risk[which(possible == 1), n] <- 1
-  }
-  ttype <- dt$legend$trans_type
-
-  prior_cols <- which(grepl(colnames(dat), pattern = "prior_"))
-  D_history <- length(prior_cols)
-  history <- dat[, prior_cols]
-
-  # Average event rates
-  pd_train <- pd$filter(subject_ids_keep = train_sub)
-  df_ttype <- average_haz_per_ttype(pd_train, dt)
-
-  # Collect
-  out <- list(
-    mu_w0 = df_ttype$log_h0_avg,
-    N_obs = N_obs,
-    N_trans = N_trans,
-    at_risk = at_risk,
-    transition = transition,
-    ttype = ttype,
-    N_trans_types = max(ttype),
-    N_country = max(dat$country_num),
-    x_his = history,
-    D_his = D_history,
-    I_sub = as.numeric("sub" %in% covariates),
-    I_cnt = as.numeric("cnt" %in% covariates),
-    I_avg = as.numeric("avg" %in% covariates),
-    x_cnt = dat$country_num,
-    x_cnt_oos = dat_oos$country_num,
-    x_fda = dat$first_dose_amount,
-    x_fda_oos = dat_oos$first_dose_amount,
-    z_mode_is = 2,
-    z_mode_oos = 1
-  )
-
-  # Spline basis
-  k_spline <- 3
-  NK <- NK # num of internal knots
-  int_dat <- create_stan_data_spline(dat, out, k_spline, P, NK, PT, t_max)
-  out <- c(out, int_dat$stan_data)
-  id_map_train <- int_dat$id_map
-
-  # Oos
-  idm_oos <- create_stan_data_idmap(dat_oos)
-  out_add <- list(
-    x_sub_oos = idm_oos$stan_data$x_sub,
-    sub_start_idx_oos = idm_oos$stan_data$sub_start_idx,
-    N_sub_oos = idm_oos$stan_data$N_sub
-  )
-  id_map_test <- idm_oos$id_map
-  out <- c(out, out_add)
-
-  # Other covariates and pk covariates
-  oth <- create_stan_data_covariates(
-    dat, dat_oos, covariates, ka_covariates, CL_covariates, V2_covariates,
-    out$sub_start_idx,
-    out$sub_start_idx_oos
-  )
-  out <- c(out, oth$stan_data)
-
-  # Another way to format the transitions and at risk matrices
-  # needed for vectorizing likelihood
-  out <- c(out, which_format_for_stan(transition, "trans"))
-  out <- c(out, which_format_for_stan(at_risk, "risk"))
-
-  # PK data
-  out <- c(out, create_stan_data_pk(pk, out, id_map_train, id_map_test))
-  out <- c(out, create_stan_data_time_since_last_pk(out))
-
-  # Likelihood flags
-  out$omit_lik_hazard <- as.integer(prior_only)
-  out$omit_lik_pk <- as.integer(prior_only)
-  out$do_pk <- as.integer(do_pk)
-
-  # Add t_int if needed by some model versions
-  out$t_int <- out$t_end - out$t_start
-
-  # Return
-  list(
-    stan_data = out,
-    id_map_train = id_map_train,
-    id_map_test = id_map_test,
-    x_oth_names = oth$x_oth_names
-  )
-}
 
 # Average hazard per transition type, ignoring transitions that didnt
 # occur

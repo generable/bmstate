@@ -4,12 +4,17 @@
 \alias{fit_model}
 \title{Fit the model.}
 \usage{
-fit_model(model, pd, prior_only = FALSE, ...)
+fit_model(model, pd, dosing = NULL, split = NULL, prior_only = FALSE, ...)
 }
 \arguments{
 \item{model}{A \code{\link{MultistateModel}} object.}
 
 \item{pd}{A \code{\link{PathData}} object of observed paths.}
+
+\item{dosing}{Dosing data frame.}
+
+\item{split}{Train-test split. See \code{\link{do_split}}. If \code{NULL},
+all subjects are training data.}
 
 \item{prior_only}{Sample from prior only.}
 

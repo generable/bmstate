@@ -1,24 +1,16 @@
-#' Create the 'Stan' data list.
-#'
-#' @inheritParams fit_model
-#' @return A list.
-create_standata <- function(model, pd, prior_only = FALSE) {
-  checkmate::assert_class(model, "MultistateModel")
-  checkmate::assert_class(pd, "PathData")
-  checkmate::assert_logical(prior_only, len = 1)
-  pd
-}
-
-
 #' Fit the model.
 #'
 #' @param model A \code{\link{MultistateModel}} object.
 #' @param pd A \code{\link{PathData}} object of observed paths.
+#' @param dosing Dosing data frame.
+#' @param split Train-test split. See \code{\link{do_split}}. If \code{NULL},
+#' all subjects are training data.
 #' @param prior_only Sample from prior only.
 #' @param ... Arguments passed to \code{sample} method of the
 #' 'CmdStanR' model.
 #' @return A \code{\link{MultistateModelFit}} object.
-fit_model <- function(model, pd, prior_only = FALSE, ...) {
+fit_model <- function(model, pd, dosing = NULL, split = NULL,
+                      prior_only = FALSE, ...) {
   checkmate::assert_class(model, "MultistateModel")
   checkmate::assert_class(pd, "PathData")
 
@@ -26,7 +18,7 @@ fit_model <- function(model, pd, prior_only = FALSE, ...) {
   stan_model <- create_stan_model()
 
   # Create Stan input list
-  d <- create_standata(model, pd, prior_only)
+  d <- create_stan_data(model, pd, dosing, split, prior_only)
 
   # Call 'Stan'
   stan_fit <- stan_model$sample(data = d$stan_data, ...)

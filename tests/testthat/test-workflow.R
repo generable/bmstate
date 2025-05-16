@@ -29,13 +29,7 @@ test_that("entire workflow works", {
   msf <- pd$fit_mstate(covariates = mod$covs())
 
   # Stan data
-  stan_dat <- create_stan_data(
-    pd, NULL, options$covariates, "age", "age", "age",
-    split$train_sub, split$test_sub,
-    P = 30, NK = options$NK,
-    do_pk = FALSE,
-    prior_only = FALSE
-  )
+  stan_dat <- create_stan_data(mod, pd, split = split)
   sd <- stan_dat$stan_data
 
   # Fit the model

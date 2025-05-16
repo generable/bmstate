@@ -4,48 +4,19 @@
 \alias{create_stan_data}
 \title{Creating Stan data list}
 \usage{
-create_stan_data(
-  pd,
-  pk,
-  covariates,
-  ka_covariates,
-  CL_covariates,
-  V2_covariates,
-  train_sub,
-  test_sub,
-  P = 30,
-  NK = 3,
-  t_max = NULL,
-  do_pk = TRUE,
-  prior_only = FALSE
-)
+create_stan_data(model, pd, dosing = NULL, split = NULL, prior_only = FALSE)
 }
 \arguments{
-\item{pd}{PD data frame}
+\item{model}{A \code{\link{MultistateModel}} object.}
 
-\item{pk}{PK data frame}
+\item{pd}{A \code{\link{PathData}} object of observed paths.}
 
-\item{covariates}{hazard covariates}
+\item{dosing}{Dosing data frame.}
 
-\item{ka_covariates}{covariates that affect ka in PK model}
+\item{split}{Train-test split. See \code{\link{do_split}}. If \code{NULL},
+all subjects are training data.}
 
-\item{CL_covariates}{covariates that affect CL in PK model}
-
-\item{V2_covariates}{covariates that affect V2 in PK model}
-
-\item{train_sub}{training subjects}
-
-\item{test_sub}{test subjects}
-
-\item{P}{number of prediction points}
-
-\item{NK}{number of internal spline knots}
-
-\item{t_max}{max time of interest}
-
-\item{do_pk}{should pk model be used}
-
-\item{prior_only}{ignore likelihood?}
+\item{prior_only}{Sample from prior only.}
 }
 \value{
 A list of data for Stan.
