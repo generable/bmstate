@@ -32,10 +32,6 @@ Main model class
 \item \href{#method-MultistateModel-simulate_events}{\code{MultistateModel$simulate_events()}}
 \item \href{#method-MultistateModel-simulate_subjects}{\code{MultistateModel$simulate_subjects()}}
 \item \href{#method-MultistateModel-target_states}{\code{MultistateModel$target_states()}}
-\item \href{#method-MultistateModel-get_stan_model}{\code{MultistateModel$get_stan_model()}}
-\item \href{#method-MultistateModel-compile}{\code{MultistateModel$compile()}}
-\item \href{#method-MultistateModel-create_standata}{\code{MultistateModel$create_standata()}}
-\item \href{#method-MultistateModel-fit}{\code{MultistateModel$fit()}}
 \item \href{#method-MultistateModel-clone}{\code{MultistateModel$clone()}}
 }
 }
@@ -49,7 +45,6 @@ Create model
   system,
   covariates = NULL,
   pk_model = NULL,
-  compile = TRUE,
   tmax = 1000,
   num_knots = 5
 )}\if{html}{\out{</div>}}
@@ -65,8 +60,6 @@ exposure estimated from PK model). Do not use reserved names
 \code{ss_auc} or \code{dose}.}
 
 \item{\code{pk_model}}{A \code{\link{PKModel}} or NULL.}
-
-\item{\code{compile}}{Should the 'Stan' model code be created and compiled.}
 
 \item{\code{tmax}}{Max time.}
 
@@ -267,83 +260,6 @@ Get indices of states that are not source states
 
 \subsection{Returns}{
 integer
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModel-get_stan_model"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModel-get_stan_model}{}}}
-\subsection{Method \code{get_stan_model()}}{
-Get the underlying 'Stan' model.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$get_stan_model()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModel-compile"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModel-compile}{}}}
-\subsection{Method \code{compile()}}{
-Create and compile the 'Stan' model.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$compile(...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{Arguments passed to \code{cmdstan_model}.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-The updated model object (invisibly).
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModel-create_standata"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModel-create_standata}{}}}
-\subsection{Method \code{create_standata()}}{
-Create the 'Stan' data list.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$create_standata(pd, prior_only = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{pd}}{A \code{\link{PathData}} object.}
-
-\item{\code{prior_only}}{Sample from prior only?}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A list.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModel-fit"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModel-fit}{}}}
-\subsection{Method \code{fit()}}{
-Fit the model.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$fit(pd, prior_only = FALSE, ...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{pd}}{A \code{\link{PathData}} object of observed paths.}
-
-\item{\code{prior_only}}{Sample from prior only.}
-
-\item{\code{...}}{Arguments passed to \code{sample} method of the
-'CmdStanR' model.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A \code{\link{MultistateModelFit}} object.
 }
 }
 \if{html}{\out{<hr>}}

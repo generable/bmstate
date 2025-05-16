@@ -6,18 +6,16 @@
 #' @param pk_covs Covariates that affect the PK parameters. A list with
 #' elements \code{ka} \code{CL}, and \code{V2}. If \code{NULL}, a PK model
 #' will not be created.
-#' @param compile compile 'Stan' model?
 #' @param ... Arguments passed to \code{\link{MultistateModel}} init
 #' @return A \code{\link{MultistateModel}} object.
-create_msm <- function(tm, hazard_covs = NULL, pk_covs = NULL,
-                       compile = TRUE, ...) {
+create_msm <- function(tm, hazard_covs = NULL, pk_covs = NULL, ...) {
   mss <- MultistateSystem$new(tm)
   if (!is.null(pk_covs)) {
     pk <- PKModel$new(pk_covs)
   } else {
     pk <- NULL
   }
-  MultistateModel$new(mss, hazard_covs, pk, compile, ...)
+  MultistateModel$new(mss, hazard_covs, pk, ...)
 }
 
 #' Main model class
@@ -29,7 +27,6 @@ MultistateModel <- R6::R6Class("MultistateModel",
 
   # PRIVATE
   private = list(
-    stan_model = NULL,
     hazard_covariates = NULL,
     simulate_log_hazard_multipliers = function(df_subjects, beta) {
       ts <- self$target_states()
@@ -70,11 +67,10 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' exposure estimated from PK model). Do not use reserved names
     #' \code{ss_auc} or \code{dose}.
     #' @param pk_model A \code{\link{PKModel}} or NULL.
-    #' @param compile Should the 'Stan' model code be created and compiled.
     #' @param tmax Max time.
     #' @param num_knots Total number of spline knots.
     initialize = function(system, covariates = NULL, pk_model = NULL,
-                          compile = TRUE, tmax = 1000, num_knots = 5) {
+                          tmax = 1000, num_knots = 5) {
       checkmate::assert_character(covariates, null.ok = TRUE)
       checkmate::assert_true(!("ss_auc" %in% covariates)) # special name
       checkmate::assert_true(!("dose" %in% covariates)) # special name
@@ -88,9 +84,6 @@ MultistateModel <- R6::R6Class("MultistateModel",
       checkmate::assert_number(tmax, lower = 0)
       checkmate::assert_integerish(num_knots, lower = 3, upper = 20)
       self$set_knots(tmax, default_event_distribution(tmax), num_knots)
-      if (compile) {
-        self$compile()
-      }
     },
 
     #' @description Set knot locations based on event times
@@ -255,67 +248,6 @@ MultistateModel <- R6::R6Class("MultistateModel",
     target_states = function() {
       df <- self$system$tm()$states_df() |> dplyr::filter(!.data$source)
       df$state_idx
-    },
-
-    #' @description Get the underlying 'Stan' model.
-    get_stan_model = function() {
-      private$stan_model
-    },
-
-    #' @description
-    #' Create and compile the 'Stan' model.
-    #'
-    #' @param ... Arguments passed to \code{cmdstan_model}.
-    #' @return The updated model object (invisibly).
-    compile = function(...) {
-      fn <- "msm.stan"
-      filepath <- system.file(file.path("stan", fn), package = "bmstate")
-      # silence compile warnings from cmdstan
-      utils::capture.output(
-        {
-          mod <- cmdstanr::cmdstan_model(filepath, ...)
-        },
-        type = "message"
-      )
-      private$stan_model <- mod
-      invisible(self)
-    },
-
-    #' @description
-    #' Create the 'Stan' data list.
-    #'
-    #' @param pd A \code{\link{PathData}} object.
-    #' @param prior_only Sample from prior only?
-    #' @return A list.
-    create_standata = function(pd,
-                               prior_only = FALSE) {
-      checkmate::assert_class(pd, "PathData")
-      checkmate::assert_logical(prior_only, len = 1)
-    },
-
-    #' @description
-    #' Fit the model.
-    #'
-    #' @param pd A \code{\link{PathData}} object of observed paths.
-    #' @param prior_only Sample from prior only.
-    #' @param ... Arguments passed to \code{sample} method of the
-    #' 'CmdStanR' model.
-    #' @return A \code{\link{MultistateModelFit}} object.
-    fit = function(pd, prior_only = FALSE, ...) {
-      # Get Stan model object
-      stan_model <- self$get_stanmodel()
-      if (is.null(stan_model)) {
-        stop("Stan model does not exist, you need to call compile()!")
-      }
-
-      # Create Stan input list
-      d <- self$create_standata(pd, prior_only)
-
-      # Call 'Stan'
-      stan_fit <- stan_model$sample(data = d$stan_data, ...)
-
-      # Return
-      MultistateModelFit$new(self, stan_fit, pd, d$stan_data)
     }
   )
 )

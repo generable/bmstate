@@ -4,7 +4,7 @@
 \alias{create_msm}
 \title{Create a multistate model}
 \usage{
-create_msm(tm, hazard_covs = NULL, pk_covs = NULL, compile = TRUE, ...)
+create_msm(tm, hazard_covs = NULL, pk_covs = NULL, ...)
 }
 \arguments{
 \item{tm}{A \code{\link{TransitionMatrix}}.}
@@ -14,8 +14,6 @@ create_msm(tm, hazard_covs = NULL, pk_covs = NULL, compile = TRUE, ...)
 \item{pk_covs}{Covariates that affect the PK parameters. A list with
 elements \code{ka} \code{CL}, and \code{V2}. If \code{NULL}, a PK model
 will not be created.}
-
-\item{compile}{compile 'Stan' model?}
 
 \item{...}{Arguments passed to \code{\link{MultistateModel}} init}
 }
