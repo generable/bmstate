@@ -44,7 +44,7 @@ create_stan_data <- function(model, pd, dosing = NULL, prior_only = FALSE) {
   stan_dat <- create_stan_data_indicators(pd)
 
   # Average event rates
-  df_ttype <- average_haz_per_ttype(pd, tm)
+  df_ttype <- average_haz_per_ttype(pd)
 
   # Collect
   out <- list(
@@ -465,7 +465,7 @@ average_haz_per_ttype <- function(pd) {
   msfit <- pd$fit_mstate()
   h0 <- msfit_average_hazard(msfit) |> dplyr::arrange(.data$trans)
   df_trans <- pd$transmat$trans_df()
-  df_ttype <- df_trans |> dplyr::select(transition, trans_type)
+  df_ttype <- df_trans |> dplyr::select("trans_idx", "trans_type")
   df_ttype$trans <- df_ttype$trans_idx
   h0 <- h0 |> left_join(df_ttype, by = "trans")
   df_mean_log_h0 <- h0 |>
