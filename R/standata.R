@@ -1,21 +1,6 @@
-#' Creating Stan data list
-#'
-#' @export
-#' @inheritParams fit_model
-#' @return A list of data for Stan.
-create_stan_data <- function(model, pd, dosing = NULL, prior_only = FALSE) {
-  checkmate::assert_class(model, "MultistateModel")
-  checkmate::assert_class(pd, "PathData")
+# Create binary indicator matrices
+create_stan_data_indicators <- function(pd) {
   tm <- pd$transmat
-  check_equal_transmats(tm, model$system$tm())
-
-  checkmate::assert_logical(prior_only, len = 1)
-  if (!is.null(dosing)) {
-    checkmate::assert_class(dosing, "data.frame")
-    stopifnot(!all(duplicated(dosing$subject_id)))
-  }
-
-  # Transition and at-risk indicators
   dat <- pd$as_transitions()
   N_int <- nrow(dat)
   N_trans <- tm$num_trans()
@@ -29,6 +14,34 @@ create_stan_data <- function(model, pd, dosing = NULL, prior_only = FALSE) {
     at_risk[tm$at_risk(dat$from[n]), n] <- 1
   }
   ttype <- tm$trans_df()$trans_type
+  list(
+    at_risk = at_risk,
+    transition = transition,
+    N_int = N_int,
+    N_trans = N_trans,
+    N_trans_types = max(ttype),
+    ttype = ttype
+  )
+}
+
+#' Creating Stan data list
+#'
+#' @export
+#' @inheritParams fit_model
+#' @return A list of data for Stan.
+create_stan_data <- function(model, pd, dosing = NULL, prior_only = FALSE) {
+  checkmate::assert_class(model, "MultistateModel")
+  checkmate::assert_class(pd, "PathData")
+  tm <- pd$transmat
+  check_equal_transmats(tm, model$system$tm())
+  checkmate::assert_logical(prior_only, len = 1)
+  if (!is.null(dosing)) {
+    checkmate::assert_class(dosing, "data.frame")
+    stopifnot(!all(duplicated(dosing$subject_id)))
+  }
+
+  # Transition and at-risk indicators
+  stan_dat <- create_stan_data_indicators(pd)
 
   # Average event rates
   df_ttype <- average_haz_per_ttype(pd, tm)
@@ -36,12 +49,6 @@ create_stan_data <- function(model, pd, dosing = NULL, prior_only = FALSE) {
   # Collect
   out <- list(
     mu_w0 = df_ttype$log_h0_avg,
-    N_int = N_int,
-    N_trans = N_trans,
-    at_risk = at_risk,
-    transition = transition,
-    ttype = ttype,
-    N_trans_types = max(ttype),
     I_auc = as.numeric("auc" %in% covariates),
     x_cnt = dat$country_num,
     x_cnt_oos = dat_oos$country_num,
@@ -454,10 +461,10 @@ create_stan_data_intervalidx <- function(t_start, t_end, t_grid, delta_grid) {
 
 # Average hazard per transition type, ignoring transitions that didnt
 # occur
-average_haz_per_ttype <- function(pd, transmat) {
+average_haz_per_ttype <- function(pd) {
   msfit <- pd$fit_mstate()
   h0 <- msfit_average_hazard(msfit) |> dplyr::arrange(.data$trans)
-  df_trans <- transmat$trans_df()
+  df_trans <- pd$transmat$trans_df()
   df_ttype <- df_trans |> dplyr::select(transition, trans_type)
   df_ttype$trans <- df_ttype$trans_idx
   h0 <- h0 |> left_join(df_ttype, by = "trans")
