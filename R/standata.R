@@ -6,20 +6,13 @@
 create_stan_data <- function(model, pd, dosing = NULL, prior_only = FALSE) {
   checkmate::assert_class(model, "MultistateModel")
   checkmate::assert_class(pd, "PathData")
+  check_equal_transmats(model$system$tm(), pd$transmat)
   checkmate::assert_logical(prior_only, len = 1)
   dt <- pd$as_transitions()
-
-  dat <- dt$df |> dplyr::filter(subject_id %in% train_sub)
-  dat_oos <- dt$df |>
-    dplyr::filter(subject_id %in% test_sub) |>
-    dplyr::group_by(subject_id) |>
-    dplyr::slice(1) |>
-    dplyr::ungroup()
-  PT <- legend_to_PT_matrix(dt$legend)
-  N_trans <- max(dt$legend$transition)
   N_obs <- nrow(dat)
-  if (!is.null(pk)) {
-    stopifnot(!all(duplicated(pk$subject_id)))
+  if (!is.null(dosing)) {
+    checkmate::assert_class(dosing, "data.frame")
+    stopifnot(!all(duplicated(dosing$subject_id)))
   }
 
   # Transition and at-risk indicators

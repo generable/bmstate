@@ -262,3 +262,9 @@ transmat_illnessdeath <- function(state_names =
   checkmate::assert_character(state_names, len = 3)
   transmat_full(state_names, self_loops = F)
 }
+
+# Check that two transition matrices are the same
+check_equal_transmats <- function(tm1, tm2) {
+  stopifnot(all(tm1$states == tm2$states))
+  stopifnot(isTRUE(all.equal(tm1$matrix, tm2$matrix)))
+}
