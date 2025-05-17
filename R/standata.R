@@ -296,8 +296,6 @@ standata_scaled_covariates <- function(pd, model, name) {
 
 # Covariates
 create_stan_data_covariates <- function(pd, model) {
-  covariates <- model$data_covs()
-  dat <- pd$as_transitions()
   x_oth <- standata_scaled_covariates(pd, model, "haz")
   x_ka <- standata_scaled_covariates(pd, model, "ka")
   x_CL <- standata_scaled_covariates(pd, model, "CL")
