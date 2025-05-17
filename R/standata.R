@@ -31,11 +31,7 @@ create_stan_data <- function(model, pd, dosing = NULL, prior_only = FALSE,
   )
 
   # Other covariates and pk covariates
-  oth <- create_stan_data_covariates(
-    dat, dat_oos, covariates, ka_covariates, CL_covariates, V2_covariates,
-    out$sub_start_idx,
-    out$sub_start_idx_oos
-  )
+  oth <- create_stan_data_covariates(pd, model)
   out <- c(out, oth$stan_data)
 
   # Another way to format the transitions and at risk matrices
@@ -108,7 +104,7 @@ create_stan_data_spline <- function(pd, model, delta_grid) {
   t <- dat$time
   SBF <- model$system$basisfun_matrix(t)
   t_max <- model$system$get_tmax()
-  if (delta_grid < 10 * t_max) {
+  if (delta_grid > 10 * t_max) {
     stop("delta_grid is very large compared to t_max")
   }
 
@@ -270,59 +266,45 @@ create_stan_data_time_since_last_pk <- function(sd) {
   )
 }
 
-# Normalized covariate to stan data
-standata_scaled_covariate <- function(dat, dat_oos, covariates, ssi, ssi_oos) {
+# Normalized covariates to stan data
+standata_scaled_covariates <- function(pd, model, name) {
+  covs <- model$data_covs()
+  sub_df <- pd$subject_df[, c("subject_index", covs)]
   x <- list()
-  x_oos <- list()
+  nc <- length(covs)
+  x_loc <- rep(0, nc)
+  x_scale <- rep(0, nc)
   j <- 0
-  if (!is.null(ssi)) {
-    dat <- dat[ssi, ]
-    dat_oos <- dat[ssi_oos, ]
-  }
-  for (cn in covariates) {
+  for (cn in covs) {
     j <- j + 1
-    xx <- dat[[cn]]
-    if (is.null(xx)) {
-      stop(cn, " not found in dat")
-    }
-    x[[j]] <- (xx - mean(xx)) / stats::sd(xx)
-    x_oos[[j]] <- (dat_oos[[cn]] - mean(xx)) / stats::sd(xx)
+    xx <- sub_df[[cn]]
+    x_loc[j] <- mean(xx)
+    x_scale[j] <- stats::sd(xx)
+    x[[j]] <- (xx - x_loc[j]) / x_scale[j]
   }
 
   # Return
-  list(
-    x = sapply(x, function(x) x),
-    x_oos = sapply(x_oos, function(x) x),
-    n = length(x)
+  out <- list(
+    x = t(sapply(x, function(x) x)),
+    x_loc = x_loc,
+    x_scale = x_scale,
+    nc = nc
   )
+  names(out) <- paste0(names(out), "_", name)
+  out
 }
 
-# Other covariates than sub, avg, cnt
-create_stan_data_covariates <- function(dat, dat_oos, covariates,
-                                        ka_covariates,
-                                        CL_covariates,
-                                        V2_covariates,
-                                        ssi,
-                                        ssi_oos) {
-  covariates_rem <- setdiff(covariates, c(
-    "avg", "sub", "cnt", "country_num", "country"
-  ))
-  x_oth <- standata_scaled_covariate(dat, dat_oos, covariates_rem, NULL, NULL)
-  x_oth$x <- t(x_oth$x)
-  x_oth$x_oos <- t(x_oth$x_oos)
-  x_ka <- standata_scaled_covariate(dat, dat_oos, ka_covariates, ssi, ssi_oos)
-  x_CL <- standata_scaled_covariate(dat, dat_oos, CL_covariates, ssi, ssi_oos)
-  x_V2 <- standata_scaled_covariate(dat, dat_oos, V2_covariates, ssi, ssi_oos)
-  names(x_oth) <- c("x_oth", "x_oth_oos", "N_oth")
-  names(x_ka) <- c("x_ka", "x_ka_oos", "nc_ka")
-  names(x_CL) <- c("x_CL", "x_CL_oos", "nc_CL")
-  names(x_V2) <- c("x_V2", "x_V2_oos", "nc_V2")
+# Covariates
+create_stan_data_covariates <- function(pd, model) {
+  covariates <- model$data_covs()
+  dat <- pd$as_transitions()
+  x_oth <- standata_scaled_covariates(pd, model, "haz")
+  x_ka <- standata_scaled_covariates(pd, model, "ka")
+  x_CL <- standata_scaled_covariates(pd, model, "CL")
+  x_V2 <- standata_scaled_covariates(pd, model, "V2")
 
   # Return
-  list(
-    stan_data = c(x_oth, x_ka, x_CL, x_V2),
-    x_oth_names = covariates_rem
-  )
+  c(x_oth, x_ka, x_CL, x_V2)
 }
 
 # Create additional Stan data, interval information

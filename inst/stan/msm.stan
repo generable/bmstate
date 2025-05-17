@@ -5,18 +5,18 @@ functions {
       data int N_int,
       array[] vector beta_oth,
       array[] vector beta_auc,
-      data array[] vector x_oth,
+      data array[] vector x_haz,
       array[] vector x_auc,
       data array[] int ttype
   ) {
     int N_trans = size(ttype);
-    int N_oth = size(x_oth);
+    int nc_haz = size(x_haz);
     matrix[N_int, N_trans] log_C_haz = rep_matrix(0.0, N_int, N_trans);
     for(j in 1:N_trans){
       int h = ttype[j];
-      if(N_oth > 0){
-        for(k in 1:N_oth){
-          log_C_haz[,j] += beta_oth[k][h] * x_oth[k];
+      if(nc_haz > 0){
+        for(k in 1:nc_haz){
+          log_C_haz[,j] += beta_oth[k][h] * x_haz[k];
         }
       }
       if(size(beta_auc)==1){
@@ -320,8 +320,8 @@ data {
   vector[N_trans] mu_w0;
 
   // Covariates that affect hazard multiplier (excluding exposure)
-  int<lower=0> N_oth; // number of other covariates
-  array[N_oth] vector[N_int] x_oth;
+  int<lower=0> nc_haz; // number of hazard covariates
+  array[nc_haz] vector[N_int] x_haz;
 
   // Which covariates to include in model
   int<lower=0,upper=1> I_auc;
@@ -388,7 +388,7 @@ parameters {
   real<lower=0> sig_w0;
 
   // Covariate effects
-  array[N_oth] vector[N_trans_types] beta_oth;
+  array[nc_haz] vector[N_trans_types] beta_oth;
   array[I_auc] vector[N_trans_types] beta_auc;
 
   // PK model
@@ -460,15 +460,15 @@ transformed parameters {
 
   // log of hazard multiplier on each interval
   matrix[N_int, N_trans] log_C_haz = compute_log_hazard_multiplier(
-    N_int, beta_oth, beta_auc, x_oth, x_auc, ttype
+    N_int, beta_oth, beta_auc, x_haz, x_auc, ttype
   );
 }
 
 model {
 
   // Prior
-  if(N_oth > 0){
-    for(k in 1:N_oth){
+  if(nc_haz > 0){
+    for(k in 1:nc_haz){
       beta_oth[k] ~ normal(0, 1);
     }
   }
