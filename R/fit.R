@@ -4,10 +4,13 @@
 #' @param pd A \code{\link{PathData}} object of observed paths.
 #' @param dosing Dosing data frame.
 #' @param prior_only Sample from prior only.
+#' @param delta_grid Time discretization delta for numerically integrating
+#' hazards.
 #' @param ... Arguments passed to \code{sample} method of the
 #' 'CmdStanR' model.
 #' @return A \code{\link{MultistateModelFit}} object.
-fit_model <- function(model, pd, dosing = NULL, prior_only = FALSE, ...) {
+fit_model <- function(model, pd, dosing = NULL, prior_only = FALSE,
+                      delta_grid = 1, ...) {
   checkmate::assert_class(model, "MultistateModel")
   checkmate::assert_class(pd, "PathData")
 

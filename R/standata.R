@@ -1,37 +1,13 @@
-# Create binary indicator matrices
-create_stan_data_indicators <- function(pd) {
-  tm <- pd$transmat
-  dat <- pd$as_transitions()
-  N_int <- nrow(dat)
-  N_trans <- tm$num_trans()
-  transition <- matrix(0, N_trans, N_int)
-  at_risk <- matrix(0, N_trans, N_int)
-  for (n in seq_len(N_int)) {
-    tval <- dat$trans_idx[n]
-    if (tval > 0) {
-      transition[tval, n] <- 1
-    }
-    at_risk[tm$at_risk(dat$from[n]), n] <- 1
-  }
-  ttype <- tm$trans_df()$trans_type
-  list(
-    at_risk = at_risk,
-    transition = transition,
-    N_int = N_int,
-    N_trans = N_trans,
-    N_trans_types = max(ttype),
-    ttype = ttype
-  )
-}
-
 #' Creating Stan data list
 #'
 #' @export
 #' @inheritParams fit_model
 #' @return A list of data for Stan.
-create_stan_data <- function(model, pd, dosing = NULL, prior_only = FALSE) {
+create_stan_data <- function(model, pd, dosing = NULL, prior_only = FALSE,
+                             delta_grid = 1) {
   checkmate::assert_class(model, "MultistateModel")
   checkmate::assert_class(pd, "PathData")
+  checkmate::assert_number(delta_grid, lower = 0)
   tm <- pd$transmat
   check_equal_transmats(tm, model$system$tm())
   checkmate::assert_logical(prior_only, len = 1)
@@ -40,25 +16,19 @@ create_stan_data <- function(model, pd, dosing = NULL, prior_only = FALSE) {
     stopifnot(!all(duplicated(dosing$subject_id)))
   }
 
-  # Transition and at-risk indicators
-  stan_dat <- create_stan_data_indicators(pd)
-
   # Average event rates
   df_ttype <- average_haz_per_ttype(pd) |> dplyr::arrange(.data$trans_idx)
 
-  # Collect
+  # Initial Stan data
   stan_dat <- c(
-    stan_dat,
+    create_stan_data_idx_sub(pd),
+    create_stan_data_indicators(pd),
     list(
       mu_w0 = df_ttype$log_h0_avg,
       I_auc = as.numeric(model$has_pk())
-    )
+    ),
+    create_stan_data_spline(pd, model, delta_grid)
   )
-
-  # Spline basis
-  int_dat <- create_stan_data_spline(pd, model)
-  stan_dat <- c(stan_dat, int_dat$stan_data)
-  id_map <- int_dat$id_map
 
   # Other covariates and pk covariates
   oth <- create_stan_data_covariates(
@@ -94,122 +64,74 @@ create_stan_data <- function(model, pd, dosing = NULL, prior_only = FALSE) {
   )
 }
 
+# Create binary indicator matrices
+create_stan_data_indicators <- function(pd) {
+  tm <- pd$transmat
+  dat <- pd$as_transitions()
+  N_int <- nrow(dat)
+  N_trans <- tm$num_trans()
+  transition <- matrix(0, N_trans, N_int)
+  at_risk <- matrix(0, N_trans, N_int)
+  for (n in seq_len(N_int)) {
+    tval <- dat$trans_idx[n]
+    if (tval > 0) {
+      transition[tval, n] <- 1
+    }
+    at_risk[tm$at_risk(dat$from[n]), n] <- 1
+  }
+  ttype <- tm$trans_df()$trans_type
+  list(
+    at_risk = at_risk,
+    transition = transition,
+    N_int = N_int,
+    N_trans = N_trans,
+    N_trans_types = max(ttype),
+    ttype = ttype
+  )
+}
+
+# Which subject does each interval correspond to
+create_stan_data_idx_sub <- function(pd) {
+  idx_sub <- as.integer(pd$as_transitions()$subject_index)
+  N_sub <- max(idx_sub)
+  stopifnot(all(seq_len(N_sub) %in% idx_sub))
+  list(
+    N_sub = N_sub,
+    idx_sub = idx_sub
+  )
+}
+
 # Evaluate spline basis functions for each interval
-create_stan_data_spline <- function(pd, model) {
-  dat <- pd$as_transitions(truncate = FALSE)
+create_stan_data_spline <- function(pd, model, delta_grid) {
+  # Interval end time spline evaluations
+  dat <- pd$as_transitions()
   t <- dat$time
   SBF <- model$system$basisfun_matrix(t)
-  print(dim(SBF))
-
-  t_end <- rep(0, N)
-  t_start <- rep(0, N)
-  ids <- unique(dat$subject_id) # keeps order ?
-  N_sub <- length(ids)
-  pb <- progress::progress_bar$new(total = N_sub)
-  N_int <- 0
-
-  # This creates also the integer subject ids (x_sub)
-  x_sub <- rep(0, N)
-  id_map <- NULL
-
-  # Loop through subjects
-  for (n in 1:N_sub) {
-    pb$tick()
-    df_n <- dat |> dplyr::filter(subject_id == ids[n])
-    id_map <- rbind(id_map, data.frame(n, ids[n]))
-    R <- nrow(df_n)
-    for (r in 1:R) {
-      N_int <- N_int + 1
-      t_cur <- df_n$time[r]
-      t_prev <- 0 # assume first interval for each subject starts from 0
-      if (r > 1) {
-        t_prev <- df_n$time[r - 1]
-      }
-      ms <- bspline_basis(t_cur, k, knots, BK)
-      t_end[N_int] <- t_cur
-      t_start[N_int] <- t_prev
-      SBF[N_int, ] <- ms
-      x_sub[N_int] <- n
-    }
+  t_max <- model$system$get_tmax()
+  if (delta_grid < 10 * t_max) {
+    stop("delta_grid is very large compared to t_max")
   }
-  colnames(id_map) <- c("x_sub", "subject_id")
-
-  # Vector indicating the start index of each subject in data
-  sub_start_idx <- sapply(seq_len(N_sub), function(x) {
-    # Get the index of the first occurrence of x, or NA if not found
-    index <- which(x_sub == x)[1]
-    if (is.na(index)) NA else index
-  })
 
   # Grid spline evaluations
-  t_grid <- seq(0.5, ceiling(t_max), by = 1) # midpoint of each grid interval
-  delta_grid <- 1.0 # length of each grid interval
-  N_grid <- length(t_grid)
-  SBF_grid <- bspline_basis(t_grid, k, knots, BK)
+  t_grid <- seq(delta_grid / 2, ceiling(t_max), by = delta_grid) # midpoints
+  SBF_grid <- model$system$basisfun_matrix(t_grid)
 
   # Grid interval indices
-  sd_int <- create_stan_data_intervalidx(t_start, t_end, t_grid, delta_grid)
+  sd_int <- create_stan_data_intervalidx(
+    dat$time_prev, dat$time, t_grid, delta_grid
+  )
 
   # Return
   sd <- list(
-    N_sbf = M,
+    N_sbf = ncol(SBF),
     SBF = SBF,
-    SBF_pred = SBF_pred,
     SBF_grid = SBF_grid,
-    N_grid = N_grid,
-    t_pred = t_pred,
+    N_grid = length(t_grid),
     t_grid = t_grid,
-    delta_grid = delta_grid,
-    t_end = t_end,
-    t_start = t_start,
-    N_pred = P,
-    x_sub = x_sub,
-    N_sub = max(x_sub),
-    sub_start_idx = sub_start_idx
+    delta_grid = delta_grid
   )
-  sd <- c(sd, sd_int)
-  list(
-    stan_data = sd,
-    id_map = id_map
-  )
+  c(sd, sd_int)
 }
-
-# OOS id map
-create_stan_data_idmap <- function(dat) {
-  ids <- unique(dat$subject_id) # keeps order ?
-  N_sub <- length(ids)
-
-  # This creates also the integer subject ids (x_sub)
-  x_sub <- rep(0, N_sub)
-  id_map <- NULL
-
-  # Loop through subjects
-  for (n in 1:N_sub) {
-    df_n <- dat |> dplyr::filter(subject_id == ids[n])
-    id_map <- rbind(id_map, data.frame(n, ids[n]))
-    x_sub[n] <- n
-  }
-  colnames(id_map) <- c("x_sub", "subject_id")
-
-  # Vector indicating the start index of each subject in data
-  sub_start_idx <- sapply(seq_len(N_sub), function(x) {
-    # Get the index of the first occurrence of x, or NA if not found
-    index <- which(x_sub == x)[1]
-    if (is.na(index)) NA else index
-  })
-
-  # Return
-  sd <- list(
-    x_sub = x_sub,
-    N_sub = max(x_sub),
-    sub_start_idx = sub_start_idx
-  )
-  list(
-    stan_data = sd,
-    id_map = id_map
-  )
-}
-
 
 # Get original subject id based on numeric id that is in Stan data
 subject_idx_to_id <- function(id_map, idx) {

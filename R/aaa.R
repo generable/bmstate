@@ -126,6 +126,7 @@ plot_time_dist <- function(t) {
 #' @export
 #' @param ... Arguments passed to CmdStanR
 create_stanmodel <- function(...) {
+  fn <- "msm.stan"
   filepath <- system.file(file.path("stan", fn), package = "bmstate")
   # silence compile warnings from cmdstan
   utils::capture.output(

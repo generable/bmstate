@@ -4,7 +4,7 @@
 \alias{fit_model}
 \title{Fit the model.}
 \usage{
-fit_model(model, pd, dosing = NULL, prior_only = FALSE, ...)
+fit_model(model, pd, dosing = NULL, prior_only = FALSE, delta_grid = 1, ...)
 }
 \arguments{
 \item{model}{A \code{\link{MultistateModel}} object.}
@@ -14,6 +14,9 @@ fit_model(model, pd, dosing = NULL, prior_only = FALSE, ...)
 \item{dosing}{Dosing data frame.}
 
 \item{prior_only}{Sample from prior only.}
+
+\item{delta_grid}{Time discretization delta for numerically integrating
+hazards.}
 
 \item{...}{Arguments passed to \code{sample} method of the
 'CmdStanR' model.}

@@ -4,7 +4,7 @@
 \alias{create_stan_data}
 \title{Creating Stan data list}
 \usage{
-create_stan_data(model, pd, dosing = NULL, prior_only = FALSE)
+create_stan_data(model, pd, dosing = NULL, prior_only = FALSE, delta_grid = 1)
 }
 \arguments{
 \item{model}{A \code{\link{MultistateModel}} object.}
@@ -14,6 +14,9 @@ create_stan_data(model, pd, dosing = NULL, prior_only = FALSE)
 \item{dosing}{Dosing data frame.}
 
 \item{prior_only}{Sample from prior only.}
+
+\item{delta_grid}{Time discretization delta for numerically integrating
+hazards.}
 }
 \value{
 A list of data for Stan.
