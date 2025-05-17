@@ -12,7 +12,7 @@ fit_model <- function(model, pd, dosing = NULL, prior_only = FALSE, ...) {
   checkmate::assert_class(pd, "PathData")
 
   # Get Stan model object
-  stan_model <- create_stan_model()
+  stan_model <- create_stanmodel()
 
   # Create Stan input list
   d <- create_stan_data(model, pd, dosing, prior_only)

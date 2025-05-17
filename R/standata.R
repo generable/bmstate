@@ -44,33 +44,21 @@ create_stan_data <- function(model, pd, dosing = NULL, prior_only = FALSE) {
   stan_dat <- create_stan_data_indicators(pd)
 
   # Average event rates
-  df_ttype <- average_haz_per_ttype(pd)
+  df_ttype <- average_haz_per_ttype(pd) |> dplyr::arrange(.data$trans_idx)
 
   # Collect
-  out <- list(
-    mu_w0 = df_ttype$log_h0_avg,
-    I_auc = as.numeric("auc" %in% covariates),
-    x_cnt = dat$country_num,
-    x_cnt_oos = dat_oos$country_num,
-    x_fda = dat$first_dose_amount
+  stan_dat <- c(
+    stan_dat,
+    list(
+      mu_w0 = df_ttype$log_h0_avg,
+      I_auc = as.numeric(model$has_pk())
+    )
   )
 
   # Spline basis
-  k_spline <- 3
-  NK <- NK # num of internal knots
-  int_dat <- create_stan_data_spline(dat, out, k_spline, P, NK, PT, t_max)
-  out <- c(out, int_dat$stan_data)
-  id_map_train <- int_dat$id_map
-
-  # Oos
-  idm_oos <- create_stan_data_idmap(dat_oos)
-  out_add <- list(
-    x_sub_oos = idm_oos$stan_data$x_sub,
-    sub_start_idx_oos = idm_oos$stan_data$sub_start_idx,
-    N_sub_oos = idm_oos$stan_data$N_sub
-  )
-  id_map_test <- idm_oos$id_map
-  out <- c(out, out_add)
+  int_dat <- create_stan_data_spline(pd, model)
+  stan_dat <- c(stan_dat, int_dat$stan_data)
+  id_map <- int_dat$id_map
 
   # Other covariates and pk covariates
   oth <- create_stan_data_covariates(
@@ -106,25 +94,12 @@ create_stan_data <- function(model, pd, dosing = NULL, prior_only = FALSE) {
   )
 }
 
-
-# Evaluate spline basis functions and their integrals
-# For each interval
-# NK = number of (inner) knots
-create_stan_data_spline <- function(dat, sd, k, P, NK, PT, t_max) {
+# Evaluate spline basis functions for each interval
+create_stan_data_spline <- function(pd, model) {
+  dat <- pd$as_transitions(truncate = FALSE)
   t <- dat$time
-  if (is.null(t_max)) {
-    t_max <- max(t)
-  }
-  t_pred <- seq(0, t_max, length.out = P)
-  t_ev <- t[dat$transition > 0]
-  knots <- place_internal_knots(t_max, NK, t_ev)
-  print(knots)
-  BK <- c(0, t_max)
-  M <- length(knots) + k
-  N <- sd$N_int
-  SBF <- array(0, dim = c(N, M))
-  SBF_pred <- bspline_basis(t_pred, k, knots, BK)
-  P <- length(t_pred)
+  SBF <- model$system$basisfun_matrix(t)
+  print(dim(SBF))
 
   t_end <- rep(0, N)
   t_start <- rep(0, N)

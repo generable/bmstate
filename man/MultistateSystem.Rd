@@ -23,6 +23,7 @@ A multistate system with proportional spline hazards
 \item \href{#method-MultistateSystem-get_tmax}{\code{MultistateSystem$get_tmax()}}
 \item \href{#method-MultistateSystem-print}{\code{MultistateSystem$print()}}
 \item \href{#method-MultistateSystem-log_baseline_hazard}{\code{MultistateSystem$log_baseline_hazard()}}
+\item \href{#method-MultistateSystem-basisfun_matrix}{\code{MultistateSystem$basisfun_matrix()}}
 \item \href{#method-MultistateSystem-log_inst_hazard}{\code{MultistateSystem$log_inst_hazard()}}
 \item \href{#method-MultistateSystem-max_inst_hazard}{\code{MultistateSystem$max_inst_hazard()}}
 \item \href{#method-MultistateSystem-simulate}{\code{MultistateSystem$simulate()}}
@@ -201,6 +202,27 @@ a vector of zeros, meaning that the log hazard is constant at
 }
 \subsection{Returns}{
 a vector with same length as \code{t}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateSystem-basisfun_matrix"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateSystem-basisfun_matrix}{}}}
+\subsection{Method \code{basisfun_matrix()}}{
+Evaluate basis function matrix for baseline hazard
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$basisfun_matrix(t)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{t}}{Evaluation time points.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Matrix with shape \code{c(N, L+1)} where \code{L} is number of
+knots
 }
 }
 \if{html}{\out{<hr>}}

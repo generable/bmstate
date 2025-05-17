@@ -359,9 +359,12 @@ PathData <- R6::R6Class(
     #' @param covariates Covariates to include.
     #' @param ... Arguments passed to \code{survival::coxph}.
     fit_mstate = function(covariates = NULL, ...) {
+      message("Formatting as msdata")
       msdat <- self$as_msdata(covariates = covariates)
+      message("Calling survival::coxph()")
       cph <- self$fit_coxph(covariates, ...)
       msdat$strata <- msdat$trans
+      message("Calling mstate::msfit()")
       mstate::msfit(
         object = cph, newdata = msdat, variance = FALSE,
         trans = attr(msdat, "trans")

@@ -252,15 +252,24 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
     #' \code{log_w0}
     #' @return a vector with same length as \code{t}
     log_baseline_hazard = function(t, log_w0, w = NULL) {
-      knots <- self$get_knots()
-      L <- length(knots)
-      BK <- knots[c(1, L)]
-      knots <- knots[2:(L - 1)]
-      SBF <- bspline_basis(t, private$spline_k, knots, BK) # shape (N, L+1)
+      SBF <- self$basisfun_matrix(t)
       if (is.null(w)) {
         w <- rep(0, self$num_weights())
       }
       as.numeric(SBF %*% w + log_w0)
+    },
+
+    #' @description Evaluate basis function matrix for baseline hazard
+    #'
+    #' @param t Evaluation time points.
+    #' @return Matrix with shape \code{c(N, L+1)} where \code{L} is number of
+    #' knots
+    basisfun_matrix = function(t) {
+      knots <- self$get_knots()
+      L <- length(knots)
+      BK <- knots[c(1, L)]
+      knots <- knots[2:(L - 1)]
+      bspline_basis(t, private$spline_k, knots, BK)
     },
 
     #' @description Evaluate log instant hazard
