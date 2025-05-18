@@ -4,7 +4,7 @@
 \alias{pop_2cpt_partly_ss}
 \title{Partially steady-state PK model}
 \usage{
-pop_2cpt_partly_ss(t, dose_ss, times, doses, theta)
+pop_2cpt_partly_ss(t, dose_ss, times, doses, theta, tau)
 }
 \arguments{
 \item{t}{vector of output time points}
@@ -16,6 +16,8 @@ pop_2cpt_partly_ss(t, dose_ss, times, doses, theta)
 \item{doses}{doses taken after \code{t_last_ss}}
 
 \item{theta}{PK params for each subject}
+
+\item{tau}{Dosing interval (same for all subjects).}
 }
 \description{
 For each subject

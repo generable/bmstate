@@ -10,6 +10,6 @@ test_that("exposed PK functions work", {
   for (j in 1:N) {
     ts[[j]] <- t
   }
-  a <- pop_2cpt_partly_ss(ts, dose_ss, times, doses, theta)
+  a <- pop_2cpt_partly_ss(ts, dose_ss, times, doses, theta, 24)
   plot(ts[[1]], a[[1]])
 })

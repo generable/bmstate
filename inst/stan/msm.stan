@@ -74,11 +74,12 @@ functions {
   }
 
   // Two-cpt population PK model with multiple doses (steady state)
-  array[] vector pop_2cpt_ss(array[] vector t, data vector dose, matrix theta) {
+  array[] vector pop_2cpt_ss(array[] vector t, data vector dose, matrix theta,
+      data real tau) {
 
     int N_id = size(dose);
     int N_t = num_elements(t[1]);
-    vector[N_id] tau = rep_vector(24.0, N_id);
+    vector[N_id] tau_ss = rep_vector(tau, N_id);
 
     vector[N_id] ka = theta[:,1];
     vector[N_id] CL = theta[:,2];
@@ -88,22 +89,22 @@ functions {
     vector[N_id] A = (dose ./ V2) .* (ka ./ (ka-ke));
 
     array[N_id] vector[N_t] conc;
-    vector[N_id] ma = A .* inv(-expm1(-ka.*tau)); // 1/(1-exp(-ka*tau))
-    vector[N_id] me = A .* inv(-expm1(-ke.*tau));
+    vector[N_id] ma = A .* inv(-expm1(-ka.*tau_ss)); // 1/(1-exp(-ka*tau))
+    vector[N_id] me = A .* inv(-expm1(-ke.*tau_ss));
     vector[N_t] tt;
 
     for(n in 1:N_id){
-      tt = fmod(t[n], tau[n]);
+      tt = fmod(t[n], tau_ss[n]);
       conc[n] = me[n] * exp(-ke[n]*tt) - ma[n] * exp(-ka[n] * tt);
     }
     return(conc);
   }
 
   // Two-cpt population PK model (steady state peak time after dose)
-  array[] vector pop_2cpt_ss_peak_time(matrix theta){
+  array[] vector pop_2cpt_ss_peak_time(matrix theta, data real tau){
 
     int N_id = rows(theta);
-    vector[N_id] tau = rep_vector(24.0, N_id);
+    vector[N_id] tau_ss = rep_vector(tau, N_id);
 
     vector[N_id] ka = theta[:,1];
     vector[N_id] CL = theta[:,2];
@@ -112,8 +113,8 @@ functions {
     vector[N_id] ke = CL ./ V2;
 
     array[N_id] vector[1] t_peak;
-    vector[N_id] ma = inv(-expm1(-ka.*tau)); // 1/(1-exp(-ka*tau))
-    vector[N_id] me = inv(-expm1(-ke.*tau));
+    vector[N_id] ma = inv(-expm1(-ka.*tau_ss)); // 1/(1-exp(-ka*tau))
+    vector[N_id] me = inv(-expm1(-ke.*tau_ss));
     real r;
     for(n in 1:N_id){
       r = me[n]*ke[n]/(ma[n]*ka[n]);
@@ -148,11 +149,12 @@ functions {
     data vector dose_ss,
     data array[] vector times,
     data array[] vector doses,
-    matrix theta
+    matrix theta,
+    data real tau
   ) {
 
     int N_id = num_elements(dose_ss);
-    vector[N_id] tau_ss = rep_vector(24.0, N_id);
+    vector[N_id] tau_ss = rep_vector(tau, N_id);
     int N_last = num_elements(times[1]);
 
     vector[N_id] ka = theta[:,1];
@@ -212,11 +214,12 @@ functions {
     data array[] vector times,
     data array[] vector doses,
     array[,] vector amounts,
-    matrix theta
+    matrix theta,
+    data real tau
   ) {
 
     int N_id = num_elements(dose_ss);
-    vector[N_id] tau_ss = rep_vector(24.0, N_id);
+    vector[N_id] tau_ss = rep_vector(tau, N_id);
     int N_t = num_elements(t[1]);
 
     vector[N_id] ka = theta[:,1];
@@ -352,6 +355,7 @@ data {
   array[N_sub] vector<lower=0>[2] conc_pk;
   array[N_sub] vector<lower=0>[2] t_obs_pk;
   vector<lower=0>[N_sub] dose_ss;
+  real<lower=0> tau_ss;
 
   // Used while checking
   array[N_sub] vector<lower=0>[N_last] last_times; // 1st = last SS trough time
@@ -440,19 +444,20 @@ transformed parameters {
 
     // Find drug amounts in both compartments at last two dose times
     last_two_amounts_pk[1] = pop_2cpt_partly_ss_stage1(
-      dose_ss, last_two_times, last_two_doses, theta_pk[1]
+      dose_ss, last_two_times, last_two_doses, theta_pk[1],
+      tau_ss
     );
 
     // Drug concentration estimated at t_obs
     conc_mu_pk[1] = pop_2cpt_partly_ss_stage2(
       t_obs_pk, dose_ss, last_two_times, last_two_doses, last_two_amounts_pk[1],
-      theta_pk[1]
+      theta_pk[1], tau_ss
     );
 
     // Trough, peak, and auc at steady state
-    t1_ss[1] = pop_2cpt_ss_peak_time(theta_pk[1]);
-    ss_trough[1] = pop_2cpt_ss(t0_ss, dose_ss, theta_pk[1]);
-    ss_peak[1] = pop_2cpt_ss(t1_ss[1], dose_ss, theta_pk[1]);
+    t1_ss[1] = pop_2cpt_ss_peak_time(theta_pk[1], tau_ss);
+    ss_trough[1] = pop_2cpt_ss(t0_ss, dose_ss, theta_pk[1], tau_ss);
+    ss_peak[1] = pop_2cpt_ss(t1_ss[1], dose_ss, theta_pk[1], tau_ss);
     ss_auc[1] = dose_ss ./ theta_pk[1][:,2]; // D/CL
 
     // Set AUC corresponding to each interval

@@ -7,8 +7,10 @@
 #' @param times time points after \code{t_last_ss}
 #' @param doses doses taken after \code{t_last_ss}
 #' @param theta PK params for each subject
-pop_2cpt_partly_ss <- function(t, dose_ss, times, doses, theta) {
+#' @param tau Dosing interval (same for all subjects).
+pop_2cpt_partly_ss <- function(t, dose_ss, times, doses, theta, tau) {
   ensure_exposed_stan_functions()
+  checkmate::assert_number(tau, lower = 0)
   checkmate::assert_numeric(dose_ss, lower = 0)
   N_sub <- length(dose_ss)
   checkmate::assert_list(times, len = N_sub)
