@@ -283,6 +283,11 @@ functions {
     return(dose * inv(-expm1(-ka*tau)));
   }
 
+  // Dummy function
+  real STAN_dummy_function(real x){
+    return(x + 1.0);
+  }
+
 }
 
 data {

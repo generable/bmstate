@@ -135,14 +135,19 @@ create_stanmodel <- function(...) {
     },
     type = "message"
   )
-  tryCatch(
-    {
-      mod$expose_functions(global = TRUE)
-    },
-    error = function(e) {
-      message("Model already compiled")
-    }
-  )
-
   mod
+}
+
+#' Expose Stan functions if they are not yet exposed
+#'
+#' @export
+#' @return logical telling whether they were already exposed
+ensure_exposed_stan_functions <- function() {
+  if (exists("STAN_dummy_function")) {
+    return(TRUE)
+  } else {
+    mod <- create_stanmodel(force_recompile = TRUE)
+    mod$expose_functions(global = TRUE)
+  }
+  FALSE
 }
