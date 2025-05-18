@@ -19,7 +19,7 @@ create_stan_data <- function(model, pd, dosing = NULL, prior_only = FALSE,
   # Initial Stan data
   stan_dat <- c(
     create_stan_data_idx_sub(pd),
-    create_stan_data_indicators(pd),
+    create_stan_data_transitions(pd),
     create_stan_data_spline(pd, model, delta_grid),
     create_stan_data_covariates(pd, model),
     create_stan_data_trans_types(pd)
@@ -33,9 +33,6 @@ create_stan_data <- function(model, pd, dosing = NULL, prior_only = FALSE,
   out$omit_lik_hazard <- as.integer(prior_only)
   out$omit_lik_pk <- as.integer(prior_only)
   out$do_pk <- as.integer(do_pk)
-
-  # Add t_int if needed by some model versions
-  out$t_int <- out$t_end - out$t_start
 
   # Return
   list(
@@ -60,7 +57,7 @@ create_stan_data_trans_types <- function(pd) {
 }
 
 # Create binary indicator matrices
-create_stan_data_indicators <- function(pd) {
+create_stan_data_transitions <- function(pd) {
   tm <- pd$transmat
   dat <- pd$as_transitions()
   N_int <- nrow(dat)

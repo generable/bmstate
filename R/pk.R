@@ -1,0 +1,21 @@
+#' Partially steady-state PK model
+#'
+#' @export
+#' @description For each subject
+#' @param t vector of output time points
+#' @param dose_ss dose amount in SS (for each subject)
+#' @param times time points after \code{t_last_ss}
+#' @param doses doses taken after \code{t_last_ss}
+#' @param theta PK params for each subject
+pop_2cpt_partly_ss <- function(t, dose_ss, times, doses, theta) {
+  checkmate::assert_numeric(dose_ss, lower = 0)
+  N_sub <- length(dose_ss)
+  checkmate::assert_list(times, len = N_sub)
+  checkmate::assert_list(doses, len = N_sub)
+  checkmate::assert_matrix(theta, nrows = N_sub, ncols = 3)
+  N_last <- length(times[[1]])
+  mod <- create_stanmodel()
+  mod$expose_functions()
+  p1 <- mod$functions$pop_2cpt_partly_ss_stage1(dose_ss, times, doses, theta)
+  p1
+}

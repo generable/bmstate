@@ -142,7 +142,6 @@ functions {
   // Two-cpt population PK model with multiple doses (partly steady-state)
   // For each subject,
   // * dose_ss = dose amount in SS
-  // * t_last_ss = last time point when subject is assumed to be in SS trough
   // * times = the time points after SS
   // * doses = the doses taken after SS
   array[,] vector pop_2cpt_partly_ss_stage1(
