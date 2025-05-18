@@ -23,9 +23,6 @@ check_columns <- function(df, needed_columns) {
 #' which the paths belong.
 PathData <- R6::R6Class(
   classname = "PathData",
-  private = list(
-    dt = NULL
-  ),
   public = list(
     subject_df = NULL,
     path_df = NULL,
