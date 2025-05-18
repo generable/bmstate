@@ -16,31 +16,17 @@ create_stan_data <- function(model, pd, dosing = NULL, prior_only = FALSE,
     stopifnot(!all(duplicated(dosing$subject_id)))
   }
 
-  # Average event rates
-  df_ttype <- average_haz_per_ttype(pd) |> dplyr::arrange(.data$trans_idx)
-
   # Initial Stan data
   stan_dat <- c(
     create_stan_data_idx_sub(pd),
     create_stan_data_indicators(pd),
-    list(
-      mu_w0 = df_ttype$log_h0_avg,
-      I_auc = as.numeric(model$has_pk())
-    ),
-    create_stan_data_spline(pd, model, delta_grid)
+    create_stan_data_spline(pd, model, delta_grid),
+    create_stan_data_covariates(pd, model),
+    create_stan_data_trans_types(pd)
   )
 
-  # Other covariates and pk covariates
-  oth <- create_stan_data_covariates(pd, model)
-  out <- c(out, oth$stan_data)
-
-  # Another way to format the transitions and at risk matrices
-  # needed for vectorizing likelihood
-  out <- c(out, which_format_for_stan(transition, "trans"))
-  out <- c(out, which_format_for_stan(at_risk, "risk"))
-
   # PK data
-  out <- c(out, create_stan_data_pk(pk, out, id_map_train, id_map_test))
+  out <- c(out, create_stan_data_pk(pd, model))
   out <- c(out, create_stan_data_time_since_last_pk(out))
 
   # Likelihood flags
@@ -60,6 +46,19 @@ create_stan_data <- function(model, pd, dosing = NULL, prior_only = FALSE,
   )
 }
 
+# Transition types
+create_stan_data_trans_types <- function(pd) {
+  tm <- pd$transmat
+  # Average event rates
+  df_ttype <- average_haz_per_ttype(pd) |> dplyr::arrange(.data$trans_idx)
+  ttype <- tm$trans_df()$trans_type
+  list(
+    N_trans_types = max(ttype),
+    ttype = ttype,
+    mu_w0 = df_ttype$log_h0_avg
+  )
+}
+
 # Create binary indicator matrices
 create_stan_data_indicators <- function(pd) {
   tm <- pd$transmat
@@ -75,15 +74,20 @@ create_stan_data_indicators <- function(pd) {
     }
     at_risk[tm$at_risk(dat$from[n]), n] <- 1
   }
-  ttype <- tm$trans_df()$trans_type
-  list(
+  out <- list(
     at_risk = at_risk,
     transition = transition,
     N_int = N_int,
-    N_trans = N_trans,
-    N_trans_types = max(ttype),
-    ttype = ttype
+    N_trans = N_trans
   )
+
+  # Another way to format the transitions and at risk matrices
+  # needed for vectorizing likelihood
+  out <- c(out, which_format_for_stan(transition, "trans"))
+  out <- c(out, which_format_for_stan(at_risk, "risk"))
+
+  # Return
+  out
 }
 
 # Which subject does each interval correspond to
@@ -217,7 +221,8 @@ create_stan_data_pk <- function(pk, sd, id_map_train, id_map_test) {
     last_two_doses = last_two_doses,
     last_times_oos = last_times_oos,
     last_doses_oos = last_doses_oos,
-    pk_lloq = pk_lloq
+    pk_lloq = pk_lloq,
+    I_auc = as.numeric(model$has_pk())
   )
 }
 
