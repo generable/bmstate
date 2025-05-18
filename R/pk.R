@@ -18,6 +18,6 @@ pop_2cpt_partly_ss <- function(t, dose_ss, times, doses, theta, tau) {
   checkmate::assert_list(t, len = N_sub)
   checkmate::assert_matrix(theta, nrows = N_sub, ncols = 3)
   N_last <- length(times[[1]])
-  amounts <- pop_2cpt_partly_ss_stage1(dose_ss, times, doses, theta)
-  pop_2cpt_partly_ss_stage2(t, dose_ss, times, doses, amounts, theta)
+  amounts <- pop_2cpt_partly_ss_stage1(dose_ss, times, doses, theta, tau)
+  pop_2cpt_partly_ss_stage2(t, dose_ss, times, doses, amounts, theta, tau)
 }
