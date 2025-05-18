@@ -46,13 +46,28 @@ DosingData <- R6::R6Class(
 
     #' Simulate PK dynamics
     #'
-    #' @param ts A vector of output times for each subject (a list).
+    #' @param t A vector of output times for each subject (a list).
     #' @param theta A matrix of parameters.
-    simulate_pk = function(ts, theta) {
-      checkmate::assert_list(ts, len = self$num_subjects())
-      pop_2cpt_partly_ss(
-        ts, self$dose_ss, self$times, self$doses, theta, self$tau_ss
+    #' @return a \code{data.frame}
+    simulate_pk = function(t, theta) {
+      checkmate::assert_list(t, len = self$num_subjects())
+      out <- pop_2cpt_partly_ss(
+        t, self$dose_ss, self$times, self$doses, theta, self$tau_ss
       )
+      time <- as.numeric(unlist(t))
+      val <- unlist(out)
+      sid <- rep(self$subject_ids, sapply(t, length))
+      data.frame(time = time, val = val, subject_id = as.factor(sid))
+    },
+
+    #' Plot PK data simulated using the dosing schedule
+    #'
+    #' @param df A data frame simulated using \code{simulate_pk}.
+    plot_pk = function(df) {
+      plt <- ggplot(df, aes(x = .data$time, y = .data$val, group = .data$subject_id)) +
+        facet_wrap(. ~ .data$subject_id) +
+        geom_line()
+      plt + ylab("Concentration in central compartment")
     }
   )
 )

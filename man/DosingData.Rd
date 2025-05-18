@@ -30,6 +30,7 @@ Initialize}
 \item \href{#method-DosingData-new}{\code{DosingData$new()}}
 \item \href{#method-DosingData-num_subjects}{\code{DosingData$num_subjects()}}
 \item \href{#method-DosingData-simulate_pk}{\code{DosingData$simulate_pk()}}
+\item \href{#method-DosingData-plot_pk}{\code{DosingData$plot_pk()}}
 \item \href{#method-DosingData-clone}{\code{DosingData$clone()}}
 }
 }
@@ -73,15 +74,35 @@ Simulate PK dynamics
 \if{latex}{\out{\hypertarget{method-DosingData-simulate_pk}{}}}
 \subsection{Method \code{simulate_pk()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DosingData$simulate_pk(ts, theta)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DosingData$simulate_pk(t, theta)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{ts}}{A vector of output times for each subject (a list).}
+\item{\code{t}}{A vector of output times for each subject (a list).}
 
 \item{\code{theta}}{A matrix of parameters.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+a \code{data.frame}
+Plot PK data simulated using the dosing schedule
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DosingData-plot_pk"></a>}}
+\if{latex}{\out{\hypertarget{method-DosingData-plot_pk}{}}}
+\subsection{Method \code{plot_pk()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DosingData$plot_pk(df)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{df}}{A data frame simulated using \code{simulate_pk}.}
 }
 \if{html}{\out{</div>}}
 }

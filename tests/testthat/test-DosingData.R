@@ -15,5 +15,5 @@ test_that("DosingData init and methods work", {
     ts[[j]] <- t
   }
   a <- dd2$simulate_pk(ts, theta)
-  plot(ts[[1]], a[[1]])
+  b <- dd2$plot_pk(a)
 })
