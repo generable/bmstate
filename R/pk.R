@@ -12,10 +12,9 @@ pop_2cpt_partly_ss <- function(t, dose_ss, times, doses, theta) {
   N_sub <- length(dose_ss)
   checkmate::assert_list(times, len = N_sub)
   checkmate::assert_list(doses, len = N_sub)
+  checkmate::assert_list(t, len = N_sub)
   checkmate::assert_matrix(theta, nrows = N_sub, ncols = 3)
   N_last <- length(times[[1]])
-  mod <- create_stanmodel()
-  mod$expose_functions()
-  p1 <- mod$functions$pop_2cpt_partly_ss_stage1(dose_ss, times, doses, theta)
-  p1
+  amounts <- pop_2cpt_partly_ss_stage1(dose_ss, times, doses, theta)
+  pop_2cpt_partly_ss_stage2(t, dose_ss, times, doses, amounts, theta)
 }

@@ -135,5 +135,14 @@ create_stanmodel <- function(...) {
     },
     type = "message"
   )
+  tryCatch(
+    {
+      mod$expose_functions(global = TRUE)
+    },
+    error = function(e) {
+      message("Model already compiled")
+    }
+  )
+
   mod
 }
