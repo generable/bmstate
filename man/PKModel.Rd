@@ -167,7 +167,8 @@ Simulate data with many subjects
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Data frame with one row for each subject
+Data frame with one row for each subject, and a
+\code{\link{DosingData}} object
 }
 }
 \if{html}{\out{<hr>}}

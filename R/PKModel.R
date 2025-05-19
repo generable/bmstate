@@ -90,9 +90,10 @@ PKModel <- R6::R6Class("PKModel",
     #' @param dose dose
     #' @return A numeric value
     compute_ss_auc = function(theta, dose) {
-      checkmate::assert_number(theta$CL, lower = 0)
+      CL <- theta[2]
+      checkmate::assert_number(CL, lower = 0)
       checkmate::assert_number(dose, lower = 0)
-      dose / theta$CL
+      dose / CL
     },
 
     #' @description Simulate data with many subjects
@@ -101,7 +102,8 @@ PKModel <- R6::R6Class("PKModel",
     #' @param beta_pk Covariate effects
     #' @param tau Dosing interval
     #' @param sigma Noise magnitude
-    #' @return Data frame with one row for each subject
+    #' @return Data frame with one row for each subject, and a
+    #' \code{\link{DosingData}} object
     simulate_data = function(df_subjects, beta_pk = NULL, tau = 24,
                              sigma = 0.1) {
       checkmate::assert_class(df_subjects, "data.frame")
@@ -110,8 +112,12 @@ PKModel <- R6::R6Class("PKModel",
       checkmate::assert_number(sigma, lower = 0)
       beta_pk <- self$format_params(beta_pk)
       N <- nrow(df_subjects)
-      dd <- simulate_dosing(df_subjects)
-      df_out <- NULL
+      dd <- simulate_dosing(df_subjects, tau = tau)
+      THETA <- matrix(0, N, 3)
+
+      # Simulate observation times and parameters
+      t_obs <- list()
+      SUB_ID <- rep("s", N)
       for (n in seq_len(N)) {
         row <- df_subjects[n, ]
         theta_n <- list(
@@ -119,21 +125,36 @@ PKModel <- R6::R6Class("PKModel",
           CL = exp(-2 + sum(row[, self$CL_covs()] * beta_pk$CL)),
           V2 = exp(-2 + sum(row[, self$V2_covs()] * beta_pk$V2))
         )
-        idx_meas <- 6 + sample.int(6, 1)
-        t_pre <- idx_meas * tau - 0.05 * runif(1) * tau
-        t_post <- idx_meas * tau + 0.2 * runif(1) * tau
-        tt <- c(t_pre, t_post)
-        conc <- self$simulate_ss(tt, theta_n, row$dose, tau)
-        ss_auc <- self$compute_ss_auc(theta_n, row$dose)
+        t_last <- max(dd$times[[n]])
+        t_pre <- t_last - 0.05 * runif(1) * tau
+        t_post <- t_last + 0.2 * runif(1) * tau
+        t_obs[[n]] <- c(t_pre, t_post)
+        THETA[n, ] <- unlist(theta_n)
+        SUB_ID[n] <- row$subject_id
+      }
+
+      # Simulate observed concentration
+      CONC <- dd$simulate_pk(t_obs, THETA)
+      df_out <- NULL
+      for (n in seq_len(N)) {
+        ss_auc <- self$compute_ss_auc(THETA[n, ], dd$dose_ss[n])
+        sid <- SUB_ID[n]
+        conc <- (CONC |> dplyr::filter(.data$subject_id == sid))[["val"]]
         conc_noisy <- stats::rlnorm(2, meanlog = log(conc), sdlog = sigma)
-        out <- c(tt, conc_noisy, ss_auc)
+        out <- c(t_obs[[n]], conc_noisy, ss_auc)
         df_out <- rbind(df_out, out)
       }
       df_out <- data.frame(df_out)
       colnames(df_out) <- c("t_pre", "t_post", "conc_pre", "conc_post", "ss_auc")
       rownames(df_out) <- NULL
       df_out$subject_id <- df_subjects$subject_id
-      df_out
+
+      # Return
+      list(
+        pk = df_out,
+        dosing = dd,
+        theta = theta
+      )
     },
 
     #' @description Format list of input PK parameters to standardized format.
