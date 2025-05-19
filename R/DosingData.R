@@ -88,6 +88,13 @@ DosingData <- R6::R6Class(
     #' @param df A data frame simulated using \code{simulate_pk}.
     plot = function(df = NULL) {
       dos <- self$as_data_frame()
+      if (self$num_subjects() > 12) {
+        sid <- unique(dos$subject_id)[1:12]
+        dos <- dos |> dplyr::filter(.data$subject_id %in% sid)
+        if (!is.null(df)) {
+          df <- df |> dplyr::filter(.data$subject_id %in% sid)
+        }
+      }
       plt <- ggplot(NULL, aes(
         x = .data$time, y = .data$val,
         group = .data$subject_id
@@ -105,3 +112,22 @@ DosingData <- R6::R6Class(
     }
   )
 )
+
+#' Simulate dosing data
+#'
+#' @export
+#' @param df_subjects Data frame with one row for each subject
+#' @param tau Dosing interval.
+#' @return A \code{\link{DosingData}} object
+simulate_dosing <- function(df_subjects, tau = 24) {
+  N <- nrow(df_subjects)
+  dose_ss <- c(15, 30, 60)[sample.int(3, N, replace = TRUE)]
+  t1 <- 100 + 100 * runif(N)
+  t2 <- t1 + (1 - 0.5 * runif(N)) * tau
+  d1 <- c(30, 0)[sample.int(2, N, replace = TRUE)]
+  d2 <- c(60, 0)[sample.int(2, N, replace = TRUE)]
+  times <- as.list(data.frame(t(matrix(c(t1, t2), ncol = 2))))
+  doses <- as.list(data.frame(t(matrix(c(d1, d2), ncol = 2))))
+  sid <- df_subjects$subject_id
+  DosingData$new(sid, doses, times, dose_ss, tau)
+}

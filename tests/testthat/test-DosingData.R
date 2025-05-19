@@ -25,7 +25,7 @@ test_that("DosingData works with zero steady-state doses", {
   tm <- seq(0, 5 * tau, by = tau) + 3
   times <- list(tm)
   d1 <- rep(30, length(tm))
-  d1[4] <- 60
+  d1[4] <- 0
   doses <- list(d1)
   sid <- c("A")
   dd1 <- DosingData$new(sid, doses, times, tau = tau)

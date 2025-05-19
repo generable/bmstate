@@ -110,6 +110,7 @@ PKModel <- R6::R6Class("PKModel",
       checkmate::assert_number(sigma, lower = 0)
       beta_pk <- self$format_params(beta_pk)
       N <- nrow(df_subjects)
+      dd <- simulate_dosing(df_subjects)
       df_out <- NULL
       for (n in seq_len(N)) {
         row <- df_subjects[n, ]
