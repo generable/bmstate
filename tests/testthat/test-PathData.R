@@ -1,6 +1,7 @@
 test_that("PathData methods work", {
   N <- 100
-  pd <- simulate_example_data(N)
+  simdat <- simulate_example_data(N)
+  pd <- simdat$events
   expect_output(print(pd))
 
   # As data frame

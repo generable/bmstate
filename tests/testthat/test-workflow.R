@@ -16,7 +16,8 @@ test_that("entire workflow works", {
   mod <- setup$model
 
   # Simulate data
-  pd <- mod$simulate_data(options$N_subject, beta_haz = setup$beta_haz)
+  simdat <- mod$simulate_data(options$N_subject, beta_haz = setup$beta_haz)
+  pd <- simdat$events
 
   # Split
   pd <- do_split(pd)

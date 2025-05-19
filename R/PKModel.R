@@ -153,7 +153,7 @@ PKModel <- R6::R6Class("PKModel",
       list(
         pk = df_out,
         dosing = dd,
-        theta = theta
+        theta = THETA
       )
     },
 
