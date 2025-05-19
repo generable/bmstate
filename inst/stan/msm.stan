@@ -179,9 +179,9 @@ functions {
         A0 = amt[1,n,j-1];
         C0 = amt[2,n,j-1];
         t0 = times[n][j-1];
-        amt[1,n,j] = two_cpt_depot(times[n][j] - t0, ka[n], A0 + doses[n][j]);
+        amt[1,n,j] = two_cpt_depot(times[n][j] - t0, ka[n], A0 + doses[n][j-1]);
         amt[2,n,j] = two_cpt_central(
-          times[n][j] - t0, ka[n], CL[n], V2[n], A0 + doses[n][j], C0
+          times[n][j] - t0, ka[n], CL[n], V2[n], A0 + doses[n][j-1], C0
         );
       }
     }
@@ -245,7 +245,6 @@ functions {
         t_eval = t[n][j];
         idx = rank_of(times[n], t_eval);
         if(idx == 0){
-
           C[n,j] = two_cpt_central_ss(
             t_eval - t_ss_offset, tau_ss[n], dose_ss[n], ka[n], CL[n], V2[n]
           );

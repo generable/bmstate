@@ -19,20 +19,20 @@ test_that("DosingData init and methods work", {
 })
 
 test_that("DosingData works with zero steady-state doses", {
-  N <- 2
-  dose_ss <- c(0, 0)
-  tm <- seq(0, 120, by = 24)
-  times <- list(tm, tm)
+  N <- 1
+  dose_ss <- c(0)
+  tau <- 12
+  tm <- seq(0, 5 * tau, by = tau) + 3
+  times <- list(tm)
   d1 <- rep(30, length(tm))
-  d2 <- d1
-  d2[5] <- 0
-  doses <- list(d1, d2)
-  sid <- c("A", "B")
-  dd1 <- DosingData$new(sid, doses, times, tau = 24)
+  d1[4] <- 60
+  doses <- list(d1)
+  sid <- c("A")
+  dd1 <- DosingData$new(sid, doses, times, tau = tau)
 
   theta <- rep(exp(-2), 3)
   theta <- matrix(rep(theta, N), N, 3, byrow = TRUE)
-  t <- seq(0, 150, by = 0.1)
+  t <- seq(0, 6 * tau, by = 0.1)
   ts <- list()
   for (j in 1:N) {
     ts[[j]] <- t
