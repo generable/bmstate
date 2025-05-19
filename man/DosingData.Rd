@@ -29,6 +29,7 @@ Initialize}
 \itemize{
 \item \href{#method-DosingData-new}{\code{DosingData$new()}}
 \item \href{#method-DosingData-as_data_frame}{\code{DosingData$as_data_frame()}}
+\item \href{#method-DosingData-print}{\code{DosingData$print()}}
 \item \href{#method-DosingData-num_subjects}{\code{DosingData$num_subjects()}}
 \item \href{#method-DosingData-simulate_pk}{\code{DosingData$simulate_pk()}}
 \item \href{#method-DosingData-plot}{\code{DosingData$plot()}}
@@ -66,6 +67,16 @@ Initialize}
 As data frame
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DosingData$as_data_frame()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DosingData-print"></a>}}
+\if{latex}{\out{\hypertarget{method-DosingData-print}{}}}
+\subsection{Method \code{print()}}{
+Print info
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DosingData$print()}\if{html}{\out{</div>}}
 }
 
 }

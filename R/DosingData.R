@@ -58,6 +58,14 @@ DosingData <- R6::R6Class(
       out
     },
 
+    #' @description Print info
+    print = function() {
+      x1 <- paste0("A DosingData object with:")
+      x2 <- paste0(" - Number of subjects: {", self$num_subjects(), "}")
+      msg <- paste(x1, x2, "\n", sep = "\n")
+      cat(msg)
+    },
+
     #' @description Get number of subjects
     num_subjects = function() {
       length(self$subject_ids)

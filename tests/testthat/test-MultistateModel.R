@@ -45,7 +45,8 @@ test_that("data simulation via MultistateModel works", {
   tmax <- 3 * 365.25
   mod$set_knots(tmax, seq(0, tmax - 1, length.out = 1000), 3)
   N_sub <- 84
-  pd <- mod$simulate_data(N_sub = N_sub)
+  simdat <- mod$simulate_data(N_sub = N_sub)
+  pd <- simdat$events
   expect_true(inherits(pd, "PathData"))
   expect_equal(pd$n_paths(), N_sub)
 })
@@ -67,8 +68,9 @@ test_that("MultistateModel with PK submodel works", {
   a <- mod$simulate_subjects(N)
   r <- mod$simulate_pk_data(a)
   expect_equal(ncol(a), 6)
-  expect_equal(nrow(r), N)
+  expect_equal(nrow(r$pk), N)
   expect_true("dose" %in% colnames(a))
-  pd <- mod$simulate_data(N)
+  ss <- mod$simulate_data(N)
+  pd <- ss$events
   expect_equal(pd$n_paths(), N)
 })
