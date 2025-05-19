@@ -76,7 +76,11 @@ DosingData <- R6::R6Class(
       time <- as.numeric(unlist(t))
       val <- unlist(out)
       sid <- rep(self$subject_ids, sapply(t, length))
-      data.frame(time = time, val = val, subject_id = as.factor(sid))
+      data.frame(
+        time = time,
+        val = val,
+        subject_id = as.factor(sid)
+      )
     },
 
     #' Plot dosing (and PK) data
@@ -84,8 +88,10 @@ DosingData <- R6::R6Class(
     #' @param df A data frame simulated using \code{simulate_pk}.
     plot = function(df = NULL) {
       dos <- self$as_data_frame()
-      plt <- ggplot(NULL, aes(x = .data$time, y = .data$val,
-                              group = .data$subject_id)) +
+      plt <- ggplot(NULL, aes(
+        x = .data$time, y = .data$val,
+        group = .data$subject_id
+      )) +
         facet_wrap(. ~ .data$subject_id) +
         geom_vline(
           data = dos, mapping = aes(xintercept = time),
