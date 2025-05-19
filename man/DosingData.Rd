@@ -28,9 +28,10 @@ Initialize}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-DosingData-new}{\code{DosingData$new()}}
+\item \href{#method-DosingData-as_data_frame}{\code{DosingData$as_data_frame()}}
 \item \href{#method-DosingData-num_subjects}{\code{DosingData$num_subjects()}}
 \item \href{#method-DosingData-simulate_pk}{\code{DosingData$simulate_pk()}}
-\item \href{#method-DosingData-plot_pk}{\code{DosingData$plot_pk()}}
+\item \href{#method-DosingData-plot}{\code{DosingData$plot()}}
 \item \href{#method-DosingData-clone}{\code{DosingData$clone()}}
 }
 }
@@ -57,6 +58,16 @@ Initialize}
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DosingData-as_data_frame"></a>}}
+\if{latex}{\out{\hypertarget{method-DosingData-as_data_frame}{}}}
+\subsection{Method \code{as_data_frame()}}{
+As data frame
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DosingData$as_data_frame()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DosingData-num_subjects"></a>}}
@@ -88,15 +99,15 @@ Simulate PK dynamics
 }
 \subsection{Returns}{
 a \code{data.frame}
-Plot PK data simulated using the dosing schedule
+Plot dosing (and PK) data
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DosingData-plot_pk"></a>}}
-\if{latex}{\out{\hypertarget{method-DosingData-plot_pk}{}}}
-\subsection{Method \code{plot_pk()}}{
+\if{html}{\out{<a id="method-DosingData-plot"></a>}}
+\if{latex}{\out{\hypertarget{method-DosingData-plot}{}}}
+\subsection{Method \code{plot()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DosingData$plot_pk(df)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DosingData$plot(df = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

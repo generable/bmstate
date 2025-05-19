@@ -39,6 +39,25 @@ DosingData <- R6::R6Class(
       self$tau_ss <- tau_ss
     },
 
+    #' @description As data frame
+    #'
+    as_data_frame = function() {
+      N <- self$num_subjects()
+      out <- NULL
+      for (n in seq_len(N)) {
+        sid <- self$subject_ids[n]
+        dose_ss <- self$dose_ss[n]
+        doses <- self$doses[[n]]
+        times <- self$times[[n]]
+        rows <- data.frame(
+          subject_id = sid, dose_ss = dose_ss,
+          dose = doses, time = times
+        )
+        out <- rbind(out, rows)
+      }
+      out
+    },
+
     #' @description Get number of subjects
     num_subjects = function() {
       length(self$subject_ids)
@@ -60,13 +79,22 @@ DosingData <- R6::R6Class(
       data.frame(time = time, val = val, subject_id = as.factor(sid))
     },
 
-    #' Plot PK data simulated using the dosing schedule
+    #' Plot dosing (and PK) data
     #'
     #' @param df A data frame simulated using \code{simulate_pk}.
-    plot_pk = function(df) {
-      plt <- ggplot(df, aes(x = .data$time, y = .data$val, group = .data$subject_id)) +
+    plot = function(df = NULL) {
+      dos <- self$as_data_frame()
+      plt <- ggplot(NULL, aes(x = .data$time, y = .data$val,
+                              group = .data$subject_id)) +
         facet_wrap(. ~ .data$subject_id) +
-        geom_line()
+        geom_vline(
+          data = dos, mapping = aes(xintercept = time),
+          col = "firebrick", lty = 2
+        )
+      if (!is.null(df)) {
+        plt <- plt + geom_line(data = df)
+      }
+
       plt + ylab("Concentration in central compartment")
     }
   )
