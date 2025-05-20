@@ -1,7 +1,16 @@
+test_that("JointData methods work", {
+  N <- 100
+  simdat <- simulate_example_data(N)
+  jd <- simdat$data
+  expect_true(inherits(jd, "JointData"))
+  expect_output(print(jd))
+})
+
+
 test_that("PathData methods work", {
   N <- 100
   simdat <- simulate_example_data(N)
-  pd <- simdat$data$events
+  pd <- simdat$data$paths
   expect_output(print(pd))
 
   # As data frame

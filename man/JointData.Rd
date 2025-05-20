@@ -41,6 +41,7 @@ Initialize}
 \item{\code{paths}}{The events data, an object of class \code{\link{PathData}}.}
 
 \item{\code{dosing}}{The dosing data, an object of class \code{\link{DosingData}}.
+Can be also \code{NULL}.
 Filter subjects, creates new object}
 }
 \if{html}{\out{</div>}}
