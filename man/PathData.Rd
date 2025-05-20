@@ -307,7 +307,7 @@ Full link data frame
 }
 \subsection{Returns}{
 A \code{data.frame} with same number of rows as \code{link_df},
-including also the covariate columns and \code{subject_index}
+including also the covariate columns and \code{subject_id}
 }
 }
 \if{html}{\out{<hr>}}
@@ -480,26 +480,15 @@ Fit frequentist 'mstate' model
 \if{html}{\out{<a id="method-PathData-filter"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-filter}{}}}
 \subsection{Method \code{filter()}}{
-Filter based on path or other id, creates new object
+Filter based on subject id, creates new object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$filter(
-  path_ids_keep = NULL,
-  subject_ids_keep = NULL,
-  rep_ids_keep = NULL,
-  draw_ids_keep = NULL
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$filter(subject_ids_keep)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{path_ids_keep}}{Path ids to keep}
-
 \item{\code{subject_ids_keep}}{Subject ids to keep}
-
-\item{\code{rep_ids_keep}}{Repetition ids to keep}
-
-\item{\code{draw_ids_keep}}{Draw ids to keep}
 }
 \if{html}{\out{</div>}}
 }

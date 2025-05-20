@@ -22,7 +22,7 @@ Initialize}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-JointData-new}{\code{JointData$new()}}
-\item \href{#method-JointData-filter_subjects}{\code{JointData$filter_subjects()}}
+\item \href{#method-JointData-filter}{\code{JointData$filter()}}
 \item \href{#method-JointData-print}{\code{JointData$print()}}
 \item \href{#method-JointData-clone}{\code{JointData$clone()}}
 }
@@ -48,11 +48,11 @@ Filter subjects, creates new object}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-JointData-filter_subjects"></a>}}
-\if{latex}{\out{\hypertarget{method-JointData-filter_subjects}{}}}
-\subsection{Method \code{filter_subjects()}}{
+\if{html}{\out{<a id="method-JointData-filter"></a>}}
+\if{latex}{\out{\hypertarget{method-JointData-filter}{}}}
+\subsection{Method \code{filter()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{JointData$filter_subjects(subject_ids_keep)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{JointData$filter(subject_ids_keep)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

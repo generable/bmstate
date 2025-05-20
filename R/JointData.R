@@ -28,7 +28,7 @@ JointData <- R6::R6Class(
     #' Filter subjects, creates new object
     #'
     #' @param subject_ids_keep Subjects to keep
-    filter_subjects = function(subject_ids_keep) {
+    filter = function(subject_ids_keep) {
       checkmate::assert_character(subject_ids_keep, min.len = 1)
       new_pd <- self$paths$filter(subject_ids_keep = subject_ids_keep)
       new_dd <- self$dosing$filter(subject_ids_keep = subject_ids_keep)

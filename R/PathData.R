@@ -212,11 +212,11 @@ PathData <- R6::R6Class(
     #'
     #' @param covariates Which covariates to include
     #' @return A \code{data.frame} with same number of rows as \code{link_df},
-    #' including also the covariate columns and \code{subject_index}
+    #' including also the covariate columns and \code{subject_id}
     full_link = function(covariates = NULL) {
-      x <- self$subject_df[, c("subject_index", covariates)]
-      self$link_df[, c("subject_index", "path_id")] |>
-        dplyr::left_join(x, by = "subject_index")
+      x <- self$subject_df[, c("subject_id", covariates)]
+      self$link_df[, c("subject_id", "path_id")] |>
+        dplyr::left_join(x, by = "subject_id")
     },
 
     #' @description Data frame in transitions format
@@ -364,34 +364,20 @@ PathData <- R6::R6Class(
       )
     },
 
-    #' @description Filter based on path or other id, creates new object
+    #' @description Filter based on subject id, creates new object
     #'
-    #' @param path_ids_keep Path ids to keep
     #' @param subject_ids_keep Subject ids to keep
-    #' @param rep_ids_keep Repetition ids to keep
-    #' @param draw_ids_keep Draw ids to keep
-    filter = function(path_ids_keep = NULL, subject_ids_keep = NULL,
-                      rep_ids_keep = NULL, draw_ids_keep = NULL) {
+    filter = function(subject_ids_keep) {
+      checkmate::assert_character(subject_ids_keep, min.len = 1)
       subject_df <- self$subject_df |>
-        dplyr::filter(is.null(subject_ids_keep) | subject_id %in% subject_ids_keep)
+        dplyr::filter(subject_id %in% subject_ids_keep)
       link_df <- self$link_df |>
-        dplyr::filter(
-          is.null(rep_ids_keep) | rep_idx %in% rep_ids_keep,
-          is.null(!!draw_ids_keep) | draw_idx %in% draw_ids_keep,
-          subject_index %in% subject_df$subject_index
-        )
+        dplyr::filter(subject_id %in% unique(subject_df$subject_id))
       path_df <- self$get_path_df(FALSE) |>
-        dplyr::filter(
-          is.null(path_ids_keep) | path_id %in% path_ids_keep,
-          path_id %in% link_df$path_id
-        )
+        dplyr::filter(path_id %in% unique(link_df$path_id))
       link_df <- link_df |> dplyr::filter(path_id %in% unique(path_df$path_id))
-      subject_df <- subject_df |> dplyr::filter(subject_index %in%
-        unique(link_df$subject_index))
-      link_df <- link_df |>
-        left_join(subject_df |> dplyr::select(subject_index, subject_id),
-          by = "subject_index"
-        )
+      subject_df <- subject_df |> dplyr::filter(subject_id %in%
+        unique(link_df$subject_id))
       PathData$new(
         subject_df, path_df, link_df,
         self$transmat,

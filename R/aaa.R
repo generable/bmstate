@@ -93,29 +93,16 @@ example_sim_setup_illnessdeath <- function(beta_dose = -0.5, beta_age = 0.5) {
 split_data <- function(dat, p_test = 0.25) {
   checkmate::assert_class(dat, "JointData")
   checkmate::assert_number(p_test, lower = 0, upper = 1)
-  pd <- dat$paths
-  all_sub <- unique(pd$subject_df$subject_id)
+  all_sub <- dat$paths$unique_subjects()
   N_sub <- length(all_sub)
   i_test <- sample.int(N_sub, round(N_sub * p_test))
   test_sub <- all_sub[i_test]
   train_sub <- setdiff(all_sub, test_sub)
-  sdf <- pd$subject_df
-
-  # Split
-  pd_test <- pd$filter(subject_ids_keep = test_sub)
-  pd_train <- pd$filter(subject_ids_keep = train_sub)
-  if (is.null(dat$dosing)) {
-    dd_test <- NULL
-    dd_train <- NULL
-  } else {
-    dd_test <- dat$dosing$filter(test_sub)
-    dd_train <- dat$dosing$filter(train_sub)
-  }
 
   # Return
   list(
-    test = JointData$new(pd_test, dd_test),
-    train = JointData$new(pd_train, dd_train)
+    test = dat$filter(test_sub),
+    train = dat$filter(train_sub)
   )
 }
 
