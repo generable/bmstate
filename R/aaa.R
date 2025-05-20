@@ -58,7 +58,8 @@ simulate_example_data <- function(N = 10, beta_haz = NULL,
   tm <- transmat_full(self_loops = FALSE)
   tmax <- 3 * 365.25
   mod <- create_msm(tm, covs, pk_covs, tmax = tmax)
-  mod$simulate_data(N, beta_haz, beta_pk, w0)
+  dat <- mod$simulate_data(N, beta_haz, beta_pk, w0)
+  list(model = mod, data = dat)
 }
 
 #' Example simulation setup
@@ -146,6 +147,7 @@ ensure_exposed_stan_functions <- function() {
   if (exists("STAN_dummy_function")) {
     return(TRUE)
   } else {
+    message("Recompiling Stan model")
     mod <- create_stanmodel(force_recompile = TRUE)
     mod$expose_functions(global = TRUE)
   }

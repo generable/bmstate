@@ -4,8 +4,7 @@ test_that("entire workflow works", {
     N_subject = 1000,
     iter_warmup = 60,
     iter_sampling = 30,
-    chains = 1,
-    NK = 3
+    chains = 1
   )
   NP <- options$iter_sampling
   NR <- 2
@@ -17,6 +16,40 @@ test_that("entire workflow works", {
 
   # Simulate data
   simdat <- mod$simulate_data(options$N_subject, beta_haz = setup$beta_haz)
+  pd <- simdat$events
+
+  # Split
+  pd <- do_split(pd)
+  expect_true(inherits(pd$test, "PathData"))
+  expect_equal(pd$test$n_paths(), options$N_subject * 0.25)
+  expect_equal(pd$train$longest_path()$n_paths(), 1)
+
+  # CoxPH fit
+  cph <- pd$train$fit_coxph(covariates = mod$covs())
+  msf <- pd$train$fit_mstate()
+  expect_true(inherits(msf, "msfit"))
+})
+
+
+
+test_that("entire workflow works (with PK)", {
+  # Options
+  options <- list(
+    N_subject = 200,
+    iter_warmup = 60,
+    iter_sampling = 30,
+    chains = 1
+  )
+  NP <- options$iter_sampling
+  NR <- 2
+
+  # Setup
+  h0_base <- 1e-3
+
+  # Simulate data
+  sim <- simulate_example_data(N = options$N_subject)
+  mod <- sim$model
+  simdat <- simdat$data
   pd <- simdat$events
 
   # Split
