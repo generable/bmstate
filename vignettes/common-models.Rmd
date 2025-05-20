@@ -54,13 +54,13 @@ mean $\frac{1}{\lambda}$.
 ```{r, fig.width=5}
 lambda <- 1e-2
 pd <- mod$simulate_data(N_sub, w0 = lambda)
-pd$plot_paths()
-pd$plot_graph()
+pd$paths$plot_paths()
+pd$paths$plot_graph()
 ```
 
 We plot the distribution of event times and the theoretical mean (red line).
 ```{r, fig.width=5}
-times <- pd$as_transitions(truncate = TRUE)$time
+times <- pd$paths$as_transitions(truncate = TRUE)$time
 plot_time_dist(times) + geom_vline(xintercept = 1 / lambda, color = "firebrick")
 ```
 
@@ -93,8 +93,8 @@ print(w0 / sum(w0))
 
 ```{r, fig.width=5}
 pd <- mod$simulate_data(N_sub, w0 = w0)
-pd$plot_paths()
-pd$plot_graph()
+pd$paths$plot_paths()
+pd$paths$plot_graph()
 ```
 
 The distribution of event times should be exponentially distributed with
@@ -104,7 +104,7 @@ $$
 $$
 is the combined hazard rate. We plot the empirical distribution and the theoretical mean (red line).
 ```{r, fig.width=5}
-times <- pd$as_transitions(truncate = TRUE)$time
+times <- pd$paths$as_transitions(truncate = TRUE)$time
 plot_time_dist(times) + geom_vline(xintercept = 1 / sum(w0), color = "firebrick")
 ```
 
@@ -118,8 +118,8 @@ print(tm)
 tm$plot()
 mod <- create_msm(tm)
 pd <- mod$simulate_data(N_sub, w0 = 1e-2)
-pd$plot_paths()
-pd$plot_graph()
+pd$paths$plot_paths()
+pd$paths$plot_graph()
 ```
 
 
@@ -134,14 +134,14 @@ print(tm)
 tm$plot()
 mod <- create_msm(tm)
 pd <- mod$simulate_data(N_sub, w0 = 1e-3)
-pd$plot_paths()
-pd$plot_graph()
+pd$paths$plot_paths()
+pd$paths$plot_graph()
 ```
 
 Some of the paths may not reach a terminal state
 before `t_max`, meaning they get censored (no event)
 
 ```{r, fig.width=5}
-pd$prop_matrix()
+pd$paths$prop_matrix()
 ```
 
