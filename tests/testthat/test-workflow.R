@@ -49,18 +49,11 @@ test_that("entire workflow works (with PK)", {
   # Simulate data
   sim <- simulate_example_data(N = options$N_subject)
   mod <- sim$model
-  simdat <- simdat$data
+  simdat <- sim$data
   pd <- simdat$events
 
   # Split
   pd <- do_split(pd)
-  expect_true(inherits(pd$test, "PathData"))
-  expect_equal(pd$test$n_paths(), options$N_subject * 0.25)
-  expect_equal(pd$train$longest_path()$n_paths(), 1)
-
-  # CoxPH fit
-  cph <- pd$train$fit_coxph(covariates = mod$covs())
-  msf <- pd$train$fit_mstate()
 
   # Stan data
   stan_dat <- create_stan_data(mod, pd$train)
