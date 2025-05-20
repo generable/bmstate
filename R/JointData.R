@@ -31,7 +31,11 @@ JointData <- R6::R6Class(
     filter = function(subject_ids_keep) {
       checkmate::assert_character(subject_ids_keep, min.len = 1)
       new_pd <- self$paths$filter(subject_ids_keep = subject_ids_keep)
-      new_dd <- self$dosing$filter(subject_ids_keep = subject_ids_keep)
+      if (!is.null(self$dosing)) {
+        new_dd <- self$dosing$filter(subject_ids_keep = subject_ids_keep)
+      } else {
+        new_dd <- NULL
+      }
       JointData$new(new_pd, new_dd)
     },
 
