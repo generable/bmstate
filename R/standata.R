@@ -1,20 +1,17 @@
 #' Creating Stan data list
 #'
 #' @export
-#' @inheritParams fit_model
+#' @inheritParams fit_stan
 #' @return A list of data for Stan.
-create_stan_data <- function(model, pd, dosing = NULL, prior_only = FALSE,
+create_stan_data <- function(model, data, dosing = NULL, prior_only = FALSE,
                              delta_grid = 1) {
   checkmate::assert_class(model, "MultistateModel")
-  checkmate::assert_class(pd, "PathData")
+  checkmate::assert_class(data, "JointData")
   checkmate::assert_number(delta_grid, lower = 0)
+  pd <- data$paths
   tm <- pd$transmat
   check_equal_transmats(tm, model$system$tm())
   checkmate::assert_logical(prior_only, len = 1)
-  if (!is.null(dosing)) {
-    checkmate::assert_class(dosing, "data.frame")
-    stopifnot(!all(duplicated(dosing$subject_id)))
-  }
 
   # Initial Stan data
   stan_dat <- c(

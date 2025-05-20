@@ -4,16 +4,20 @@
 \alias{create_stan_data}
 \title{Creating Stan data list}
 \usage{
-create_stan_data(model, pd, dosing = NULL, prior_only = FALSE, delta_grid = 1)
+create_stan_data(
+  model,
+  data,
+  dosing = NULL,
+  prior_only = FALSE,
+  delta_grid = 1
+)
 }
 \arguments{
 \item{model}{A \code{\link{MultistateModel}} object.}
 
-\item{pd}{A \code{\link{PathData}} object of observed paths.}
+\item{data}{A \code{\link{JointData}} object of observed paths and dosing.}
 
-\item{dosing}{Dosing data frame.}
-
-\item{prior_only}{Sample from prior only.}
+\item{prior_only}{Sample from prior only?}
 
 \item{delta_grid}{Time discretization delta for numerically integrating
 hazards.}
