@@ -63,7 +63,7 @@ fit_stan <- function(model, data, prior_only = FALSE,
 #' @export
 #' @inheritParams fit_stan
 #' @return A list of data for Stan.
-create_stan_data <- function(model, data, dosing = NULL, prior_only = FALSE,
+create_stan_data <- function(model, data, prior_only = FALSE,
                              delta_grid = 1) {
   checkmate::assert_class(model, "MultistateModel")
   checkmate::assert_class(data, "JointData")
@@ -79,25 +79,19 @@ create_stan_data <- function(model, data, dosing = NULL, prior_only = FALSE,
     create_stan_data_transitions(pd),
     create_stan_data_spline(pd, model, delta_grid),
     create_stan_data_covariates(pd, model),
-    create_stan_data_trans_types(pd)
+    create_stan_data_trans_types(pd),
+    create_stan_data_pk(data, model)
   )
-
-  # PK data
-  out <- c(out, create_stan_data_pk(data, model))
-  out <- c(out, create_stan_data_time_since_last_pk(out))
 
   # Likelihood flags
-  out$omit_lik_hazard <- as.integer(prior_only)
-  out$omit_lik_pk <- as.integer(prior_only)
-  out$do_pk <- as.integer(do_pk)
+  flags <- list(
+    omit_lik_hazard = as.integer(prior_only),
+    omit_lik_pk = as.integer(prior_only),
+    do_pk = as.integer(model$has_pk())
+  )
 
   # Return
-  list(
-    stan_data = out,
-    id_map_train = id_map_train,
-    id_map_test = id_map_test,
-    x_oth_names = oth$x_oth_names
-  )
+  c(stan_dat, stan_dat_pk, flags)
 }
 
 # Transition types

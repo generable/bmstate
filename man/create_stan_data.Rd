@@ -4,13 +4,7 @@
 \alias{create_stan_data}
 \title{Creating Stan data list}
 \usage{
-create_stan_data(
-  model,
-  data,
-  dosing = NULL,
-  prior_only = FALSE,
-  delta_grid = 1
-)
+create_stan_data(model, data, prior_only = FALSE, delta_grid = 1)
 }
 \arguments{
 \item{model}{A \code{\link{MultistateModel}} object.}

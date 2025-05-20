@@ -55,11 +55,9 @@ PathData <- R6::R6Class(
       }
       if (!("draw_idx" %in% colnames(link_df))) {
         link_df$draw_idx <- 1
-        link_df$draw_idx <- as.factor(link_df$draw_idx)
       }
       if (!("rep_idx" %in% colnames(link_df))) {
         link_df$rep_idx <- 1
-        link_df$rep_idx <- as.factor(link_df$rep_idx)
       }
       cols1 <- c("subject_id", covs)
       cols2 <- c("path_id", "state", "time", "is_event", "is_censor", "trans_idx")
@@ -67,26 +65,19 @@ PathData <- R6::R6Class(
       check_columns(subject_df, cols1)
       check_columns(path_df, cols2)
       check_columns(link_df, cols3)
+      checkmate::assert_character(subject_df$subject_id)
+      checkmate::assert_character(link_df$subject_id)
+      checkmate::assert_integerish(link_df$path_id)
+      checkmate::assert_integerish(path_df$path_id)
+
+      # As tibbles
       subject_df <- as_tibble(subject_df[, cols1])
       path_df <- as_tibble(path_df[, cols2])
       link_df <- as_tibble(link_df[, cols3])
 
-      # Add the subject_index column
-      ensure_numeric_factor <- function(x) {
-        as.factor(as.numeric(as.factor(x)))
-      }
-      subject_df$subject_index <- ensure_numeric_factor(subject_df$subject_id)
-      cols1 <- c("subject_index", cols1)
-
-      # Format other
-      link_df$subject_index <- ensure_numeric_factor(link_df$subject_id)
-      path_df$path_id <- ensure_numeric_factor(path_df$path_id)
-      link_df$path_id <- ensure_numeric_factor(link_df$path_id)
-      link_df$subject_id <- NULL
-
-      # Ensure order
+      # Order
       link_df <- link_df |> dplyr::arrange(.data$path_id)
-      subject_df <- subject_df |> dplyr::arrange(.data$subject_index)
+      subject_df <- subject_df |> dplyr::arrange(.data$subject_id)
 
       # Set fields
       self$transmat <- transmat
@@ -94,6 +85,11 @@ PathData <- R6::R6Class(
       self$subject_df <- subject_df
       self$path_df <- path_df
       self$link_df <- link_df
+    },
+
+    #' @description Get unique subject ids
+    unique_subjects = function() {
+      unique(self$subject_df$subject_id)
     },
 
     #' @description Get names of covariates

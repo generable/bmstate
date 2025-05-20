@@ -33,6 +33,7 @@ Initialize}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-PathData-new}{\code{PathData$new()}}
+\item \href{#method-PathData-unique_subjects}{\code{PathData$unique_subjects()}}
 \item \href{#method-PathData-covariate_names}{\code{PathData$covariate_names()}}
 \item \href{#method-PathData-lengths}{\code{PathData$lengths()}}
 \item \href{#method-PathData-n_paths}{\code{PathData$n_paths()}}
@@ -88,6 +89,16 @@ which the paths belong.}
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-unique_subjects"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-unique_subjects}{}}}
+\subsection{Method \code{unique_subjects()}}{
+Get unique subject ids
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$unique_subjects()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-covariate_names"></a>}}
