@@ -21,7 +21,6 @@ test_that("entire workflow works", {
   jd <- split_data(jd)
   expect_true(inherits(jd$test, "JointData"))
   expect_equal(jd$test$paths$n_paths(), options$N_subject * 0.25)
-  expect_equal(jd$train$paths$longest_path()$n_paths(), 1)
 
   # CoxPH fit
   cph <- jd$train$paths$fit_coxph(covariates = mod$covs())
@@ -53,13 +52,8 @@ test_that("entire workflow works (with PK)", {
   # Split
   jd <- split_data(jd)
 
-  # Stan data
-  stan_dat <- create_stan_data(mod, jd$train)
-  sd <- stan_dat$stan_data
-
   # Fit the model
-  fit <- mod$sample(
-    data = sd,
+  fit <- fit_stan(mod, jd$train,
     iter_warmup = options$iter_warmup,
     iter_sampling = options$iter_sampling,
     chains = options$chains,

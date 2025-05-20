@@ -1,26 +1,16 @@
 #' The Fit class
 #'
 #' @export
-MultistateModelFit <- R6::R6Class("MultistateModelFit",
-  private = list(
+#' @field stan_fit The Stan fit object
+#' @field stan_data Full Stan data list
+#' @field data A \code{\link{JointData}} object
+#' @field model A \code{\link{MultistateModel}} object
+StanMultistateModelFit <- R6::R6Class("StanMultistateModelFit",
+  public = list(
     stan_fit = NULL,
     stan_data = NULL,
-    path_data = NULL,
-    model = NULL
-  ),
-  public = list(
-
-
-    #' @description
-    #' Get original data used to fit the model.
-    #'
-    #' @param dataname Name of dataset.
-    get_data = function(dataname = "LON") {
-      dn <- self$datanames()
-      checkmate::assert_choice(dataname, dn)
-      private$datasets[[dataname]]
-    },
-
+    data = NULL,
+    model = NULL,
     #' @description
     #' Get model.
     #'
@@ -33,35 +23,24 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
     #' @description
     #' Create model fit object
     #'
-    #' @param model A \code{\link{StanModel}} object.
-    #' @param stan_fit The created 'Stan' fit.
-    #' @param datasets Original data sets.
-    #' @param stan_data The created 'Stan' data. Stored mainly for easier
-    #' debugging.
-    initialize = function(model, stan_fit, datasets, stan_data) {
-      checkmate::assert_list(datasets)
-      checkmate::assert_class(model, "StanModel")
-      private$model <- model
-      private$datasets <- datasets
-      private$stan_fit <- stan_fit
-      private$stan_data <- stan_data
-    },
-
-    #' @description Get the underlying 'Stan' fit object.
-    get_stan_fit = function() {
-      private$stan_fit
-    },
-
-    #' @description Get the underlying 'Stan' data object (for debugging).
-    get_stan_data = function() {
-      private$stan_data
+    #' @param stan_fit The Stan fit object
+    #' @param stan_data Full Stan data list
+    #' @param data A \code{\link{JointData}} object
+    #' @param model A \code{\link{MultistateModel}} object
+    initialize = function(model, data, stan_fit, stan_data) {
+      checkmate::assert_class(data, "JointData")
+      checkmate::assert_class(model, "MultistateModel")
+      self$model <- model
+      self$data <- data
+      self$stan_fit <- stan_fit
+      self$stan_data <- stan_data
     },
 
     #' @description Extract draws as \code{rvar}s
     #'
     #' @param name Param/quantity name
     draws = function(name = NULL) {
-      d <- self$get_stan_fit()$draws(name)
+      d <- self$stan_fit$draws(name)
       d <- posterior::as_draws_rvars(d)
       if (is.null(name)) {
         return(d)
@@ -75,12 +54,6 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
       nams <- names(self$draws())
       match <- grepl(nams, pattern = "log_z_")
       nams[which(match)]
-    },
-
-    #' @description
-    #' Extract log likelihood as 'rvars'.
-    loglik = function() {
-      self$draws("log_lik")
     },
 
     #' @description Generate quantities using the fit.

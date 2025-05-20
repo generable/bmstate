@@ -37,7 +37,6 @@ Initialize}
 \item \href{#method-PathData-covariate_names}{\code{PathData$covariate_names()}}
 \item \href{#method-PathData-lengths}{\code{PathData$lengths()}}
 \item \href{#method-PathData-n_paths}{\code{PathData$n_paths()}}
-\item \href{#method-PathData-longest_path}{\code{PathData$longest_path()}}
 \item \href{#method-PathData-null_state}{\code{PathData$null_state()}}
 \item \href{#method-PathData-state_names}{\code{PathData$state_names()}}
 \item \href{#method-PathData-terminal_states}{\code{PathData$terminal_states()}}
@@ -144,19 +143,6 @@ Get number of paths
 
 \subsection{Returns}{
 an integer
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PathData-longest_path"></a>}}
-\if{latex}{\out{\hypertarget{method-PathData-longest_path}{}}}
-\subsection{Method \code{longest_path()}}{
-Get longest path
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$longest_path()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-a \code{\link{PathData}} object with just one path
 }
 }
 \if{html}{\out{<hr>}}

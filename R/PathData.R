@@ -116,16 +116,6 @@ PathData <- R6::R6Class(
         dplyr::count())
     },
 
-    #' @description Get longest path
-    #'
-    #' @return a \code{\link{PathData}} object with just one path
-    longest_path = function() {
-      lens <- self$lengths(FALSE)
-      idx <- which(lens$n == max(lens$n))[1]
-      df <- self$get_path_df(FALSE) |> dplyr::filter(path_id == lens$path_id[idx])
-      self$filter(unique(df$path_id))
-    },
-
     #' @description Get name of null state
     null_state = function() {
       self$transmat$source_states()

@@ -48,13 +48,13 @@ fit_stan <- function(model, data, prior_only = FALSE,
   stan_model <- create_stan_model()
 
   # Create Stan input list
-  d <- create_stan_data(model, data, prior_only)
+  sd <- create_stan_data(model, data, prior_only)
 
   # Call 'Stan'
-  stan_fit <- stan_model$sample(data = d$stan_data, ...)
+  stan_fit <- stan_model$sample(data = sd, ...)
 
   # Return
-  MultistateModelFit$new(self, stan_fit, pd, d$stan_data)
+  MultistateModelFit$new(self, data, stan_fit, sd)
 }
 
 
