@@ -15,18 +15,17 @@ test_that("entire workflow works", {
   mod <- setup$model
 
   # Simulate data
-  simdat <- mod$simulate_data(options$N_subject, beta_haz = setup$beta_haz)
-  pd <- simdat$events
+  jd <- mod$simulate_data(options$N_subject, beta_haz = setup$beta_haz)
 
   # Split
-  pd <- do_split(pd)
-  expect_true(inherits(pd$test, "PathData"))
-  expect_equal(pd$test$n_paths(), options$N_subject * 0.25)
-  expect_equal(pd$train$longest_path()$n_paths(), 1)
+  jd <- split_data(jd)
+  expect_true(inherits(jd$test, "JointData"))
+  expect_equal(jd$test$paths$n_paths(), options$N_subject * 0.25)
+  expect_equal(jd$train$paths$longest_path()$n_paths(), 1)
 
   # CoxPH fit
-  cph <- pd$train$fit_coxph(covariates = mod$covs())
-  msf <- pd$train$fit_mstate()
+  cph <- jd$train$paths$fit_coxph(covariates = mod$covs())
+  msf <- jd$train$paths$fit_mstate()
   expect_true(inherits(msf, "msfit"))
 })
 
@@ -49,14 +48,13 @@ test_that("entire workflow works (with PK)", {
   # Simulate data
   sim <- simulate_example_data(N = options$N_subject)
   mod <- sim$model
-  simdat <- sim$data
-  pd <- simdat$events
+  jd <- sim$data
 
   # Split
-  pd <- do_split(pd)
+  jd <- split_data(jd)
 
   # Stan data
-  stan_dat <- create_stan_data(mod, pd$train)
+  stan_dat <- create_stan_data(mod, jd$train)
   sd <- stan_dat$stan_data
 
   # Fit the model
@@ -72,25 +70,25 @@ test_that("entire workflow works (with PK)", {
 
   # Path prediction
   gq <- mod$generate_quantities(fit, data = sd)
-  dt <- pd$as_transitions()
+  dt <- jd$as_transitions()
   TFI <- legend_to_TFI_matrix(dt$legend)
   t_max_gen <- 3 * 365.25 # 3 yr
   t_start <- 0
   init_state <- 1
 
   # Finding subjects for whom to predict
-  sub_first_rows <- subject_df_with_idx(pd, split$train_sub, stan_dat$id_map_train)
-  sub_first_rows_test <- subject_df_with_idx(pd, split$test_sub, stan_dat$id_map_test)
-  sub_ids_char <- pd$subject_df |> dplyr::filter(subject_id %in% split$train_sub)
-  sub_ids_char_test <- pd$subject_df |> dplyr::filter(subject_id %in% split$test_sub)
+  sub_first_rows <- subject_df_with_idx(jd, split$train_sub, stan_dat$id_map_train)
+  sub_first_rows_test <- subject_df_with_idx(jd, split$test_sub, stan_dat$id_map_test)
+  sub_ids_char <- jd$subject_df |> dplyr::filter(subject_id %in% split$train_sub)
+  sub_ids_char_test <- jd$subject_df |> dplyr::filter(subject_id %in% split$test_sub)
 
   # Paths from 0 to 3 years starting from Randomization
   paths_3yr <- generate_paths_many_subjects(gq, sd, possible_covs,
     TFI, init_state, t_start, t_max_gen,
-    state_names = pd$state_names,
+    state_names = jd$state_names,
     trans_names = dt$legend$trans_char,
     df_subjects = sub_first_rows,
-    terminal_states = pd$terminal_states,
+    terminal_states = jd$terminal_states,
     num_paths = NP, n_repeats = NR,
   )
   expect_equal(paths_3yr$n_paths(), 9000)
@@ -98,10 +96,10 @@ test_that("entire workflow works (with PK)", {
   # Paths from 0 to 3 years starting from Randomization
   paths_3yr_oos <- generate_paths_many_subjects(gq, sd, possible_covs,
     TFI, init_state, t_start, t_max_gen,
-    state_names = pd$state_names,
+    state_names = jd$state_names,
     trans_names = dt$legend$trans_char,
     df_subjects = sub_first_rows_test,
-    terminal_states = pd$terminal_states,
+    terminal_states = jd$terminal_states,
     num_paths = NP, n_repeats = NR,
     oos = TRUE
   )
@@ -112,31 +110,31 @@ test_that("entire workflow works (with PK)", {
   df_beta_true <- d$df_beta_true
   N_subject <- options$N_subject
   res <- dplyr::lst(
-    fit, stan_dat, pd, paths_3yr, paths_3yr_oos,
+    fit, stan_dat, jd, paths_3yr, paths_3yr_oos,
     sub_first_rows, sub_first_rows_test, N_subject, df_beta_true,
     h0_true_all, m_sub, split
   )
 
   # Covariate effect and baseline hazard plots
   sd <- res$stan_dat$stan_data
-  all_states <- res$pd$state_names
-  dt <- res$pd$as_transitions()
-  plt_oth <- plot_other_beta(res$fit, res$stan_dat, res$pd, res$df_beta_true)
+  all_states <- res$jd$state_names
+  dt <- res$jd$as_transitions()
+  plt_oth <- plot_other_beta(res$fit, res$stan_dat, res$jd, res$df_beta_true)
   expect_equal(length(plt_oth), 3)
 
   df_h0 <- tibble::as_tibble(data.frame(
     transition = seq_len(length(res$h0_true_all)),
     log_h0_true = log(res$h0_true_all)
   ))
-  plt_h0 <- plot_h0(res$fit, sd, res$pd, df_h0)
+  plt_h0 <- plot_h0(res$fit, sd, res$jd, df_h0)
   expect_s3_class(plt_h0, "ggplot")
 
   # Event probabilities
   names <- c("1. Obs", "2. IS pred", "3. OOS pred")
-  plt_a <- plot_p_event(res$pd, res$paths_3yr, res$paths_3yr_oos, names)
+  plt_a <- plot_p_event(res$jd, res$paths_3yr, res$paths_3yr_oos, names)
 
   # no points selected for one or more curves, consider using the extend argument
-  plt_b <- plot_p_event_by_dose(res$pd, res$paths_3yr, res$paths_3yr_oos, names)
+  plt_b <- plot_p_event_by_dose(res$jd, res$paths_3yr, res$paths_3yr_oos, names)
   expect_s3_class(plt_a, "ggplot")
   expect_s3_class(plt_b, "ggplot")
 
@@ -165,17 +163,17 @@ test_that("entire workflow works (with PK)", {
   train_sub <- res$sub_first_rows$subject_id
   test_sub <- res$sub_first_rows_test$subject_id
   plt_bs_is <- create_brier_score_plot(
-    ppsurv_subj, res$pd, train_sub
+    ppsurv_subj, res$jd, train_sub
   )
   plt_bs_oos <- create_brier_score_plot(
-    ppsurv_subj_oos, res$pd, test_sub
+    ppsurv_subj_oos, res$jd, test_sub
   )
   expect_s3_class(plt_bs_is, "ggplot")
   expect_s3_class(plt_bs_oos, "ggplot")
 
   # Concordance index
   ci_eval <- create_cindex_plot(
-    res$pd, res$paths_3yr, res$paths_3yr_oos,
+    res$jd, res$paths_3yr, res$paths_3yr_oos,
     train_sub, test_sub,
     ppsurv_subj, ppsurv_subj_oos
   )
