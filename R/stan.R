@@ -1,3 +1,63 @@
+#' Create the main 'Stan' model
+#'
+#' @param ... Arguments passed to 'CmdStanR'
+create_stan_model <- function(...) {
+  fn <- "msm.stan"
+  filepath <- system.file(file.path("stan", fn), package = "bmstate")
+  # silence compile warnings from cmdstan
+  utils::capture.output(
+    {
+      mod <- cmdstanr::cmdstan_model(filepath, ...)
+    },
+    type = "message"
+  )
+  mod
+}
+
+#' Expose 'Stan' functions if they are not yet exposed
+#'
+#' @export
+#' @return logical telling whether they were already exposed
+ensure_exposed_stan_functions <- function() {
+  if (exists("STAN_dummy_function")) {
+    return(TRUE)
+  } else {
+    message("Recompiling Stan model")
+    mod <- create_stan_model(force_recompile = TRUE)
+    mod$expose_functions(global = TRUE)
+  }
+  FALSE
+}
+
+#' Fit a model using 'Stan'
+#'
+#' @param model A \code{\link{MultistateModel}} object.
+#' @param data A \code{\link{JointData}} object of observed paths and dosing.
+#' @param prior_only Sample from prior only?
+#' @param delta_grid Time discretization delta for numerically integrating
+#' hazards.
+#' @param ... Arguments passed to \code{sample} method of the
+#' 'CmdStanR' model.
+#' @return A \code{\link{MultistateModelFit}} object.
+fit_stan <- function(model, data, prior_only = FALSE,
+                     delta_grid = 1, ...) {
+  checkmate::assert_class(model, "MultistateModel")
+  checkmate::assert_class(data, "JointData")
+
+  # Get Stan model object
+  stan_model <- create_stan_model()
+
+  # Create Stan input list
+  d <- create_stan_data(model, data, prior_only)
+
+  # Call 'Stan'
+  stan_fit <- stan_model$sample(data = d$stan_data, ...)
+
+  # Return
+  MultistateModelFit$new(self, stan_fit, pd, d$stan_data)
+}
+
+
 #' Creating Stan data list
 #'
 #' @export
@@ -23,7 +83,7 @@ create_stan_data <- function(model, data, dosing = NULL, prior_only = FALSE,
   )
 
   # PK data
-  out <- c(out, create_stan_data_pk(pd, model))
+  out <- c(out, create_stan_data_pk(data, model))
   out <- c(out, create_stan_data_time_since_last_pk(out))
 
   # Likelihood flags
@@ -127,31 +187,14 @@ create_stan_data_spline <- function(pd, model, delta_grid) {
   c(sd, sd_int)
 }
 
-# Get original subject id based on numeric id that is in Stan data
-subject_idx_to_id <- function(id_map, idx) {
-  id_map$subject_id[which(id_map$x_sub == idx)]
-}
-
 # PK data
-create_stan_data_pk <- function(pk, sd, id_map_train, id_map_test) {
+create_stan_data_pk <- function(data, model) {
+  checkmate::assert_class(data, "JointData")
   N_sub <- sd$N_sub
-  N_sub_oos <- sd$N_sub_oos
   t_obs_pk <- matrix(0, N_sub, 2)
-  t_obs_pk_oos <- matrix(0, N_sub_oos, 2)
   conc_pk <- matrix(0, N_sub, 2)
-  conc_pk_oos <- matrix(0, N_sub_oos, 2)
-  if (is.null(pk)) {
-    last_n <- 2
-  } else {
-    last_n <- unique(pk$pk_last_n)
-  }
-  checkmate::assert_integerish(last_n, lower = 2, len = 1)
-  last_times <- matrix(0, N_sub, last_n)
-  last_doses <- matrix(0, N_sub, last_n)
   last_two_times <- matrix(0, N_sub, 2)
   last_two_doses <- matrix(0, N_sub, 2)
-  last_times_oos <- matrix(0, N_sub_oos, last_n)
-  last_doses_oos <- matrix(0, N_sub_oos, last_n)
   pk_lloq <- rep(0, N_sub)
   for (n in 1:N_sub) {
     sub_id <- subject_idx_to_id(id_map_train, n)

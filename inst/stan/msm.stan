@@ -356,10 +356,6 @@ data {
   vector<lower=0>[N_sub] dose_ss;
   real<lower=0> tau_ss;
 
-  // Used while checking
-  array[N_sub] vector<lower=0>[N_last] last_times; // 1st = last SS trough time
-  array[N_sub] vector<lower=0>[N_last] last_doses;
-
   // Used while fitting
   array[N_sub] vector<lower=0>[2] last_two_times; // 1st = last SS trough time
   array[N_sub] vector<lower=0>[2] last_two_doses;

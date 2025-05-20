@@ -134,36 +134,3 @@ plot_time_dist <- function(t) {
       lty = 2
     )
 }
-
-
-#' Create the main Stan model
-#'
-#' @export
-#' @param ... Arguments passed to CmdStanR
-create_stanmodel <- function(...) {
-  fn <- "msm.stan"
-  filepath <- system.file(file.path("stan", fn), package = "bmstate")
-  # silence compile warnings from cmdstan
-  utils::capture.output(
-    {
-      mod <- cmdstanr::cmdstan_model(filepath, ...)
-    },
-    type = "message"
-  )
-  mod
-}
-
-#' Expose Stan functions if they are not yet exposed
-#'
-#' @export
-#' @return logical telling whether they were already exposed
-ensure_exposed_stan_functions <- function() {
-  if (exists("STAN_dummy_function")) {
-    return(TRUE)
-  } else {
-    message("Recompiling Stan model")
-    mod <- create_stanmodel(force_recompile = TRUE)
-    mod$expose_functions(global = TRUE)
-  }
-  FALSE
-}
