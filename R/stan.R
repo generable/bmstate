@@ -91,7 +91,7 @@ create_stan_data <- function(model, data, prior_only = FALSE,
   )
 
   # Return
-  c(stan_dat, stan_dat_pk, flags)
+  c(stan_dat, flags)
 }
 
 # Transition types
@@ -138,9 +138,19 @@ create_stan_data_transitions <- function(pd) {
   out
 }
 
+# Map of subject id to integer
+stan_data_id_map <- function(pd) {
+  checkmate::assert_class(pd, "PathData")
+  sid <- pd$unique_subjects()
+  idx <- seq_len(length(sid))
+  data.frame(subject_index = idx, subject_id = sid)
+}
+
 # Which subject does each interval correspond to
 create_stan_data_idx_sub <- function(pd) {
-  idx_sub <- as.integer(pd$as_transitions()$subject_index)
+  im <- stan_data_id_map(pd)
+  dt <- pd$as_transitions() |> dplyr::left_join(im, by = "subject_id")
+  idx_sub <- as.integer(dt$subject_index)
   N_sub <- max(idx_sub)
   stopifnot(all(seq_len(N_sub) %in% idx_sub))
   list(
@@ -184,128 +194,56 @@ create_stan_data_spline <- function(pd, model, delta_grid) {
 # PK data
 create_stan_data_pk <- function(data, model) {
   checkmate::assert_class(data, "JointData")
-  N_sub <- sd$N_sub
-  t_obs_pk <- matrix(0, N_sub, 2)
-  conc_pk <- matrix(0, N_sub, 2)
-  last_two_times <- matrix(0, N_sub, 2)
-  last_two_doses <- matrix(0, N_sub, 2)
-  pk_lloq <- rep(0, N_sub)
-  for (n in 1:N_sub) {
-    sub_id <- subject_idx_to_id(id_map_train, n)
-    if (is.null(pk)) {
-      conc_pk[n, ] <- 1
-      t_obs_pk[n, ] <- 1
-      last_times[n, ] <- 1
-      last_doses[n, ] <- 1
-      last_two_times[n, ] <- 1
-      last_two_doses[n, ] <- 1
-      pk_lloq[n] <- 1
-    } else {
-      pk_sub <- pk |> dplyr::filter(subject_id == sub_id)
-      if (nrow(pk_sub) != 1) {
-        stop("found multiple rows for subject ", n)
-      }
-      conc_pk[n, ] <- unlist(pk_sub$list_pk_conc)
-      t_obs_pk[n, ] <- unlist(pk_sub$list_pk_hours)
-      last_times[n, ] <- unlist(pk_sub$list_dose_hours)
-      last_doses[n, ] <- unlist(pk_sub$list_dose_amts)
-      last_two_times[n, ] <- last_times[n, (last_n - 1):last_n]
-      last_two_doses[n, ] <- last_doses[n, (last_n - 1):last_n]
-      pk_lloq[n] <- pk_sub$pk_lloq
-    }
+  if (model$has_pk()) {
+    pk_obs <- data$paths$subject_df |>
+      dplyr::select("t_pre", "t_post", "conc_pre", "conc_post", "pk_lloq")
+    last_two_times <- t(sapply(data$dosing$times, function(x) x))
+    last_two_doses <- t(sapply(data$dosing$doses, function(x) x))
+    dose_ss <- data$dosing$dose_ss
+  } else {
+    N_sub <- nrow(data$paths$subject_df)
+    pk_obs <- matrix(1, N_sub, 5)
+    last_two_doses <- matrix(0, N_sub, 2)
+    last_two_times <- matrix(1, N_sub, 2)
+    dose_ss <- rep(0, N_sub)
   }
-  for (n in 1:N_sub_oos) {
-    sub_id <- subject_idx_to_id(id_map_test, n)
-    if (is.null(pk)) {
-      conc_pk_oos[n, ] <- 1
-      t_obs_pk_oos[n, ] <- 1
-      last_times_oos[n, ] <- 1
-      last_doses_oos[n, ] <- 1
-    } else {
-      pk_sub <- pk |> dplyr::filter(subject_id == sub_id)
-      if (nrow(pk_sub) != 1) {
-        stop("found multiple rows for subject ", n)
-      }
-      conc_pk_oos[n, ] <- unlist(pk_sub$list_pk_conc)
-      t_obs_pk_oos[n, ] <- unlist(pk_sub$list_pk_hours)
-      last_times_oos[n, ] <- unlist(pk_sub$list_dose_hours)
-      last_doses_oos[n, ] <- unlist(pk_sub$list_dose_amts)
-    }
-  }
+  t_obs_pk <- pk_obs[, 1:2]
+  conc_pk <- pk_obs[, 3:4]
+  pk_lloq <- pk_obs[, 5]
 
   # Return
-  list(
+  sd <- list(
     t_obs_pk = t_obs_pk,
     conc_pk = conc_pk,
-    t_obs_pk_oos = t_obs_pk_oos,
-    conc_pk_oos = conc_pk_oos,
-    dose_ss = sd$x_fda[sd$sub_start_idx],
-    dose_ss_oos = sd$x_fda_oos[sd$sub_start_idx_oos],
-    t_pred_pk = t_obs_pk,
-    t_pred_pk_oos = t_obs_pk_oos,
-    pred_pk = 0, # will be set to 1 when using standalone GQ
-    N_pred_pk = 2,
-    N_last = last_n,
-    last_times = last_times,
-    last_doses = last_doses,
+    dose_ss = dose_ss,
     last_two_times = last_two_times,
     last_two_doses = last_two_doses,
-    last_times_oos = last_times_oos,
-    last_doses_oos = last_doses_oos,
     pk_lloq = pk_lloq,
     I_auc = as.numeric(model$has_pk())
   )
-}
-
-# PK data
-update_stan_data_pk_pred <- function(sd, P = 200) {
-  N_sub <- sd$N_sub
-  N_sub_oos <- sd$N_sub_oos
-  t_pred_pk <- matrix(0, N_sub, P)
-  t_pred_pk_oos <- matrix(0, N_sub_oos, P)
-  for (n in 1:N_sub) {
-    t_max <- 1.002 * (max(sd$last_times[n, ]) + 1 * 24)
-    t_min <- 0.998 * (min(sd$last_times[n, ]) - 2 * 24)
-    t_pred_pk[n, ] <- seq(t_min, t_max, length.out = P)
-  }
-  for (n in 1:N_sub_oos) {
-    t_max <- 1.002 * (max(sd$last_times_oos[n, ]) + 1 * 24)
-    t_min <- 0.998 * (min(sd$last_times_oos[n, ]) - 2 * 24)
-    t_pred_pk_oos[n, ] <- seq(t_min, t_max, length.out = P)
-  }
-  sd$t_pred_pk <- t_pred_pk
-  sd$t_pred_pk_oos <- t_pred_pk_oos
-  sd$pred_pk <- 1
-  sd$N_pred_pk <- P
-  sd
+  c(sd, create_stan_data_time_since_last_pk(sd))
 }
 
 # Time since last dose
 create_stan_data_time_since_last_pk <- function(sd) {
-  N_sub <- sd$N_sub
-  N_sub_oos <- sd$N_sub_oos
+  N_sub <- length(sd$dose_ss)
   t_since_last_pk <- matrix(0, N_sub, 2)
-  t_since_last_pk_oos <- matrix(0, N_sub_oos, 2)
-  for (n in 1:N_sub) {
-    t_since_last_pk[n, ] <- time_since_last_dose(
-      sd$t_obs_pk[n, ], sd$last_times[n, ]
+  for (n in seq_len(N_sub)) {
+    tsl <- time_since_last_dose(
+      as.numeric(sd$t_obs_pk[n, ]),
+      as.numeric(sd$last_two_times[n, ])
     )
-  }
-  for (n in 1:N_sub_oos) {
-    t_since_last_pk_oos[n, ] <- time_since_last_dose(
-      sd$t_obs_pk_oos[n, ], sd$last_times_oos[n, ]
-    )
+    t_since_last_pk[n, ] <- tsl
   }
   list(
-    t_since_last_pk = t_since_last_pk,
-    t_since_last_pk_oos = t_since_last_pk_oos
+    t_since_last_pk = t_since_last_pk
   )
 }
 
 # Normalized covariates to stan data
 standata_scaled_covariates <- function(pd, model, name) {
   covs <- model$data_covs()
-  sub_df <- pd$subject_df[, c("subject_index", covs)]
+  sub_df <- pd$subject_df
   x <- list()
   nc <- length(covs)
   x_loc <- rep(0, nc)
@@ -406,46 +344,6 @@ which_format_for_stan <- function(x, name) {
   out <- list(M, N_sum, a)
   names(out) <- paste0(c("D_", "sum_", "which_"), name)
   out
-}
-
-
-#' Create matrix indicating possible transitions given current state
-#'
-#' @export
-#' @param legend PathData legend
-#' @return a binary matrix
-legend_to_PT_matrix <- function(legend) {
-  trans <- legend$transition
-  M <- max(c(legend$state, legend$prev_state)) # number of states
-  H <- nrow(legend) # number of transitions
-  checkmate::assert_true(all(trans == 1:H))
-  PT <- matrix(0, H, M)
-  us <- unique(legend$prev_state)
-  L <- length(us)
-  for (j in seq_len(L)) {
-    rows <- legend |> dplyr::filter(prev_state == us[j])
-    possible <- rows$transition
-    PT[possible, us[j]] <- 1
-  }
-  colnames(PT) <- paste0("s", 1:M)
-  rownames(PT) <- legend$trans_char
-  PT
-}
-
-
-#' State/transition legend to TFI matrix
-#'
-#' @export
-#' @param legend PathData legend
-#' @return an integer matrix
-legend_to_TFI_matrix <- function(legend) {
-  M <- max(c(legend$state, legend$prev_state))
-  TFI <- matrix(0, M, M)
-  H <- nrow(legend)
-  for (h in seq_len(H)) {
-    TFI[legend$prev_state[h], legend$state[h]] <- legend$transition[h]
-  }
-  TFI
 }
 
 # Computes time since last dose for both post and pre dose measurement
