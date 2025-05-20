@@ -33,6 +33,7 @@ Initialize}
 \item \href{#method-DosingData-num_subjects}{\code{DosingData$num_subjects()}}
 \item \href{#method-DosingData-simulate_pk}{\code{DosingData$simulate_pk()}}
 \item \href{#method-DosingData-plot}{\code{DosingData$plot()}}
+\item \href{#method-DosingData-filter}{\code{DosingData$filter()}}
 \item \href{#method-DosingData-clone}{\code{DosingData$clone()}}
 }
 }
@@ -125,6 +126,23 @@ Plot dosing (and PK) data
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{df}}{A data frame simulated using \code{simulate_pk}.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DosingData-filter"></a>}}
+\if{latex}{\out{\hypertarget{method-DosingData-filter}{}}}
+\subsection{Method \code{filter()}}{
+Filter based on subject id, creates new object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DosingData$filter(subject_ids_keep = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{subject_ids_keep}}{Subject ids to keep}
 }
 \if{html}{\out{</div>}}
 }

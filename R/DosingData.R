@@ -117,6 +117,24 @@ DosingData <- R6::R6Class(
       }
 
       plt + ylab("Concentration in central compartment")
+    },
+
+    #' @description Filter based on subject id, creates new object
+    #'
+    #' @param subject_ids_keep Subject ids to keep
+    filter = function(subject_ids_keep = NULL) {
+      if (is.null(subject_ids_keep)) {
+        subject_ids_keep <- unique(self$subject_ids)
+      }
+      checkmate::assert_character(subject_ids_keep)
+      idx_keep <- which(self$subject_ids %in% subject_ids_keep)
+      DosingData$new(
+        self$subject_ids[idx_keep],
+        self$doses[idx_keep],
+        self$times[idx_keep],
+        self$dose_ss[idx_keep],
+        tau_ss = self$tau_ss
+      )
     }
   )
 )

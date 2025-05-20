@@ -469,7 +469,7 @@ Fit frequentist 'mstate' model
 \if{html}{\out{<a id="method-PathData-filter"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-filter}{}}}
 \subsection{Method \code{filter()}}{
-Filter based on path id, creates new object
+Filter based on path or other id, creates new object
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$filter(
   path_ids_keep = NULL,

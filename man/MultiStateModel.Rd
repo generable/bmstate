@@ -175,8 +175,7 @@ a vector of zeros is used.}
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A \code{\link{PathData}} object and a \code{\link{DosingData}}
-object.
+A \code{\link{JointData}} object.
 }
 }
 \if{html}{\out{<hr>}}

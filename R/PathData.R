@@ -368,7 +368,7 @@ PathData <- R6::R6Class(
       )
     },
 
-    #' @description Filter based on path id, creates new object
+    #' @description Filter based on path or other id, creates new object
     #'
     #' @param path_ids_keep Path ids to keep
     #' @param subject_ids_keep Subject ids to keep

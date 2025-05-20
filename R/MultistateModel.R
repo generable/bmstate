@@ -154,8 +154,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' three elements, each being a vector. If any element is \code{NULL},
     #' a vector of zeros is used.
     #' @param w0 Baseline hazard rate for all transitions
-    #' @return A \code{\link{PathData}} object and a \code{\link{DosingData}}
-    #' object.
+    #' @return A \code{\link{JointData}} object.
     simulate_data = function(N_subject = 100, beta_haz = NULL,
                              beta_pk = NULL, w0 = 1e-3) {
       H <- self$system$num_trans()
@@ -186,10 +185,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       link_df$rep_idx <- rep(1, N)
       link_df$draw_idx <- rep(1, N)
       pd <- PathData$new(sub_df, path_df, link_df, self$system$tm(), colnames(sub_df))
-      list(
-        events = pd,
-        dosing = pksim$dosing
-      )
+      JointData$new(pd, pksim$dosing)
     },
 
     #' @description Simulate PK data.
