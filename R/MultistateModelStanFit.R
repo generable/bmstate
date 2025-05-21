@@ -58,6 +58,18 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
       cat(msg)
     },
 
+    #' @description Plot used basis functions (grid)
+    plot_basisfun = function() {
+      sd <- self$stan_data
+      t <- rep(sd$t_grid, sd$N_sbf)
+      y <- as.vector(sd$SBF_grid)
+      idx <- as.factor(rep(1:sd$N_sbf, each = sd$N_grid))
+      df <- data.frame(t, y, idx)
+      ggplot(df, aes(.data$t, .data$y, color = .data$idx)) +
+        geom_line() +
+        ggtitle("Basis functions")
+    },
+
     #' @description
     #' Full names of parameters that start with \code{log_z_}.
     log_z_pars = function() {

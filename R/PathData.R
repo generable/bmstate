@@ -142,16 +142,6 @@ PathData <- R6::R6Class(
       match(self$get_event_state_names(), self$state_names())
     },
 
-    #' @description Format as time to first event
-    #'
-    #' @param covs covariates to include in output data frame
-    #' @param truncate truncate after terminal events?
-    as_time_to_first_event = function(covs = c("subject_id"), truncate = FALSE) {
-      df <- self$as_data_frame(covs, truncate = truncate)
-      df |>
-        as_time_to_first_event(states = self$get_event_states(), by = covs)
-    },
-
     #' @description Get names of event states
     #'
     #' @return a character vector
@@ -377,41 +367,6 @@ PathData <- R6::R6Class(
   )
 )
 
-as_time_to_first_event <- function(dat, states, by = c()) {
-  by_syms <- rlang::syms(unique(c(by, "path_id")))
-  # max time as censor time
-  censor <- dat |>
-    dplyr::group_by(!!!by_syms) |>
-    summarise(time = max(time), .groups = "keep") |>
-    dplyr::ungroup() |>
-    expand_grid(state = states) |>
-    mutate(is_event = 0)
-  # min event time per state
-  events <- dat |>
-    dplyr::filter(is_event == 1, state %in% states) |>
-    dplyr::group_by(state, !!!by_syms) |>
-    summarize(time = min(time), .groups = "keep") |>
-    dplyr::ungroup() |>
-    mutate(is_event = 1)
-  censor |>
-    anti_join(events, by = c("path_id", "state")) |>
-    dplyr::bind_rows(events)
-}
-
-
-#' Get subject df with numeric subject index
-#'
-#' @export
-#' @param pd A \code{\link{PathData}} object
-#' @param subs Subject indices (from \code{\link{do_split}})
-#' @param id_map Maps numeric id to original id
-subject_df_with_idx <- function(pd, subs, id_map) {
-  checkmate::assert_class(pd, "PathData")
-  df <- pd$subject_df |> dplyr::filter(subject_id %in% subs)
-  df$sub_idx <- id_map$x_sub[match(df$subject_id, id_map$subject_id)]
-  df
-}
-
 #' Fit Cox PH model using Breslow method
 #'
 #' @param msdat \code{msdata} object
@@ -496,101 +451,6 @@ to_mstate_format <- function(df, transmat) {
   df_out
 }
 
-
-# Helper (slow?)
-set_trans_based_on_from_and_to <- function(dt, transmat) {
-  df <- transmat$trans_df()
-  R <- nrow(dt)
-  new_trans <- rep(0, R)
-  for (r in seq_len(R)) {
-    i1 <- which(df$prev_state == dt[r, ]$from)
-    i2 <- which(df$state == dt[r, ]$to)
-    idx <- base::intersect(i1, i2)
-    if (length(idx) != 1) {
-      print(dt[r, ])
-      print(idx)
-      stop("error in set_trans_based_on_from_and_to")
-    }
-    new_trans[r] <- idx
-  }
-  dt$trans <- new_trans
-  dt
-}
-
-
-summarize_event_prob <- function(pd, target_times, by = c("subject_id")) {
-  by_syms <- rlang::syms(by)
-  surv_df <- as_time_to_event(pd) |>
-    mutate(vv = dense_rank(str_c(!!!by_syms, sep = ":")))
-  pred_pd_surv <- survival::survfit(
-    survival::Surv(start_time, end_time, event) ~ vv,
-    id = path_id, data = surv_df
-  )
-
-  # summarize event rates
-  pp_summary <- summary(pred_pd_surv, target_times)
-  pstate_cols <- pp_summary$pstate
-  colnames(pstate_cols) <- pp_summary$states
-
-  pp_cumhaz <- as_tibble(lst(
-    time = pp_summary$time,
-    strata = pp_summary$strata
-  )) |>
-    dplyr::bind_cols(pstate_cols) |>
-    rgeco:::.tidy_km_strata() |>
-    mutate(`vv` = as.integer(vv)) |>
-    left_join(surv_df |> dplyr::distinct(vv, !!!by_syms), by = "vv") |>
-    dplyr::select(-vv)
-}
-
-# Full formula with expanded covariates
-cph_full_formula <- function(msdata, ttype = FALSE) {
-  a <- grep("\\.", colnames(msdata), value = TRUE)
-  str <- paste(a, collapse = " + ")
-  if (ttype) {
-    strata <- "trans_type"
-  } else {
-    strata <- "trans"
-  }
-  paste0(str, " + strata(", strata, ")")
-}
-
-
-
-# Pathdata to single event format
-to_single_event <- function(pd, event) {
-  path_df <- pd$path_df
-  STATE <- find_one(event, pd$state_names)
-  pid <- unique(path_df$path_id)
-  path_df_new <- NULL
-  for (path in pid) {
-    df <- path_df |>
-      dplyr::filter(path_id == path) |>
-      dplyr::arrange(time)
-    df$row_num <- 1:nrow(df)
-    ri <- which(df$state == STATE)
-    if (length(ri) == 0) {
-      df <- df[c(1, nrow(df)), ]
-      df$state[2] <- 1
-      df$is_event[2] <- 0
-    } else {
-      df <- df[c(1, ri[1]), ]
-      df$state[2] <- 2
-    }
-    path_df_new <- rbind(path_df_new, df |> dplyr::select(-row_num))
-  }
-
-  state_names <- c("Randomization", event, "Censor")
-  link_df <- pd$link_df |> left_join(
-    pd$subject_df |> dplyr::select(subject_id, subject_index),
-    by = "subject_index"
-  )
-  PathData$new(pd$subject_df, path_df_new, link_df,
-    state_names,
-    covs = pd$covs, check_order = TRUE,
-    terminal_states = event
-  )
-}
 
 # Look for potential covariates
 potential_covariates <- function(pd, possible = NULL, ...) {

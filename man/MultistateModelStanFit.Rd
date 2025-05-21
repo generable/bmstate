@@ -28,6 +28,7 @@ The Fit class
 \item \href{#method-MultistateModelStanFit-new}{\code{MultistateModelStanFit$new()}}
 \item \href{#method-MultistateModelStanFit-draws}{\code{MultistateModelStanFit$draws()}}
 \item \href{#method-MultistateModelStanFit-print}{\code{MultistateModelStanFit$print()}}
+\item \href{#method-MultistateModelStanFit-plot_basisfun}{\code{MultistateModelStanFit$plot_basisfun()}}
 \item \href{#method-MultistateModelStanFit-log_z_pars}{\code{MultistateModelStanFit$log_z_pars()}}
 \item \href{#method-MultistateModelStanFit-gq}{\code{MultistateModelStanFit$gq()}}
 \item \href{#method-MultistateModelStanFit-clone}{\code{MultistateModelStanFit$clone()}}
@@ -103,6 +104,16 @@ Print the object}
 \subsection{Returns}{
 nothing
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModelStanFit-plot_basisfun"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModelStanFit-plot_basisfun}{}}}
+\subsection{Method \code{plot_basisfun()}}{
+Plot used basis functions (grid)
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModelStanFit$plot_basisfun()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateModelStanFit-log_z_pars"></a>}}

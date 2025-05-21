@@ -41,7 +41,6 @@ Initialize}
 \item \href{#method-PathData-state_names}{\code{PathData$state_names()}}
 \item \href{#method-PathData-terminal_states}{\code{PathData$terminal_states()}}
 \item \href{#method-PathData-get_event_states}{\code{PathData$get_event_states()}}
-\item \href{#method-PathData-as_time_to_first_event}{\code{PathData$as_time_to_first_event()}}
 \item \href{#method-PathData-get_event_state_names}{\code{PathData$get_event_state_names()}}
 \item \href{#method-PathData-print}{\code{PathData$print()}}
 \item \href{#method-PathData-get_path_df}{\code{PathData$get_path_df()}}
@@ -192,25 +191,6 @@ Get indices of event states
 
 \subsection{Returns}{
 integer vector
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PathData-as_time_to_first_event"></a>}}
-\if{latex}{\out{\hypertarget{method-PathData-as_time_to_first_event}{}}}
-\subsection{Method \code{as_time_to_first_event()}}{
-Format as time to first event
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$as_time_to_first_event(covs = c("subject_id"), truncate = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{covs}}{covariates to include in output data frame}
-
-\item{\code{truncate}}{truncate after terminal events?}
-}
-\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
