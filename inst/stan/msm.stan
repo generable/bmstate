@@ -349,7 +349,6 @@ data {
   int<lower=0, upper=1> omit_lik_pk;
 
   // PK model data
-  int<lower=2> N_last;
   vector<lower=0>[N_sub] pk_lloq; // lower limit of quantification
   array[N_sub] vector<lower=0>[2] conc_pk;
   array[N_sub] vector<lower=0>[2] t_obs_pk;

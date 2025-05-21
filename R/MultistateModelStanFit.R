@@ -5,7 +5,7 @@
 #' @field stan_data Full Stan data list
 #' @field data A \code{\link{JointData}} object
 #' @field model A \code{\link{MultistateModel}} object
-StanMultistateModelFit <- R6::R6Class("StanMultistateModelFit",
+MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
   public = list(
     stan_fit = NULL,
     stan_data = NULL,
@@ -46,6 +46,15 @@ StanMultistateModelFit <- R6::R6Class("StanMultistateModelFit",
         return(d)
       }
       d[[name]]
+    },
+
+    #' Print the object
+    #'
+    #' @return nothing
+    print = function() {
+      x1 <- paste0("A MultistateModelStanFit.")
+      msg <- paste(x1, "\n", sep = "\n")
+      cat(msg)
     },
 
     #' @description

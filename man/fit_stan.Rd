@@ -20,7 +20,7 @@ hazards.}
 'CmdStanR' model.}
 }
 \value{
-A \code{\link{MultistateModelFit}} object.
+A \code{\link{MultistateModelStanFit}} object.
 }
 \description{
 Fit a model using 'Stan'

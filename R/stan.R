@@ -38,7 +38,7 @@ ensure_exposed_stan_functions <- function() {
 #' hazards.
 #' @param ... Arguments passed to \code{sample} method of the
 #' 'CmdStanR' model.
-#' @return A \code{\link{MultistateModelFit}} object.
+#' @return A \code{\link{MultistateModelStanFit}} object.
 fit_stan <- function(model, data, prior_only = FALSE,
                      delta_grid = 1, ...) {
   checkmate::assert_class(model, "MultistateModel")
@@ -54,7 +54,7 @@ fit_stan <- function(model, data, prior_only = FALSE,
   stan_fit <- stan_model$sample(data = sd, ...)
 
   # Return
-  MultistateModelFit$new(self, data, stan_fit, sd)
+  MultistateModelStanFit$new(model, data, stan_fit, sd)
 }
 
 
@@ -200,12 +200,14 @@ create_stan_data_pk <- function(data, model) {
     last_two_times <- t(sapply(data$dosing$times, function(x) x))
     last_two_doses <- t(sapply(data$dosing$doses, function(x) x))
     dose_ss <- data$dosing$dose_ss
+    tau_ss <- data$dosing$tau_ss
   } else {
     N_sub <- nrow(data$paths$subject_df)
     pk_obs <- matrix(1, N_sub, 5)
     last_two_doses <- matrix(0, N_sub, 2)
     last_two_times <- matrix(1, N_sub, 2)
     dose_ss <- rep(0, N_sub)
+    tau_ss <- 0
   }
   t_obs_pk <- pk_obs[, 1:2]
   conc_pk <- pk_obs[, 3:4]
@@ -219,7 +221,8 @@ create_stan_data_pk <- function(data, model) {
     last_two_times = last_two_times,
     last_two_doses = last_two_doses,
     pk_lloq = pk_lloq,
-    I_auc = as.numeric(model$has_pk())
+    I_auc = as.numeric(model$has_pk()),
+    tau_ss = tau_ss
   )
   c(sd, create_stan_data_time_since_last_pk(sd))
 }
