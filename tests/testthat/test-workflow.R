@@ -38,7 +38,7 @@ test_that("entire workflow works", {
     adapt_delta = 0.95,
     init = 0.1
   )
-  checkmate::assert_true(inherits(fit, "MultistateModelStanFit"))
+  expect_true(inherits(fit, "MultistateModelStanFit"))
 })
 
 
@@ -68,7 +68,7 @@ test_that("entire workflow works (with PK)", {
     init = 0.1
   )
 
-  checkmate::assert_true(inherits(fit, "MultistateModelStanFit"))
+  expect_true(inherits(fit, "MultistateModelStanFit"))
 
   # Path prediction
 
