@@ -11,9 +11,9 @@ The Fit class
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{stan_fit}}{The Stan fit object}
+\item{\code{stan_fit}}{The 'Stan' fit object}
 
-\item{\code{stan_data}}{Full Stan data list}
+\item{\code{stan_data}}{Full 'Stan' data list}
 
 \item{\code{data}}{A \code{\link{JointData}} object}
 
@@ -67,9 +67,9 @@ Create model fit object
 
 \item{\code{data}}{A \code{\link{JointData}} object}
 
-\item{\code{stan_fit}}{The Stan fit object}
+\item{\code{stan_fit}}{The 'Stan' fit object}
 
-\item{\code{stan_data}}{Full Stan data list}
+\item{\code{stan_data}}{Full 'Stan' data list}
 }
 \if{html}{\out{</div>}}
 }
@@ -108,7 +108,7 @@ nothing
 \if{html}{\out{<a id="method-MultistateModelStanFit-log_z_pars"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateModelStanFit-log_z_pars}{}}}
 \subsection{Method \code{log_z_pars()}}{
-Full names of parameters that start with 'log_z_'.
+Full names of parameters that start with \code{log_z_}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModelStanFit$log_z_pars()}\if{html}{\out{</div>}}
 }

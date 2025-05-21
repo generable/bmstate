@@ -1,8 +1,8 @@
 #' The Fit class
 #'
 #' @export
-#' @field stan_fit The Stan fit object
-#' @field stan_data Full Stan data list
+#' @field stan_fit The 'Stan' fit object
+#' @field stan_data Full 'Stan' data list
 #' @field data A \code{\link{JointData}} object
 #' @field model A \code{\link{MultistateModel}} object
 MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
@@ -11,6 +11,7 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
     stan_data = NULL,
     data = NULL,
     model = NULL,
+
     #' @description
     #' Get model.
     #'
@@ -23,8 +24,8 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
     #' @description
     #' Create model fit object
     #'
-    #' @param stan_fit The Stan fit object
-    #' @param stan_data Full Stan data list
+    #' @param stan_fit The 'Stan' fit object
+    #' @param stan_data Full 'Stan' data list
     #' @param data A \code{\link{JointData}} object
     #' @param model A \code{\link{MultistateModel}} object
     initialize = function(model, data, stan_fit, stan_data) {
@@ -58,7 +59,7 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
     },
 
     #' @description
-    #' Full names of parameters that start with 'log_z_'.
+    #' Full names of parameters that start with \code{log_z_}.
     log_z_pars = function() {
       nams <- names(self$draws())
       match <- grepl(nams, pattern = "log_z_")
