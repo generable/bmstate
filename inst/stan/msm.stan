@@ -375,11 +375,11 @@ transformed data {
     t0_ss[n] = rep_vector(0.0, 1);
   }
   // Set x corresponding to each interval
-  array[nc_haz] vector[N_int] x_auc_long;
-  if(n_haz > 0){
-    for(j in 1:n_haz){
+  array[nc_haz] vector[N_int] x_haz_long;
+  if(nc_haz > 0){
+    for(j in 1:nc_haz){
       for(n in 1:N_int){
-        x_auc_long[j][n] = x_haz[j][idx_sub[n]];
+        x_haz_long[j][n] = x_haz[j][idx_sub[n]];
       }
     }
   }
