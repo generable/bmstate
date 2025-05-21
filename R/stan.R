@@ -197,6 +197,7 @@ create_stan_data_pk <- function(data, model) {
   if (model$has_pk()) {
     pk_obs <- data$paths$subject_df |>
       dplyr::select("t_pre", "t_post", "conc_pre", "conc_post", "pk_lloq")
+    pk_obs <- as.matrix(pk_obs)
     last_two_times <- t(sapply(data$dosing$times, function(x) x))
     last_two_doses <- t(sapply(data$dosing$doses, function(x) x))
     dose_ss <- data$dosing$dose_ss
@@ -211,7 +212,7 @@ create_stan_data_pk <- function(data, model) {
   }
   t_obs_pk <- pk_obs[, 1:2]
   conc_pk <- pk_obs[, 3:4]
-  pk_lloq <- pk_obs[, 5]
+  pk_lloq <- as.numeric(pk_obs[, 5])
 
   # Return
   sd <- list(
