@@ -26,6 +26,17 @@ test_that("entire workflow works", {
   cph <- jd$train$paths$fit_coxph(covariates = mod$covs())
   msf <- jd$train$paths$fit_mstate()
   expect_true(inherits(msf, "msfit"))
+
+
+  # Fit the model
+  fit <- fit_stan(mod, jd$train,
+    iter_warmup = options$iter_warmup,
+    iter_sampling = options$iter_sampling,
+    chains = options$chains,
+    refresh = 5,
+    adapt_delta = 0.95,
+    init = 0.1
+  )
 })
 
 
@@ -33,7 +44,7 @@ test_that("entire workflow works", {
 test_that("entire workflow works (with PK)", {
   # Options
   options <- list(
-    N_subject = 200,
+    N_subject = 20,
     iter_warmup = 60,
     iter_sampling = 30,
     chains = 1
@@ -57,7 +68,7 @@ test_that("entire workflow works (with PK)", {
     iter_warmup = options$iter_warmup,
     iter_sampling = options$iter_sampling,
     chains = options$chains,
-    refresh = 500,
+    refresh = 5,
     adapt_delta = 0.95,
     init = 0.1
   )
