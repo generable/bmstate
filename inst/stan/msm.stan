@@ -327,7 +327,7 @@ data {
 
   // Covariates that affect hazard multiplier (excluding exposure)
   int<lower=0> nc_haz; // number of hazard covariates
-  array[nc_haz] vector[N_int] x_haz;
+  array[nc_haz] vector[N_sub] x_haz;
 
   // Which covariates to include in model
   int<lower=0,upper=1> I_auc;
@@ -373,6 +373,15 @@ transformed data {
   array[N_sub] vector[1] t0_ss;
   for(n in 1:N_sub){
     t0_ss[n] = rep_vector(0.0, 1);
+  }
+  // Set x corresponding to each interval
+  array[nc_haz] vector[N_int] x_auc_long;
+  if(n_haz > 0){
+    for(j in 1:n_haz){
+      for(n in 1:N_int){
+        x_auc_long[j][n] = x_haz[j][idx_sub[n]];
+      }
+    }
   }
 }
 
@@ -426,7 +435,7 @@ transformed parameters {
   array[do_pk, N_sub] vector[1] ss_trough;
   array[do_pk, N_sub] vector[1] ss_peak;
   array[do_pk] vector[N_sub] ss_auc; // auc for each subject
-  array[do_pk] vector[N_int] x_auc; // auc for each interval
+  array[do_pk] vector[N_int] x_auc_long; // auc for each interval
 
   if(do_pk == 1){
 
@@ -456,14 +465,14 @@ transformed parameters {
 
     // Set AUC corresponding to each interval
     for(n in 1:N_int){
-      x_auc[1][n] = ss_auc[1][idx_sub[n]];
+      x_auc_long[1][n] = ss_auc[1][idx_sub[n]];
     }
   }
 
 
   // log of hazard multiplier on each interval
   matrix[N_int, N_trans] log_C_haz = compute_log_hazard_multiplier(
-    N_int, beta_oth, beta_auc, x_haz, x_auc, ttype
+    N_int, beta_oth, beta_auc, x_haz_long, x_auc_long, ttype
   );
 }
 

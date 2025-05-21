@@ -120,7 +120,7 @@ create_stan_data_transitions <- function(pd) {
     if (tval > 0) {
       transition[tval, n] <- 1
     }
-    at_risk[tm$at_risk(dat$from[n]), n] <- 1
+    at_risk[tm$possible_transitions_from(dat$from[n]), n] <- 1
   }
   out <- list(
     at_risk = at_risk,
@@ -262,7 +262,7 @@ standata_scaled_covariates <- function(pd, model, name) {
 
   # Return
   out <- list(
-    x = t(sapply(x, function(x) x)),
+    x = sapply(x, function(x) x),
     x_loc = x_loc,
     x_scale = x_scale,
     nc = nc
@@ -279,7 +279,9 @@ create_stan_data_covariates <- function(pd, model) {
   x_V2 <- standata_scaled_covariates(pd, model, "V2")
 
   # Return
-  c(x_oth, x_ka, x_CL, x_V2)
+  out <- c(x_oth, x_ka, x_CL, x_V2)
+  out$x_haz <- t(out$x_haz)
+  out
 }
 
 # Create additional Stan data, interval information
