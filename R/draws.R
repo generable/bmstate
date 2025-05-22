@@ -3,15 +3,12 @@ rv <- function(fit, name) {
   posterior::as_draws_rvars(fit$draws(name))[[name]]
 }
 
-
 # Log baseline hazard distribution at times t
 msmsf_log_baseline_hazard <- function(fit, t = NULL) {
   checkmate::assert_class(fit, "MultistateModelStanFit")
   sys <- fit$model$system
   if (is.null(t)) {
     t <- seq(0, sys$get_tmax(), length.out = 30)
-  } else {
-
   }
   checkmate::assert_numeric(t, min.len = 2)
   SBF <- sys$basisfun_matrix(t)

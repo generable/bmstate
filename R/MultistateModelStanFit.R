@@ -45,7 +45,7 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
     #' @param name Param/quantity name of \code{x}
     #' @return Array with dimension \code{c(ndraws(x), dim(x))}
     draws_of = function(name) {
-      posterior::draws_of(fit$draws(name), with_chains = FALSE)
+      posterior::draws_of(self$draws(name), with_chains = FALSE)
     },
 
     #' Print the object
