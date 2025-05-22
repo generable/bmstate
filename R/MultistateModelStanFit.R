@@ -151,11 +151,18 @@ msmsf_log_m_per_subject <- function(fit) {
   log_m[, first_indices, ]
 }
 
-msmsf_pathgen <- function(fit, draw_idx, init_state = 1) {
+msmsf_pathgen <- function(fit, init_state = 1) {
   checkmate::assert_class(fit, "MultistateModelStanFit")
   sys <- fit$model$system
+  S <- fit$num_draws()
+  N <- fit$stan_data$N_sub
   w <- fit$draws_of("weights")
   log_w0 <- fit$draws_of("log_w0")
-  log_m <- msmsf_log_m_per_subject(fit)[draw_idx, , ]
-  sim <- sys$simulate(w, log_w0, log_m, init_state)
+  w_rep <- abind::abind(replicate(N, w, simplify = FALSE), along = 1)
+  log_w0_rep <- abind::abind(replicate(N, log_w0, simplify = FALSE), along = 1)
+  log_m <- msmsf_log_m_per_subject(fit)
+  H <- dim(log_m)[3]
+  log_m_reshaped <- matrix(aperm(log_m, c(1, 2, 3)), nrow = N * S, ncol = H)
+  sim <- sys$simulate(w_rep, log_w0_rep, log_m_reshaped, init_state)
+  sim
 }
