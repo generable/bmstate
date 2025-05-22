@@ -3,30 +3,33 @@ rv <- function(fit, name) {
   posterior::as_draws_rvars(fit$draws(name))[[name]]
 }
 
-#' Extract log hazard multiplier draws
-#'
-#' @export
-#' @param fit fit object
-#' @param oos for out-of-sample subjects?
-#' @return an array with \code{dim = c(n_draws, n_hazards, n_obs)}
-get_and_format_log_C_haz_draws <- function(fit, oos) {
-  vn <- "log_C_haz"
-  if (oos) {
-    vn <- paste0(vn, "_oos")
-  } else {
-    vn <- paste0(vn, "_is")
+
+# Log baseline hazard distribution at times t
+msmsf_log_baseline_hazard <- function(fit, t = NULL) {
+  checkmate::assert_class(fit, "MultistateModelStanFit")
+  sys <- fit$model$system
+  if (is.null(t)) {
+    t <- seq(0, sys$get_tmax(), length.out = 30)
   }
-  log_C <- rv(fit, vn)
-  log_C <- posterior::merge_chains(log_C) # shape c(N_obs, N_pred)
-  N_draws <- posterior::ndraws(log_C)
-  N_obs <- dim(log_C)[1]
-  H <- dim(log_C)[2]
-  out <- array(0, dim = c(N_draws, H, N_obs))
-  for (j in seq_len(H)) {
-    log_C_j <- posterior::as_draws_array(as.vector(log_C[, j]))
-    for (d in 1:N_draws) {
-      out[d, j, ] <- as.vector(log_C_j[d, 1, ])
+  checkmate::assert_numeric(t, min.len = 2)
+  SBF <- sys$basisfun_matrix(t)
+  w <- fit$draws_of("weights") # dim = c(S, H, W)
+  log_w0 <- fit$draws_of("log_w0") # dim = c(S, H)
+  S <- fit$num_draws()
+  N <- length(t)
+  H <- sys$num_trans()
+  log_h0 <- NULL
+  trans_idx <- NULL
+  draw_idx <- NULL
+  time <- NULL
+  for (h in seq_len(H)) {
+    for (s in seq_len(S)) {
+      log_h0_s <- sys$log_baseline_hazard(NULL, log_w0[s, h], w[s, h, ], SBF)
+      log_h0 <- c(log_h0, log_h0_s)
+      time <- c(time, t)
+      draw_idx <- c(draw_idx, rep(s, N))
+      trans_idx <- c(trans_idx, rep(h, N))
     }
   }
-  out
+  data.frame(draw_idx, trans_idx, log_h0, time)
 }

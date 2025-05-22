@@ -70,6 +70,47 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
         ggtitle("Basis functions")
     },
 
+    #' Plot baseline hazard distribution
+    #'
+    #' @param t times where to evaluate the baseline hazards
+    #' @param ci_alpha width of credible interval
+    plot_h0 = function(t = NULL, ci_alpha = 0.95) {
+      df <- self$h0_dist(t, ci_alpha)
+      legend <- self$model$system$tm()$trans_df()
+      df <- df |> dplyr::left_join(legend, by = "trans_idx")
+      df$trans_type <- as.factor(df$trans_type)
+      capt <- paste0("Median and ", 100 * ci_alpha, "% CrI")
+      ggplot(df, aes(
+        x = .data$time, y = .data$median, ymin = .data$lower,
+        ymax = .data$upper, color = .data$trans_type, fill = .data$trans_type
+      )) +
+        geom_ribbon(alpha = 0.7) +
+        geom_line() +
+        facet_wrap(. ~ .data$trans_char) +
+        ylab("Log baseline hazard") +
+        theme(legend.position = "none") +
+        labs(caption = capt)
+    },
+
+    #' Baseline hazard distribution
+    #'
+    #' @param t times where to evaluate the baseline hazards
+    #' @param ci_alpha width of credible interval
+    h0_dist = function(t = NULL, ci_alpha = 0.95) {
+      checkmate::assert_number(ci_alpha, lower = 0, upper = 1)
+      LB <- (1 - ci_alpha) / 2
+      UB <- 1 - LB
+      df <- msmsf_log_baseline_hazard(self, t)
+      df |>
+        dplyr::group_by(.data$draw_idx, .data$time, .data$trans_idx) |>
+        dplyr::summarize(
+          median = stats::median(.data$log_h0),
+          upper = stats::quantile(.data$log_h0, UB),
+          lower = stats::quantile(.data$log_h0, LB)
+        ) |>
+        dplyr::ungroup()
+    },
+
     #' @description
     #' Full names of parameters that start with \code{log_z_}.
     log_z_pars = function() {
@@ -101,41 +142,3 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
     }
   )
 )
-
-# Log baseline hazard distribution at times t
-msmsf_log_baseline_hazard <- function(fit, t = NULL) {
-  checkmate::assert_class(fit, "MultistateModelStanFit")
-  sys <- fit$model$system
-  if (is.null(t)) {
-    t <- seq(0, sys$get_tmax(), length.out = 30)
-  }
-  checkmate::assert_numeric(t, min.len = 2)
-  SBF <- sys$basisfun_matrix(t)
-  w <- fit$draws_of("weights") # dim = c(S, H, W)
-  log_w0 <- fit$draws_of("log_w0") # dim = c(S, H)
-  S <- fit$num_draws()
-  N <- length(t)
-  bh <- matrix(0, S, N)
-  for (s in seq_len(S)) {
-    bh[s, ] <- sys$log_baseline_hazard(NULL, log_w0[s, 1, 1], w[s, 1, ], SBF)
-  }
-  list(t = t, log_h0 = bh)
-}
-
-# Spline weights
-draws_df_weights <- function(fit) {
-  checkmate::assert_class(fit, "MultistateModelStanFit")
-  a <- as.vector(posterior::merge_chains(fit$draws("weights")))
-  S <- fit$model$system$num_trans()
-  W <- fit$model$system$num_weights()
-  trans_idx <- rep(1:S, times = W)
-  weight_idx <- rep(1:W, each = S)
-  data.frame(trans_idx = trans_idx, weight_idx = weight_idx, weight = a)
-}
-
-# As draws array with single chain
-draws_array_merged <- function(fit, name) {
-  a <- posterior::as_draws_array(posterior::merge_chains(fit$draws(name)))
-  class(a) <- "array"
-  a
-}

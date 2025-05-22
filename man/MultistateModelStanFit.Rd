@@ -29,6 +29,8 @@ The Fit class
 \item \href{#method-MultistateModelStanFit-draws_of}{\code{MultistateModelStanFit$draws_of()}}
 \item \href{#method-MultistateModelStanFit-print}{\code{MultistateModelStanFit$print()}}
 \item \href{#method-MultistateModelStanFit-plot_basisfun}{\code{MultistateModelStanFit$plot_basisfun()}}
+\item \href{#method-MultistateModelStanFit-plot_h0}{\code{MultistateModelStanFit$plot_h0()}}
+\item \href{#method-MultistateModelStanFit-h0_dist}{\code{MultistateModelStanFit$h0_dist()}}
 \item \href{#method-MultistateModelStanFit-log_z_pars}{\code{MultistateModelStanFit$log_z_pars()}}
 \item \href{#method-MultistateModelStanFit-num_draws}{\code{MultistateModelStanFit$num_draws()}}
 \item \href{#method-MultistateModelStanFit-gq}{\code{MultistateModelStanFit$gq()}}
@@ -113,10 +115,48 @@ nothing
 \if{latex}{\out{\hypertarget{method-MultistateModelStanFit-plot_basisfun}{}}}
 \subsection{Method \code{plot_basisfun()}}{
 Plot used basis functions (grid)
+Plot baseline hazard distribution
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModelStanFit$plot_basisfun()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModelStanFit-plot_h0"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModelStanFit-plot_h0}{}}}
+\subsection{Method \code{plot_h0()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModelStanFit$plot_h0(t = NULL, ci_alpha = 0.95)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{t}}{times where to evaluate the baseline hazards}
+
+\item{\code{ci_alpha}}{width of credible interval
+Baseline hazard distribution}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModelStanFit-h0_dist"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModelStanFit-h0_dist}{}}}
+\subsection{Method \code{h0_dist()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModelStanFit$h0_dist(t = NULL, ci_alpha = 0.95)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{t}}{times where to evaluate the baseline hazards}
+
+\item{\code{ci_alpha}}{width of credible interval}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateModelStanFit-log_z_pars"></a>}}

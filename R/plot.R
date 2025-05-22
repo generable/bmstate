@@ -1,31 +1,3 @@
-#' Plot log baseline hazard
-#'
-#' @export
-#' @inheritParams plot_other_beta
-#' @param log_h0_true true baseline hazards
-#' @param sd Stan data list
-plot_h0 <- function(fit, sd, pd, log_h0_true = NULL) {
-  df <- fit |> tidybayes::spread_draws(log_h0[transition, time_idx])
-  dt <- pd$as_transitions()
-  all_states <- pd$state_names
-  if (!is.null(log_h0_true)) {
-    df <- df |> left_join(log_h0_true, by = "transition")
-  }
-  plt <- plot_fun_per_transition(
-    df, sd, dt$legend, "log_h0", "t_pred", all_states
-  ) +
-    ggtitle("Log baseline hazard") + theme(strip.text = element_text(
-      size = 5
-    ), legend.position = "none")
-  if (!is.null(log_h0_true)) {
-    plt <- plt + geom_hline(
-      mapping = aes(yintercept = log_h0_true), lty = 3, color = "red", lwd = 1
-    )
-  }
-  plt
-}
-
-
 # Plot KDE of effect multipliers in PK model
 plot_effect_beta_pk <- function(a, beta_name, group_by) {
   a[[group_by]] <- as.factor(a[[group_by]])
