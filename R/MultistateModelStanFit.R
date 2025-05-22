@@ -142,3 +142,20 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
     }
   )
 )
+
+msmsf_log_m_per_subject <- function(fit) {
+  log_m <- fit$draws_of("log_C_haz")
+  idx_sub <- fit$stan_data$idx_sub
+  N_sub <- fit$stan_data$N_sub
+  first_indices <- sapply(seq_len(N_sub), function(x) which(idx_sub == x)[1])
+  log_m[, first_indices, ]
+}
+
+msmsf_pathgen <- function(fit, draw_idx, init_state = 1) {
+  checkmate::assert_class(fit, "MultistateModelStanFit")
+  sys <- fit$model$system
+  w <- fit$draws_of("weights")
+  log_w0 <- fit$draws_of("log_w0")
+  log_m <- msmsf_log_m_per_subject(fit)[draw_idx, , ]
+  sim <- sys$simulate(w, log_w0, log_m, init_state)
+}
