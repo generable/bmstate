@@ -26,6 +26,7 @@ The Fit class
 \itemize{
 \item \href{#method-MultistateModelStanFit-new}{\code{MultistateModelStanFit$new()}}
 \item \href{#method-MultistateModelStanFit-draws}{\code{MultistateModelStanFit$draws()}}
+\item \href{#method-MultistateModelStanFit-draws_of}{\code{MultistateModelStanFit$draws_of()}}
 \item \href{#method-MultistateModelStanFit-print}{\code{MultistateModelStanFit$print()}}
 \item \href{#method-MultistateModelStanFit-plot_basisfun}{\code{MultistateModelStanFit$plot_basisfun()}}
 \item \href{#method-MultistateModelStanFit-log_z_pars}{\code{MultistateModelStanFit$log_z_pars()}}
@@ -70,9 +71,29 @@ Extract draws as \code{rvar}s
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{name}}{Param/quantity name
-Print the object}
+Draws in a raw array with same shape as Stan variable}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModelStanFit-draws_of"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModelStanFit-draws_of}{}}}
+\subsection{Method \code{draws_of()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModelStanFit$draws_of(name)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name}}{Param/quantity name of \code{x}}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Array with dimension \code{c(ndraws(x), dim(x))}
+Print the object
 }
 }
 \if{html}{\out{<hr>}}

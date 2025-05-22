@@ -40,6 +40,14 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
       d[[name]]
     },
 
+    #' Draws in a raw array with same shape as Stan variable
+    #'
+    #' @param name Param/quantity name of \code{x}
+    #' @return Array with dimension \code{c(ndraws(x), dim(x))}
+    draws_of = function(name) {
+      posterior::draws_of(fit$draws(name), with_chains = FALSE)
+    },
+
     #' Print the object
     #'
     #' @return nothing
@@ -103,8 +111,8 @@ msmsf_log_baseline_hazard <- function(fit, t = NULL) {
   }
   checkmate::assert_numeric(t, min.len = 2)
   SBF <- sys$basisfun_matrix(t)
-  w <- draws_array_merged(fit, "weights")
-  log_w0 <- draws_array_merged(fit, "log_w0")
+  w <- fit$draws_of("weights") # dim = c(S, H, W)
+  log_w0 <- fit$draws_of("log_w0") # dim = c(S, H)
   S <- fit$num_draws()
   N <- length(t)
   bh <- matrix(0, S, N)
@@ -112,6 +120,17 @@ msmsf_log_baseline_hazard <- function(fit, t = NULL) {
     bh[s, ] <- sys$log_baseline_hazard(NULL, log_w0[s, 1, 1], w[s, 1, ], SBF)
   }
   list(t = t, log_h0 = bh)
+}
+
+# Spline weights
+draws_df_weights <- function(fit) {
+  checkmate::assert_class(fit, "MultistateModelStanFit")
+  a <- as.vector(posterior::merge_chains(fit$draws("weights")))
+  S <- fit$model$system$num_trans()
+  W <- fit$model$system$num_weights()
+  trans_idx <- rep(1:S, times = W)
+  weight_idx <- rep(1:W, each = S)
+  data.frame(trans_idx = trans_idx, weight_idx = weight_idx, weight = a)
 }
 
 # As draws array with single chain

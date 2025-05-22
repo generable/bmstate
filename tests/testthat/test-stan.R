@@ -24,3 +24,19 @@ test_that("fitting with Stan works (single transition)", {
 
   expect_true(inherits(fit, "MultistateModelStanFit"))
 })
+
+test_that("fitting with Stan works (multi-transition)", {
+  # Setup
+  tm <- transmat_illnessdeath()
+  mod <- create_msm(tm)
+  jd <- mod$simulate_data(options$N_subject, w0 = 1e-2)
+
+  # Fit
+  fit <- fit_stan(mod, jd,
+    iter_warmup = options$iter_warmup,
+    iter_sampling = options$iter_sampling,
+    chains = options$chains
+  )
+
+  expect_true(inherits(fit, "MultistateModelStanFit"))
+})
