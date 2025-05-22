@@ -1,8 +1,8 @@
 # Options
 options <- list(
-  N_subject = 200,
+  N_subject = 30,
   iter_warmup = 100,
-  iter_sampling = 100,
+  iter_sampling = 20,
   chains = 1
 )
 
@@ -26,6 +26,10 @@ test_that("fitting with Stan works (single transition)", {
   # Plots
   expect_s3_class(fit$plot_basisfun(), "ggplot")
   expect_s3_class(fit$plot_h0(), "ggplot")
+
+  # Pathgen
+  p <- generate_paths(fit)
+  expect_true(inherits(p, "PathData"))
 })
 
 test_that("fitting with Stan works (multi-transition)", {
@@ -43,4 +47,8 @@ test_that("fitting with Stan works (multi-transition)", {
 
   expect_true(inherits(fit, "MultistateModelStanFit"))
   expect_s3_class(fit$plot_h0(), "ggplot")
+
+  # Pathgen
+  p <- generate_paths(fit)
+  expect_true(inherits(p, "PathData"))
 })

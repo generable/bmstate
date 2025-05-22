@@ -148,7 +148,7 @@ msmsf_log_m_per_subject <- function(fit) {
   idx_sub <- fit$stan_data$idx_sub
   N_sub <- fit$stan_data$N_sub
   first_indices <- sapply(seq_len(N_sub), function(x) which(idx_sub == x)[1])
-  log_m[, first_indices, ]
+  log_m[, first_indices, , drop = FALSE]
 }
 
 #' Path generation for 'MultistateModelStanFit'
