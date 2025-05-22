@@ -7,23 +7,6 @@ check_columns <- function(df, needed_columns) {
   }
 }
 
-# Initialize data from single observational path data frame that has
-# One path per subject
-create_pathdata <- function(df, covs, ...) {
-  draw_idx <- 1
-  rep_idx <- 1
-  df$path_id <- paste0(df$subject_id, draw_idx, rep_idx)
-  df$draw_idx <- 1
-  df$rep_idx <- 1
-  subject_df <- df |>
-    dplyr::group_by(subject_id) |>
-    dplyr::slice(1)
-  link_df <- df |>
-    dplyr::group_by(path_id) |>
-    dplyr::slice(1)
-  PathData$new(subject_df, df, link_df, covs = covs, ...)
-}
-
 
 #' Path data class (R6 class)
 #'
@@ -36,254 +19,253 @@ create_pathdata <- function(df, covs, ...) {
 #' \code{path_id}, \code{draw_idx}, \code{rep_idx}, and \code{subject_id} as
 #' columns.
 #' @field covs Covariate column names.
-#' @field state_names Names of the states.
-#' @field state_types State types.
-#' @field terminal_states Terminal states.
-#' @field initial_states Initial states.
-#' @field censor_states Censoring states.
+#' @field transmat A \code{\link{TransitionMatrix}} describing the system in to
+#' which the paths belong.
 PathData <- R6::R6Class(
   classname = "PathData",
-  private = list(
-    dt = NULL
-  ),
   public = list(
     subject_df = NULL,
     path_df = NULL,
     link_df = NULL,
     covs = NULL,
-    state_names = NULL,
-    state_types = NULL,
-    terminal_states = NULL,
-    initial_states = NULL,
-    censor_states = NULL,
+    transmat = NULL,
 
     #' Initialize
-    #' @param subject_df Subjects data frame.
-    #' @param path_df Paths data frame.
-    #' @param link_df Link data frame.
+    #' @param subject_df Data frame with one row per subject. Must have
+    #' \code{subject_id} and all covariates as columns.
+    #' @param path_df Data frame of actual paths. Must have \code{path_id},
+    #' \code{state}, \code{time}, \code{is_event}, \code{is_censor}
+    #' and \code{trans_idx} as columns.
+    #' @param link_df Links the path and subject data frames. Must have
+    #' \code{path_id}, \code{draw_idx}, \code{rep_idx}, and \code{subject_id} as
+    #' columns.
     #' @param covs Covariate column names.
-    #' @param check_order Check order of paths?
-    #' @param state_names Names of the states.
-    #' @param terminal_states Terminal states.
-    #' @param initial_states Initial states.
-    #' @param censor_states Censoring states.
+    #' @param transmat A \code{\link{TransitionMatrix}} describing the system to
+    #' which the paths belong.
     initialize = function(subject_df, path_df, link_df,
-                          state_names, covs = NULL, check_order = TRUE,
-                          terminal_states = c(),
-                          censor_states = state_names[length(state_names)],
-                          initial_states = state_names[1]) {
+                          transmat, covs = NULL) {
       checkmate::assert_class(subject_df, "data.frame")
       checkmate::assert_class(path_df, "data.frame")
       checkmate::assert_class(link_df, "data.frame")
-      if (check_order) {
-        path_df <- check_and_sort_paths(path_df)
-      }
+      checkmate::assert_class(transmat, "TransitionMatrix")
+      path_df <- path_df |> dplyr::arrange(.data$path_id, .data$time)
       if (!is.null(covs)) {
         checkmate::assert_character(covs)
+        covs <- setdiff(covs, "subject_id")
       }
       if (!("draw_idx" %in% colnames(link_df))) {
         link_df$draw_idx <- 1
-        link_df$draw_idx <- as.factor(link_df$draw_idx)
       }
       if (!("rep_idx" %in% colnames(link_df))) {
         link_df$rep_idx <- 1
-        link_df$rep_idx <- as.factor(link_df$rep_idx)
       }
       cols1 <- c("subject_id", covs)
-      cols2 <- c("path_id", "state", "time", "is_event")
+      cols2 <- c("path_id", "state", "time", "is_event", "is_censor", "trans_idx")
       cols3 <- c("path_id", "draw_idx", "rep_idx", "subject_id")
       check_columns(subject_df, cols1)
       check_columns(path_df, cols2)
       check_columns(link_df, cols3)
+      checkmate::assert_character(subject_df$subject_id)
+      checkmate::assert_character(link_df$subject_id)
+      checkmate::assert_integerish(link_df$path_id)
+      checkmate::assert_integerish(path_df$path_id)
+
+      # As tibbles
       subject_df <- as_tibble(subject_df[, cols1])
       path_df <- as_tibble(path_df[, cols2])
       link_df <- as_tibble(link_df[, cols3])
 
-      # Add the subject_index column
-      ensure_numeric_factor <- function(x) {
-        as.factor(as.numeric(as.factor(x)))
-      }
-      subject_df$subject_index <- ensure_numeric_factor(subject_df$subject_id)
-      cols1 <- c("subject_index", cols1)
+      # Order
+      link_df <- link_df |> dplyr::arrange(.data$path_id)
+      subject_df <- subject_df |> dplyr::arrange(.data$subject_id)
 
-      # Format other
-      link_df$subject_index <- ensure_numeric_factor(link_df$subject_id)
-      path_df$path_id <- ensure_numeric_factor(path_df$path_id)
-      link_df$path_id <- ensure_numeric_factor(link_df$path_id)
-      link_df$subject_id <- NULL
-      self$check_states(
-        state_names = state_names, terminal_states = terminal_states,
-        initial_states = initial_states, censor_states = censor_states,
-        path_df = path_df
-      )
-      self$terminal_states <- terminal_states
-      self$initial_states <- initial_states
-      self$censor_states <- censor_states
-      self$state_names <- state_names
-      self$state_types <- seq(from = 0, to = length(state_names))
+      # Set fields
+      self$transmat <- transmat
       self$covs <- covs
       self$subject_df <- subject_df
       self$path_df <- path_df
       self$link_df <- link_df
     },
-    #' Get names of covariates
+
+    #' @description Get unique subject ids
+    unique_subjects = function() {
+      unique(self$subject_df$subject_id)
+    },
+
+    #' @description Get names of covariates
     #' @return a character vector
     covariate_names = function() {
       self$covs
     },
-    #' Get path lenghts (among paths that include events)
+
+    #' @description Get path lengths (among paths that include events)
+    #' @param truncate Remove rows after terminal events first?
     #' @return a data frame of path ids and counts
-    lengths = function() {
-      self$path_df |>
+    lengths = function(truncate = FALSE) {
+      self$get_path_df(truncate) |>
         dplyr::filter(is_event == TRUE) |>
         dplyr::group_by(path_id) |>
         dplyr::count()
     },
-    #' Get number of paths
+
+    #' @description Get number of paths
     #' @return an integer
     n_paths = function() {
-      nrow(self$path_df |>
+      nrow(self$get_path_df() |>
         dplyr::group_by(.data$path_id) |>
         dplyr::count())
     },
-    #' Get longest path
-    #' @return a \code{\link{PathData}} object with just one path
-    longest_path = function() {
-      lens <- self$lengths()
-      idx <- which(lens$n == max(lens$n))[1]
-      df <- self$path_df |> dplyr::filter(path_id == lens$path_id[idx])
-      self$filter(unique(df$path_id))
-    },
-    #' Get indices of event states
-    #' @return integer vector
-    get_event_states = function() {
-      match(self$get_event_state_names(), self$state_names)
-    },
-    #' Get names of states that are events (i.e. not initial and not censor)
-    #'
-    #' @return character vector
-    get_event_state_names = function() {
-      self$state_names |>
-        purrr::discard(~ .x %in% self$initial_states) |>
-        purrr::discard(~ .x %in% self$censor_states)
+
+    #' @description Get name of null state
+    null_state = function() {
+      self$transmat$source_states()
     },
 
-    #' Convert to format used by the 'mstate' package
+    #' @description Get names of all states
     #'
-    #' @param covariates Include covariates?
-    as_msdata = function(covariates = FALSE) {
-      checkmate::assert_logical(covariates, len = 1)
-      pathdata_to_mstate_format(self, covariates)
+    #' @return character vector
+    state_names = function() {
+      self$transmat$states
     },
-    #' Format as time to first event
+
+    #' @description Get names of terminal states
     #'
-    #' @param covs covariates to include in output data frame
-    #' @param truncate truncate after terminal events?
-    as_time_to_first_event = function(covs = c("subject_id"), truncate = FALSE) {
-      df <- self$as_data_frame(covs, truncate = truncate)
-      tt_event <- df |>
-        as_time_to_first_event(states = self$get_event_states(), by = covs)
+    #' @return character vector
+    terminal_states = function() {
+      self$transmat$absorbing_states()
     },
-    #' Print info
+
+    #' @description Get indices of event states
+    #'
+    #' @return integer vector
+    get_event_states = function() {
+      match(self$get_event_state_names(), self$state_names())
+    },
+
+    #' @description Get names of event states
+    #'
+    #' @return a character vector
+    get_event_state_names = function() {
+      setdiff(self$state_names(), self$null_state())
+    },
+
+    #' @description Print info
+    #'
+    #' @return nothing
     print = function() {
       n_path <- self$n_paths()
       covs <- self$covariate_names()
-      sn <- self$state_names
-      message(paste0("PathData object with ", n_path, " paths"))
-      message(paste0("States = {"), paste0(sn, collapse = ", "), "}")
-      message(paste0("Covariates = {"), paste0(covs, collapse = ", "), "}")
+      sn <- self$get_event_state_names()
+      x1 <- paste0("PathData object with ", n_path, " paths")
+      x2 <- paste0(" * Null state = {", self$null_state(), "}")
+      x3 <- paste0(" * Event states = {", paste0(sn, collapse = ", "), "}")
+      x4 <- paste0(" * Covariates = {", paste0(covs, collapse = ", "), "}")
+      msg <- paste(x1, x2, x3, x4, "\n", sep = "\n")
+      cat(msg)
     },
 
-    #' Check that a state is valid
+    #' @description Get path data frame
     #'
-    #' @param check_states states to check
-    #' @param state_names all state names
-    #' @param min_len minimum length
-    check_valid_state = function(check_states, state_names, min_len) {
-      checkmate::assert_character(check_states, min.len = min_len)
-      stopifnot(all(check_states %in% state_names))
-      stopifnot(purrr::none(check_states, duplicated))
-    },
-
-    #' Check that states input is valid
-    #'
-    #' @param state_names names of all states
-    #' @param terminal_states names of terminal states
-    #' @param initial_states names of initial states
-    #' @param censor_states names of censoring states
-    #' @param path_df the path data frame
-    check_states = function(state_names, terminal_states, initial_states,
-                            censor_states, path_df) {
-      checkmate::assert_character(state_names, min.len = 1)
-      stopifnot(purrr::none(state_names, duplicated))
-      observed_states <- unique(state_names[path_df$state])
-      self$check_valid_state(observed_states, state_names, min_len = 1)
-      self$check_valid_state(terminal_states, state_names, min_len = 0)
-      self$check_valid_state(initial_states, state_names, min_len = 0)
-      self$check_valid_state(censor_states, state_names, min_len = 1)
-    },
-    #' Convert to one long data frame
-    #' @param covariates Which covariates to include?
-    #' @param truncate Truncate after terminal events?
-    as_data_frame = function(covariates = NULL, truncate = FALSE) {
+    #' @param truncate Remove rows after terminal events?
+    get_path_df = function(truncate = FALSE) {
+      checkmate::assert_logical(truncate, len = 1)
       df <- self$path_df
       if (isTRUE(truncate)) {
-        term_states <- which(self$state_names %in% self$terminal_states)
+        term_state_idx <- self$transmat$absorbing_states(names = FALSE)
         df <- df |>
-          truncate_after_terminal_events(term_states)
+          truncate_after_terminal_events(term_state_idx)
       }
-      out <- df |>
-        inner_join(self$link_df, by = "path_id", relationship = "many-to-one")
-      sub_df <- self$subject_df
-      if (!is.null(covariates)) {
-        sub_df <- sub_df |> dplyr::select(subject_index, one_of(covariates))
-      }
-      out <- out |>
-        inner_join(sub_df, by = "subject_index", relationship = "many-to-one")
-      stopifnot(nrow(out) == nrow(df))
-      out
+      df |> dplyr::arrange(.data$path_id, .data$time)
     },
 
-    #' Data frame in transitions format
+    #' @description Convert to one long data frame
     #'
-    #' @param only_observed Limit transitions to only the observed ones?
-    #' @param force_rerun Force rerun of the conversion? If \code{FALSE},
-    #' a cached version is used if it exists.
-    as_transitions = function(only_observed = FALSE, force_rerun = FALSE) {
-      if (is.null(private$dt) || force_rerun) {
-        private$dt <- dt <- as_transitions(self$as_data_frame(),
-          state_names = self$state_names,
-          state_types = self$state_types,
-          terminal_states = self$terminal_states,
-          censor_states = self$censor_states,
-          initial_states = self$initial_states,
-          covs = self$covariate_names()
-        )
-      } else {
-        dt <- private$dt
-      }
-      if (only_observed) {
-        # Limit possible transitions to only the observed ones
-        obs <- unique(dt$df$transition)
-        idx_obs <- which(dt$legend$transition %in% obs)
-        n_trans <- length(idx_obs)
-        dt$legend <- dt$legend[idx_obs, ]
-        dt$legend$transition <- seq_len(n_trans)
-        dt$df$transition <- match(
-          dt$df$trans_char, dt$legend$trans_char,
-          nomatch = 0
-        )
-      }
-      dt
+    #' @param covariates Which covariates to include?
+    #' @param truncate Remove rows after terminal events?
+    as_data_frame = function(covariates = NULL, truncate = FALSE) {
+      fl <- self$full_link(covariates)
+      df <- self$get_path_df(truncate)
+      df |> dplyr::left_join(fl, by = "path_id")
     },
 
-    #' Step plot of the paths
+    #' @description Full link data frame
+    #'
+    #' @param covariates Which covariates to include
+    #' @return A \code{data.frame} with same number of rows as \code{link_df},
+    #' including also the covariate columns and \code{subject_id}
+    full_link = function(covariates = NULL) {
+      x <- self$subject_df[, c("subject_id", covariates)]
+      self$link_df[, c("subject_id", "path_id")] |>
+        dplyr::left_join(x, by = "subject_id")
+    },
+
+    #' @description Data frame in transitions format
+    #'
+    #' @param covariates Which covariates to include?
+    #' @param truncate Remove rows after terminal events first?
+    #' @return A \code{data.frame}
+    as_transitions = function(covariates = NULL, truncate = FALSE) {
+      pdf <- self$get_path_df(truncate)
+      pdf$time_prev <- c(0, pdf$time[1:(nrow(pdf) - 1)])
+      pdf$keep <- as.numeric((pdf$trans_idx > 0) | (pdf$is_censor == 1))
+      tdf <- self$transmat$trans_df()
+      prev_states <- c(NA, tdf$prev_state)
+      states <- c(NA, tdf$state)
+      out <- pdf |>
+        dplyr::filter(.data$keep == 1) |>
+        dplyr::select(
+          "path_id", "time", "time_prev", "trans_idx", "is_censor",
+          "state", "is_event"
+        )
+      out$from <- prev_states[out$trans_idx + 1]
+      out$to <- states[out$trans_idx + 1]
+      idx_censor <- which(out$is_censor == 1)
+      out$from[idx_censor] <- out$state[idx_censor]
+      out$to[idx_censor] <- out$state[idx_censor]
+      out <- out |> dplyr::select(-c("state", "is_censor"))
+      fl <- self$full_link(covariates)
+      out |> dplyr::left_join(fl, by = "path_id")
+    },
+
+    #' @description Data frame in alternative transitions format
+    #'
+    #' @param covariates Which covariates to include?
+    #' @param truncate Remove rows after terminal events first?
+    #' @return A \code{data.frame}
+    as_transitions_alt = function(covariates = NULL, truncate = FALSE) {
+      dt <- self$as_transitions(
+        covariates = covariates,
+        truncate = truncate
+      )
+      dt$Tstart <- dt$time_prev
+      dt$Tstop <- dt$time
+      dt$time <- dt$Tstop - dt$Tstart
+      dt$status <- dt$is_event
+      dt$trans <- dt$trans_idx
+      dt |> dplyr::select(-c("is_event", "time_prev", "trans_idx"))
+    },
+
+    #' @description Convert to format used by the 'mstate' package
+    #'
+    #' @param covariates Which covariates to include?
+    #' @return An \code{msdata} object
+    as_msdata = function(covariates = NULL) {
+      dt <- self$as_transitions_alt(covariates, truncate = TRUE)
+      df_out <- to_mstate_format(dt, self$transmat)
+      attr(df_out, "trans") <- self$transmat$as_mstate_transmat()
+      class(df_out) <- c("msdata", "data.frame")
+      df_out
+    },
+
+    #' @description Step plot of the paths
     #'
     #' @param n_paths Number of paths to subsample for plotting.
     #' @param alpha opacity
-    plot_paths = function(n_paths = NULL, alpha = 0.5) {
-      df <- self$as_data_frame()
+    #' @param truncate truncate after terminal events?
+    plot_paths = function(n_paths = NULL, alpha = 0.5, truncate = FALSE) {
+      df <- self$as_data_frame(truncate = truncate)
       df$is_event <- as.factor(df$is_event)
+      sn <- self$state_names()
       uid <- unique(df$path_id)
       N <- length(uid)
       if (is.null(n_paths)) {
@@ -293,343 +275,159 @@ PathData <- R6::R6Class(
       }
       ids <- uid[idx_path]
       df <- df |>
-        dplyr::filter(path_id %in% ids) |>
+        dplyr::filter(.data$path_id %in% ids) |>
         mutate(
-          state_char = self$state_names[state],
-          state = factor(state_char, levels = self$state_names, ordered = T)
+          state_char = sn[state],
+          state = factor(state_char, levels = sn, ordered = T)
         )
-      ggplot(df, aes(x = time, y = state, group = path_id)) +
+      ggplot(df, aes(x = .data$time, y = .data$state, group = .data$path_id)) +
         geom_step(direction = "hv", alpha = alpha) +
         labs(x = "Time", y = "State", title = "State paths") +
-        geom_point(mapping = aes(color = is_event, pch = is_event))
+        geom_point(mapping = aes(color = .data$is_event, pch = .data$is_event))
     },
 
-    #' Transition proportion matrix
-    #'
-    #' @return a matrix
-    trans_matrix = function() {
-      r <- self$as_msdata()
-      prop <- mstate::events(r$msdata)$Proportions
-      cn <- colnames(prop)
-      idx_noevent <- find_one("no event", cn)
-      colnames(prop)[idx_noevent] <- "Censoring"
-      prop <- rbind(prop, rep(0, ncol(prop)))
-      rownames(prop)[nrow(prop)] <- "Censoring"
+    #' @description Transition proportion matrix
+    #' @param include_censor Include censoring (no event) proportion in the
+    #' matrix
+    #' @return a \code{table}
+    prop_matrix = function(include_censor = TRUE) {
+      ms <- self$as_msdata()
+      prop <- mstate::events(ms)$Proportions
+      if (isFALSE(include_censor)) {
+        prop <- prop[, 1:(ncol(prop) - 1)]
+      }
       prop
     },
 
-    #' Visualize the transition proportion matrix as a graph
+    #' @description Visualize the transition proportion matrix as a graph
     #'
     #' @param digits Max number of digits to show in numbers
     #' @param ... Arguments passed to \code{qgraph}
-    #' @param include_censor Include censoring state in the graph?
     #' @return \code{qgraph} plot
-    plot_graph = function(digits = 3, include_censor = FALSE, ...) {
-      f <- self$trans_matrix()
-      cn <- colnames(f)
-      idx_noevent <- find_one("Censoring", cn)
-      idx_term <- which(colnames(f) %in% self$terminal_states)
-      idx_init <- which(colnames(f) %in% self$initial_states)
-      N <- length(cn)
-      color <- rep("black", N)
-      col <- "gray60"
-      col_term <- "firebrick"
-      col_init <- "steelblue2"
-      color[idx_noevent] <- col
-      color[idx_term] <- col_term
-      color[idx_init] <- col_init
-      acol <- matrix("black", nrow(f), ncol(f))
-      acol[, idx_noevent] <- col
-      lcol <- acol
-      lcol[, idx_term] <- col_term
-      lcol[, idx_init] <- col_init
-
-      # Filter
-      idx_keep <- seq_len(N)
-      if (!include_censor) {
-        idx_keep <- setdiff(idx_keep, idx_noevent)
-      }
-
-      f <- f[idx_keep, idx_keep, drop = F]
-      lcol <- lcol[idx_keep, idx_keep, drop = F]
-      acol <- acol[idx_keep, idx_keep, drop = F]
-      color <- color[idx_keep]
-
-      # Create plot
-      qgraph::qgraph(f,
-        edge.labels = TRUE, label.color = color,
-        edge.color = acol,
-        fade = FALSE,
+    plot_graph = function(digits = 3, ...) {
+      f <- self$prop_matrix(include_censor = FALSE)
+      f <- matrix(f, ncol = ncol(f), dimnames = dimnames(f))
+      transition_matrix_plot(
+        f,
+        self$terminal_states(),
+        self$null_state(),
+        edge_labs = TRUE,
         ...
       )
     },
 
-    # Fit CoxPH model
-    coxph = function(covs = NULL, ...) {
-      if (is.null(covs)) {
-        covs <- self$covs
-        rm <- c(
-          "individual_id", "pk_post_dose", "pk_pre_dose", "country_num",
-          "crcl", "weight", "dose_arm", "first_dose_amount",
-          "dose_adjustment"
-        )
-        covs <- setdiff(covs, rm)
-      }
-      df <- self$as_msdata(covariates = TRUE)$msdata
-      str <- paste(covs, collapse = " + ")
-      form <- paste0("Surv(Tstart, Tstop, status) ~ ", str)
-      survival::coxph(as.formula(form), df, ...)
+    #' @description Fit Cox proportional hazards model
+    #'
+    #' @param covariates Covariates to include.
+    #' @param ... Arguments passed to \code{survival::coxph}.
+    fit_coxph = function(covariates = NULL, ...) {
+      msdat <- self$as_msdata(covariates = covariates)
+      terms <- c("strata(trans)", covariates)
+      str <- paste(terms, collapse = " + ")
+      fit_coxph(msdat, formula_rhs = str, ...)
     },
 
-    # Filter based on path id, creates new object
-    filter = function(path_ids_keep = NULL, subject_ids_keep = NULL,
-                      rep_ids_keep = NULL, draw_ids_keep = NULL) {
+    #' @description Fit frequentist 'mstate' model
+    #'
+    #' @param covariates Covariates to include.
+    #' @param ... Arguments passed to \code{survival::coxph}.
+    fit_mstate = function(covariates = NULL, ...) {
+      message("Formatting as msdata")
+      msdat <- self$as_msdata(covariates = covariates)
+      message("Calling survival::coxph()")
+      cph <- self$fit_coxph(covariates, ...)
+      msdat$strata <- msdat$trans
+      message("Calling mstate::msfit()")
+      mstate::msfit(
+        object = cph, newdata = msdat, variance = FALSE,
+        trans = attr(msdat, "trans")
+      )
+    },
+
+    #' @description Filter based on subject id, creates new object
+    #'
+    #' @param subject_ids_keep Subject ids to keep
+    filter = function(subject_ids_keep) {
+      checkmate::assert_character(subject_ids_keep, min.len = 1)
       subject_df <- self$subject_df |>
-        dplyr::filter(is.null(subject_ids_keep) | subject_id %in% subject_ids_keep)
+        dplyr::filter(subject_id %in% subject_ids_keep)
       link_df <- self$link_df |>
-        dplyr::filter(
-          is.null(rep_ids_keep) | rep_idx %in% rep_ids_keep,
-          is.null(!!draw_ids_keep) | draw_idx %in% draw_ids_keep,
-          subject_index %in% subject_df$subject_index
-        )
-      path_df <- self$path_df |>
-        dplyr::filter(
-          is.null(path_ids_keep) | path_id %in% path_ids_keep,
-          path_id %in% link_df$path_id
-        )
+        dplyr::filter(subject_id %in% unique(subject_df$subject_id))
+      path_df <- self$get_path_df(FALSE) |>
+        dplyr::filter(path_id %in% unique(link_df$path_id))
       link_df <- link_df |> dplyr::filter(path_id %in% unique(path_df$path_id))
-      subject_df <- subject_df |> dplyr::filter(subject_index %in%
-        unique(link_df$subject_index))
-      link_df <- link_df |>
-        left_join(subject_df |> dplyr::select(subject_index, subject_id),
-          by = "subject_index"
-        )
-      PathData$new(subject_df, path_df, link_df,
-        self$state_names, self$covs,
-        terminal_states = self$terminal_states,
-        censor_states = self$censor_states,
-        initial_states = self$initial_states
+      subject_df <- subject_df |> dplyr::filter(subject_id %in%
+        unique(link_df$subject_id))
+      PathData$new(
+        subject_df, path_df, link_df,
+        self$transmat,
+        self$covs
       )
     }
   )
 )
 
-shorten_name2 <- function(input_string) {
-  input_string
-}
-
-as_time_to_first_event <- function(dat, states, by = c()) {
-  by_syms <- rlang::syms(unique(c(by, "path_id")))
-  # max time as censor time
-  censor <- dat |>
-    dplyr::group_by(!!!by_syms) |>
-    summarise(time = max(time), .groups = "keep") |>
-    dplyr::ungroup() |>
-    expand_grid(state = states) |>
-    mutate(is_event = 0)
-  # min event time per state
-  events <- dat |>
-    dplyr::filter(is_event == 1, state %in% states) |>
-    dplyr::group_by(state, !!!by_syms) |>
-    summarize(time = min(time), .groups = "keep") |>
-    dplyr::ungroup() |>
-    mutate(is_event = 1)
-  d <- censor |>
-    anti_join(events, by = c("path_id", "state")) |>
-    dplyr::bind_rows(events)
-}
-
-# Only creates trans_char and not actual integer index yet
-as_transitions_char_single <- function(dat, state_names, terminal_states) {
-  R <- nrow(dat)
-  a <- dat[2:R, ]
-  a$prev_state <- dat[1:(R - 1), ]$state
-  s1 <- sapply(state_names[a$prev_state], shorten_name2)
-  s2 <- sapply(state_names[a$state], shorten_name2)
-  if (any(s1 %in% terminal_states)) {
-    incorrect_states <- unique(s1[s1 %in% terminal_states])
-    warning(str_c(
-      "non-terminal record found for state: ", incorrect_states,
-      " (which is marked as a terminal state) for subject ",
-      unique(dat$subject_id), "\n"
-    ))
+#' Fit Cox PH model using Breslow method
+#'
+#' @param msdat \code{msdata} object
+#' @param formula_rhs Formula right hand side that is appended to
+#' \code{Surv(Tstart, Tstop, status) ~ }. If \code{NULL} (default), then
+#' \code{strata(trans)} is used
+#' @return value returned by \code{survival::coxph}
+fit_coxph <- function(msdat, formula_rhs = NULL) {
+  if (is.null(formula_rhs)) {
+    formula_rhs <- "strata(trans)"
   }
-  a$trans_char <- format_transition_char(s1, s2)
-  a
-}
-
-format_transition_char <- function(s1, s2) {
-  paste0(s1, "->", s2)
-}
-
-# Only creates trans_char and not actual integer index yet
-as_transitions_char <- function(dat, state_names, terminal_states) {
-  df <- NULL
-  ids <- unique(dat$subject_id)
-  for (id in ids) {
-    dat_id <- dat |> dplyr::filter(subject_id == id)
-    df <- rbind(df, as_transitions_char_single(dat_id, state_names, terminal_states))
-  }
-
-  # Edit trans_char for intervals that do not end in event
-  df$trans_char[df$is_event == 0] <- NA
-  df
-}
-
-# Add previous state and remove initial row of each subject
-as_transitions <- function(dat, state_names, state_types, terminal_states, covs,
-                           censor_states, initial_states) {
-  # Transitions character representation
-  dat_trans <- as_transitions_char(dat, state_names, terminal_states)
-
-  # Create legend first
-  r <- tidyr::expand_grid(prev_state = state_names, state = state_names) |>
-    mutate(trans_char = format_transition_char(prev_state, state)) |>
-    dplyr::filter(
-      !prev_state %in% terminal_states, # no transition from terminal state
-      !state %in% initial_states, # no transition into initial states
-      !state %in% censor_states, # no transition into or out of censor
-      !prev_state %in% censor_states
-    ) |>
-    mutate(terminal = state %in% terminal_states) |>
-    mutate(
-      state = as.integer(factor(state, levels = state_names, ordered = T)),
-      prev_state = as.integer(factor(prev_state, levels = state_names, ordered = T))
-    ) |>
-    as.data.frame()
-  legend <- r[, c("trans_char", "prev_state", "state", "terminal")] |>
-    dplyr::filter(!is.na(trans_char))
-  legend$transition <- seq_len(nrow(legend))
-  trans_names <- legend$trans_char
-  # add trans_type
-  target_state_name <- state_names[legend$state]
-  legend$trans_type <- state_types[match(target_state_name, state_names)]
-  # confirm that all transitions in the data are represented in the legend
-  stopifnot(all(na.omit(dat_trans$trans_char) %in% legend$trans_char))
-
-  # Finally add actual transition index to data
-  dat_trans$transition <- match(dat_trans$trans_char, trans_names)
-  dat_trans$transition[which(is.na(dat_trans$transition))] <- 0
-
-  # Order columns and drop unnecessary ones
-  fields <- c(
-    "time", "is_event", "state", "prev_state",
-    "transition", "trans_char", "subject_id"
-  )
-  dat_trans <- dat_trans[, c(fields, covs)]
-
-  # Return
-  list(
-    df = dat_trans,
-    legend = legend
+  formula <- paste0("Surv(Tstart, Tstop, status) ~ ", formula_rhs)
+  survival::coxph(stats::as.formula(formula),
+    data = msdat, method = "breslow"
   )
 }
 
-
-# Function to check and sort paths based on time
-check_and_sort_paths <- function(df) {
-  # Initialize a flag to track if any sorting is needed
-  needs_sorting <- FALSE
-
-  # Iterate over each unique path id
-  unique_paths <- unique(df$path_id)
-
-  for (path_id in unique_paths) {
-    # Get the rows for this path id
-    path_rows <- df[df$path_id == path_id, ]
-
-    # Check if the rows are sorted by time
-    if (!all(order(path_rows$time) == seq_along(path_rows$time))) {
-      # If not sorted, sort the rows by time
-      df[df$path_id == path_id, ] <- path_rows[order(path_rows$time), ]
-      # Set the flag to TRUE
-      needs_sorting <- TRUE
-      # Print a warning message
-      warning(paste(
-        "Rows for path_id", path_id,
-        "were not ordered by time and have been sorted."
-      ))
-    }
-  }
-
-  return(df)
-}
-
-#' Get subject df with numeric subject index
+#' Plot cumulative hazard of 'msfit'
 #'
 #' @export
-#' @param pd A \code{\link{PathData}} object
-#' @param subs Subject indices (from \code{\link{do_split}})
-#' @param id_map Maps numeric id to original id
-subject_df_with_idx <- function(pd, subs, id_map) {
-  checkmate::assert_class(pd, "PathData")
-  df <- pd$subject_df |> dplyr::filter(subject_id %in% subs)
-  df$sub_idx <- id_map$x_sub[match(df$subject_id, id_map$subject_id)]
-  df
+#' @param msfit An \code{msfit} object
+#' @param legend transition name legend
+msfit_plot_cumhaz <- function(msfit, legend = NULL) {
+  df <- msfit$Haz
+  if (!is.null(legend)) {
+    leg <- legend[, c("trans_idx", "trans_char")]
+    leg$trans <- leg$trans_idx
+    df$transition <- df$trans
+    df <- df |> left_join(leg, by = "trans")
+    df$trans <- paste0(df$transition, ": ", df$trans_char)
+  } else {
+    df$trans <- as.factor(df$trans)
+  }
+  ggplot(df, aes(x = .data$time, y = .data$Haz, color = .data$trans)) +
+    geom_line() +
+    ylab("Cumulative Hazard")
 }
 
-# To transition format used by mstate (msdata)
-pathdata_to_mstate_format <- function(pd, covariates = FALSE) {
-  dt <- pd$as_transitions()
-  df <- dt$df
-  siu <- unique(df$subject_id)
-  df_out <- NULL
-  PT <- legend_to_PT_matrix(dt$legend)
-  TFI <- legend_to_TFI_matrix(dt$legend)
-  for (sid in siu) {
-    df_j <- df |> dplyr::filter(subject_id == sid)
-    df_out <- rbind(df_out, to_mstate_format_part1(df_j))
-  }
-  df_out <- to_mstate_format_part2(df_out, PT, TFI)
-  rownames(df_out) <- NULL
-  tmat <- TFI_to_mstate_transmat(TFI, pd$state_names)
-  attr(df_out, "trans") <- tmat
-  class(df_out) <- c("msdata", "data.frame")
-  if (covariates) {
-    sdf <- pd$subject_df |> mutate(id = subject_id)
-    df_out <- df_out |> left_join(sdf, by = "id")
-  }
-  list(
-    msdata = df_out,
-    legend = dt$legend
-  )
+#' Estimate average hazard of an 'msfit'
+#'
+#' @export
+#' @param msfit An \code{msfit} object
+msfit_average_hazard <- function(msfit) {
+  msfit$Haz |>
+    dplyr::group_by(trans) |>
+    summarise(
+      avg_haz = (dplyr::last(Haz) - dplyr::first(Haz)) /
+        (dplyr::last(time) - dplyr::first(time))
+    )
 }
 
-# First pass in transforming transitions format to mstate format (msdata)
-# For one subject, creates the columns needed for mstate format
-to_mstate_format_part1 <- function(df_sub) {
-  df <- data.frame(
-    id = df_sub$subject_id,
-    from = df_sub$prev_state,
-    to = df_sub$state,
-    trans = df_sub$transition
-  )
-  K <- nrow(df)
-  Tstart <- rep(0, K)
-  if (K > 1) {
-    Tstart[2:K] <- df_sub$time[1:(K - 1)]
-  }
-  df$Tstart <- Tstart
-  df$Tstop <- df_sub$time
-  df$time <- df$Tstop - df$Tstart
-  df$status <- df_sub$is_event
-  df
-}
 
-# Second pass in transforming transitions format to mstate format (msdata)
 # Creates the additional rows corresponding to each transition
 # that is at risk
-to_mstate_format_part2 <- function(df, PT, TFI) {
+to_mstate_format <- function(df, transmat) {
   N <- nrow(df)
   df_out <- NULL
+  TFI <- transmat$as_transition_index_matrix()
   for (n in 1:N) {
     row <- df[n, ]
-    possible_trans <- which(as.numeric(PT[, row$from]) == 1)
-    J <- length(possible_trans)
-    possible_targets <- rep(0, J)
-    for (j in seq_len(J)) {
-      possible_targets[j] <- find_column_with_number(TFI, possible_trans[j])
-    }
+    possible_targets <- transmat$at_risk(row$from)
 
     if (row$status == 0) {
       rows <- NULL
@@ -653,169 +451,6 @@ to_mstate_format_part2 <- function(df, PT, TFI) {
   df_out
 }
 
-# TFI matrix to format used by mstate
-TFI_to_mstate_transmat <- function(TFI, state_names) {
-  sn <- state_names[1:(length(state_names) - 1)]
-  TFI[TFI == 0] <- NA
-  colnames(TFI) <- sn
-  rownames(TFI) <- sn
-  TFI
-}
-
-#' Fit Cox PH model using Breslow method
-#'
-#' @export
-#' @param msdat \code{msdata} object
-#' @param formula_rhs Formula right hand side that is appended to
-#' \code{Surv(Tstart, Tstop, status) ~ }. If \code{NULL} (default), then
-#' \code{strata(trans)} is used
-#' @return value returned by \code{survival::coxph}
-fit_coxph <- function(msdat, formula_rhs = NULL) {
-  if (is.null(formula_rhs)) {
-    formula_rhs <- "strata(trans)"
-  }
-  formula <- paste0("Surv(Tstart, Tstop, status) ~ ", formula_rhs)
-  survival::coxph(as.formula(formula),
-    data = msdat, method = "breslow"
-  )
-}
-
-#' Fit 'mstate' model
-#'
-#' @export
-#' @param msdat \code{msdata} object
-#' @param formula formula
-fit_mstate <- function(msdat, formula = NULL) {
-  cph <- fit_coxph(msdat, formula)
-  mstate::msfit(object = cph, variance = FALSE, trans = attr(msdat, "trans"))
-}
-fit_basehaz <- function(msdat, ...) {
-  cph <- fit_coxph(msdat)
-  survival::basehaz(cph, ...)
-}
-
-#' Plot cumulative hazard of 'msfit'
-#'
-#' @export
-#' @param msfit An \code{msfit} object
-#' @param legend transition name legend
-plot_cumhaz_msfit <- function(msfit, legend = NULL) {
-  df <- msfit$Haz
-  if (!is.null(legend)) {
-    leg <- legend[, c("transition", "trans_char")]
-    df$transition <- df$trans
-    df <- df |> left_join(leg, by = "transition")
-    df$trans <- paste0(df$transition, ": ", df$trans_char)
-  } else {
-    df$trans <- as.factor(df$trans)
-  }
-  ggplot(df, aes(x = time, y = Haz, color = trans)) +
-    geom_line() +
-    ylab("Cumulative Hazard")
-}
-
-#' Estimate average hazard of an 'msfit'
-#'
-#' @export
-#' @param msfit An \code{msfit} object
-estimate_average_hazard <- function(msfit) {
-  msfit$Haz |>
-    dplyr::group_by(trans) |>
-    summarise(
-      avg_haz = (dplyr::last(Haz) - dplyr::first(Haz)) /
-        (dplyr::last(time) - dplyr::first(time))
-    )
-}
-
-truncate_after_terminal_events <- function(df, term_states) {
-  term_events <- df |>
-    dplyr::filter(state %in% !!term_states, is_event == 1) |>
-    dplyr::group_by(path_id) |>
-    summarise(term_time = min(time, na.rm = T)) |>
-    dplyr::ungroup()
-  no_terms <- df |>
-    dplyr::anti_join(term_events, by = "path_id")
-  with_terms <- df |>
-    inner_join(term_events, by = c("path_id")) |>
-    dplyr::filter(time <= term_time) |>
-    dplyr::select(-term_time)
-  no_terms |>
-    dplyr::bind_rows(with_terms)
-}
-
-summarize_event_prob <- function(pd, target_times, by = c("subject_id")) {
-  by_syms <- rlang::syms(by)
-  surv_df <- as_time_to_event(pd) |>
-    mutate(vv = dense_rank(str_c(!!!by_syms, sep = ":")))
-  pred_pd_surv <- survival::survfit(
-    survival::Surv(start_time, end_time, event) ~ vv,
-    id = path_id, data = surv_df
-  )
-
-  # summarize event rates
-  pp_summary <- summary(pred_pd_surv, target_times)
-  pstate_cols <- pp_summary$pstate
-  colnames(pstate_cols) <- pp_summary$states
-
-  pp_cumhaz <- as_tibble(lst(
-    time = pp_summary$time,
-    strata = pp_summary$strata
-  )) |>
-    bind_cols(pstate_cols) |>
-    rgeco:::.tidy_km_strata() |>
-    mutate(`vv` = as.integer(vv)) |>
-    left_join(surv_df |> dplyr::distinct(vv, !!!by_syms), by = "vv") |>
-    dplyr::select(-vv)
-}
-
-# Full formula with expanded covariates
-cph_full_formula <- function(msdata, ttype = FALSE) {
-  a <- grep("\\.", colnames(msdata), value = TRUE)
-  str <- paste(a, collapse = " + ")
-  if (ttype) {
-    strata <- "trans_type"
-  } else {
-    strata <- "trans"
-  }
-  paste0(str, " + strata(", strata, ")")
-}
-
-
-
-# Pathdata to single event format
-to_single_event <- function(pd, event) {
-  path_df <- pd$path_df
-  STATE <- find_one(event, pd$state_names)
-  pid <- unique(path_df$path_id)
-  path_df_new <- NULL
-  for (path in pid) {
-    df <- path_df |>
-      dplyr::filter(path_id == path) |>
-      arrange(time)
-    df$row_num <- 1:nrow(df)
-    ri <- which(df$state == STATE)
-    if (length(ri) == 0) {
-      df <- df[c(1, nrow(df)), ]
-      df$state[2] <- 1
-      df$is_event[2] <- 0
-    } else {
-      df <- df[c(1, ri[1]), ]
-      df$state[2] <- 2
-    }
-    path_df_new <- rbind(path_df_new, df |> dplyr::select(-row_num))
-  }
-
-  state_names <- c("Randomization", event, "Censor")
-  link_df <- pd$link_df |> left_join(
-    pd$subject_df |> dplyr::select(subject_id, subject_index),
-    by = "subject_index"
-  )
-  PathData$new(pd$subject_df, path_df_new, link_df,
-    state_names,
-    covs = pd$covs, check_order = TRUE,
-    terminal_states = event
-  )
-}
 
 # Look for potential covariates
 potential_covariates <- function(pd, possible = NULL, ...) {

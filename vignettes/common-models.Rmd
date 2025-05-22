@@ -1,0 +1,147 @@
+---
+title: "Common multistate models"
+author: Juho Timonen
+date: 14th April 2025
+output: 
+  rmarkdown::html_vignette:
+    toc: true 
+    toc_depth: 3
+    number_sections: true
+vignette: >
+  %\VignetteIndexEntry{Common multistate models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(bmstate)
+library(ggplot2)
+theme_set(theme_bw())
+N_sub <- 300
+```
+
+# Basic survival model
+
+First we create a `TransitionMatrix`. The transition matrix is a directed
+graph encoded by a binary matrix.
+
+```{r, fig.width=5}
+tm <- transmat_survival()
+print(tm)
+tm$plot()
+```
+
+Then we create a `MultistateModel` using this graph.
+
+```{r}
+tmax <- 3 * 365.25
+mod <- create_msm(tm, tmax = tmax)
+print(mod)
+```
+
+Now we can simulate events with known constant hazard rate `lambda`. For this
+model, we are simulating from a homogeneous Poisson process with rate $\lambda$,
+meaning that the event times should follow an exponential distribution with
+mean $\frac{1}{\lambda}$.
+
+```{r, fig.width=5}
+lambda <- 1e-2
+pd <- mod$simulate_data(N_sub, w0 = lambda)
+pd$paths$plot_paths()
+pd$paths$plot_graph()
+```
+
+We plot the distribution of event times and the theoretical mean (red line).
+```{r, fig.width=5}
+times <- pd$paths$as_transitions(truncate = TRUE)$time
+plot_time_dist(times) + geom_vline(xintercept = 1 / lambda, color = "firebrick")
+```
+
+
+# Competing risks model
+
+The transition matrix is for a competing risks model can be created like so.
+
+```{r, fig.width=5}
+tm <- transmat_comprisk()
+print(tm)
+tm$plot()
+mod <- create_msm(tm, tmax = tmax)
+```
+
+This model has 3 possible transitions. 
+Now we can simulate events with known constant hazard rates `lambda_1`, 
+`lambda_2`, `lambda_3`. For this
+model, we are simulating from independent homogeneous Poisson processes with 
+rates $\lambda_i$, meaning that the transition probabilities should be
+$$
+P(i) = \frac{\lambda_i}{\sum_{j=1}^ 3 \lambda_j}.
+$$
+
+```{r, fig.width=5}
+lambda <- 1e-2
+w0 <- c(lambda, 2 * lambda, 3 * lambda)
+print(w0 / sum(w0))
+```
+
+```{r, fig.width=5}
+pd <- mod$simulate_data(N_sub, w0 = w0)
+pd$paths$plot_paths()
+pd$paths$plot_graph()
+```
+
+The distribution of event times should be exponentially distributed with
+mean $\frac{1}{\lambda_0}$ where
+$$
+\lambda_0 = \sum_{j=1}^ 3 \lambda_j
+$$
+is the combined hazard rate. We plot the empirical distribution and the theoretical mean (red line).
+```{r, fig.width=5}
+times <- pd$paths$as_transitions(truncate = TRUE)$time
+plot_time_dist(times) + geom_vline(xintercept = 1 / sum(w0), color = "firebrick")
+```
+
+# Illness-death model
+
+The illness-death model is another common multistate model.
+
+```{r, fig.width=5}
+tm <- transmat_illnessdeath()
+print(tm)
+tm$plot()
+mod <- create_msm(tm)
+pd <- mod$simulate_data(N_sub, w0 = 1e-2)
+pd$paths$plot_paths()
+pd$paths$plot_graph()
+```
+
+
+# General multistate models
+
+General multistate models can have multiple terminal states and various
+transitions.
+
+```{r, fig.width=5}
+tm <- transmat_full(state_names = LETTERS[1:5], sources = 1, terminal = c(4, 5))
+print(tm)
+tm$plot()
+mod <- create_msm(tm)
+pd <- mod$simulate_data(N_sub, w0 = 1e-3)
+pd$paths$plot_paths()
+pd$paths$plot_graph()
+```
+
+Some of the paths may not reach a terminal state
+before `t_max`, meaning they get censored (no event)
+
+```{r, fig.width=5}
+pd$paths$prop_matrix()
+```
+

@@ -23,15 +23,8 @@ columns.}
 
 \item{\code{covs}}{Covariate column names.}
 
-\item{\code{state_names}}{Names of the states.}
-
-\item{\code{state_types}}{State types.}
-
-\item{\code{terminal_states}}{Terminal states.}
-
-\item{\code{initial_states}}{Initial states.}
-
-\item{\code{censor_states}}{Censoring states.
+\item{\code{transmat}}{A \code{\link{TransitionMatrix}} describing the system in to
+which the paths belong.
 Initialize}
 }
 \if{html}{\out{</div>}}
@@ -40,23 +33,27 @@ Initialize}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-PathData-new}{\code{PathData$new()}}
+\item \href{#method-PathData-unique_subjects}{\code{PathData$unique_subjects()}}
 \item \href{#method-PathData-covariate_names}{\code{PathData$covariate_names()}}
 \item \href{#method-PathData-lengths}{\code{PathData$lengths()}}
 \item \href{#method-PathData-n_paths}{\code{PathData$n_paths()}}
-\item \href{#method-PathData-longest_path}{\code{PathData$longest_path()}}
+\item \href{#method-PathData-null_state}{\code{PathData$null_state()}}
+\item \href{#method-PathData-state_names}{\code{PathData$state_names()}}
+\item \href{#method-PathData-terminal_states}{\code{PathData$terminal_states()}}
 \item \href{#method-PathData-get_event_states}{\code{PathData$get_event_states()}}
 \item \href{#method-PathData-get_event_state_names}{\code{PathData$get_event_state_names()}}
-\item \href{#method-PathData-as_msdata}{\code{PathData$as_msdata()}}
-\item \href{#method-PathData-as_time_to_first_event}{\code{PathData$as_time_to_first_event()}}
 \item \href{#method-PathData-print}{\code{PathData$print()}}
-\item \href{#method-PathData-check_valid_state}{\code{PathData$check_valid_state()}}
-\item \href{#method-PathData-check_states}{\code{PathData$check_states()}}
+\item \href{#method-PathData-get_path_df}{\code{PathData$get_path_df()}}
 \item \href{#method-PathData-as_data_frame}{\code{PathData$as_data_frame()}}
+\item \href{#method-PathData-full_link}{\code{PathData$full_link()}}
 \item \href{#method-PathData-as_transitions}{\code{PathData$as_transitions()}}
+\item \href{#method-PathData-as_transitions_alt}{\code{PathData$as_transitions_alt()}}
+\item \href{#method-PathData-as_msdata}{\code{PathData$as_msdata()}}
 \item \href{#method-PathData-plot_paths}{\code{PathData$plot_paths()}}
-\item \href{#method-PathData-trans_matrix}{\code{PathData$trans_matrix()}}
+\item \href{#method-PathData-prop_matrix}{\code{PathData$prop_matrix()}}
 \item \href{#method-PathData-plot_graph}{\code{PathData$plot_graph()}}
-\item \href{#method-PathData-coxph}{\code{PathData$coxph()}}
+\item \href{#method-PathData-fit_coxph}{\code{PathData$fit_coxph()}}
+\item \href{#method-PathData-fit_mstate}{\code{PathData$fit_mstate()}}
 \item \href{#method-PathData-filter}{\code{PathData$filter()}}
 \item \href{#method-PathData-clone}{\code{PathData$clone()}}
 }
@@ -66,216 +63,175 @@ Initialize}
 \if{latex}{\out{\hypertarget{method-PathData-new}{}}}
 \subsection{Method \code{new()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$new(
-  subject_df,
-  path_df,
-  link_df,
-  state_names,
-  covs = NULL,
-  check_order = TRUE,
-  terminal_states = c(),
-  censor_states = state_names[length(state_names)],
-  initial_states = state_names[1]
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$new(subject_df, path_df, link_df, transmat, covs = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{subject_df}}{Subjects data frame.}
+\item{\code{subject_df}}{Data frame with one row per subject. Must have
+\code{subject_id} and all covariates as columns.}
 
-\item{\code{path_df}}{Paths data frame.}
+\item{\code{path_df}}{Data frame of actual paths. Must have \code{path_id},
+\code{state}, \code{time}, \code{is_event}, \code{is_censor}
+and \code{trans_idx} as columns.}
 
-\item{\code{link_df}}{Link data frame.}
+\item{\code{link_df}}{Links the path and subject data frames. Must have
+\code{path_id}, \code{draw_idx}, \code{rep_idx}, and \code{subject_id} as
+columns.}
 
-\item{\code{state_names}}{Names of the states.}
+\item{\code{transmat}}{A \code{\link{TransitionMatrix}} describing the system to
+which the paths belong.}
 
 \item{\code{covs}}{Covariate column names.}
-
-\item{\code{check_order}}{Check order of paths?}
-
-\item{\code{terminal_states}}{Terminal states.}
-
-\item{\code{censor_states}}{Censoring states.
-Get names of covariates}
-
-\item{\code{initial_states}}{Initial states.}
 }
 \if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-unique_subjects"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-unique_subjects}{}}}
+\subsection{Method \code{unique_subjects()}}{
+Get unique subject ids
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$unique_subjects()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-covariate_names"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-covariate_names}{}}}
 \subsection{Method \code{covariate_names()}}{
+Get names of covariates
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$covariate_names()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 a character vector
-Get path lenghts (among paths that include events)
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-lengths"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-lengths}{}}}
 \subsection{Method \code{lengths()}}{
+Get path lengths (among paths that include events)
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$lengths()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$lengths(truncate = FALSE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{truncate}}{Remove rows after terminal events first?}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
 a data frame of path ids and counts
-Get number of paths
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-n_paths"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-n_paths}{}}}
 \subsection{Method \code{n_paths()}}{
+Get number of paths
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$n_paths()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 an integer
-Get longest path
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PathData-longest_path"></a>}}
-\if{latex}{\out{\hypertarget{method-PathData-longest_path}{}}}
-\subsection{Method \code{longest_path()}}{
+\if{html}{\out{<a id="method-PathData-null_state"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-null_state}{}}}
+\subsection{Method \code{null_state()}}{
+Get name of null state
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$longest_path()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$null_state()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-state_names"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-state_names}{}}}
+\subsection{Method \code{state_names()}}{
+Get names of all states
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$state_names()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-a \code{\link{PathData}} object with just one path
-Get indices of event states
+character vector
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-terminal_states"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-terminal_states}{}}}
+\subsection{Method \code{terminal_states()}}{
+Get names of terminal states
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$terminal_states()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+character vector
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-get_event_states"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-get_event_states}{}}}
 \subsection{Method \code{get_event_states()}}{
+Get indices of event states
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$get_event_states()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 integer vector
-Get names of states that are events (i.e. not initial and not censor)
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-get_event_state_names"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-get_event_state_names}{}}}
 \subsection{Method \code{get_event_state_names()}}{
+Get names of event states
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$get_event_state_names()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
-character vector
-Convert to format used by the 'mstate' package
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PathData-as_msdata"></a>}}
-\if{latex}{\out{\hypertarget{method-PathData-as_msdata}{}}}
-\subsection{Method \code{as_msdata()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$as_msdata(covariates = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{covariates}}{Include covariates?
-Format as time to first event}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PathData-as_time_to_first_event"></a>}}
-\if{latex}{\out{\hypertarget{method-PathData-as_time_to_first_event}{}}}
-\subsection{Method \code{as_time_to_first_event()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$as_time_to_first_event(covs = c("subject_id"), truncate = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{covs}}{covariates to include in output data frame}
-
-\item{\code{truncate}}{truncate after terminal events?
-Print info
-Check that a state is valid}
-}
-\if{html}{\out{</div>}}
+a character vector
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-print"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-print}{}}}
 \subsection{Method \code{print()}}{
+Print info
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$print()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+nothing
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PathData-check_valid_state"></a>}}
-\if{latex}{\out{\hypertarget{method-PathData-check_valid_state}{}}}
-\subsection{Method \code{check_valid_state()}}{
+\if{html}{\out{<a id="method-PathData-get_path_df"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-get_path_df}{}}}
+\subsection{Method \code{get_path_df()}}{
+Get path data frame
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$check_valid_state(check_states, state_names, min_len)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$get_path_df(truncate = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{check_states}}{states to check}
-
-\item{\code{state_names}}{all state names}
-
-\item{\code{min_len}}{minimum length
-Check that states input is valid}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PathData-check_states"></a>}}
-\if{latex}{\out{\hypertarget{method-PathData-check_states}{}}}
-\subsection{Method \code{check_states()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$check_states(
-  state_names,
-  terminal_states,
-  initial_states,
-  censor_states,
-  path_df
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{state_names}}{names of all states}
-
-\item{\code{terminal_states}}{names of terminal states}
-
-\item{\code{initial_states}}{names of initial states}
-
-\item{\code{censor_states}}{names of censoring states}
-
-\item{\code{path_df}}{the path data frame
-Convert to one long data frame}
+\item{\code{truncate}}{Remove rows after terminal events?}
 }
 \if{html}{\out{</div>}}
 }
@@ -284,6 +240,7 @@ Convert to one long data frame}
 \if{html}{\out{<a id="method-PathData-as_data_frame"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-as_data_frame}{}}}
 \subsection{Method \code{as_data_frame()}}{
+Convert to one long data frame
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$as_data_frame(covariates = NULL, truncate = FALSE)}\if{html}{\out{</div>}}
 }
@@ -293,38 +250,103 @@ Convert to one long data frame}
 \describe{
 \item{\code{covariates}}{Which covariates to include?}
 
-\item{\code{truncate}}{Truncate after terminal events?
-Data frame in transitions format}
+\item{\code{truncate}}{Remove rows after terminal events?}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-full_link"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-full_link}{}}}
+\subsection{Method \code{full_link()}}{
+Full link data frame
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$full_link(covariates = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{covariates}}{Which covariates to include}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A \code{data.frame} with same number of rows as \code{link_df},
+including also the covariate columns and \code{subject_id}
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-as_transitions"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-as_transitions}{}}}
 \subsection{Method \code{as_transitions()}}{
+Data frame in transitions format
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$as_transitions(only_observed = FALSE, force_rerun = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$as_transitions(covariates = NULL, truncate = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{only_observed}}{Limit transitions to only the observed ones?}
+\item{\code{covariates}}{Which covariates to include?}
 
-\item{\code{force_rerun}}{Force rerun of the conversion? If \code{FALSE},
-a cached version is used if it exists.
-Step plot of the paths}
+\item{\code{truncate}}{Remove rows after terminal events first?}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A \code{data.frame}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-as_transitions_alt"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-as_transitions_alt}{}}}
+\subsection{Method \code{as_transitions_alt()}}{
+Data frame in alternative transitions format
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$as_transitions_alt(covariates = NULL, truncate = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{covariates}}{Which covariates to include?}
+
+\item{\code{truncate}}{Remove rows after terminal events first?}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A \code{data.frame}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-as_msdata"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-as_msdata}{}}}
+\subsection{Method \code{as_msdata()}}{
+Convert to format used by the 'mstate' package
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$as_msdata(covariates = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{covariates}}{Which covariates to include?}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+An \code{msdata} object
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-plot_paths"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-plot_paths}{}}}
 \subsection{Method \code{plot_paths()}}{
+Step plot of the paths
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$plot_paths(n_paths = NULL, alpha = 0.5)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$plot_paths(n_paths = NULL, alpha = 0.5, truncate = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -332,39 +354,47 @@ Step plot of the paths}
 \describe{
 \item{\code{n_paths}}{Number of paths to subsample for plotting.}
 
-\item{\code{alpha}}{opacity
-Transition proportion matrix}
+\item{\code{alpha}}{opacity}
+
+\item{\code{truncate}}{truncate after terminal events?}
 }
 \if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PathData-trans_matrix"></a>}}
-\if{latex}{\out{\hypertarget{method-PathData-trans_matrix}{}}}
-\subsection{Method \code{trans_matrix()}}{
+\if{html}{\out{<a id="method-PathData-prop_matrix"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-prop_matrix}{}}}
+\subsection{Method \code{prop_matrix()}}{
+Transition proportion matrix
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$trans_matrix()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$prop_matrix(include_censor = TRUE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{include_censor}}{Include censoring (no event) proportion in the
+matrix}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
-a matrix
-Visualize the transition proportion matrix as a graph
+a \code{table}
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-plot_graph"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-plot_graph}{}}}
 \subsection{Method \code{plot_graph()}}{
+Visualize the transition proportion matrix as a graph
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$plot_graph(digits = 3, include_censor = FALSE, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$plot_graph(digits = 3, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{digits}}{Max number of digits to show in numbers}
-
-\item{\code{include_censor}}{Include censoring state in the graph?}
 
 \item{\code{...}}{Arguments passed to \code{qgraph}}
 }
@@ -375,27 +405,59 @@ Visualize the transition proportion matrix as a graph
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PathData-coxph"></a>}}
-\if{latex}{\out{\hypertarget{method-PathData-coxph}{}}}
-\subsection{Method \code{coxph()}}{
+\if{html}{\out{<a id="method-PathData-fit_coxph"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-fit_coxph}{}}}
+\subsection{Method \code{fit_coxph()}}{
+Fit Cox proportional hazards model
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$coxph(covs = NULL, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$fit_coxph(covariates = NULL, ...)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{covariates}}{Covariates to include.}
+
+\item{\code{...}}{Arguments passed to \code{survival::coxph}.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-fit_mstate"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-fit_mstate}{}}}
+\subsection{Method \code{fit_mstate()}}{
+Fit frequentist 'mstate' model
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$fit_mstate(covariates = NULL, ...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{covariates}}{Covariates to include.}
+
+\item{\code{...}}{Arguments passed to \code{survival::coxph}.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-filter"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-filter}{}}}
 \subsection{Method \code{filter()}}{
+Filter based on subject id, creates new object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$filter(
-  path_ids_keep = NULL,
-  subject_ids_keep = NULL,
-  rep_ids_keep = NULL,
-  draw_ids_keep = NULL
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PathData$filter(subject_ids_keep)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{subject_ids_keep}}{Subject ids to keep}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-clone"></a>}}
