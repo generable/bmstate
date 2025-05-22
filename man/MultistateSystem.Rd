@@ -281,7 +281,7 @@ Generate paths}
 \if{latex}{\out{\hypertarget{method-MultistateSystem-simulate}{}}}
 \subsection{Method \code{simulate()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$simulate(w, log_w0, log_m, init_state = 1)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$simulate(w, log_w0, log_m, init_state = 1, t_max = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -295,6 +295,8 @@ Generate paths}
 \item{\code{log_m}}{An array of shape \code{n_paths} x \code{n_trans}}
 
 \item{\code{init_state}}{Integer index of starting state.}
+
+\item{\code{t_max}}{Max time. If not given, \code{self$get_tmax()} is used.}
 }
 \if{html}{\out{</div>}}
 }

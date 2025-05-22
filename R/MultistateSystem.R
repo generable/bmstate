@@ -305,8 +305,9 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
     #' @param log_w0 An array of shape \code{n_paths} x \code{n_trans}
     #' @param log_m An array of shape \code{n_paths} x \code{n_trans}
     #' @param init_state Integer index of starting state.
+    #' @param t_max Max time. If not given, \code{self$get_tmax()} is used.
     #' @return a data frame
-    simulate = function(w, log_w0, log_m, init_state = 1) {
+    simulate = function(w, log_w0, log_m, init_state = 1, t_max = NULL) {
       checkmate::assert_array(w, d = 3)
       n_paths <- dim(w)[1]
       checkmate::assert_true(dim(w)[3] == self$num_weights())
@@ -315,11 +316,16 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
       S <- self$num_states()
       checkmate::assert_integerish(init_state, len = 1, lower = 1, upper = S)
       pb <- progress::progress_bar$new(total = n_paths)
-      message("Generating ", n_paths, " paths")
+
+      # Set max time
+      out <- NULL
+      if (is.null(t_max)) {
+        t_max <- self$get_tmax()
+      }
+      checkmate::assert_number(t_max, lower = 0)
 
       # Could be done in parallel and some things be precomputed
-      out <- NULL
-      t_max <- self$get_tmax()
+      message("Generating ", n_paths, " paths")
       for (j in seq_len(n_paths)) {
         pb$tick()
         p <- private$generate_path(

@@ -151,8 +151,17 @@ msmsf_log_m_per_subject <- function(fit) {
   log_m[, first_indices, ]
 }
 
-msmsf_pathgen <- function(fit, init_state = 1) {
+#' Path generation for 'MultistateModelStanFit'
+#'
+#' @export
+#' @param init_state Index of starting state
+#' @param t_max Max time (start time is always 0). If \code{NULL}, the max
+#' time of the model is used.
+#' @return A \code{\link{PathData}} object.
+generate_paths <- function(fit, init_state = 1, t_max = NULL) {
   checkmate::assert_class(fit, "MultistateModelStanFit")
+
+  # Get and reshape draws
   sys <- fit$model$system
   S <- fit$num_draws()
   N <- fit$stan_data$N_sub
@@ -163,6 +172,26 @@ msmsf_pathgen <- function(fit, init_state = 1) {
   log_m <- msmsf_log_m_per_subject(fit)
   H <- dim(log_m)[3]
   log_m_reshaped <- matrix(aperm(log_m, c(1, 2, 3)), nrow = N * S, ncol = H)
-  sim <- sys$simulate(w_rep, log_w0_rep, log_m_reshaped, init_state)
-  sim
+
+  # Generate paths
+  path_df <- sys$simulate(w_rep, log_w0_rep, log_m_reshaped, init_state, t_max)
+
+  # Create indices for link
+  subject_index <- rep(seq_len(N), times = S)
+  draw_index <- rep(seq_len(S), each = N)
+  sub_df <- fit$data$paths$subject_df
+  link_df <- data.frame(
+    path_id = seq_len(N * S),
+    subject_id = sub_df$subject_id[subject_index],
+    draw_idx = draw_index
+  )
+
+  # Create PathData object
+  PathData$new(
+    subject_df = sub_df,
+    path_df = path_df,
+    link_df = link_df,
+    transmat = fit$model$system$tm(),
+    covs = fit$model$data_covs()
+  )
 }
