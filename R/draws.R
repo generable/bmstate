@@ -10,6 +10,8 @@ msmsf_log_baseline_hazard <- function(fit, t = NULL) {
   sys <- fit$model$system
   if (is.null(t)) {
     t <- seq(0, sys$get_tmax(), length.out = 30)
+  } else {
+
   }
   checkmate::assert_numeric(t, min.len = 2)
   SBF <- sys$basisfun_matrix(t)

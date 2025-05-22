@@ -250,11 +250,10 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
     #' @param w Spline weights (log scale). If \code{NULL}, will be set to
     #' a vector of zeros, meaning that the log hazard is constant at
     #' \code{log_w0}
-    #' @param SBF_precomp Precomputed basisfunction matrix at \code{t}.
+    #' @param SBF Precomputed basisfunction matrix at \code{t}.
     #' @return a vector with same length as \code{t}
-    log_baseline_hazard = function(t, log_w0, w = NULL,
-                                   SBF_precomp = NULL) {
-      if (is.null(SBF_precomp)) {
+    log_baseline_hazard = function(t, log_w0, w = NULL, SBF = NULL) {
+      if (is.null(SBF)) {
         SBF <- self$basisfun_matrix(t)
       }
       if (is.null(w)) {

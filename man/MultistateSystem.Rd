@@ -184,7 +184,7 @@ nothing
 \subsection{Method \code{log_baseline_hazard()}}{
 Evaluate log baseline hazard
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$log_baseline_hazard(t, log_w0, w = NULL, SBF_precomp = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$log_baseline_hazard(t, log_w0, w = NULL, SBF = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -198,7 +198,7 @@ Evaluate log baseline hazard
 a vector of zeros, meaning that the log hazard is constant at
 \code{log_w0}}
 
-\item{\code{SBF_precomp}}{Precomputed basisfunction matrix at \code{t}.}
+\item{\code{SBF}}{Precomputed basisfunction matrix at \code{t}.}
 }
 \if{html}{\out{</div>}}
 }

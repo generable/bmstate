@@ -23,6 +23,10 @@ test_that("fitting with Stan works (single transition)", {
   )
 
   expect_true(inherits(fit, "MultistateModelStanFit"))
+
+  # Plots
+  expect_s3_class(fit$plot_basisfun(), "ggplot")
+  expect_s3_class(fit$plot_h0(), "ggplot")
 })
 
 test_that("fitting with Stan works (multi-transition)", {
@@ -39,4 +43,5 @@ test_that("fitting with Stan works (multi-transition)", {
   )
 
   expect_true(inherits(fit, "MultistateModelStanFit"))
+  expect_s3_class(fit$plot_h0(), "ggplot")
 })

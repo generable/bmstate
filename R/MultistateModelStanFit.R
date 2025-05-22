@@ -102,7 +102,7 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
       UB <- 1 - LB
       df <- msmsf_log_baseline_hazard(self, t)
       df |>
-        dplyr::group_by(.data$draw_idx, .data$time, .data$trans_idx) |>
+        dplyr::group_by(.data$time, .data$trans_idx) |>
         dplyr::summarize(
           median = stats::median(.data$log_h0),
           upper = stats::quantile(.data$log_h0, UB),
