@@ -24,32 +24,14 @@ The Fit class
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-MultistateModelStanFit-get_model}{\code{MultistateModelStanFit$get_model()}}
 \item \href{#method-MultistateModelStanFit-new}{\code{MultistateModelStanFit$new()}}
 \item \href{#method-MultistateModelStanFit-draws}{\code{MultistateModelStanFit$draws()}}
 \item \href{#method-MultistateModelStanFit-print}{\code{MultistateModelStanFit$print()}}
 \item \href{#method-MultistateModelStanFit-plot_basisfun}{\code{MultistateModelStanFit$plot_basisfun()}}
 \item \href{#method-MultistateModelStanFit-log_z_pars}{\code{MultistateModelStanFit$log_z_pars()}}
+\item \href{#method-MultistateModelStanFit-num_draws}{\code{MultistateModelStanFit$num_draws()}}
 \item \href{#method-MultistateModelStanFit-gq}{\code{MultistateModelStanFit$gq()}}
 \item \href{#method-MultistateModelStanFit-clone}{\code{MultistateModelStanFit$clone()}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModelStanFit-get_model"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModelStanFit-get_model}{}}}
-\subsection{Method \code{get_model()}}{
-Get model.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModelStanFit$get_model(name)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{name}}{Name of model. Only has effect for
-\code{\link{JointModelFit}} objects.}
-}
-\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -122,6 +104,16 @@ Plot used basis functions (grid)
 Full names of parameters that start with \code{log_z_}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModelStanFit$log_z_pars()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModelStanFit-num_draws"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModelStanFit-num_draws}{}}}
+\subsection{Method \code{num_draws()}}{
+Get number of draws
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModelStanFit$num_draws()}\if{html}{\out{</div>}}
 }
 
 }

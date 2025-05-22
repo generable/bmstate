@@ -184,19 +184,21 @@ nothing
 \subsection{Method \code{log_baseline_hazard()}}{
 Evaluate log baseline hazard
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$log_baseline_hazard(t, log_w0, w = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$log_baseline_hazard(t, log_w0, w = NULL, SBF_precomp = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{t}}{Output time points.}
+\item{\code{t}}{Output time points. Not used if \code{SBF_precomp} is given.}
 
 \item{\code{log_w0}}{Intercept (log_scale).}
 
 \item{\code{w}}{Spline weights (log scale). If \code{NULL}, will be set to
 a vector of zeros, meaning that the log hazard is constant at
 \code{log_w0}}
+
+\item{\code{SBF_precomp}}{Precomputed basisfunction matrix at \code{t}.}
 }
 \if{html}{\out{</div>}}
 }

@@ -13,15 +13,6 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
     model = NULL,
 
     #' @description
-    #' Get model.
-    #'
-    #' @param name Name of model. Only has effect for
-    #' \code{\link{JointModelFit}} objects.
-    get_model = function(name) {
-      private$model
-    },
-
-    #' @description
     #' Create model fit object
     #'
     #' @param stan_fit The 'Stan' fit object
@@ -53,7 +44,8 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
     #'
     #' @return nothing
     print = function() {
-      x1 <- paste0("A MultistateModelStanFit.")
+      S <- self$num_draws()
+      x1 <- paste0("A MultistateModelStanFit with ", S, " draws.")
       msg <- paste(x1, "\n", sep = "\n")
       cat(msg)
     },
@@ -78,6 +70,11 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
       nams[which(match)]
     },
 
+    #' @description Get number of draws
+    num_draws = function() {
+      posterior::ndraws(self$draws("lp__"))
+    },
+
     #' @description Generate quantities using the fit.
     #'
     #' @param stan_data Full 'Stan' input list.
@@ -92,11 +89,34 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
       }
 
       # Call 'Stan'
-      self$get_model()$get_stanmodel()$generate_quantities(
-        fitted_params = fitted_params,
-        data = stan_data,
-        ...
-      )
+      stop("Not implemented")
     }
   )
 )
+
+# Log baseline hazard distribution at times t
+msmsf_log_baseline_hazard <- function(fit, t = NULL) {
+  checkmate::assert_class(fit, "MultistateModelStanFit")
+  sys <- fit$model$system
+  if (is.null(t)) {
+    t <- seq(0, sys$get_tmax(), length.out = 30)
+  }
+  checkmate::assert_numeric(t, min.len = 2)
+  SBF <- sys$basisfun_matrix(t)
+  w <- draws_array_merged(fit, "weights")
+  log_w0 <- draws_array_merged(fit, "log_w0")
+  S <- fit$num_draws()
+  N <- length(t)
+  bh <- matrix(0, S, N)
+  for (s in seq_len(S)) {
+    bh[s, ] <- sys$log_baseline_hazard(NULL, log_w0[s, 1, 1], w[s, 1, ], SBF)
+  }
+  list(t = t, log_h0 = bh)
+}
+
+# As draws array with single chain
+draws_array_merged <- function(fit, name) {
+  a <- posterior::as_draws_array(posterior::merge_chains(fit$draws(name)))
+  class(a) <- "array"
+  a
+}

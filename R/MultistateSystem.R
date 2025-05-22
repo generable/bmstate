@@ -245,14 +245,18 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
 
     #' @description Evaluate log baseline hazard
     #'
-    #' @param t Output time points.
+    #' @param t Output time points. Not used if \code{SBF_precomp} is given.
     #' @param log_w0 Intercept (log_scale).
     #' @param w Spline weights (log scale). If \code{NULL}, will be set to
     #' a vector of zeros, meaning that the log hazard is constant at
     #' \code{log_w0}
+    #' @param SBF_precomp Precomputed basisfunction matrix at \code{t}.
     #' @return a vector with same length as \code{t}
-    log_baseline_hazard = function(t, log_w0, w = NULL) {
-      SBF <- self$basisfun_matrix(t)
+    log_baseline_hazard = function(t, log_w0, w = NULL,
+                                   SBF_precomp = NULL) {
+      if (is.null(SBF_precomp)) {
+        SBF <- self$basisfun_matrix(t)
+      }
       if (is.null(w)) {
         w <- rep(0, self$num_weights())
       }
