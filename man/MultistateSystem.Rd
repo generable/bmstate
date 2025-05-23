@@ -281,27 +281,36 @@ Generate paths}
 \if{latex}{\out{\hypertarget{method-MultistateSystem-simulate}{}}}
 \subsection{Method \code{simulate()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$simulate(w, log_w0, log_m, init_state = 1, t_max = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$simulate(
+  w,
+  log_w0,
+  log_m,
+  init_state = 1,
+  t_max = NULL,
+  n_rep = 1
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{w}}{An array of shape \code{n_paths} x \code{n_trans} x
+\item{\code{w}}{An array of shape \code{n_draws} x \code{n_trans} x
 \code{n_weights}}
 
-\item{\code{log_w0}}{An array of shape \code{n_paths} x \code{n_trans}}
+\item{\code{log_w0}}{An array of shape \code{n_draws} x \code{n_trans}}
 
-\item{\code{log_m}}{An array of shape \code{n_paths} x \code{n_trans}}
+\item{\code{log_m}}{An array of shape \code{n_draws} x \code{n_trans}}
 
 \item{\code{init_state}}{Integer index of starting state.}
 
 \item{\code{t_max}}{Max time. If not given, \code{self$get_tmax()} is used.}
+
+\item{\code{n_rep}}{Number of repetitions.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-a data frame
+A data frame with \code{n_draws} x \code{n_rep} paths.
 }
 }
 \if{html}{\out{<hr>}}

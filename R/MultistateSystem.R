@@ -300,21 +300,24 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
 
     #' Generate paths
     #'
-    #' @param w An array of shape \code{n_paths} x \code{n_trans} x
+    #' @param w An array of shape \code{n_draws} x \code{n_trans} x
     #' \code{n_weights}
-    #' @param log_w0 An array of shape \code{n_paths} x \code{n_trans}
-    #' @param log_m An array of shape \code{n_paths} x \code{n_trans}
+    #' @param log_w0 An array of shape \code{n_draws} x \code{n_trans}
+    #' @param log_m An array of shape \code{n_draws} x \code{n_trans}
     #' @param init_state Integer index of starting state.
     #' @param t_max Max time. If not given, \code{self$get_tmax()} is used.
-    #' @return a data frame
-    simulate = function(w, log_w0, log_m, init_state = 1, t_max = NULL) {
+    #' @param n_rep Number of repetitions.
+    #' @return A data frame with \code{n_draws} x \code{n_rep} paths.
+    simulate = function(w, log_w0, log_m, init_state = 1, t_max = NULL, n_rep = 1) {
       checkmate::assert_array(w, d = 3)
-      n_paths <- dim(w)[1]
+      n_draws <- dim(w)[1]
       checkmate::assert_true(dim(w)[3] == self$num_weights())
-      checkmate::assert_matrix(log_w0, nrows = n_paths)
-      checkmate::assert_matrix(log_m, nrows = n_paths)
+      checkmate::assert_matrix(log_w0, nrows = n_draws)
+      checkmate::assert_matrix(log_m, nrows = n_draws)
       S <- self$num_states()
       checkmate::assert_integerish(init_state, len = 1, lower = 1, upper = S)
+      checkmate::assert_integerish(n_rep, len = 1, lower = 1)
+      n_paths <- n_draws * n_rep
       pb <- progress::progress_bar$new(total = n_paths)
 
       # Set max time
@@ -324,15 +327,19 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
       }
       checkmate::assert_number(t_max, lower = 0)
 
-      # Could be done in parallel and some things be precomputed
+      # Should not be done in parallel as such because can mess order in link df
+      cnt <- 0
       message("Generating ", n_paths, " paths")
-      for (j in seq_len(n_paths)) {
-        pb$tick()
-        p <- private$generate_path(
-          w[j, , ], log_w0[j, ], log_m[j, ], t_max, init_state
-        )
-        p <- cbind(p, rep(j, nrow(p)))
-        out <- rbind(out, p)
+      for (k in seq_len(n_rep)) {
+        for (j in seq_len(n_draws)) {
+          cnt <- cnt + 1
+          pb$tick()
+          p <- private$generate_path(
+            w[j, , ], log_w0[j, ], log_m[j, ], t_max, init_state
+          )
+          p <- cbind(p, rep(cnt, nrow(p)))
+          out <- rbind(out, p)
+        }
       }
       df <- data.frame(out)
       colnames(df)[ncol(df)] <- "path_id"

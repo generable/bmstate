@@ -28,12 +28,12 @@ test_that("fitting with Stan works (single transition)", {
   expect_s3_class(fit$plot_h0(), "ggplot")
 
   # Pathgen
-  p <- generate_paths(fit)
+  p <- generate_paths(fit, n_rep = 3)
   expect_true(inherits(p, "PathData"))
 
   # P(event)
   pe <- p_event(p)
-  expect_equal(row(pe), 2)
+  expect_equal(nrow(pe), 2)
 })
 
 test_that("fitting with Stan works (multi-transition)", {
@@ -53,11 +53,11 @@ test_that("fitting with Stan works (multi-transition)", {
   expect_s3_class(fit$plot_h0(), "ggplot")
 
   # Pathgen
-  p <- generate_paths(fit)
+  p <- generate_paths(fit, n_rep = 4)
   expect_true(inherits(p, "PathData"))
 
   # P(event)
   pe <- p_event(p)
-  expect_equal(row(pe), 3)
+  expect_equal(nrow(pe), 3)
   expect_equal(pe$n[1], 0)
 })

@@ -157,9 +157,11 @@ msmsf_log_m_per_subject <- function(fit) {
 #' @param init_state Index of starting state
 #' @param t_max Max time (start time is always 0). If \code{NULL}, the max
 #' time of the model is used.
+#' @param n_rep Number of repeats per draw.
 #' @return A \code{\link{PathData}} object.
-generate_paths <- function(fit, init_state = 1, t_max = NULL) {
+generate_paths <- function(fit, init_state = 1, t_max = NULL, n_rep = 10) {
   checkmate::assert_class(fit, "MultistateModelStanFit")
+  checkmate::assert_integerish(n_rep, lower = 1, len = 1)
 
   # Get and reshape draws
   sys <- fit$model$system
@@ -173,17 +175,28 @@ generate_paths <- function(fit, init_state = 1, t_max = NULL) {
   H <- dim(log_m)[3]
   log_m_reshaped <- matrix(aperm(log_m, c(1, 2, 3)), nrow = N * S, ncol = H)
 
-  # Generate paths
-  path_df <- sys$simulate(w_rep, log_w0_rep, log_m_reshaped, init_state, t_max)
+  # Generate path df
+  path_df <- sys$simulate(
+    w_rep, log_w0_rep, log_m_reshaped, init_state, t_max, n_rep
+  )
 
   # Create indices for link
-  subject_index <- rep(seq_len(N), times = S)
-  draw_index <- rep(seq_len(S), each = N)
+  subject_index <- rep(rep(seq_len(N), times = S), times = n_rep)
+  draw_index <- rep(rep(seq_len(S), each = N), times = n_rep)
+  rep_index <- rep(seq_len(n_rep), each = N * S)
+
+  # Check
+  stopifnot(length(subject_index) == N * S * n_rep)
+  stopifnot(length(draw_index) == N * S * n_rep)
+  stopifnot(length(rep_index) == N * S * n_rep)
+
+  # Create link df
   sub_df <- fit$data$paths$subject_df
   link_df <- data.frame(
-    path_id = seq_len(N * S),
+    path_id = seq_len(N * S * n_rep),
     subject_id = sub_df$subject_id[subject_index],
-    draw_idx = draw_index
+    draw_idx = draw_index,
+    rep_idx = rep_index
   )
 
   # Create PathData object
