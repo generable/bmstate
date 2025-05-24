@@ -190,7 +190,7 @@ Evaluate log baseline hazard
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{t}}{Output time points. Not used if \code{SBF_precomp} is given.}
+\item{\code{t}}{Output time points. Not used if \code{SBF} is given.}
 
 \item{\code{log_w0}}{Intercept (log_scale).}
 
@@ -233,19 +233,21 @@ knots
 \subsection{Method \code{log_inst_hazard()}}{
 Evaluate log instant hazard
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$log_inst_hazard(t, w, log_w0, log_m)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$log_inst_hazard(t, w, log_w0, log_m, SBF = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{t}}{Time point(s)}
+\item{\code{t}}{Time point(s). Not used if \code{SBF} is given.}
 
 \item{\code{w}}{Spline basis function weights (vector)}
 
 \item{\code{log_w0}}{Intercept (log)}
 
 \item{\code{log_m}}{Hazard multiplier (log)}
+
+\item{\code{SBF}}{Precomputed basisfunction matrix at \code{t}.}
 }
 \if{html}{\out{</div>}}
 }
