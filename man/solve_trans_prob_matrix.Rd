@@ -25,8 +25,6 @@ solve_trans_prob_matrix(
 \item{t_init}{Initial time}
 
 \item{t_end}{End time}
-
-\item{init_state}{Index of initial state}
 }
 \value{
 A matrix \code{P} where \code{P[i,j]} is the probability that

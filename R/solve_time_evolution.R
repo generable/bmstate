@@ -37,7 +37,6 @@ solve_time_evolution <- function(system, t, log_w0, w = NULL, log_m = NULL) {
 #'
 #' @export
 #' @param system A \code{\link{MultistateSystem}}
-#' @param init_state Index of initial state
 #' @param log_w0 A vector of length \code{n_trans}
 #' @param t_init Initial time
 #' @param t_end End time

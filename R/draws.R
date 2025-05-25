@@ -64,6 +64,8 @@ get_inst_hazard_param_draws <- function(fit) {
   list(
     log_m = log_m_reshaped,
     log_w0 = log_w0_rep,
-    w = w_rep
+    w = w_rep,
+    subject_index = rep(seq_len(N), times = S),
+    draw_index = rep(seq_len(S), each = N)
   )
 }
