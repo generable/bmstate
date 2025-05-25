@@ -11,16 +11,17 @@ solve_time_evolution <- function(system, t, log_w0, w = NULL, log_m = NULL) {
   S <- system$num_states()
   H <- system$num_trans()
   W <- system$num_weights()
-  checkmate::assert_numeric(t, min.len = 1)
-  checkmate::assert_matrix(w, ncols = W, nrows = H)
-  checkmate::assert_numeric(log_w0, len = H)
-  checkmate::assert_numeric(log_m, len = H)
   if (is.null(w)) {
     w <- matrix(0, H, W)
   }
   if (is.null(log_m)) {
     log_m <- rep(0, H)
   }
+  checkmate::assert_numeric(t, min.len = 1)
+  checkmate::assert_matrix(w, ncols = W, nrows = H)
+  checkmate::assert_numeric(log_w0, len = H)
+  checkmate::assert_numeric(log_m, len = H)
+
   odefun <- function(time, y, parms) {
     P <- matrix(y, S, S)
     Lambda <- system$intensity_matrix(time, log_w0, w, log_m)
@@ -64,7 +65,7 @@ solve_trans_prob_matrix <- function(system, log_w0, w = NULL,
   }
   t <- c(t_init, t_end)
   kfe <- solve_time_evolution(system, t, log_w0, w, log_m)
-  P <- matrix(kfe[2, 2:(H + 1)], S, S)
+  P <- matrix(kfe[2, 2:ncol(kfe)], S, S)
   cn <- system$tm()$states
   colnames(P) <- cn
   rownames(P) <- cn
