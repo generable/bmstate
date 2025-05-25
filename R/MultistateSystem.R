@@ -281,9 +281,41 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
     #' @param w Spline basis function weights (vector)
     #' @param log_w0 Intercept (log)
     #' @param log_m Hazard multiplier (log)
-    #' @param SBF Precomputed basisfunction matrix at \code{t}.
+    #' @param SBF Pre-computed basis function matrix at \code{t}.
     log_inst_hazard = function(t, w, log_w0, log_m, SBF = NULL) {
       log_m + self$log_baseline_hazard(t, log_w0, w, SBF)
+    },
+
+    #' @description Evaluate transition intensity matrix at time t
+    #'
+    #' @param t A number (time point)
+    #' @param w An array of shape \code{n_trans} x \code{n_weights}
+    #' @param log_w0 A vector of length \code{n_trans}
+    #' @param log_m A vector of length \code{n_trans}
+    #' @return a matrix with shape \code{n_states} x \code{n_states}
+    intensity_matrix = function(t, w, log_w0, log_m) {
+      if (self$has_self_loops()) {
+        stop("System is not a standard continuous-time Markov multistate model")
+      }
+      tm <- self$tm()
+      mat <- tm$as_transition_index_matrix()
+      H <- self$num_trans()
+      S <- self$num_states()
+      ti <- which(mat > 0)
+      for (idx in seq_len(H)) {
+        log_h <- self$log_inst_hazard(t, w[idx, ], log_w0[idx], log_m[idx])
+        mat[ti[idx]] <- exp(log_h)
+      }
+      for (s in seq_len(S)) {
+        mat[s, s] <- -sum(mat[s, ])
+      }
+      mat
+    },
+
+    #' @description Does the system have self loops?
+    #' @return Boolean value
+    has_self_loops = function() {
+      sum(diag(self$tm()$matrix)) > 0
     },
 
     #' @description Max instant hazard on interval (t1, t2)

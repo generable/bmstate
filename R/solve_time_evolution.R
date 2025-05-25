@@ -8,12 +8,56 @@
 #' @param log_m A vector of length \code{n_trans}
 solve_time_evolution <- function(system, t, w, log_w0, log_m) {
   checkmate::assert_class(system, "MultistateSystem")
-  S <- sys$num_trans()
-  W <- sys$num_weights()
+  S <- system$num_states()
+  H <- system$num_trans()
+  W <- system$num_weights()
   checkmate::assert_numeric(t, min.len = 1)
-  checkmate::assert_matrix(w, ncols = S, nrows = W)
-  checkmate::assert_numeric(log_w0, len = S)
-  checkmate::assert_numeric(log_m, len = S)
-  H <- system$log_inst_hazard(t, w, log_w0, log_m)
-  H
+  checkmate::assert_matrix(w, ncols = W, nrows = H)
+  checkmate::assert_numeric(log_w0, len = H)
+  checkmate::assert_numeric(log_m, len = H)
+  odefun <- function(time, y, parms) {
+    P <- matrix(y, S, S)
+    Lambda <- system$intensity_matrix(time, w, log_w0, log_m)
+    dydt <- as.vector(P %*% Lambda)
+    list(dydt)
+  }
+  P0 <- diag(1, S, S)
+  y0 <- as.vector(P0)
+  deSolve::ode(y0, t, odefun)
+}
+
+#' Solve the transition probability matrix
+#'
+#' @export
+#' @param system A \code{\link{MultistateSystem}}
+#' @param init_state Index of initial state
+#' @param log_w0 A vector of length \code{n_trans}
+#' @param t_init Initial time
+#' @param t_end End time
+#' @param w An array of shape \code{n_trans} x \code{n_weights}
+#' @param log_m A vector of length \code{n_trans}
+#' @return A matrix \code{P} where \code{P[i,j]} is the probability that
+#' the system will be in state \code{j} at time \code{t_end} given that it
+#' is in state \code{i} at time \code{t_init}
+solve_trans_prob_matrix <- function(system, t_end, log_w0, w = NULL,
+                                    log_m = NULL, t_init = 0) {
+  checkmate::assert_class(system, "MultistateSystem")
+  checkmate::assert_number(t_init, lower = 0)
+  checkmate::assert_number(t_end, lower = t_init)
+  H <- system$num_trans()
+  W <- system$num_weights()
+  S <- system$num_states()
+  if (is.null(w)) {
+    w <- matrix(0, H, W)
+  }
+  if (is.null(log_m)) {
+    log_m <- rep(0, H)
+  }
+  t <- c(t_init, t_end)
+  kfe <- solve_time_evolution(system, t, w, log_w0, log_m)
+  P <- matrix(kfe[2, 2:(H+1)], S, S)
+  cn <- system$tm()$states
+  colnames(P) <- cn
+  rownames(P) <- cn
+  P
 }

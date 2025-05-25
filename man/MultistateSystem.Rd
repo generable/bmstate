@@ -25,6 +25,8 @@ A multistate system with proportional spline hazards
 \item \href{#method-MultistateSystem-log_baseline_hazard}{\code{MultistateSystem$log_baseline_hazard()}}
 \item \href{#method-MultistateSystem-basisfun_matrix}{\code{MultistateSystem$basisfun_matrix()}}
 \item \href{#method-MultistateSystem-log_inst_hazard}{\code{MultistateSystem$log_inst_hazard()}}
+\item \href{#method-MultistateSystem-intensity_matrix}{\code{MultistateSystem$intensity_matrix()}}
+\item \href{#method-MultistateSystem-has_self_loops}{\code{MultistateSystem$has_self_loops()}}
 \item \href{#method-MultistateSystem-max_inst_hazard}{\code{MultistateSystem$max_inst_hazard()}}
 \item \href{#method-MultistateSystem-simulate}{\code{MultistateSystem$simulate()}}
 \item \href{#method-MultistateSystem-clone}{\code{MultistateSystem$clone()}}
@@ -247,9 +249,48 @@ Evaluate log instant hazard
 
 \item{\code{log_m}}{Hazard multiplier (log)}
 
-\item{\code{SBF}}{Precomputed basisfunction matrix at \code{t}.}
+\item{\code{SBF}}{Pre-computed basis function matrix at \code{t}.}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateSystem-intensity_matrix"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateSystem-intensity_matrix}{}}}
+\subsection{Method \code{intensity_matrix()}}{
+Evaluate transition intensity matrix at time t
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$intensity_matrix(t, w, log_w0, log_m)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{t}}{A number (time point)}
+
+\item{\code{w}}{An array of shape \code{n_trans} x \code{n_weights}}
+
+\item{\code{log_w0}}{A vector of length \code{n_trans}}
+
+\item{\code{log_m}}{A vector of length \code{n_trans}}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+a matrix with shape \code{n_states} x \code{n_states}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateSystem-has_self_loops"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateSystem-has_self_loops}{}}}
+\subsection{Method \code{has_self_loops()}}{
+Does the system have self loops?
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$has_self_loops()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Boolean value
 }
 }
 \if{html}{\out{<hr>}}

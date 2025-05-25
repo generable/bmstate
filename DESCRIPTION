@@ -24,6 +24,7 @@ Imports:
     brio,
     checkmate,
     cmdstanr,
+    deSolve,
     diagram,
     dplyr,
     forcats,
