@@ -143,17 +143,10 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
   )
 )
 
-msmsf_log_m_per_subject <- function(fit) {
-  log_m <- fit$draws_of("log_C_haz")
-  idx_sub <- fit$stan_data$idx_sub
-  N_sub <- fit$stan_data$N_sub
-  first_indices <- sapply(seq_len(N_sub), function(x) which(idx_sub == x)[1])
-  log_m[, first_indices, , drop = FALSE]
-}
-
 #' Path generation for 'MultistateModelStanFit'
 #'
 #' @export
+#' @param fit A \code{\link{MultistateModelStanFit}} object
 #' @param init_state Index of starting state
 #' @param t_max Max time (start time is always 0). If \code{NULL}, the max
 #' time of the model is used.
@@ -167,18 +160,10 @@ generate_paths <- function(fit, init_state = 1, t_max = NULL, n_rep = 10) {
   sys <- fit$model$system
   S <- fit$num_draws()
   N <- fit$stan_data$N_sub
-  w <- fit$draws_of("weights")
-  log_w0 <- fit$draws_of("log_w0")
-  w_rep <- abind::abind(replicate(N, w, simplify = FALSE), along = 1)
-  log_w0_rep <- abind::abind(replicate(N, log_w0, simplify = FALSE), along = 1)
-  log_m <- msmsf_log_m_per_subject(fit)
-  H <- dim(log_m)[3]
-  log_m_reshaped <- matrix(aperm(log_m, c(1, 2, 3)), nrow = N * S, ncol = H)
+  d <- get_inst_hazard_param_draws(fit)
 
   # Generate path df
-  path_df <- sys$simulate(
-    w_rep, log_w0_rep, log_m_reshaped, init_state, t_max, n_rep
-  )
+  path_df <- sys$simulate(d$w, d$log_w0, d$log_m, init_state, t_max, n_rep)
 
   # Create indices for link
   subject_index <- rep(rep(seq_len(N), times = S), times = n_rep)

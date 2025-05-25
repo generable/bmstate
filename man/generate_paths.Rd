@@ -7,6 +7,8 @@
 generate_paths(fit, init_state = 1, t_max = NULL, n_rep = 10)
 }
 \arguments{
+\item{fit}{A \code{\link{MultistateModelStanFit}} object}
+
 \item{init_state}{Index of starting state}
 
 \item{t_max}{Max time (start time is always 0). If \code{NULL}, the max
