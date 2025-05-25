@@ -293,7 +293,7 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
     #' @param log_w0 A vector of length \code{n_trans}
     #' @param log_m A vector of length \code{n_trans}
     #' @return a matrix with shape \code{n_states} x \code{n_states}
-    intensity_matrix = function(t, w, log_w0, log_m) {
+    intensity_matrix = function(t, log_w0, w = NULL, log_m = NULL) {
       if (self$has_self_loops()) {
         stop("System is not a standard continuous-time Markov multistate model")
       }
@@ -301,6 +301,13 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
       mat <- tm$as_transition_index_matrix()
       H <- self$num_trans()
       S <- self$num_states()
+      if (is.null(w)) {
+        W <- self$num_weights()
+        w <- matrix(0, H, W)
+      }
+      if (is.null(log_m)) {
+        log_m <- rep(0, H)
+      }
       ti <- which(mat > 0)
       for (idx in seq_len(H)) {
         log_h <- self$log_inst_hazard(t, w[idx, ], log_w0[idx], log_m[idx])

@@ -6,17 +6,15 @@
 \usage{
 solve_trans_prob_matrix(
   system,
-  t_end,
   log_w0,
   w = NULL,
   log_m = NULL,
-  t_init = 0
+  t_init = 0,
+  t_end = NULL
 )
 }
 \arguments{
 \item{system}{A \code{\link{MultistateSystem}}}
-
-\item{t_end}{End time}
 
 \item{log_w0}{A vector of length \code{n_trans}}
 
@@ -25,6 +23,8 @@ solve_trans_prob_matrix(
 \item{log_m}{A vector of length \code{n_trans}}
 
 \item{t_init}{Initial time}
+
+\item{t_end}{End time}
 
 \item{init_state}{Index of initial state}
 }

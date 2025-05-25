@@ -4,16 +4,16 @@
 \alias{solve_time_evolution}
 \title{Solve the Kolmogorov forward equation of a Markovian multistate system}
 \usage{
-solve_time_evolution(system, t, w, log_w0, log_m)
+solve_time_evolution(system, t, log_w0, w = NULL, log_m = NULL)
 }
 \arguments{
 \item{system}{A \code{\link{MultistateSystem}}}
 
 \item{t}{A time grid}
 
-\item{w}{An array of shape \code{n_trans} x \code{n_weights}}
-
 \item{log_w0}{A vector of length \code{n_trans}}
+
+\item{w}{An array of shape \code{n_trans} x \code{n_weights}}
 
 \item{log_m}{A vector of length \code{n_trans}}
 }

@@ -64,6 +64,6 @@ test_that("fitting with Stan works (multi-transition)", {
   expect_equal(pe$n[1], 0)
 
   # Solve
-  te <- mod$system$get_tmax()
-  P <- solve_trans_prob_matrix(mod$system, te, c(-5, -6, -7))
+  P <- solve_trans_prob_matrix(mod$system, c(-5, -6, -7))
+  checkmate::assert_matrix(P, ncols = 3, nrows = 3)
 })

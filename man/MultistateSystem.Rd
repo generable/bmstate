@@ -260,7 +260,7 @@ Evaluate log instant hazard
 \subsection{Method \code{intensity_matrix()}}{
 Evaluate transition intensity matrix at time t
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$intensity_matrix(t, w, log_w0, log_m)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$intensity_matrix(t, log_w0, w = NULL, log_m = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -268,9 +268,9 @@ Evaluate transition intensity matrix at time t
 \describe{
 \item{\code{t}}{A number (time point)}
 
-\item{\code{w}}{An array of shape \code{n_trans} x \code{n_weights}}
-
 \item{\code{log_w0}}{A vector of length \code{n_trans}}
+
+\item{\code{w}}{An array of shape \code{n_trans} x \code{n_weights}}
 
 \item{\code{log_m}}{A vector of length \code{n_trans}}
 }
