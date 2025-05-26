@@ -7,9 +7,6 @@ options <- list(
 )
 
 test_that("entire workflow works", {
-  NP <- options$iter_sampling
-  NR <- 2
-
   # Setup
   h0_base <- 1e-3
   setup <- example_sim_setup_illnessdeath()
@@ -28,7 +25,6 @@ test_that("entire workflow works", {
   msf <- jd$train$paths$fit_mstate()
   expect_true(inherits(msf, "msfit"))
 
-
   # Fit the model
   fit <- fit_stan(mod, jd$train,
     iter_warmup = options$iter_warmup,
@@ -44,9 +40,6 @@ test_that("entire workflow works", {
 
 
 test_that("entire workflow works (with PK)", {
-  NP <- options$iter_sampling
-  NR <- 2
-
   # Setup
   h0_base <- 1e-3
 
@@ -71,6 +64,8 @@ test_that("entire workflow works (with PK)", {
   expect_true(inherits(fit, "MultistateModelStanFit"))
 
   # Path prediction
+  p <- generate_paths(fit)
+  P <- solve_trans_prob_fit(fit)
 
   # Paths from 0 to 3 years starting from Randomization
 
