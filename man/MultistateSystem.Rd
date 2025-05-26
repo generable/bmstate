@@ -25,6 +25,8 @@ A multistate system with proportional spline hazards
 \item \href{#method-MultistateSystem-log_baseline_hazard}{\code{MultistateSystem$log_baseline_hazard()}}
 \item \href{#method-MultistateSystem-basisfun_matrix}{\code{MultistateSystem$basisfun_matrix()}}
 \item \href{#method-MultistateSystem-log_inst_hazard}{\code{MultistateSystem$log_inst_hazard()}}
+\item \href{#method-MultistateSystem-intensity_matrix}{\code{MultistateSystem$intensity_matrix()}}
+\item \href{#method-MultistateSystem-has_self_loops}{\code{MultistateSystem$has_self_loops()}}
 \item \href{#method-MultistateSystem-max_inst_hazard}{\code{MultistateSystem$max_inst_hazard()}}
 \item \href{#method-MultistateSystem-simulate}{\code{MultistateSystem$simulate()}}
 \item \href{#method-MultistateSystem-clone}{\code{MultistateSystem$clone()}}
@@ -190,7 +192,7 @@ Evaluate log baseline hazard
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{t}}{Output time points. Not used if \code{SBF_precomp} is given.}
+\item{\code{t}}{Output time points. Not used if \code{SBF} is given.}
 
 \item{\code{log_w0}}{Intercept (log_scale).}
 
@@ -233,21 +235,62 @@ knots
 \subsection{Method \code{log_inst_hazard()}}{
 Evaluate log instant hazard
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$log_inst_hazard(t, w, log_w0, log_m)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$log_inst_hazard(t, w, log_w0, log_m, SBF = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{t}}{Time point(s)}
+\item{\code{t}}{Time point(s). Not used if \code{SBF} is given.}
 
 \item{\code{w}}{Spline basis function weights (vector)}
 
 \item{\code{log_w0}}{Intercept (log)}
 
 \item{\code{log_m}}{Hazard multiplier (log)}
+
+\item{\code{SBF}}{Pre-computed basis function matrix at \code{t}.}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateSystem-intensity_matrix"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateSystem-intensity_matrix}{}}}
+\subsection{Method \code{intensity_matrix()}}{
+Evaluate transition intensity matrix at time t
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$intensity_matrix(t, log_w0, w = NULL, log_m = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{t}}{A number (time point)}
+
+\item{\code{log_w0}}{A vector of length \code{n_trans}}
+
+\item{\code{w}}{An array of shape \code{n_trans} x \code{n_weights}}
+
+\item{\code{log_m}}{A vector of length \code{n_trans}}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+a matrix with shape \code{n_states} x \code{n_states}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateSystem-has_self_loops"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateSystem-has_self_loops}{}}}
+\subsection{Method \code{has_self_loops()}}{
+Does the system have self loops?
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$has_self_loops()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Boolean value
 }
 }
 \if{html}{\out{<hr>}}
@@ -281,27 +324,36 @@ Generate paths}
 \if{latex}{\out{\hypertarget{method-MultistateSystem-simulate}{}}}
 \subsection{Method \code{simulate()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$simulate(w, log_w0, log_m, init_state = 1, t_max = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$simulate(
+  w,
+  log_w0,
+  log_m,
+  init_state = 1,
+  t_max = NULL,
+  n_rep = 1
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{w}}{An array of shape \code{n_paths} x \code{n_trans} x
+\item{\code{w}}{An array of shape \code{n_draws} x \code{n_trans} x
 \code{n_weights}}
 
-\item{\code{log_w0}}{An array of shape \code{n_paths} x \code{n_trans}}
+\item{\code{log_w0}}{An array of shape \code{n_draws} x \code{n_trans}}
 
-\item{\code{log_m}}{An array of shape \code{n_paths} x \code{n_trans}}
+\item{\code{log_m}}{An array of shape \code{n_draws} x \code{n_trans}}
 
 \item{\code{init_state}}{Integer index of starting state.}
 
 \item{\code{t_max}}{Max time. If not given, \code{self$get_tmax()} is used.}
+
+\item{\code{n_rep}}{Number of repetitions.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-a data frame
+A data frame with \code{n_draws} x \code{n_rep} paths.
 }
 }
 \if{html}{\out{<hr>}}

@@ -245,7 +245,7 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
 
     #' @description Evaluate log baseline hazard
     #'
-    #' @param t Output time points. Not used if \code{SBF_precomp} is given.
+    #' @param t Output time points. Not used if \code{SBF} is given.
     #' @param log_w0 Intercept (log_scale).
     #' @param w Spline weights (log scale). If \code{NULL}, will be set to
     #' a vector of zeros, meaning that the log hazard is constant at
@@ -277,12 +277,52 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
 
     #' @description Evaluate log instant hazard
     #'
-    #' @param t Time point(s)
+    #' @param t Time point(s). Not used if \code{SBF} is given.
     #' @param w Spline basis function weights (vector)
     #' @param log_w0 Intercept (log)
     #' @param log_m Hazard multiplier (log)
-    log_inst_hazard = function(t, w, log_w0, log_m) {
-      log_m + self$log_baseline_hazard(t, log_w0, w)
+    #' @param SBF Pre-computed basis function matrix at \code{t}.
+    log_inst_hazard = function(t, w, log_w0, log_m, SBF = NULL) {
+      log_m + self$log_baseline_hazard(t, log_w0, w, SBF)
+    },
+
+    #' @description Evaluate transition intensity matrix at time t
+    #'
+    #' @param t A number (time point)
+    #' @param w An array of shape \code{n_trans} x \code{n_weights}
+    #' @param log_w0 A vector of length \code{n_trans}
+    #' @param log_m A vector of length \code{n_trans}
+    #' @return a matrix with shape \code{n_states} x \code{n_states}
+    intensity_matrix = function(t, log_w0, w = NULL, log_m = NULL) {
+      if (self$has_self_loops()) {
+        stop("System is not a standard continuous-time Markov multistate model")
+      }
+      tm <- self$tm()
+      mat <- tm$as_transition_index_matrix()
+      H <- self$num_trans()
+      S <- self$num_states()
+      if (is.null(w)) {
+        W <- self$num_weights()
+        w <- matrix(0, H, W)
+      }
+      if (is.null(log_m)) {
+        log_m <- rep(0, H)
+      }
+      ti <- which(mat > 0)
+      for (idx in seq_len(H)) {
+        log_h <- self$log_inst_hazard(t, w[idx, ], log_w0[idx], log_m[idx])
+        mat[ti[idx]] <- exp(log_h)
+      }
+      for (s in seq_len(S)) {
+        mat[s, s] <- -sum(mat[s, ])
+      }
+      mat
+    },
+
+    #' @description Does the system have self loops?
+    #' @return Boolean value
+    has_self_loops = function() {
+      sum(diag(self$tm()$matrix)) > 0
     },
 
     #' @description Max instant hazard on interval (t1, t2)
@@ -300,21 +340,24 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
 
     #' Generate paths
     #'
-    #' @param w An array of shape \code{n_paths} x \code{n_trans} x
+    #' @param w An array of shape \code{n_draws} x \code{n_trans} x
     #' \code{n_weights}
-    #' @param log_w0 An array of shape \code{n_paths} x \code{n_trans}
-    #' @param log_m An array of shape \code{n_paths} x \code{n_trans}
+    #' @param log_w0 An array of shape \code{n_draws} x \code{n_trans}
+    #' @param log_m An array of shape \code{n_draws} x \code{n_trans}
     #' @param init_state Integer index of starting state.
     #' @param t_max Max time. If not given, \code{self$get_tmax()} is used.
-    #' @return a data frame
-    simulate = function(w, log_w0, log_m, init_state = 1, t_max = NULL) {
+    #' @param n_rep Number of repetitions.
+    #' @return A data frame with \code{n_draws} x \code{n_rep} paths.
+    simulate = function(w, log_w0, log_m, init_state = 1, t_max = NULL, n_rep = 1) {
       checkmate::assert_array(w, d = 3)
-      n_paths <- dim(w)[1]
+      n_draws <- dim(w)[1]
       checkmate::assert_true(dim(w)[3] == self$num_weights())
-      checkmate::assert_matrix(log_w0, nrows = n_paths)
-      checkmate::assert_matrix(log_m, nrows = n_paths)
+      checkmate::assert_matrix(log_w0, nrows = n_draws)
+      checkmate::assert_matrix(log_m, nrows = n_draws)
       S <- self$num_states()
       checkmate::assert_integerish(init_state, len = 1, lower = 1, upper = S)
+      checkmate::assert_integerish(n_rep, len = 1, lower = 1)
+      n_paths <- n_draws * n_rep
       pb <- progress::progress_bar$new(total = n_paths)
 
       # Set max time
@@ -324,15 +367,19 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
       }
       checkmate::assert_number(t_max, lower = 0)
 
-      # Could be done in parallel and some things be precomputed
+      # Should not be done in parallel as such because can mess order in link df
+      cnt <- 0
       message("Generating ", n_paths, " paths")
-      for (j in seq_len(n_paths)) {
-        pb$tick()
-        p <- private$generate_path(
-          w[j, , ], log_w0[j, ], log_m[j, ], t_max, init_state
-        )
-        p <- cbind(p, rep(j, nrow(p)))
-        out <- rbind(out, p)
+      for (k in seq_len(n_rep)) {
+        for (j in seq_len(n_draws)) {
+          cnt <- cnt + 1
+          pb$tick()
+          p <- private$generate_path(
+            w[j, , ], log_w0[j, ], log_m[j, ], t_max, init_state
+          )
+          p <- cbind(p, rep(cnt, nrow(p)))
+          out <- rbind(out, p)
+        }
       }
       df <- data.frame(out)
       colnames(df)[ncol(df)] <- "path_id"

@@ -4,13 +4,17 @@
 \alias{generate_paths}
 \title{Path generation for 'MultistateModelStanFit'}
 \usage{
-generate_paths(fit, init_state = 1, t_max = NULL)
+generate_paths(fit, init_state = 1, t_max = NULL, n_rep = 10)
 }
 \arguments{
+\item{fit}{A \code{\link{MultistateModelStanFit}} object}
+
 \item{init_state}{Index of starting state}
 
 \item{t_max}{Max time (start time is always 0). If \code{NULL}, the max
 time of the model is used.}
+
+\item{n_rep}{Number of repeats per draw.}
 }
 \value{
 A \code{\link{PathData}} object.

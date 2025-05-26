@@ -122,8 +122,7 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
       abs[self$absorbing_states(names = FALSE)] <- TRUE
       src[self$source_states(names = FALSE)] <- TRUE
       data.frame(
-        state_idx = idx, state = self$states, terminal0 = abs,
-        source = src
+        state_idx = idx, state = self$states, terminal = abs, source = src
       )
     },
 

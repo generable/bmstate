@@ -7,7 +7,6 @@ check_columns <- function(df, needed_columns) {
   }
 }
 
-
 #' Path data class (R6 class)
 #'
 #' @export
@@ -468,4 +467,30 @@ potential_covariates <- function(pd, possible = NULL, ...) {
     ))
   }
   df
+}
+
+#' Compute probability of each event before given time
+#'
+#' @export
+#' @param pd A \code{\link{PathData}} object.
+#' @param t The given time.
+p_event <- function(pd, t = NULL) {
+  checkmate::assert_class(pd, "PathData")
+  S <- pd$transmat$num_states()
+  if (is.null(t)) {
+    t <- max(pd$get_path_df()$time)
+  }
+  checkmate::assert_numeric(t, lower = 0)
+  c <- pd$as_data_frame() |>
+    dplyr::group_by(.data$state) |>
+    dplyr::filter(is_event == 1, .data$time <= t) |>
+    dplyr::distinct(path_id) |>
+    dplyr::count()
+  df <- data.frame(state = seq_len(S)) |> dplyr::left_join(c, by = "state")
+  df$n[which(is.na(df$n))] <- 0
+  df$prob <- df$n / pd$n_paths()
+  df$state_idx <- df$state
+  df$state <- NULL
+  sdf <- pd$transmat$states_df()
+  df |> dplyr::left_join(sdf, by = "state_idx")
 }
