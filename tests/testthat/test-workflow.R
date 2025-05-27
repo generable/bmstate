@@ -35,6 +35,11 @@ test_that("entire workflow works", {
     init = 0.1
   )
   expect_true(inherits(fit, "MultistateModelStanFit"))
+
+  # Path generation
+  p <- generate_paths(fit, n_rep = 3)
+  pe <- p_event(p)
+  pe_by <- p_event(p, by = "sex")
 })
 
 

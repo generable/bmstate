@@ -474,17 +474,27 @@ potential_covariates <- function(pd, possible = NULL, ...) {
 #' @export
 #' @param pd A \code{\link{PathData}} object.
 #' @param t The given time.
-p_event <- function(pd, t = NULL) {
+#' @param by Factor to summarize over.
+#' @return A data frame
+p_event <- function(pd, t = NULL, by = NULL) {
   checkmate::assert_class(pd, "PathData")
   S <- pd$transmat$num_states()
   if (is.null(t)) {
     t <- max(pd$get_path_df()$time)
   }
   checkmate::assert_numeric(t, lower = 0)
-  c <- pd$as_data_frame() |>
-    dplyr::group_by(.data$state) |>
-    dplyr::filter(is_event == 1, .data$time <= t) |>
-    dplyr::distinct(path_id) |>
+
+  if (!is.null(by)) {
+    checkmate::assert_character(by, len = 1)
+    c <- pd$as_data_frame(covariates = by) |>
+      dplyr::group_by(.data$state, .data[[by]])
+  } else {
+    c <- pd$as_data_frame() |>
+      dplyr::group_by(.data$state)
+  }
+  c <- c |>
+    dplyr::filter(.data$is_event == 1, .data$time <= t) |>
+    dplyr::distinct(.data$path_id) |>
     dplyr::count()
   df <- data.frame(state = seq_len(S)) |> dplyr::left_join(c, by = "state")
   df$n[which(is.na(df$n))] <- 0
