@@ -79,7 +79,7 @@ example_sim_setup_illnessdeath <- function(beta_dose = -0.5, beta_age = 0.5) {
   bh_true[2, 3] <- beta_age
   bh_true[1, 2] <- beta_dose
   list(
-    model = create_msm(tm, covariates, categ_covs = c("sex", "dose_amt")),
+    model = create_msm(tm, covariates, categ_covs = c("sex")),
     beta_haz = bh_true
   )
 }

@@ -263,9 +263,13 @@ MultistateModel <- R6::R6Class("MultistateModel",
       df <- data.frame(A)
       colnames(df) <- covs
       df$subject_id <- sim_subject_ids(N_subject)
+      n_groups <- length(doses)
+      doses_vec <- doses[sample.int(n_groups, N_subject, replace = TRUE)]
       if (self$has_pk()) {
-        n_groups <- length(doses)
-        df$dose <- doses[sample.int(n_groups, N_subject, replace = TRUE)]
+        df$dose <- doses_vec
+      }
+      if ("dose_amt" %in% covs) {
+        df$dose_amt <- doses_vec
       }
       as_tibble(df)
     },

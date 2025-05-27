@@ -39,7 +39,11 @@ test_that("entire workflow works", {
   # Path generation
   p <- generate_paths(fit, n_rep = 3)
   pe <- p_event(p)
-  pe_by <- p_event(p, by = "sex")
+  pe_bysex <- p_event(p, by = "sex")
+  pe_bydose <- p_event(p, by = "dose_amt")
+  expect_equal(nrow(pe), 3)
+  expect_equal(nrow(pe_bysex), 5)
+  expect_equal(nrow(pe_bydose), 7)
 })
 
 
