@@ -193,7 +193,7 @@ msmsf_pk_params <- function(fit, data = NULL) {
     theta <- NULL
     if (sd$do_pk == 1) {
       theta <- compute_theta_pk(
-        mat2list(log_z[s, 1, , ]),
+        mat2list(t(log_z[s, 1, , ])),
         log_mu[s, 1, ],
         log_sig[s, 1, ],
         beta_ka[s, 1, ],
