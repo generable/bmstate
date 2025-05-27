@@ -148,19 +148,39 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
   )
 )
 
-#' Compute hazard multipliers
+#' Compute log_hazard multipliers
 #'
 #' @export
 #' @param fit A \code{\link{MultistateModelStanFit}} object
 #' @param data A \code{\link{JointData}} object. If \code{NULL}, the
 #' data used to fit the model is used.
-hazard_multipliers <- function(fit, data = NULL) {
+log_hazard_multipliers <- function(fit, data = NULL) {
+  # Check
+  checkmate::assert_class(fit, "MultistateModelStanFit")
   if (is.null(data)) {
-    stan_data <- fit$get_data()
+    sd <- fit$get_data()
   } else {
-    stan_data <- create_stan_data(fit$model, data)
+    sd <- create_stan_data(fit$model, data)
   }
-  stan_data
+  ensure_exposed_stan_functions()
+
+  # Get draws
+  beta_oth <- fit$get_draws_of("beta_oth")
+
+  # Call exposed Stan function
+  S <- fit$num_draws()
+  out <- list()
+  for (s in seq_len(S)) {
+    out[[s]] <- compute_log_hazard_multiplier(
+      sd$N_int,
+      beta_oth[s, , ],
+      beta_auc[s, ],
+      sd$x_haz,
+      x_auc[s],
+      sd$ttype
+    )
+  }
+  out
 }
 
 #' Path generation for 'MultistateModelStanFit'
