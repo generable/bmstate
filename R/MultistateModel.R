@@ -34,6 +34,8 @@ MultistateModel <- R6::R6Class("MultistateModel",
   private = list(
     hazard_covariates = NULL,
     categorical = NULL,
+    normalizer_locations = NULL,
+    normalizer_scales = NULL,
     simulate_log_hazard_multipliers = function(df_subjects, beta) {
       ts <- self$target_states()
       x <- self$covs()
@@ -65,6 +67,27 @@ MultistateModel <- R6::R6Class("MultistateModel",
   public = list(
     system = NULL,
     pk_model = NULL,
+
+    #' @description Get normalization constant for each variable
+    #' @return list
+    get_normalizers = function() {
+      list(
+        locations = private$normalizer_locations,
+        scales = private$normalizer_scales
+      )
+    },
+
+    #' Set normalization constant for each variable (side effect)
+    #'
+    #' @param data A \code{\link{JointData}} object
+    set_normalizers = function(data) {
+      checkmate::assert_class(data, "JointData")
+      df_sub <- data$paths$subject_df
+      num_cols <- which(sapply(df_sub, is.numeric))
+      private$normalizer_locations <- lapply(df_sub[, num_cols], mean)
+      private$normalizer_scales <- lapply(df_sub[, num_cols], stats::sd)
+      NULL
+    },
 
     #' @description
     #' Create model

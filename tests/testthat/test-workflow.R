@@ -26,14 +26,16 @@ test_that("entire workflow works", {
   expect_true(inherits(msf, "msfit"))
 
   # Fit the model
-  fit <- fit_stan(mod, jd$train,
+  a <- fit_stan(mod, jd$train,
     iter_warmup = options$iter_warmup,
     iter_sampling = options$iter_sampling,
     chains = options$chains,
     refresh = 5,
     adapt_delta = 0.95,
-    init = 0.1
+    init = 0.1,
+    return_stanfit = TRUE
   )
+  fit <- a$fit
   expect_true(inherits(fit, "MultistateModelStanFit"))
 
   # Path generation
@@ -46,7 +48,7 @@ test_that("entire workflow works", {
   expect_equal(nrow(pe_bydose), 7)
 
   # Baseline hazard viz
-  plot_h0 <- fit$plot_h0()
+  plot_h0 <- fit$plot_h0() # should be at h0_base level
   expect_s3_class(plot_h0, "ggplot")
 })
 

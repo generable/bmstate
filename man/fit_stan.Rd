@@ -4,7 +4,14 @@
 \alias{fit_stan}
 \title{Fit a model using 'Stan'}
 \usage{
-fit_stan(model, data, prior_only = FALSE, delta_grid = 1, ...)
+fit_stan(
+  model,
+  data,
+  prior_only = FALSE,
+  delta_grid = 1,
+  return_stanfit = FALSE,
+  ...
+)
 }
 \arguments{
 \item{model}{A \code{\link{MultistateModel}} object.}
@@ -16,6 +23,8 @@ fit_stan(model, data, prior_only = FALSE, delta_grid = 1, ...)
 \item{delta_grid}{Time discretization delta for numerically integrating
 hazards.}
 
+\item{return_stanfit}{Return also the raw 'Stan' fit object?}
+
 \item{...}{Arguments passed to \code{sample} method of the
 'CmdStanR' model.}
 }
@@ -23,5 +32,5 @@ hazards.}
 A \code{\link{MultistateModelStanFit}} object.
 }
 \description{
-Fit a model using 'Stan'
+**NOTE:** This function has a side effect of setting normalizers.
 }

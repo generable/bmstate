@@ -20,6 +20,8 @@ Main model class
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
+\item \href{#method-MultistateModel-get_normalizers}{\code{MultistateModel$get_normalizers()}}
+\item \href{#method-MultistateModel-set_normalizers}{\code{MultistateModel$set_normalizers()}}
 \item \href{#method-MultistateModel-new}{\code{MultistateModel$new()}}
 \item \href{#method-MultistateModel-set_knots}{\code{MultistateModel$set_knots()}}
 \item \href{#method-MultistateModel-get_states}{\code{MultistateModel$get_states()}}
@@ -34,6 +36,36 @@ Main model class
 \item \href{#method-MultistateModel-simulate_subjects}{\code{MultistateModel$simulate_subjects()}}
 \item \href{#method-MultistateModel-target_states}{\code{MultistateModel$target_states()}}
 \item \href{#method-MultistateModel-clone}{\code{MultistateModel$clone()}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-get_normalizers"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-get_normalizers}{}}}
+\subsection{Method \code{get_normalizers()}}{
+Get normalization constant for each variable
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$get_normalizers()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+list
+Set normalization constant for each variable (side effect)
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-set_normalizers"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-set_normalizers}{}}}
+\subsection{Method \code{set_normalizers()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$set_normalizers(data)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{data}}{A \code{\link{JointData}} object}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}

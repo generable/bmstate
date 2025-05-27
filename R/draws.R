@@ -12,8 +12,8 @@ msmsf_log_baseline_hazard <- function(fit, t = NULL) {
   }
   checkmate::assert_numeric(t, min.len = 2)
   SBF <- sys$basisfun_matrix(t)
-  w <- fit$draws_of("weights") # dim = c(S, H, W)
-  log_w0 <- fit$draws_of("log_w0") # dim = c(S, H)
+  w <- fit$get_draws_of("weights") # dim = c(S, H, W)
+  log_w0 <- fit$get_draws_of("log_w0") # dim = c(S, H)
   S <- fit$num_draws()
   N <- length(t)
   H <- sys$num_trans()

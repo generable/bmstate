@@ -1,51 +1,73 @@
-#' The Fit class
+# Helper
+create_rv_list <- function(stan_fit, names) {
+  out <- list()
+  j <- 0
+  names_out <- NULL
+  for (name in names) {
+    tryCatch(
+      {
+        rv <- rv(stan_fit, name)
+        j <- j + 1
+        out[[j]] <- rv
+        names_out <- c(names_out, name)
+      },
+      error = function(e) {
+      }
+    )
+  }
+  names(out) <- names_out
+  out
+}
+
+#' Minimal fit class
 #'
 #' @export
-#' @field stan_fit The 'Stan' fit object
-#' @field stan_data Full 'Stan' data list
-#' @field data A \code{\link{JointData}} object
-#' @field model A \code{\link{MultistateModel}} object
+#' @field model The \code{\link{MultistateModel}}
 MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
+  private = list(
+    draws = NULL,
+    stan_data = NULL
+  ),
   public = list(
-    stan_fit = NULL,
-    stan_data = NULL,
-    data = NULL,
     model = NULL,
 
     #' @description
     #' Create model fit object
     #'
-    #' @param stan_fit The 'Stan' fit object
-    #' @param stan_data Full 'Stan' data list
-    #' @param data A \code{\link{JointData}} object
-    #' @param model A \code{\link{MultistateModel}} object
-    initialize = function(model, data, stan_fit, stan_data) {
-      checkmate::assert_class(data, "JointData")
+    #' @param stan_fit A 'Stan' fit object
+    #' @param stan_data The used 'Stan' data list.
+    #' @param model A \code{\link{MultistateModel}}
+    initialize = function(stan_fit, stan_data, model) {
       checkmate::assert_class(model, "MultistateModel")
+      pars <- c(
+        "weights", "log_w0", "beta_ka", "beta_V2", "beta_CL",
+        "beta_oth",
+        "sigma_pk", "log_z_pk", "log_mu_pk", "log_sig_pk", "lp__"
+      )
       self$model <- model
-      self$data <- data
-      self$stan_fit <- stan_fit
-      self$stan_data <- stan_data
+      private$draws <- create_rv_list(stan_fit, pars)
+      private$stan_data <- stan_data
+    },
+
+    #' @description Extract data list
+    #'
+    get_data = function() {
+      private$stan_data
     },
 
     #' @description Extract draws as \code{rvar}s
     #'
     #' @param name Param/quantity name
-    draws = function(name = NULL) {
-      d <- self$stan_fit$draws(name)
-      d <- posterior::as_draws_rvars(d)
-      if (is.null(name)) {
-        return(d)
-      }
-      d[[name]]
+    get_draws = function(name = NULL) {
+      private$draws[[name]]
     },
 
     #' Draws in a raw array with same shape as Stan variable
     #'
     #' @param name Param/quantity name of \code{x}
     #' @return Array with dimension \code{c(ndraws(x), dim(x))}
-    draws_of = function(name) {
-      posterior::draws_of(self$draws(name), with_chains = FALSE)
+    get_draws_of = function(name) {
+      posterior::draws_of(self$get_draws(name), with_chains = FALSE)
     },
 
     #' Print the object
@@ -60,7 +82,7 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
 
     #' @description Plot used basis functions (grid)
     plot_basisfun = function() {
-      sd <- self$stan_data
+      sd <- self$get_data()
       t <- rep(sd$t_grid, sd$N_sbf)
       y <- as.vector(sd$SBF_grid)
       idx <- as.factor(rep(1:sd$N_sbf, each = sd$N_grid))
@@ -122,7 +144,7 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
 
     #' @description Get number of draws
     num_draws = function() {
-      posterior::ndraws(self$draws("lp__"))
+      posterior::ndraws(self$get_draws("lp__"))
     },
 
     #' @description Generate quantities using the fit.

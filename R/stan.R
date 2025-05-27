@@ -31,21 +31,29 @@ ensure_exposed_stan_functions <- function() {
 
 #' Fit a model using 'Stan'
 #'
+#' @description
+#' **NOTE:** This function has a side effect of setting normalizers.
+#'
 #' @param model A \code{\link{MultistateModel}} object.
 #' @param data A \code{\link{JointData}} object of observed paths and dosing.
 #' @param prior_only Sample from prior only?
 #' @param delta_grid Time discretization delta for numerically integrating
 #' hazards.
+#' @param return_stanfit Return also the raw 'Stan' fit object?
 #' @param ... Arguments passed to \code{sample} method of the
 #' 'CmdStanR' model.
 #' @return A \code{\link{MultistateModelStanFit}} object.
 fit_stan <- function(model, data, prior_only = FALSE,
-                     delta_grid = 1, ...) {
+                     delta_grid = 1, return_stanfit = FALSE, ...) {
   checkmate::assert_class(model, "MultistateModel")
   checkmate::assert_class(data, "JointData")
+  checkmate::assert_logical(return_stanfit, len = 1)
 
   # Get Stan model object
   stan_model <- create_stan_model()
+
+  # Set normalizing locations and scales (side effect)
+  model$set_normalizers(data)
 
   # Create Stan input list
   sd <- create_stan_data(model, data, prior_only)
@@ -54,7 +62,14 @@ fit_stan <- function(model, data, prior_only = FALSE,
   stan_fit <- stan_model$sample(data = sd, ...)
 
   # Return
-  MultistateModelStanFit$new(model, data, stan_fit, sd)
+  fit <- MultistateModelStanFit$new(stan_fit, sd, model)
+  if (!return_stanfit) {
+    return(fit)
+  }
+  list(
+    fit = fit,
+    stanfit = stan_fit
+  )
 }
 
 
@@ -250,22 +265,22 @@ standata_scaled_covariates <- function(pd, model, name) {
   sub_df <- pd$subject_df
   x <- list()
   nc <- length(covs)
-  x_loc <- rep(0, nc)
-  x_scale <- rep(0, nc)
   j <- 0
+  norms <- model$get_normalizers()
   for (cn in covs) {
     j <- j + 1
     xx <- sub_df[[cn]]
-    x_loc[j] <- mean(xx)
-    x_scale[j] <- stats::sd(xx)
-    x[[j]] <- (xx - x_loc[j]) / x_scale[j]
+    xj_loc <- norms$locations[[cn]]
+    xj_scale <- norms$scales[[cn]]
+    if (is.null(xj_loc) || is.null(xj_scale)) {
+      stop("no normalizers set for ", cn)
+    }
+    x[[j]] <- (xx - xj_loc) / xj_scale
   }
 
   # Return
   out <- list(
     x = sapply(x, function(x) x),
-    x_loc = x_loc,
-    x_scale = x_scale,
     nc = nc
   )
   names(out) <- paste0(names(out), "_", name)
