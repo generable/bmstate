@@ -79,7 +79,7 @@ example_sim_setup_illnessdeath <- function(beta_dose = -0.5, beta_age = 0.5) {
   bh_true[2, 3] <- beta_age
   bh_true[1, 2] <- beta_dose
   list(
-    model = create_msm(tm, covariates),
+    model = create_msm(tm, covariates, categ_covs = c("sex", "dose_amt")),
     beta_haz = bh_true
   )
 }
@@ -89,7 +89,7 @@ example_sim_setup_illnessdeath <- function(beta_dose = -0.5, beta_age = 0.5) {
 #' @export
 #' @param dat A \code{\link{JointData}} object
 #' @param p_test Proportion of test subjects
-#' @return a list with test and train \code{\link{JointData}} objects
+#' @return A list with test and train \code{\link{JointData}} objects
 split_data <- function(dat, p_test = 0.25) {
   checkmate::assert_class(dat, "JointData")
   checkmate::assert_number(p_test, lower = 0, upper = 1)

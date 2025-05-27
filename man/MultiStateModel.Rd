@@ -27,6 +27,7 @@ Main model class
 \item \href{#method-MultistateModel-print}{\code{MultistateModel$print()}}
 \item \href{#method-MultistateModel-covs}{\code{MultistateModel$covs()}}
 \item \href{#method-MultistateModel-data_covs}{\code{MultistateModel$data_covs()}}
+\item \href{#method-MultistateModel-categ_covs}{\code{MultistateModel$categ_covs()}}
 \item \href{#method-MultistateModel-simulate_data}{\code{MultistateModel$simulate_data()}}
 \item \href{#method-MultistateModel-simulate_pk_data}{\code{MultistateModel$simulate_pk_data()}}
 \item \href{#method-MultistateModel-simulate_events}{\code{MultistateModel$simulate_events()}}
@@ -46,7 +47,8 @@ Create model
   covariates = NULL,
   pk_model = NULL,
   tmax = 1000,
-  num_knots = 5
+  num_knots = 5,
+  categorical = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -64,6 +66,8 @@ exposure estimated from PK model). Do not use reserved names
 \item{\code{tmax}}{Max time.}
 
 \item{\code{num_knots}}{Total number of spline knots.}
+
+\item{\code{categorical}}{Names of categorical covariates.}
 }
 \if{html}{\out{</div>}}
 }
@@ -127,7 +131,7 @@ nothing
 \if{latex}{\out{\hypertarget{method-MultistateModel-covs}{}}}
 \subsection{Method \code{covs()}}{
 Get the hazard covariates (including steady-state exposure
-if PK model is included).
+if PK model is included)
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModel$covs()}\if{html}{\out{</div>}}
 }
@@ -137,9 +141,19 @@ if PK model is included).
 \if{html}{\out{<a id="method-MultistateModel-data_covs"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateModel-data_covs}{}}}
 \subsection{Method \code{data_covs()}}{
-Get all covariates that need to be given as data.
+Get all covariates that need to be given as data
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModel$data_covs()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-categ_covs"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-categ_covs}{}}}
+\subsection{Method \code{categ_covs()}}{
+Get names of categorical covariates
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$categ_covs()}\if{html}{\out{</div>}}
 }
 
 }
@@ -147,7 +161,7 @@ Get all covariates that need to be given as data.
 \if{html}{\out{<a id="method-MultistateModel-simulate_data"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateModel-simulate_data}{}}}
 \subsection{Method \code{simulate_data()}}{
-Simulate data using the multistate model.
+Simulate data using the multistate model
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate_data(
   N_subject = 100,
@@ -182,7 +196,7 @@ A \code{\link{JointData}} object.
 \if{html}{\out{<a id="method-MultistateModel-simulate_pk_data"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateModel-simulate_pk_data}{}}}
 \subsection{Method \code{simulate_pk_data()}}{
-Simulate PK data.
+Simulate PK data
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate_pk_data(df_subjects, beta_pk = NULL)}\if{html}{\out{</div>}}
 }
@@ -204,7 +218,7 @@ a \code{data.frame} object
 \if{html}{\out{<a id="method-MultistateModel-simulate_events"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateModel-simulate_events}{}}}
 \subsection{Method \code{simulate_events()}}{
-Simulate events data.
+Simulate events data
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate_events(df_subjects, beta_haz, log_w0, w_scale = 0.1)}\if{html}{\out{</div>}}
 }
@@ -231,7 +245,7 @@ a \code{tibble}
 \if{html}{\out{<a id="method-MultistateModel-simulate_subjects"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateModel-simulate_subjects}{}}}
 \subsection{Method \code{simulate_subjects()}}{
-Simulate subject data.
+Simulate subject data
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate_subjects(N_subject = 100, doses = c(15, 30, 60))}\if{html}{\out{</div>}}
 }
@@ -246,7 +260,7 @@ Simulate subject data.
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-a \code{tibble}
+A \code{tibble}
 Get indices of states that are not source states
 }
 }

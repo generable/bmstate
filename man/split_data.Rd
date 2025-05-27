@@ -12,7 +12,7 @@ split_data(dat, p_test = 0.25)
 \item{p_test}{Proportion of test subjects}
 }
 \value{
-a list with test and train \code{\link{JointData}} objects
+A list with test and train \code{\link{JointData}} objects
 }
 \description{
 Train-test split
