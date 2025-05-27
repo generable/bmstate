@@ -38,6 +38,10 @@ test_that("entire workflow works", {
   fit <- a$fit
   expect_true(inherits(fit, "MultistateModelStanFit"))
 
+  # Computing hazard multipliers
+  log_m <- hazard_multipliers(fit)
+  log_m_test <- hazard_multipliers(fit, data = jd$test)
+
   # Path generation
   p <- generate_paths(fit, n_rep = 3)
   pe <- p_event(p)

@@ -28,7 +28,6 @@ Minimal fit class
 \item \href{#method-MultistateModelStanFit-h0_dist}{\code{MultistateModelStanFit$h0_dist()}}
 \item \href{#method-MultistateModelStanFit-log_z_pars}{\code{MultistateModelStanFit$log_z_pars()}}
 \item \href{#method-MultistateModelStanFit-num_draws}{\code{MultistateModelStanFit$num_draws()}}
-\item \href{#method-MultistateModelStanFit-gq}{\code{MultistateModelStanFit$gq()}}
 \item \href{#method-MultistateModelStanFit-clone}{\code{MultistateModelStanFit$clone()}}
 }
 }
@@ -180,27 +179,6 @@ Get number of draws
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModelStanFit$num_draws()}\if{html}{\out{</div>}}
 }
 
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModelStanFit-gq"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModelStanFit-gq}{}}}
-\subsection{Method \code{gq()}}{
-Generate quantities using the fit.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModelStanFit$gq(stan_data = NULL, fitted_params = NULL, ...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{stan_data}}{Full 'Stan' input list.}
-
-\item{\code{fitted_params}}{Argument to \code{generate_quantities()}.}
-
-\item{\code{...}}{Other arguments to \code{generate_quantities()}.}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateModelStanFit-clone"></a>}}

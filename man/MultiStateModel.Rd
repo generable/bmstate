@@ -14,6 +14,9 @@ Main model class
 \item{\code{system}}{A \code{\link{MultistateSystem}}}
 
 \item{\code{pk_model}}{A \code{\link{PKModel}} or NULL}
+
+\item{\code{delta_grid}}{Time discretization delta for numerically integrating
+hazards.}
 }
 \if{html}{\out{</div>}}
 }

@@ -40,8 +40,7 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
     initialize = function(stan_fit, stan_data, model) {
       checkmate::assert_class(model, "MultistateModel")
       pars <- c(
-        "weights", "log_w0", "beta_ka", "beta_V2", "beta_CL",
-        "beta_oth",
+        "weights", "log_w0", "beta_ka", "beta_V2", "beta_CL", "beta_oth",
         "sigma_pk", "log_z_pk", "log_mu_pk", "log_sig_pk", "lp__"
       )
       self$model <- model
@@ -145,26 +144,24 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
     #' @description Get number of draws
     num_draws = function() {
       posterior::ndraws(self$get_draws("lp__"))
-    },
-
-    #' @description Generate quantities using the fit.
-    #'
-    #' @param stan_data Full 'Stan' input list.
-    #' @param fitted_params Argument to \code{generate_quantities()}.
-    #' @param ... Other arguments to \code{generate_quantities()}.
-    gq = function(stan_data = NULL, fitted_params = NULL, ...) {
-      if (is.null(fitted_params)) {
-        fitted_params <- self$get_stan_fit()
-      }
-      if (inherits(fitted_params, "draws_rvars")) {
-        fitted_params <- posterior::as_draws_array(fitted_params)
-      }
-
-      # Call 'Stan'
-      stop("Not implemented")
     }
   )
 )
+
+#' Compute hazard multipliers
+#'
+#' @export
+#' @param fit A \code{\link{MultistateModelStanFit}} object
+#' @param data A \code{\link{JointData}} object. If \code{NULL}, the
+#' data used to fit the model is used.
+hazard_multipliers <- function(fit, data = NULL) {
+  if (is.null(data)) {
+    stan_data <- fit$get_data()
+  } else {
+    stan_data <- create_stan_data(fit$model, data)
+  }
+  stan_data
+}
 
 #' Path generation for 'MultistateModelStanFit'
 #'

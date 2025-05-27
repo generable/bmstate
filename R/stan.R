@@ -37,14 +37,12 @@ ensure_exposed_stan_functions <- function() {
 #' @param model A \code{\link{MultistateModel}} object.
 #' @param data A \code{\link{JointData}} object of observed paths and dosing.
 #' @param prior_only Sample from prior only?
-#' @param delta_grid Time discretization delta for numerically integrating
-#' hazards.
 #' @param return_stanfit Return also the raw 'Stan' fit object?
 #' @param ... Arguments passed to \code{sample} method of the
 #' 'CmdStanR' model.
 #' @return A \code{\link{MultistateModelStanFit}} object.
 fit_stan <- function(model, data, prior_only = FALSE,
-                     delta_grid = 1, return_stanfit = FALSE, ...) {
+                     return_stanfit = FALSE, ...) {
   checkmate::assert_class(model, "MultistateModel")
   checkmate::assert_class(data, "JointData")
   checkmate::assert_logical(return_stanfit, len = 1)
@@ -78,11 +76,9 @@ fit_stan <- function(model, data, prior_only = FALSE,
 #' @export
 #' @inheritParams fit_stan
 #' @return A list of data for Stan.
-create_stan_data <- function(model, data, prior_only = FALSE,
-                             delta_grid = 1) {
+create_stan_data <- function(model, data, prior_only = FALSE) {
   checkmate::assert_class(model, "MultistateModel")
   checkmate::assert_class(data, "JointData")
-  checkmate::assert_number(delta_grid, lower = 0)
   pd <- data$paths
   tm <- pd$transmat
   check_equal_transmats(tm, model$system$tm())
@@ -92,7 +88,7 @@ create_stan_data <- function(model, data, prior_only = FALSE,
   stan_dat <- c(
     create_stan_data_idx_sub(pd),
     create_stan_data_transitions(pd),
-    create_stan_data_spline(pd, model, delta_grid),
+    create_stan_data_spline(pd, model, model$delta_grid),
     create_stan_data_covariates(pd, model),
     create_stan_data_trans_types(pd),
     create_stan_data_pk(data, model)

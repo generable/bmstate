@@ -28,6 +28,8 @@ create_msm <- function(tm, hazard_covs = NULL, pk_covs = NULL, categ_covs = NULL
 #' @export
 #' @field system A \code{\link{MultistateSystem}}
 #' @field pk_model A \code{\link{PKModel}} or NULL
+#' @field delta_grid Time discretization delta for numerically integrating
+#' hazards.
 MultistateModel <- R6::R6Class("MultistateModel",
 
   # PRIVATE
@@ -67,6 +69,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
   public = list(
     system = NULL,
     pk_model = NULL,
+    delta_grid = 1,
 
     #' @description Get normalization constant for each variable
     #' @return list
