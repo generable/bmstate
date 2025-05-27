@@ -87,9 +87,10 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
         geom_ribbon(alpha = 0.7) +
         geom_line() +
         facet_wrap(. ~ .data$trans_char) +
-        ylab("Log baseline hazard") +
+        ylab("Baseline hazard") +
         theme(legend.position = "none") +
-        labs(caption = capt)
+        labs(caption = capt) +
+        scale_y_log10()
     },
 
     #' Baseline hazard distribution
@@ -104,9 +105,9 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
       df |>
         dplyr::group_by(.data$time, .data$trans_idx) |>
         dplyr::summarize(
-          median = stats::median(.data$log_h0),
-          upper = stats::quantile(.data$log_h0, UB),
-          lower = stats::quantile(.data$log_h0, LB)
+          median = stats::median(exp(.data$log_h0)),
+          upper = stats::quantile(exp(.data$log_h0), UB),
+          lower = stats::quantile(exp(.data$log_h0), LB)
         ) |>
         dplyr::ungroup()
     },

@@ -44,6 +44,10 @@ test_that("entire workflow works", {
   expect_equal(nrow(pe), 3)
   expect_equal(nrow(pe_bysex), 5)
   expect_equal(nrow(pe_bydose), 7)
+
+  # Baseline hazard viz
+  plot_h0 <- fit$plot_h0()
+  expect_s3_class(plot_h0, "ggplot")
 })
 
 
