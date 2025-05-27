@@ -41,6 +41,7 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
       checkmate::assert_class(model, "MultistateModel")
       pars <- c(
         "weights", "log_w0", "beta_ka", "beta_V2", "beta_CL", "beta_oth",
+        "beta_auc",
         "sigma_pk", "log_z_pk", "log_mu_pk", "log_sig_pk", "lp__"
       )
       self$model <- model
@@ -176,18 +177,20 @@ msmsf_pk_params <- function(fit, data = NULL) {
   oos_mode <- is.null(data)
   sd <- msmsf_stan_data(fit, data)
   S <- fit$num_draws()
+
+  # Extract
   log_mu <- fit$get_draws_of("log_mu_pk")
   log_sig <- fit$get_draws_of("log_sig_pk")
   if (oos_mode) {
     log_z <- fit$get_draws_of("log_z_pk")
   } else {
-    log_z <- array(0, dim = c(S, 1, sd$N_sub, sd$N_trans))
+    log_z <- array(0, dim = c(S, 1, sd$N_sub, 3))
   }
   beta_ka <- fit$get_draws_of("beta_ka")
   beta_CL <- fit$get_draws_of("beta_CL")
   beta_V2 <- fit$get_draws_of("beta_V2")
 
-  # Call exposed Stan function
+  # Call exposed Stan function for each draw (not optimal)
   out <- list()
   for (s in seq_len(S)) {
     theta <- NULL
@@ -211,26 +214,23 @@ msmsf_pk_params <- function(fit, data = NULL) {
 
 #' Compute exposure
 #'
-#' @inheritParams msmsf_log_hazard_multipliers
+#' @export
+#' @inheritParams msmsf_pk_params
 msmsf_exposure <- function(fit, data = NULL) {
-  # Check
-
-
   # Get draws
-  beta_oth <- fit$get_draws_of("beta_oth")
+  sd <- msmsf_stan_data(fit, data)
+  pkpar <- msmsf_pk_params(fit, data)
 
   # Call exposed Stan function
   S <- fit$num_draws()
   out <- list()
   for (s in seq_len(S)) {
-    out[[s]] <- compute_log_hazard_multiplier(
-      sd$N_int,
-      beta_oth[s, , ],
-      beta_auc[s, ],
-      sd$x_haz,
-      x_auc[s],
-      sd$ttype
-    )
+    if (sd$do_pk == 1) {
+      x_auc <- sd$dose_ss / pkpar[[s]][, 2] # D/CL
+    } else {
+      x_auc <- NULL
+    }
+    out[[s]] <- x_auc
   }
   out
 }
@@ -238,18 +238,16 @@ msmsf_exposure <- function(fit, data = NULL) {
 
 #' Compute log_hazard multipliers
 #'
+#' @export
+#' @inheritParams msmsf_pk_params
 msmsf_log_hazard_multipliers <- function(fit, data = NULL) {
-  # Check
-  checkmate::assert_class(fit, "MultistateModelStanFit")
-  if (is.null(data)) {
-    sd <- fit$get_data()
-  } else {
-    sd <- create_stan_data(fit$model, data)
-  }
-  ensure_exposed_stan_functions()
-
   # Get draws
+  sd <- msmsf_stan_data(fit, data)
+  auc <- msmsf_exposure(fit, data)
   beta_oth <- fit$get_draws_of("beta_oth")
+  if (sd$do_pk == 1) {
+    beta_auc <- fit$get_draws_of("beta_auc")
+  }
 
   # Call exposed Stan function
   S <- fit$num_draws()

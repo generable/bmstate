@@ -6,6 +6,13 @@
 \usage{
 msmsf_exposure(fit, data = NULL)
 }
+\arguments{
+\item{fit}{A \code{\link{MultistateModelStanFit}} object}
+
+\item{data}{A \code{\link{JointData}} object. If \code{NULL}, the
+data used to fit the model is used. If not \code{NULL}, out-of-sample
+mode is assumed (new subjects).}
+}
 \description{
 Compute exposure
 }
