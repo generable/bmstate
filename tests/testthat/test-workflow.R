@@ -39,8 +39,8 @@ test_that("entire workflow works", {
   expect_true(inherits(fit, "MultistateModelStanFit"))
 
   # Computing hazard multipliers
-  log_m <- log_hazard_multipliers(fit)
-  log_m_test <- log_hazard_multipliers(fit, data = jd$test)
+  log_m <- msmsf_log_hazard_multipliers(fit)
+  log_m_test <- msmsf_log_hazard_multipliers(fit, data = jd$test)
 
   # Path generation
   p <- generate_paths(fit, n_rep = 3)
@@ -79,8 +79,13 @@ test_that("entire workflow works (with PK)", {
     adapt_delta = 0.95,
     init = 0.1
   )
-
   expect_true(inherits(fit, "MultistateModelStanFit"))
+
+  # Pk params
+  pkpar <- msmsf_pk_params(fit)
+  pkpar_oos <- msmsf_pk_params(fit, jd$test)
+  expect_true(length(pkpar) == 30)
+  expect_true(length(pkpar_oos) == 30)
 
   # Path prediction
   p <- generate_paths(fit)

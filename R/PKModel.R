@@ -186,16 +186,3 @@ PKModel <- R6::R6Class("PKModel",
     }
   )
 )
-
-#' Compute PK params
-#'
-#' @param mu mean parameter values
-#' @param beta values of covariate multipliers
-#' @param x values of (normalized) covariates
-compute_theta_pk <- function(mu, beta, x) {
-  theta <- list()
-  theta$ka <- exp(log(mu$ka) + sum(beta$ka * x$ka))
-  theta$CL <- exp(log(mu$CL) + sum(beta$CL * x$CL))
-  theta$V2 <- exp(log(mu$V2) + sum(beta$V2 * x$V2))
-  theta
-}

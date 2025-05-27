@@ -148,13 +148,97 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
   )
 )
 
-#' Compute log_hazard multipliers
-#'
+# Helper
+msmsf_stan_data <- function(fit, data = NULL) {
+  checkmate::assert_class(fit, "MultistateModelStanFit")
+  if (is.null(data)) {
+    sd <- fit$get_data()
+  } else {
+    sd <- create_stan_data(fit$model, data)
+  }
+  ensure_exposed_stan_functions()
+  sd
+}
+
+mat2list <- function(mat) {
+  lapply(seq_len(ncol(mat)), function(j) mat[, j])
+}
+
+
+#' Evaluate PK parameters
 #' @export
 #' @param fit A \code{\link{MultistateModelStanFit}} object
 #' @param data A \code{\link{JointData}} object. If \code{NULL}, the
-#' data used to fit the model is used.
-log_hazard_multipliers <- function(fit, data = NULL) {
+#' data used to fit the model is used. If not \code{NULL}, out-of-sample
+#' mode is assumed (new subjects).
+#' @return A list with length equal to number of draws.
+msmsf_pk_params <- function(fit, data = NULL) {
+  oos_mode <- is.null(data)
+  sd <- msmsf_stan_data(fit, data)
+  S <- fit$num_draws()
+  log_mu <- fit$get_draws_of("log_mu_pk")
+  log_sig <- fit$get_draws_of("log_sig_pk")
+  if (oos_mode) {
+    log_z <- fit$get_draws_of("log_z_pk")
+  } else {
+    log_z <- array(0, dim = c(S, 1, sd$N_sub, sd$N_trans))
+  }
+  beta_ka <- fit$get_draws_of("beta_ka")
+  beta_CL <- fit$get_draws_of("beta_CL")
+  beta_V2 <- fit$get_draws_of("beta_V2")
+
+  # Call exposed Stan function
+  out <- list()
+  for (s in seq_len(S)) {
+    theta <- NULL
+    if (sd$do_pk == 1) {
+      theta <- compute_theta_pk(
+        mat2list(log_z[s, 1, , ]),
+        log_mu[s, 1, ],
+        log_sig[s, 1, ],
+        beta_ka[s, 1, ],
+        beta_CL[s, 1, ],
+        beta_V2[s, 1, ],
+        mat2list(t(sd$x_ka)),
+        mat2list(t(sd$x_CL)),
+        mat2list(t(sd$x_V2))
+      )
+    }
+    out[[s]] <- theta
+  }
+  out
+}
+
+#' Compute exposure
+#'
+#' @inheritParams msmsf_log_hazard_multipliers
+msmsf_exposure <- function(fit, data = NULL) {
+  # Check
+
+
+  # Get draws
+  beta_oth <- fit$get_draws_of("beta_oth")
+
+  # Call exposed Stan function
+  S <- fit$num_draws()
+  out <- list()
+  for (s in seq_len(S)) {
+    out[[s]] <- compute_log_hazard_multiplier(
+      sd$N_int,
+      beta_oth[s, , ],
+      beta_auc[s, ],
+      sd$x_haz,
+      x_auc[s],
+      sd$ttype
+    )
+  }
+  out
+}
+
+
+#' Compute log_hazard multipliers
+#'
+msmsf_log_hazard_multipliers <- function(fit, data = NULL) {
   # Check
   checkmate::assert_class(fit, "MultistateModelStanFit")
   if (is.null(data)) {
@@ -182,6 +266,7 @@ log_hazard_multipliers <- function(fit, data = NULL) {
   }
   out
 }
+
 
 #' Path generation for 'MultistateModelStanFit'
 #'
