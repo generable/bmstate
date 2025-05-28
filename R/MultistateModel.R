@@ -3,19 +3,24 @@
 #' @export
 #' @param tm A \code{\link{TransitionMatrix}}.
 #' @param hazard_covs Covariates that affect the hazard. A character vector.
+#' @param categ_covs Names of covariates that are categorical or binary.
 #' @param pk_covs Covariates that affect the PK parameters. A list with
 #' elements \code{ka} \code{CL}, and \code{V2}. If \code{NULL}, a PK model
 #' will not be created.
 #' @param ... Arguments passed to \code{\link{MultistateModel}} init
 #' @return A \code{\link{MultistateModel}} object.
-create_msm <- function(tm, hazard_covs = NULL, pk_covs = NULL, ...) {
+create_msm <- function(tm, hazard_covs = NULL, pk_covs = NULL, categ_covs = NULL,
+                       ...) {
   mss <- MultistateSystem$new(tm)
   if (!is.null(pk_covs)) {
     pk <- PKModel$new(pk_covs)
   } else {
     pk <- NULL
   }
-  MultistateModel$new(mss, hazard_covs, pk, ...)
+  MultistateModel$new(mss, hazard_covs, pk,
+    categorica = categ_covs,
+    ...
+  )
 }
 
 #' Main model class
@@ -23,11 +28,16 @@ create_msm <- function(tm, hazard_covs = NULL, pk_covs = NULL, ...) {
 #' @export
 #' @field system A \code{\link{MultistateSystem}}
 #' @field pk_model A \code{\link{PKModel}} or NULL
+#' @field delta_grid Time discretization delta for numerically integrating
+#' hazards.
 MultistateModel <- R6::R6Class("MultistateModel",
 
   # PRIVATE
   private = list(
     hazard_covariates = NULL,
+    categorical = NULL,
+    normalizer_locations = NULL,
+    normalizer_scales = NULL,
     simulate_log_hazard_multipliers = function(df_subjects, beta) {
       ts <- self$target_states()
       x <- self$covs()
@@ -39,6 +49,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       out <- matrix(0, N, S)
       tf <- self$system$tm()$trans_df()
       X <- df_subjects |> dplyr::select(tidyselect::all_of(x))
+      X_norm <- normalize_columns(as.matrix(X))
       for (s in seq_len(S)) {
         target_state <- tf$state[s]
         idx_in_beta <- which(ts == target_state)
@@ -47,7 +58,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
         }
         beta_s <- beta[idx_in_beta, ]
         for (n in seq_len(N)) {
-          out[n, s] <- sum(as.numeric(X[n, ]) * beta_s)
+          out[n, s] <- sum(as.numeric(X_norm[n, ]) * beta_s)
         }
       }
       out
@@ -58,6 +69,28 @@ MultistateModel <- R6::R6Class("MultistateModel",
   public = list(
     system = NULL,
     pk_model = NULL,
+    delta_grid = 1,
+
+    #' @description Get normalization constant for each variable
+    #' @return list
+    get_normalizers = function() {
+      list(
+        locations = private$normalizer_locations,
+        scales = private$normalizer_scales
+      )
+    },
+
+    #' Set normalization constant for each variable (side effect)
+    #'
+    #' @param data A \code{\link{JointData}} object
+    set_normalizers = function(data) {
+      checkmate::assert_class(data, "JointData")
+      df_sub <- data$paths$subject_df
+      num_cols <- which(sapply(df_sub, is.numeric))
+      private$normalizer_locations <- lapply(df_sub[, num_cols], mean)
+      private$normalizer_scales <- lapply(df_sub[, num_cols], stats::sd)
+      NULL
+    },
 
     #' @description
     #' Create model
@@ -69,9 +102,11 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' @param pk_model A \code{\link{PKModel}} or NULL.
     #' @param tmax Max time.
     #' @param num_knots Total number of spline knots.
+    #' @param categorical Names of categorical covariates.
     initialize = function(system, covariates = NULL, pk_model = NULL,
-                          tmax = 1000, num_knots = 5) {
+                          tmax = 1000, num_knots = 5, categorical = NULL) {
       checkmate::assert_character(covariates, null.ok = TRUE)
+      checkmate::assert_character(categorical, null.ok = TRUE)
       checkmate::assert_true(!("ss_auc" %in% covariates)) # special name
       checkmate::assert_true(!("dose" %in% covariates)) # special name
       checkmate::assert_class(system, "MultistateSystem")
@@ -79,6 +114,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
         checkmate::assert_class(pk_model, "PKModel")
       }
       private$hazard_covariates <- covariates
+      private$categorical <- categorical
       self$pk_model <- pk_model
       self$system <- system
       checkmate::assert_number(tmax, lower = 0)
@@ -126,7 +162,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
     },
 
     #' @description Get the hazard covariates (including steady-state exposure
-    #' if PK model is included).
+    #' if PK model is included)
     covs = function() {
       x <- private$hazard_covariates
       if (self$has_pk()) {
@@ -135,7 +171,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       unique(x)
     },
 
-    #' @description Get all covariates that need to be given as data.
+    #' @description Get all covariates that need to be given as data
     data_covs = function() {
       x <- private$hazard_covariates
       if (self$has_pk()) {
@@ -144,7 +180,12 @@ MultistateModel <- R6::R6Class("MultistateModel",
       unique(x)
     },
 
-    #' @description Simulate data using the multistate model.
+    #' @description Get names of categorical covariates
+    categ_covs = function() {
+      unique(private$categorical)
+    },
+
+    #' @description Simulate data using the multistate model
     #'
     #' @param N_subject Number of subjects.
     #' @param beta_haz Covariate effects on each transition type.
@@ -188,7 +229,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       JointData$new(pd, pksim$dosing)
     },
 
-    #' @description Simulate PK data.
+    #' @description Simulate PK data
     #'
     #' @param df_subjects The subjects data frame
     #' @param beta_pk TODO
@@ -202,7 +243,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       pk_dat
     },
 
-    #' @description Simulate events data.
+    #' @description Simulate events data
     #'
     #' @param df_subjects The subjects data frame
     #' @param beta_haz Matrix of shape \code{num_target_states} x \code{num_covs}
@@ -224,22 +265,37 @@ MultistateModel <- R6::R6Class("MultistateModel",
       as_tibble(paths)
     },
 
-    #' @description Simulate subject data.
+    #' @description Simulate subject data
     #'
     #' @param N_subject Number of subjects.
     #' @param doses Possible doses. Only has effect if a PK submodel exists.
-    #' @return a \code{tibble}
+    #' @return A \code{tibble}
     simulate_subjects = function(N_subject = 100, doses = c(15, 30, 60)) {
       checkmate::assert_numeric(doses, min.len = 1, lower = 0)
+
+      # Generate covariates
       covs <- self$data_covs()
+      categ <- self$categ_covs()
+      idx_cat <- which(covs %in% categ)
       N_covs <- length(covs)
-      A <- matrix(rnorm(N_subject * N_covs), N_subject, N_covs)
+      A <- 100 + 30 * matrix(rnorm(N_subject * N_covs), N_subject, N_covs)
+
+      # Discretize covariates
+      for (idx in idx_cat) {
+        A[, idx] <- as.numeric(A[, idx] > mean(A[, idx]))
+      }
+
+      # Create data frame
       df <- data.frame(A)
       colnames(df) <- covs
       df$subject_id <- sim_subject_ids(N_subject)
+      n_groups <- length(doses)
+      doses_vec <- doses[sample.int(n_groups, N_subject, replace = TRUE)]
       if (self$has_pk()) {
-        n_groups <- length(doses)
-        df$dose <- doses[sample.int(n_groups, N_subject, replace = TRUE)]
+        df$dose <- doses_vec
+      }
+      if ("dose_amt" %in% covs) {
+        df$dose_amt <- doses_vec
       }
       as_tibble(df)
     },
@@ -259,4 +315,14 @@ place_internal_knots <- function(t_max, num_knots, t_event) {
   h <- 1 / (num_knots + 1)
   knots <- stats::quantile(t_event, probs = seq(0, 1, h))
   knots[2:(length(knots) - 1)]
+}
+
+# Normalize columns of matrix A
+normalize_columns <- function(A) {
+  K <- ncol(A)
+  for (j in seq_len(K)) {
+    a <- A[, j]
+    A[, j] <- (a - mean(a)) / stats::sd(a)
+  }
+  A
 }

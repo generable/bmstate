@@ -2,22 +2,18 @@
 % Please edit documentation in R/MultistateModelStanFit.R
 \name{MultistateModelStanFit}
 \alias{MultistateModelStanFit}
-\title{The Fit class}
+\title{Minimal fit class}
 \description{
-The Fit class
+Minimal fit class
 
-The Fit class
+Minimal fit class
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{stan_fit}}{The 'Stan' fit object}
+\item{\code{model}}{The \code{\link{MultistateModel}}}
 
-\item{\code{stan_data}}{Full 'Stan' data list}
-
-\item{\code{data}}{A \code{\link{JointData}} object}
-
-\item{\code{model}}{A \code{\link{MultistateModel}} object}
+\item{\code{data}}{A  \code{\link{JointData}} object}
 }
 \if{html}{\out{</div>}}
 }
@@ -25,15 +21,15 @@ The Fit class
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-MultistateModelStanFit-new}{\code{MultistateModelStanFit$new()}}
-\item \href{#method-MultistateModelStanFit-draws}{\code{MultistateModelStanFit$draws()}}
-\item \href{#method-MultistateModelStanFit-draws_of}{\code{MultistateModelStanFit$draws_of()}}
+\item \href{#method-MultistateModelStanFit-get_data}{\code{MultistateModelStanFit$get_data()}}
+\item \href{#method-MultistateModelStanFit-get_draws}{\code{MultistateModelStanFit$get_draws()}}
+\item \href{#method-MultistateModelStanFit-get_draws_of}{\code{MultistateModelStanFit$get_draws_of()}}
 \item \href{#method-MultistateModelStanFit-print}{\code{MultistateModelStanFit$print()}}
 \item \href{#method-MultistateModelStanFit-plot_basisfun}{\code{MultistateModelStanFit$plot_basisfun()}}
 \item \href{#method-MultistateModelStanFit-plot_h0}{\code{MultistateModelStanFit$plot_h0()}}
 \item \href{#method-MultistateModelStanFit-h0_dist}{\code{MultistateModelStanFit$h0_dist()}}
 \item \href{#method-MultistateModelStanFit-log_z_pars}{\code{MultistateModelStanFit$log_z_pars()}}
 \item \href{#method-MultistateModelStanFit-num_draws}{\code{MultistateModelStanFit$num_draws()}}
-\item \href{#method-MultistateModelStanFit-gq}{\code{MultistateModelStanFit$gq()}}
 \item \href{#method-MultistateModelStanFit-clone}{\code{MultistateModelStanFit$clone()}}
 }
 }
@@ -43,30 +39,40 @@ The Fit class
 \subsection{Method \code{new()}}{
 Create model fit object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModelStanFit$new(model, data, stan_fit, stan_data)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModelStanFit$new(data, stan_fit, stan_data, model)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{model}}{A \code{\link{MultistateModel}} object}
+\item{\code{data}}{Data used to create the fit.}
 
-\item{\code{data}}{A \code{\link{JointData}} object}
+\item{\code{stan_fit}}{A 'Stan' fit object}
 
-\item{\code{stan_fit}}{The 'Stan' fit object}
+\item{\code{stan_data}}{The used 'Stan' data list.}
 
-\item{\code{stan_data}}{Full 'Stan' data list}
+\item{\code{model}}{A \code{\link{MultistateModel}}}
 }
 \if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModelStanFit-draws"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModelStanFit-draws}{}}}
-\subsection{Method \code{draws()}}{
+\if{html}{\out{<a id="method-MultistateModelStanFit-get_data"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModelStanFit-get_data}{}}}
+\subsection{Method \code{get_data()}}{
+Extract data list
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModelStanFit$get_data()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModelStanFit-get_draws"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModelStanFit-get_draws}{}}}
+\subsection{Method \code{get_draws()}}{
 Extract draws as \code{rvar}s
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModelStanFit$draws(name = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModelStanFit$get_draws(name = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -79,11 +85,11 @@ Draws in a raw array with same shape as Stan variable}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModelStanFit-draws_of"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModelStanFit-draws_of}{}}}
-\subsection{Method \code{draws_of()}}{
+\if{html}{\out{<a id="method-MultistateModelStanFit-get_draws_of"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModelStanFit-get_draws_of}{}}}
+\subsection{Method \code{get_draws_of()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModelStanFit$draws_of(name)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModelStanFit$get_draws_of(name)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -177,27 +183,6 @@ Get number of draws
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModelStanFit$num_draws()}\if{html}{\out{</div>}}
 }
 
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModelStanFit-gq"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModelStanFit-gq}{}}}
-\subsection{Method \code{gq()}}{
-Generate quantities using the fit.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModelStanFit$gq(stan_data = NULL, fitted_params = NULL, ...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{stan_data}}{Full 'Stan' input list.}
-
-\item{\code{fitted_params}}{Argument to \code{generate_quantities()}.}
-
-\item{\code{...}}{Other arguments to \code{generate_quantities()}.}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateModelStanFit-clone"></a>}}

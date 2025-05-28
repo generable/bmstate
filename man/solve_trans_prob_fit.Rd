@@ -4,7 +4,13 @@
 \alias{solve_trans_prob_fit}
 \title{Solve transition probabilities for each subject in 'MultistateModelStanFit'}
 \usage{
-solve_trans_prob_fit(fit, init_state = 1, t_init = 0, t_end = NULL)
+solve_trans_prob_fit(
+  fit,
+  init_state = 1,
+  t_init = 0,
+  t_end = NULL,
+  data = NULL
+)
 }
 \arguments{
 \item{fit}{A \code{\link{MultistateModelStanFit}} object}
@@ -14,6 +20,10 @@ solve_trans_prob_fit(fit, init_state = 1, t_init = 0, t_end = NULL)
 \item{t_init}{Initial time}
 
 \item{t_end}{End time}
+
+\item{data}{A \code{\link{JointData}} object. If \code{NULL}, the
+data used to fit the model is used. If not \code{NULL}, out-of-sample
+mode is assumed (new subjects).}
 }
 \value{
 A data frame, where each row has the probabilities that a given subject

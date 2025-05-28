@@ -4,12 +4,17 @@
 \alias{p_event}
 \title{Compute probability of each event before given time}
 \usage{
-p_event(pd, t = NULL)
+p_event(pd, t = NULL, by = NULL)
 }
 \arguments{
 \item{pd}{A \code{\link{PathData}} object.}
 
 \item{t}{The given time.}
+
+\item{by}{Factor to summarize over.}
+}
+\value{
+A data frame
 }
 \description{
 Compute probability of each event before given time

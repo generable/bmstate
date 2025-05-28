@@ -4,7 +4,7 @@
 \alias{generate_paths}
 \title{Path generation for 'MultistateModelStanFit'}
 \usage{
-generate_paths(fit, init_state = 1, t_max = NULL, n_rep = 10)
+generate_paths(fit, init_state = 1, t_max = NULL, n_rep = 10, data = NULL)
 }
 \arguments{
 \item{fit}{A \code{\link{MultistateModelStanFit}} object}
@@ -15,6 +15,10 @@ generate_paths(fit, init_state = 1, t_max = NULL, n_rep = 10)
 time of the model is used.}
 
 \item{n_rep}{Number of repeats per draw.}
+
+\item{data}{A \code{\link{JointData}} object. If \code{NULL}, the
+data used to fit the model is used. If not \code{NULL}, out-of-sample
+mode is assumed (new subjects).}
 }
 \value{
 A \code{\link{PathData}} object.

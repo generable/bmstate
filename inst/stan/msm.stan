@@ -469,7 +469,6 @@ transformed parameters {
     }
   }
 
-
   // log of hazard multiplier on each interval
   matrix[N_int, N_trans] log_C_haz = compute_log_hazard_multiplier(
     N_int, beta_oth, beta_auc, x_haz_long, x_auc_long, ttype
