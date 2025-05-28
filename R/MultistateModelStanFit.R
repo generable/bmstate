@@ -23,6 +23,7 @@ create_rv_list <- function(stan_fit, names) {
 #'
 #' @export
 #' @field model The \code{\link{MultistateModel}}
+#' @field data A  \code{\link{JointData}} object
 MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
   private = list(
     draws = NULL,
@@ -30,20 +31,24 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
   ),
   public = list(
     model = NULL,
+    data = NULL,
 
     #' @description
     #' Create model fit object
     #'
+    #' @param data Data used to create the fit.
     #' @param stan_fit A 'Stan' fit object
     #' @param stan_data The used 'Stan' data list.
     #' @param model A \code{\link{MultistateModel}}
-    initialize = function(stan_fit, stan_data, model) {
+    initialize = function(data, stan_fit, stan_data, model) {
+      checkmate::assert_class(data, "JointData")
       checkmate::assert_class(model, "MultistateModel")
       pars <- c(
         "weights", "log_w0", "beta_ka", "beta_V2", "beta_CL", "beta_oth",
         "beta_auc",
         "sigma_pk", "log_z_pk", "log_mu_pk", "log_sig_pk", "lp__"
       )
+      self$data <- data
       self$model <- model
       private$draws <- create_rv_list(stan_fit, pars)
       private$stan_data <- stan_data
@@ -324,13 +329,11 @@ msmsf_inst_hazard_param_draws <- function(fit, data = NULL) {
   log_m <- msmsf_log_hazard_multipliers(fit, data)
   S <- fit$num_draws()
   N <- sd$N_sub
-  w <- fit$draws_of("weights")
-  log_w0 <- fit$draws_of("log_w0")
+  w <- fit$get_draws_of("weights")
+  log_w0 <- fit$get_draws_of("log_w0")
   w_rep <- abind::abind(replicate(N, w, simplify = FALSE), along = 1)
   log_w0_rep <- abind::abind(replicate(N, log_w0, simplify = FALSE), along = 1)
-  log_m <- msmsf_log_m_per_subject(fit)
-  H <- dim(log_m)[3]
-  log_m_reshaped <- matrix(aperm(log_m, c(1, 2, 3)), nrow = N * S, ncol = H)
+  log_m_reshaped <- do.call(rbind, log_m)
   list(
     log_m = log_m_reshaped,
     log_w0 = log_w0_rep,
@@ -361,9 +364,11 @@ generate_paths <- function(fit, init_state = 1, t_max = NULL, n_rep = 10,
   sys <- fit$model$system
   S <- fit$num_draws()
   N <- sd$N_sub
-  d <- get_inst_hazard_param_draws(fit, log_m)
+  message("Computing hazard multipliers")
+  d <- msmsf_inst_hazard_param_draws(fit, data)
 
   # Generate path df
+  message("Generating paths")
   path_df <- sys$simulate(d$w, d$log_w0, d$log_m, init_state, t_max, n_rep)
 
   # Create indices for link
@@ -377,7 +382,7 @@ generate_paths <- function(fit, init_state = 1, t_max = NULL, n_rep = 10,
   stopifnot(length(rep_index) == N * S * n_rep)
 
   # Create link df
-  sub_df <- fit$data$paths$subject_df
+  sub_df <- data$paths$subject_df
   link_df <- data.frame(
     path_id = seq_len(N * S * n_rep),
     subject_id = sub_df$subject_id[subject_index],

@@ -12,6 +12,8 @@ Minimal fit class
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
 \item{\code{model}}{The \code{\link{MultistateModel}}}
+
+\item{\code{data}}{A  \code{\link{JointData}} object}
 }
 \if{html}{\out{</div>}}
 }
@@ -37,12 +39,14 @@ Minimal fit class
 \subsection{Method \code{new()}}{
 Create model fit object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModelStanFit$new(stan_fit, stan_data, model)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModelStanFit$new(data, stan_fit, stan_data, model)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
+\item{\code{data}}{Data used to create the fit.}
+
 \item{\code{stan_fit}}{A 'Stan' fit object}
 
 \item{\code{stan_data}}{The used 'Stan' data list.}
