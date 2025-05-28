@@ -254,6 +254,9 @@ msmsf_log_hazard_multipliers <- function(fit, data = NULL) {
   auc <- msmsf_exposure(fit, data)
   S <- fit$num_draws()
   beta_oth <- fit$get_draws_of("beta_oth")
+  if (is.null(beta_oth)) {
+    beta_oth <- array(0, dim = c(S, 0, sd$N_trans_types))
+  }
   if (sd$do_pk == 1) {
     beta_auc <- fit$get_draws_of("beta_auc")
   } else {
@@ -264,6 +267,12 @@ msmsf_log_hazard_multipliers <- function(fit, data = NULL) {
   out <- list()
   N_sub <- sd$N_sub
   first_indices <- sapply(seq_len(N_sub), function(x) which(sd$idx_sub == x)[1])
+  if (sd$nc_haz > 0) {
+    x_haz_long <- sd$x_haz[, sd$idx_sub]
+  } else {
+    x_haz_long <- array(0, dim = c(0, sd$N_int))
+  }
+
   for (s in seq_len(S)) {
     if (sd$do_pk == 1) {
       ba <- list(beta_auc[s, 1, ])
@@ -272,15 +281,20 @@ msmsf_log_hazard_multipliers <- function(fit, data = NULL) {
       ba <- NULL
       aa <- NULL
     }
-    out[[s]] <- compute_log_hazard_multiplier(
-      sd$N_int,
-      mat2list(t(beta_oth[s, , ])),
-      ba,
-      mat2list(t(sd$x_haz[, sd$idx_sub])),
-      aa,
-      sd$ttype
-    )
-    out[[s]] <- out[[s]][first_indices, ]
+    if (sd$nc_haz == 0) {
+      r <- matrix(0, sd$N_sub, sd$N_trans)
+    } else {
+      r <- compute_log_hazard_multiplier(
+        sd$N_int,
+        mat2list(t(beta_oth[s, , ])),
+        ba,
+        mat2list(t(x_haz_long)),
+        aa,
+        sd$ttype
+      )
+      r <- r[first_indices, , drop = FALSE]
+    }
+    out[[s]] <- r
   }
   out
 }
