@@ -60,7 +60,7 @@ fit_stan <- function(model, data, prior_only = FALSE,
   stan_fit <- stan_model$sample(data = sd, ...)
 
   # Return
-  fit <- MultistateModelStanFit$new(stan_fit, sd, model)
+  fit <- MultistateModelStanFit$new(data, stan_fit, sd, model)
   if (!return_stanfit) {
     return(fit)
   }

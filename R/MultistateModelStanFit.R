@@ -382,7 +382,12 @@ generate_paths <- function(fit, init_state = 1, t_max = NULL, n_rep = 10,
   stopifnot(length(rep_index) == N * S * n_rep)
 
   # Create link df
-  sub_df <- data$paths$subject_df
+  if (is.null(data)) {
+    dat <- fit$data
+  } else {
+    dat <- data
+  }
+  sub_df <- dat$paths$subject_df
   link_df <- data.frame(
     path_id = seq_len(N * S * n_rep),
     subject_id = sub_df$subject_id[subject_index],
@@ -403,19 +408,20 @@ generate_paths <- function(fit, init_state = 1, t_max = NULL, n_rep = 10,
 #' Solve transition probabilities for each subject in 'MultistateModelStanFit'
 #'
 #' @export
-#' @param fit A \code{\link{MultistateModelStanFit}} object
+#' @inheritParams msmsf_pk_params
 #' @param init_state Index of initial state
 #' @param t_init Initial time
 #' @param t_end End time
 #' @return A data frame, where each row has the probabilities that a given subject
 #' will be in each state at time \code{t_end} given that they were in
 #' \code{init_state} at \code{t_init}
-solve_trans_prob_fit <- function(fit, init_state = 1, t_init = 0, t_end = NULL) {
+solve_trans_prob_fit <- function(fit, init_state = 1, t_init = 0, t_end = NULL,
+                                 data = NULL) {
   checkmate::assert_class(fit, "MultistateModelStanFit")
   S <- fit$model$system$num_states()
   checkmate::assert_integerish(init_state, len = 1, lower = 1, upper = S)
   message("Solving transition probabilities")
-  tp <- solve_trans_prob_matrix_each_subject(fit, t_init, t_end)
+  tp <- solve_trans_prob_matrix_each_subject(fit, t_init, t_end, data = data)
   message("Formatting")
   NS <- length(tp$subject_index)
   us <- unique(tp$subject_index)
@@ -435,21 +441,23 @@ solve_trans_prob_fit <- function(fit, init_state = 1, t_init = 0, t_end = NULL) 
 
 #' Solve transition probabilities for each subject in 'MultistateModelStanFit'
 #'
-#' @param fit A \code{\link{MultistateModelStanFit}} object
+#' @inheritParams msmsf_pk_params
 #' @param t_init Initial time
 #' @param t_end End time
 #' @return For each subject and each draw, a matrix \code{P} where
 #' \code{P[i,j]} is the probability that the system will be in state
 #' \code{j} at time \code{t_end}
 #' given that it is in state \code{i} at time \code{t_init}
-solve_trans_prob_matrix_each_subject <- function(fit, t_init = 0, t_end = NULL) {
+solve_trans_prob_matrix_each_subject <- function(fit, t_init = 0, t_end = NULL,
+                                                 data = NULL) {
   checkmate::assert_class(fit, "MultistateModelStanFit")
 
   # Get and reshape draws
   sys <- fit$model$system
   S <- fit$num_draws()
-  N <- fit$stan_data$N_sub
-  d <- get_inst_hazard_param_draws(fit)
+  sd <- msmsf_stan_data(fit, data)
+  N <- sd$N_sub
+  d <- msmsf_inst_hazard_param_draws(fit, data)
   NS <- length(d$subject_index)
   pb <- progress::progress_bar$new(total = NS)
   K <- sys$num_states()

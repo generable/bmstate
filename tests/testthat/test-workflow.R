@@ -47,6 +47,7 @@ test_that("entire workflow works", {
   p_oos <- generate_paths(fit, n_rep = 3, data = jd$test)
 
   pe <- p_event(p)
+  pe_oos <- p_event(p_oos)
   pe_bysex <- p_event(p, by = "sex")
   pe_bydose <- p_event(p, by = "dose_amt")
   expect_equal(nrow(pe), 3)
@@ -83,6 +84,10 @@ test_that("entire workflow works (with PK)", {
   )
   expect_true(inherits(fit, "MultistateModelStanFit"))
 
+  # Plot baseline hazards
+  p0 <- fit$plot_h0()
+  expect_s3_class(p0, "ggplot")
+
   # Pk params
   pkpar <- msmsf_pk_params(fit)
   pkpar_oos <- msmsf_pk_params(fit, jd$test)
@@ -98,38 +103,9 @@ test_that("entire workflow works (with PK)", {
 
   # Path prediction
   p <- generate_paths(fit)
+  p_oos <- generate_paths(fit, data = jd$test)
   P <- solve_trans_prob_fit(fit)
-
-  # Paths from 0 to 3 years starting from Randomization
-
-  # Paths from 0 to 3 years starting from Randomization (oos)
-
-  # Covariate effect and baseline hazard plots
-  # plt_oth <- plot_other_beta(res$fit, res$stan_dat, res$jd, res$df_beta_true)
-
-  # plt_h0 <- plot_h0(res$fit, sd, res$jd, df_h0)
-  # expect_s3_class(plt_h0, "ggplot")
-
-  # Event probabilities
-  # names <- c("1. Obs", "2. IS pred", "3. OOS pred")
-  # plt_a <- plot_p_event(res$jd, res$paths_3yr, res$paths_3yr_oos, names)
-
-  # no points selected for one or more curves, consider using the extend argument
-  # plt_b <- plot_p_event_by_dose(res$jd, res$paths_3yr, res$paths_3yr_oos, names)
-  # expect_s3_class(plt_a, "ggplot")
-  # expect_s3_class(plt_b, "ggplot")
-
-  # Event summary
-  # There was 1 warning in `dplyr::mutate()`.
-  # i In argument: `event_surv = furrr::future_map(...)`.
-  # Caused by warning in `serializedSize()`:
-  #  ! 'package:stats' may not be available when loading
-  # target_times <- seq(0, 3 * 365.25, by = 365.25 / 4)
-  # ppsurv_subj <- summarize_ppsurv(
-  #  res$paths_3yr,
-  #  target_times = target_times,
-  #  by = c("subject_id"),
-  #  truncate_at_terminal_events = FALSE
-  # )
-  # expect_true(inherits(ppsurv_subj, "tbl_df"))
+  P_oos <- solve_trans_prob_fit(fit, data = jd$test)
+  expect_equal(nrow(P), 75)
+  expect_equal(nrow(P_oos), 25)
 })
