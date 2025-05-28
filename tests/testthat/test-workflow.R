@@ -87,6 +87,13 @@ test_that("entire workflow works (with PK)", {
   expect_true(length(pkpar) == 30)
   expect_true(length(pkpar_oos) == 30)
 
+  # Hazard multipliers
+  log_m <- msmsf_log_hazard_multipliers(fit)
+  log_m_test <- msmsf_log_hazard_multipliers(fit, jd$test)
+  N_int_test <- nrow(jd$test$paths$as_transitions())
+  H <- mod$system$num_trans()
+  expect_equal(dim(log_m_test[[1]]), c(N_int_test, H))
+
   # Path prediction
   p <- generate_paths(fit)
   P <- solve_trans_prob_fit(fit)

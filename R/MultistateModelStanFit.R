@@ -240,25 +240,36 @@ msmsf_exposure <- function(fit, data = NULL) {
 #'
 #' @export
 #' @inheritParams msmsf_pk_params
+#' @return A list of length \code{n_draws} where each element is a
+#' matrix of shape \code{n_intervals} x \code{n_transitions}
 msmsf_log_hazard_multipliers <- function(fit, data = NULL) {
   # Get draws
   sd <- msmsf_stan_data(fit, data)
   auc <- msmsf_exposure(fit, data)
+  S <- fit$num_draws()
   beta_oth <- fit$get_draws_of("beta_oth")
   if (sd$do_pk == 1) {
     beta_auc <- fit$get_draws_of("beta_auc")
+  } else {
+    beta_auc <- array(0, dim = c(S, 0, sd$N_trans_types))
   }
 
-  # Call exposed Stan function
-  S <- fit$num_draws()
+  # Call exposed Stan function for each draw (not optimal)
   out <- list()
   for (s in seq_len(S)) {
+    if (sd$do_pk == 1) {
+      ba <- list(beta_auc[s, 1, ])
+      aa <- list(auc[[s]][sd$idx_sub])
+    } else {
+      ba <- NULL
+      aa <- NULL
+    }
     out[[s]] <- compute_log_hazard_multiplier(
       sd$N_int,
-      beta_oth[s, , ],
-      beta_auc[s, ],
-      sd$x_haz,
-      x_auc[s],
+      mat2list(t(beta_oth[s, , ])),
+      ba,
+      mat2list(t(sd$x_haz[, sd$idx_sub])),
+      aa,
       sd$ttype
     )
   }
