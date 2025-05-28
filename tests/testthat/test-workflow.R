@@ -44,6 +44,8 @@ test_that("entire workflow works", {
 
   # Path generation
   p <- generate_paths(fit, n_rep = 3)
+  p_oos <- generate_paths(fit, n_rep = 3, data = jd$test)
+
   pe <- p_event(p)
   pe_bysex <- p_event(p, by = "sex")
   pe_bydose <- p_event(p, by = "dose_amt")
@@ -90,9 +92,9 @@ test_that("entire workflow works (with PK)", {
   # Hazard multipliers
   log_m <- msmsf_log_hazard_multipliers(fit)
   log_m_test <- msmsf_log_hazard_multipliers(fit, jd$test)
-  N_int_test <- nrow(jd$test$paths$as_transitions())
+  N_sub_test <- length(jd$test$paths$unique_subjects())
   H <- mod$system$num_trans()
-  expect_equal(dim(log_m_test[[1]]), c(N_int_test, H))
+  expect_equal(dim(log_m_test[[1]]), c(N_sub_test, H))
 
   # Path prediction
   p <- generate_paths(fit)

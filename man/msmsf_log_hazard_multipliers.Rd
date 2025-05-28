@@ -15,7 +15,7 @@ mode is assumed (new subjects).}
 }
 \value{
 A list of length \code{n_draws} where each element is a
-matrix of shape \code{n_intervals} x \code{n_transitions}
+matrix of shape \code{n_subject} x \code{n_transitions}
 }
 \description{
 Compute log_hazard multipliers
