@@ -146,8 +146,8 @@ DosingData <- R6::R6Class(
 simulate_dosing <- function(df_subjects, tau = 24) {
   N <- nrow(df_subjects)
   dose_ss <- c(15, 30, 60)[sample.int(3, N, replace = TRUE)]
-  t1 <- 100 + 100 * runif(N)
-  t2 <- t1 + (1 - 0.5 * runif(N)) * tau
+  t1 <- 100 + 100 * stats::runif(N)
+  t2 <- t1 + (1 - 0.5 * stats::runif(N)) * tau
   d1 <- c(30, 0)[sample.int(2, N, replace = TRUE)]
   d2 <- c(60, 0)[sample.int(2, N, replace = TRUE)]
   times <- as.list(data.frame(t(matrix(c(t1, t2), ncol = 2))))

@@ -6,6 +6,9 @@
 \usage{
 transmat_survival(state_names = c("Alive", "Dead"))
 }
+\arguments{
+\item{state_names}{Names of the states.}
+}
 \value{
 A \code{\link{TransitionMatrix}}
 }

@@ -247,6 +247,7 @@ transmat_comprisk <- function(state_names = LETTERS[1:4]) {
 #' Basic alive-dead survival model transition matrix
 #'
 #' @export
+#' @param state_names Names of the states.
 #' @return A \code{\link{TransitionMatrix}}
 transmat_survival <- function(state_names = c("Alive", "Dead")) {
   checkmate::assert_character(state_names, len = 2)
@@ -256,6 +257,7 @@ transmat_survival <- function(state_names = c("Alive", "Dead")) {
 #' Illness-death model transition matrix
 #'
 #' @export
+#' @param state_names Names of the states.
 #' @return A \code{\link{TransitionMatrix}}
 transmat_illnessdeath <- function(state_names =
                                     c("Randomization", "Illness", "Death")) {

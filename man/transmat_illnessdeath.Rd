@@ -6,6 +6,9 @@
 \usage{
 transmat_illnessdeath(state_names = c("Randomization", "Illness", "Death"))
 }
+\arguments{
+\item{state_names}{Names of the states.}
+}
 \value{
 A \code{\link{TransitionMatrix}}
 }
