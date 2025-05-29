@@ -23,7 +23,7 @@ The following classes and their documentation can be useful
 }
 
 \author{
-Juho Timonen (first.last at iki.fi) and Jacki Buros
+Juho Timonen (first.last at iki.fi) and Jacqueline Buros
 }
 \keyword{Bayesian}
 \keyword{Stan}

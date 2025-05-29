@@ -4,9 +4,11 @@
 \alias{create_stan_model}
 \title{Create the main 'Stan' model}
 \usage{
-create_stan_model(...)
+create_stan_model(filepath = NULL, ...)
 }
 \arguments{
+\item{filepath}{File path to the \code{msm.stan} file.}
+
 \item{...}{Arguments passed to 'CmdStanR'}
 }
 \description{

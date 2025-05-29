@@ -1,9 +1,13 @@
 #' Create the main 'Stan' model
 #'
+#' @export
 #' @param ... Arguments passed to 'CmdStanR'
-create_stan_model <- function(...) {
+#' @param filepath File path to the \code{msm.stan} file.
+create_stan_model <- function(filepath = NULL, ...) {
   fn <- "msm.stan"
-  filepath <- system.file(file.path("stan", fn), package = "bmstate")
+  if (is.null(filepath)) {
+    filepath <- system.file(file.path("stan", fn), package = "bmstate")
+  }
   # silence compile warnings from cmdstan
   utils::capture.output(
     {
@@ -17,13 +21,14 @@ create_stan_model <- function(...) {
 #' Expose 'Stan' functions if they are not yet exposed
 #'
 #' @export
+#' @param ... Passed to \code{\link{create_stan_model}}
 #' @return logical telling whether they were already exposed
-ensure_exposed_stan_functions <- function() {
+ensure_exposed_stan_functions <- function(...) {
   if (exists("STAN_dummy_function")) {
     return(TRUE)
   } else {
     message("Recompiling Stan model")
-    mod <- create_stan_model(force_recompile = TRUE)
+    mod <- create_stan_model(force_recompile = TRUE, ...)
     mod$expose_functions(global = TRUE)
   }
   FALSE
@@ -39,17 +44,18 @@ ensure_exposed_stan_functions <- function() {
 #' @param data A \code{\link{JointData}} object of observed paths and dosing.
 #' @param prior_only Sample from prior only?
 #' @param return_stanfit Return also the raw 'Stan' fit object?
+#' @param filepath Passed to \code{\link{create_stan_model}}.
 #' @param ... Arguments passed to \code{sample} method of the
 #' 'CmdStanR' model.
 #' @return A \code{\link{MultistateModelStanFit}} object.
-fit_stan <- function(model, data, prior_only = FALSE,
+fit_stan <- function(model, data, prior_only = FALSE, filepath = NULL,
                      return_stanfit = FALSE, ...) {
   checkmate::assert_class(model, "MultistateModel")
   checkmate::assert_class(data, "JointData")
   checkmate::assert_logical(return_stanfit, len = 1)
 
   # Get Stan model object
-  stan_model <- create_stan_model()
+  stan_model <- create_stan_model(filepath = filepath)
 
   # Set normalizing locations and scales (side effect)
   model$set_normalizers(data)

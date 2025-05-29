@@ -7,7 +7,7 @@
 #' The 'bmstate' package.
 #'
 #' @description Bayesian multistate modeling using 'Stan'.
-#' @author Juho Timonen (first.last at iki.fi) and Jacki Buros
+#' @author Juho Timonen (first.last at iki.fi) and Jacqueline Buros
 #' @keywords multistate Stan Bayesian
 #'
 #' @section Getting started:

@@ -4,7 +4,14 @@
 \alias{fit_stan}
 \title{Fit a model using 'Stan'}
 \usage{
-fit_stan(model, data, prior_only = FALSE, return_stanfit = FALSE, ...)
+fit_stan(
+  model,
+  data,
+  prior_only = FALSE,
+  filepath = NULL,
+  return_stanfit = FALSE,
+  ...
+)
 }
 \arguments{
 \item{model}{A \code{\link{MultistateModel}} object.}
@@ -12,6 +19,8 @@ fit_stan(model, data, prior_only = FALSE, return_stanfit = FALSE, ...)
 \item{data}{A \code{\link{JointData}} object of observed paths and dosing.}
 
 \item{prior_only}{Sample from prior only?}
+
+\item{filepath}{Passed to \code{\link{create_stan_model}}.}
 
 \item{return_stanfit}{Return also the raw 'Stan' fit object?}
 

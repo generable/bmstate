@@ -4,7 +4,10 @@
 \alias{ensure_exposed_stan_functions}
 \title{Expose 'Stan' functions if they are not yet exposed}
 \usage{
-ensure_exposed_stan_functions()
+ensure_exposed_stan_functions(...)
+}
+\arguments{
+\item{...}{Passed to \code{\link{create_stan_model}}}
 }
 \value{
 logical telling whether they were already exposed
