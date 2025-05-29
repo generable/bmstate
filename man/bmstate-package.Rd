@@ -10,7 +10,8 @@ Bayesian multistate modeling using 'Stan'.
 }
 \section{Getting started}{
 
-See the vignettes. You can create a model using \code{\link{create_msm}}.
+See the vignettes. You can create a model using \code{\link{create_msm}}
+and fit one using \code{\link{fit_stan}}.
 The following classes and their documentation can be useful
 
 \itemize{

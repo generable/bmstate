@@ -34,6 +34,7 @@ ensure_exposed_stan_functions <- function() {
 #' @description
 #' **NOTE:** This function has a side effect of setting normalizers.
 #'
+#' @export
 #' @param model A \code{\link{MultistateModel}} object.
 #' @param data A \code{\link{JointData}} object of observed paths and dosing.
 #' @param prior_only Sample from prior only?
