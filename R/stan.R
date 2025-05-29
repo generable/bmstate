@@ -8,14 +8,7 @@ create_stan_model <- function(filepath = NULL, ...) {
   if (is.null(filepath)) {
     filepath <- system.file(file.path("stan", fn), package = "bmstate")
   }
-  # silence compile warnings from cmdstan
-  utils::capture.output(
-    {
-      mod <- cmdstanr::cmdstan_model(filepath, ...)
-    },
-    type = "message"
-  )
-  mod
+  cmdstanr::cmdstan_model(filepath, ...)
 }
 
 #' Expose 'Stan' functions if they are not yet exposed

@@ -13,4 +13,4 @@ pkgdown/
 .gitignore
 ^codecov\.yml$
 dev/
-inst/stan/msm
+^inst/stan/(?!msm\.stan).*
