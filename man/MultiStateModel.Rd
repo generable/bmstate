@@ -202,7 +202,8 @@ Simulate data using the multistate model
   N_subject = 100,
   beta_haz = NULL,
   beta_pk = NULL,
-  w0 = 0.001
+  w0 = 0.001,
+  w = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -220,6 +221,9 @@ three elements, each being a vector. If any element is \code{NULL},
 a vector of zeros is used.}
 
 \item{\code{w0}}{Baseline hazard rate for all transitions}
+
+\item{\code{w}}{Spline weights. Matrix of shape \code{num_trans} x
+\code{num_weights}. If \code{NULL}, a matrix of zeros is used.}
 }
 \if{html}{\out{</div>}}
 }
@@ -255,7 +259,7 @@ a \code{data.frame} object
 \subsection{Method \code{simulate_events()}}{
 Simulate events data
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate_events(df_subjects, beta_haz, log_w0, w_scale = 0.1)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$simulate_events(df_subjects, beta_haz, log_w0, w)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -268,7 +272,8 @@ Simulate events data
 \item{\code{log_w0}}{Baseline log hazard rate, vector with length
 \code{num_trans}}
 
-\item{\code{w_scale}}{scale of spline weights variation}
+\item{\code{w}}{Spline weights. Matrix of shape \code{num_trans} x
+\code{num_weights}. If \code{NULL}, a matrix of zeros is used.}
 }
 \if{html}{\out{</div>}}
 }
