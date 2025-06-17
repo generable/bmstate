@@ -469,6 +469,50 @@ potential_covariates <- function(pd, possible = NULL, ...) {
   df
 }
 
+#' PathData to single event format
+#'
+#' @export
+#' @param pd A \code{\link{PathData}} object
+#' @param event Name of the event of interest (character)
+#' @return A \code{\link{PathData}} object
+as_single_event <- function(pd, event) {
+  checkmate::assert_class(pd, "PathData")
+  checkmate::assert_character(event, len = 1)
+  state <- which(pd$state_names() == event)
+  if (length(state) != 1) {
+    stop("invalid event")
+  }
+  path_df <- pd$path_df
+  pid <- unique(path_df$path_id)
+  path_df_new <- NULL
+  for (path in pid) {
+    df <- path_df |>
+      dplyr::filter(.data$path_id == path) |>
+      dplyr::arrange(.data$time)
+    df$row_num <- 1:nrow(df)
+    ri <- which(df$state == state)
+    if (length(ri) == 0) {
+      df <- df[c(1, nrow(df)), ]
+      df$state[2] <- 1
+      df$is_event[2] <- 0
+    } else {
+      df <- df[c(1, ri[1]), ]
+      df$state[2] <- 2
+    }
+    path_df_new <- rbind(path_df_new, df |> dplyr::select(-row_num))
+  }
+
+  link_df <- pd$link_df |> left_join(
+    pd$subject_df |> dplyr::select(subject_id, subject_id),
+    by = "subject_id"
+  )
+  tm <- transmat_survival(state_names = c("Randomization", state))
+  PathData$new(
+    pd$subject_df, path_df_new, link_df,
+    tm, pd$covs
+  )
+}
+
 #' Compute probability of each event before given time
 #'
 #' @export
