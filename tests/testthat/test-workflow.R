@@ -57,6 +57,13 @@ test_that("entire workflow works", {
   # Baseline hazard viz
   plot_h0 <- fit$plot_h0() # should be at h0_base level
   expect_s3_class(plot_h0, "ggplot")
+
+  # Scoring
+  ev <- "Death"
+  er <- event_risk(p, ev)
+  a <- as_single_event(jd$train$paths, ev)
+  ci <- c_index(a, er)
+  expect_gt(ci$ci$concordance, 0)
 })
 
 

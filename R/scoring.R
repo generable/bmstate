@@ -20,8 +20,7 @@ event_risk <- function(p, event) {
 #' @param pd A \code{\link{PathData}} object of observed paths
 #' @param risk Predicted event risk for each subject
 c_index <- function(pd, risk) {
-  a <- as_single_event(pd, event)
-  ppd <- a$get_path_df() |> dplyr::filter(time > 0)
+  ppd <- pd$get_path_df() |> dplyr::filter(time > 0)
   ppd$surv <- Surv(ppd$time, ppd$is_event)
   dd <- pd$link_df |> dplyr::select(path_id, subject_id)
   ppd <- ppd |>
