@@ -193,7 +193,8 @@ PathData <- R6::R6Class(
     #' @return A \code{data.frame} with same number of rows as \code{link_df},
     #' including also the covariate columns and \code{subject_id}
     full_link = function(covariates = NULL) {
-      x <- self$subject_df[, c("subject_id", covariates)]
+      cols <- unique(c("subject_id", covariates))
+      x <- self$subject_df[, cols]
       self$link_df[, c("subject_id", "path_id")] |>
         dplyr::left_join(x, by = "subject_id")
     },
@@ -493,7 +494,7 @@ as_single_event <- function(pd, event) {
   if (length(state) != 1) {
     stop("invalid event")
   }
-  path_df <- pd$path_df
+  path_df <- pd$get_path_df()
   pid <- unique(path_df$path_id)
   path_df_new <- NULL
   for (path in pid) {
@@ -514,7 +515,7 @@ as_single_event <- function(pd, event) {
   }
   path_df_new$trans_idx <- as.numeric(path_df_new$trans_idx > 0)
 
-  link_df <- pd$link_df |> left_join(
+  link_df <- pd$link_df |> dplyr::left_join(
     pd$subject_df |> dplyr::select(subject_id, subject_id),
     by = "subject_id"
   )
@@ -524,6 +525,7 @@ as_single_event <- function(pd, event) {
     tm, pd$covs
   )
 }
+
 
 #' Compute probability of each event before given time
 #'

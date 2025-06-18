@@ -60,7 +60,6 @@ test_that("entire workflow works", {
 })
 
 
-
 test_that("entire workflow works (with PK)", {
   # Setup
   h0_base <- 1e-3
