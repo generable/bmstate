@@ -193,7 +193,8 @@ PathData <- R6::R6Class(
     #' @return A \code{data.frame} with same number of rows as \code{link_df},
     #' including also the covariate columns and \code{subject_id}
     full_link = function(covariates = NULL) {
-      x <- self$subject_df[, c("subject_id", covariates)]
+      cols <- unique(c("subject_id", covariates))
+      x <- self$subject_df[, cols]
       self$link_df[, c("subject_id", "path_id")] |>
         dplyr::left_join(x, by = "subject_id")
     },
@@ -451,14 +452,24 @@ to_mstate_format <- function(df, transmat) {
 }
 
 
-# Look for potential covariates
+#' Look for potential covariates
+#'
+#' @export
+#' @param pd A \code{\link{PathData}} object
+#' @param possible Possible covariates to look for (character vector)
+#' @return A \code{data.frame}
 potential_covariates <- function(pd, possible = NULL, ...) {
+  checkmate::assert_class(pd, "PathData")
+  if (is.null(possible)) {
+    possible <- pd$covariate_names()
+  }
+  checkmate::assert_character(possible)
   events <- pd$get_event_state_names()
   df <- NULL
   for (e in events) {
-    message("Event: ", e)
-    a <- to_single_event(pd, e)
-    r <- a$coxph(covs = possible, ...)
+    message("Looking for covariates that affect ", e)
+    a <- as_single_event(pd, e)
+    r <- a$fit_coxph(covariates = possible, ...)
     s <- summary(r)
     pval <- summary(r)$coefficients[, 5]
     df <- rbind(df, data.frame(
@@ -467,6 +478,80 @@ potential_covariates <- function(pd, possible = NULL, ...) {
     ))
   }
   df
+}
+
+#' PathData to single event format
+#'
+#' @export
+#' @param pd A \code{\link{PathData}} object
+#' @param event Name of the event of interest (character)
+#' @return A \code{\link{PathData}} object
+as_single_event <- function(pd, event) {
+  checkmate::assert_class(pd, "PathData")
+  checkmate::assert_character(event, len = 1)
+  stopifnot(event %in% pd$get_event_state_names())
+  state <- which(pd$state_names() == event)
+  if (length(state) != 1) {
+    stop("invalid event")
+  }
+  path_df <- pd$get_path_df()
+  pid <- unique(path_df$path_id)
+  path_df_new <- NULL
+  for (path in pid) {
+    df <- path_df |>
+      dplyr::filter(.data$path_id == path) |>
+      dplyr::arrange(.data$time)
+    df$row_num <- 1:nrow(df)
+    ri <- which(df$state == state)
+    if (length(ri) == 0) {
+      df <- df[c(1, nrow(df)), ]
+      df$state[2] <- 1
+      df$is_event[2] <- 0
+    } else {
+      df <- df[c(1, ri[1]), ]
+      df$state[2] <- 2
+    }
+    path_df_new <- rbind(path_df_new, df |> dplyr::select(-row_num))
+  }
+  path_df_new$trans_idx <- as.numeric(path_df_new$trans_idx > 0)
+
+  link_df <- pd$link_df |> dplyr::left_join(
+    pd$subject_df |> dplyr::select(subject_id, subject_id),
+    by = "subject_id"
+  )
+  tm <- transmat_survival(state_names = c("Randomization", event))
+  PathData$new(
+    pd$subject_df, path_df_new, link_df,
+    tm, pd$covs
+  )
+}
+
+#' PathData to event-free survival format
+#'
+#' @export
+#' @param pd A \code{\link{PathData}} object
+#' @param event Name of the event of interest (character)
+#' @return A \code{\link{PathData}} object
+as_survival <- function(pd, event) {
+  N_sub <- length(pd$unique_subjects())
+  a <- as_single_event(pd, event)
+  ppd <- a$get_path_df() |>
+    dplyr::arrange(.data$path_id, .data$time) |>
+    dplyr::filter(.data$state == 2 | .data$is_censor) |>
+    dplyr::group_by(.data$path_id) |>
+    dplyr::slice(1) |>
+    dplyr::ungroup()
+  ppd$surv <- Surv(ppd$time, ppd$is_event)
+  dd <- pd$link_df |>
+    dplyr::select(path_id, subject_id) |>
+    dplyr::left_join(pd$subject_df, by = "subject_id")
+  ppd <- ppd |>
+    dplyr::left_join(dd, by = "path_id") |>
+    dplyr::select(-"state", -"trans_idx")
+  if (nrow(ppd) != N_sub) {
+    stop("internal error in as_survival")
+  }
+  ppd
 }
 
 #' Compute probability of each event before given time

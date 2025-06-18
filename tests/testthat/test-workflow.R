@@ -1,7 +1,7 @@
 # Options
 options <- list(
   N_subject = 100,
-  iter_warmup = 60,
+  iter_warmup = 100,
   iter_sampling = 30,
   chains = 1
 )
@@ -57,8 +57,15 @@ test_that("entire workflow works", {
   # Baseline hazard viz
   plot_h0 <- fit$plot_h0() # should be at h0_base level
   expect_s3_class(plot_h0, "ggplot")
-})
 
+  # Scoring
+  ev <- "Death"
+  er <- event_risk(p, ev)
+  a <- as_survival(jd$train$paths, ev)
+  a <- a |> dplyr::left_join(er, by = "subject_id")
+  ci <- c_index(a)
+  expect_gt(ci$concordance, 0)
+})
 
 
 test_that("entire workflow works (with PK)", {
