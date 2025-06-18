@@ -451,14 +451,24 @@ to_mstate_format <- function(df, transmat) {
 }
 
 
-# Look for potential covariates
+#' Look for potential covariates
+#'
+#' @export
+#' @param pd A \code{\link{PathData}} object
+#' @param possible Possible covariates to look for (character vector)
+#' @return A \code{data.frame}
 potential_covariates <- function(pd, possible = NULL, ...) {
+  checkmate::assert_class(pd, "PathData")
+  if (is.null(possible)) {
+    possible <- pd$covariate_names()
+  }
+  checkmate::assert_character(possible)
   events <- pd$get_event_state_names()
   df <- NULL
   for (e in events) {
-    message("Event: ", e)
-    a <- to_single_event(pd, e)
-    r <- a$coxph(covs = possible, ...)
+    message("Looking for covariates that affect ", e)
+    a <- as_single_event(pd, e)
+    r <- a$fit_coxph(covariates = possible, ...)
     s <- summary(r)
     pval <- summary(r)$coefficients[, 5]
     df <- rbind(df, data.frame(
@@ -478,6 +488,7 @@ potential_covariates <- function(pd, possible = NULL, ...) {
 as_single_event <- function(pd, event) {
   checkmate::assert_class(pd, "PathData")
   checkmate::assert_character(event, len = 1)
+  stopifnot(event %in% pd$get_event_state_names())
   state <- which(pd$state_names() == event)
   if (length(state) != 1) {
     stop("invalid event")
@@ -501,12 +512,13 @@ as_single_event <- function(pd, event) {
     }
     path_df_new <- rbind(path_df_new, df |> dplyr::select(-row_num))
   }
+  path_df_new$trans_idx <- as.numeric(path_df_new$trans_idx > 0)
 
   link_df <- pd$link_df |> left_join(
     pd$subject_df |> dplyr::select(subject_id, subject_id),
     by = "subject_id"
   )
-  tm <- transmat_survival(state_names = c("Randomization", state))
+  tm <- transmat_survival(state_names = c("Randomization", event))
   PathData$new(
     pd$subject_df, path_df_new, link_df,
     tm, pd$covs
