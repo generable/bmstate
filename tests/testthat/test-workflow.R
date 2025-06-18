@@ -1,7 +1,7 @@
 # Options
 options <- list(
   N_subject = 100,
-  iter_warmup = 60,
+  iter_warmup = 100,
   iter_sampling = 30,
   chains = 1
 )
@@ -61,9 +61,10 @@ test_that("entire workflow works", {
   # Scoring
   ev <- "Death"
   er <- event_risk(p, ev)
-  a <- as_single_event(jd$train$paths, ev)
-  ci <- c_index(a, er)
-  expect_gt(ci$ci$concordance, 0)
+  a <- as_survival(jd$train$paths, ev)
+  a <- a |> dplyr::left_join(er, by = "subject_id")
+  ci <- c_index(a)
+  expect_gt(ci$concordance, 0)
 })
 
 

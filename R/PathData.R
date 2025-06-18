@@ -526,6 +526,33 @@ as_single_event <- function(pd, event) {
   )
 }
 
+#' PathData to event-free survival format
+#'
+#' @export
+#' @param pd A \code{\link{PathData}} object
+#' @param event Name of the event of interest (character)
+#' @return A \code{\link{PathData}} object
+as_survival <- function(pd, event) {
+  N_sub <- length(pd$unique_subjects())
+  a <- as_single_event(pd, event)
+  ppd <- a$get_path_df() |>
+    dplyr::arrange(.data$path_id, .data$time) |>
+    dplyr::filter(.data$state == 2 | .data$is_censor) |>
+    dplyr::group_by(.data$path_id) |>
+    dplyr::slice(1) |>
+    dplyr::ungroup()
+  ppd$surv <- Surv(ppd$time, ppd$is_event)
+  dd <- pd$link_df |>
+    dplyr::select(path_id, subject_id) |>
+    dplyr::left_join(pd$subject_df, by = "subject_id")
+  ppd <- ppd |>
+    dplyr::left_join(dd, by = "path_id") |>
+    dplyr::select(-"state", -"trans_idx")
+  if (nrow(ppd) != N_sub) {
+    stop("internal error in as_survival")
+  }
+  ppd
+}
 
 #' Compute probability of each event before given time
 #'

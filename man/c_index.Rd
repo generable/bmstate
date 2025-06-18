@@ -4,12 +4,10 @@
 \alias{c_index}
 \title{Compute C index}
 \usage{
-c_index(pd, risk)
+c_index(df)
 }
 \arguments{
-\item{pd}{A \code{\link{PathData}} object of observed paths}
-
-\item{risk}{Predicted event risk for each subject}
+\item{df}{A \code{data.frame} with \code{surv} and \code{risk} columns}
 }
 \description{
 Compute C index
