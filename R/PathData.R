@@ -554,6 +554,20 @@ as_survival <- function(pd, event) {
   ppd
 }
 
+# Helper
+count_paths_with_event <- function(c, t, S) {
+  cnt <- c |>
+    dplyr::filter(.data$is_event == 1 & .data$time <= t) |>
+    dplyr::distinct(.data$path_id) |>
+    dplyr::count()
+  df <- data.frame(state = seq_len(S)) |> dplyr::left_join(cnt, by = "state")
+  df$n[which(is.na(df$n))] <- 0
+  df$n_event <- df$n
+  df$n <- NULL
+  df
+}
+
+
 #' Compute probability of each event before given time
 #'
 #' @export
@@ -577,13 +591,19 @@ p_event <- function(pd, t = NULL, by = NULL) {
     c <- pd$as_data_frame() |>
       dplyr::group_by(.data$state)
   }
-  c <- c |>
-    dplyr::filter(.data$is_event == 1, .data$time <= t) |>
-    dplyr::distinct(.data$path_id) |>
-    dplyr::count()
-  df <- data.frame(state = seq_len(S)) |> dplyr::left_join(c, by = "state")
-  df$n[which(is.na(df$n))] <- 0
-  df$prob <- df$n / pd$n_paths()
+  estates <- pd$get_event_states()
+  df <- count_paths_with_event(c, t, S) |> dplyr::filter(.data$state %in% estates)
+  if (!is.null(by)) {
+    df_all <- c |> dplyr::ungroup()
+    df_all <- df_all |> dplyr::group_by(.data[[by]])
+    df_all <- df_all |>
+      dplyr::distinct(.data$path_id) |>
+      dplyr::count()
+    df <- df |> dplyr::left_join(df_all, by = by)
+    df$prob <- df$n_event / df$n
+  } else {
+    df$prob <- df$n_event / pd$n_paths()
+  }
   df$state_idx <- df$state
   df$state <- NULL
   sdf <- pd$transmat$states_df()
