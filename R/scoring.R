@@ -19,5 +19,6 @@ event_risk <- function(p, event) {
 #' @export
 #' @param df A \code{data.frame} with \code{surv} and \code{risk} columns
 c_index <- function(df) {
-  survival::concordance(df$surv ~ df$risk)
+  df$p_noevent <- 1 - df$risk
+  survival::concordance(df$surv ~ df$p_noevent)
 }
