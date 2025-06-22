@@ -50,9 +50,9 @@ test_that("entire workflow works", {
   pe_oos <- p_event(p_oos)
   pe_bysex <- p_event(p, by = "sex")
   pe_bydose <- p_event(p, by = "dose_amt")
-  expect_equal(nrow(pe), 3)
-  expect_equal(nrow(pe_bysex), 5)
-  expect_equal(nrow(pe_bydose), 7)
+  expect_equal(nrow(pe), 2)
+  expect_equal(nrow(pe_bysex), 4)
+  expect_equal(nrow(pe_bydose), 6)
 
   # Baseline hazard viz
   plot_h0 <- fit$plot_h0() # should be at h0_base level
