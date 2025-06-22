@@ -555,7 +555,7 @@ as_survival <- function(pd, event) {
 }
 
 # Helper
-count_paths_with_event <- function(c, t) {
+count_paths_with_event <- function(c, t, S) {
   cnt <- c |>
     dplyr::filter(.data$is_event == 1 & .data$time <= t) |>
     dplyr::distinct(.data$path_id) |>
@@ -592,7 +592,7 @@ p_event <- function(pd, t = NULL, by = NULL) {
       dplyr::group_by(.data$state)
   }
   estates <- pd$get_event_states()
-  df <- count_paths_with_event(c, t) |> dplyr::filter(.data$state %in% estates)
+  df <- count_paths_with_event(c, t, S) |> dplyr::filter(.data$state %in% estates)
   if (!is.null(by)) {
     df_all <- c |> dplyr::ungroup()
     df_all <- df_all |> dplyr::group_by(.data[[by]])
