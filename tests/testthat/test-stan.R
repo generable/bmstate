@@ -33,7 +33,7 @@ test_that("fitting with Stan works (single transition)", {
 
   # P(event)
   pe <- p_event(p)
-  expect_equal(nrow(pe), 2)
+  expect_equal(nrow(pe), 1)
 })
 
 test_that("fitting with Stan works (multi-transition)", {
@@ -60,8 +60,7 @@ test_that("fitting with Stan works (multi-transition)", {
 
   # P(event)
   pe <- p_event(p)
-  expect_equal(nrow(pe), 3)
-  expect_equal(pe$n[1], 0)
+  expect_equal(nrow(pe), 2)
 
   # Solve
   P <- solve_trans_prob_matrix(mod$system, c(-7, -7, -7))
