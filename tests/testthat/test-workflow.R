@@ -95,7 +95,7 @@ test_that("entire workflow works (with PK)", {
     adapt_delta = 0.95,
     init = 0.1
   )
-  expect_true(inherits(fit, "MultistateModelStanFit"))
+  expect_true(inherits(fit, "MultistateModelFit"))
 
   # Plot baseline hazards
   p0 <- fit$plot_h0()
