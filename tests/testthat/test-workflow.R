@@ -69,8 +69,12 @@ test_that("entire workflow works", {
   # Test that reducing to mean works
   mfit <- fit$mean_fit()
   expect_equal(mfit$num_draws(), 1)
-  p_mfit <- generate_paths(mfit, n_rep = 1)
-  expect_equal(p_mfit$n_paths(), jd$train$paths$n_paths())
+  p_mfit <- generate_paths(mfit, n_rep = 100)
+  expect_equal(p_mfit$n_paths(), 100 * jd$train$paths$n_paths())
+  pes1 <- event_risk(p_mfit, "Death")
+
+  # Test that solving time evolution with single draw works
+  tp2 <- solve_trans_prob_fit(mfit)
 })
 
 
