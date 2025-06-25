@@ -76,6 +76,23 @@ test_that("entire workflow works", {
   # Test that solving time evolution with single draw works
   tp2 <- solve_trans_prob_fit(mfit)
   expect_equal(nrow(tp2), nrow(pes1))
+
+  # Single-transition model
+  tds <- as_single_event(jd$train$paths, event = "Death")
+  tds <- JointData$new(tds, jd$train$dosing)
+  mod_tte <- create_msm(tds$paths$transmat)
+  a <- fit_stan(mod_tte, tds,
+    iter_warmup = options$iter_warmup,
+    iter_sampling = options$iter_sampling,
+    chains = options$chains,
+    refresh = 5,
+    adapt_delta = 0.95,
+    init = 0.1,
+    return_stanfit = TRUE
+  )
+  fit_tte <- a$fit$mean_fit()
+  r <- solve_trans_prob_fit(fit_tte)
+  expect_equal(nrow(r), 75)
 })
 
 
