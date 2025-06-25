@@ -135,8 +135,12 @@ solve_trans_prob_matrix_each_subject <- function(fit, t_init = 0, t_end = NULL,
   A <- array(0, dim = c(NS, K, K))
   for (j in seq_len(NS)) {
     pb$tick()
+    wj <- d$w[j, , ]
+    if (is.null(dim(wj))) {
+      wj <- matrix(wj, 1, length(wj))
+    }
     A[j, , ] <- solve_trans_prob_matrix(
-      sys, d$log_w0[j, ], d$w[j, , ], d$log_m[j, ], t_init, t_end
+      sys, d$log_w0[j, ], wj, d$log_m[j, ], t_init, t_end
     )
   }
   c(list(P = A), d[c("subject_index", "draw_index")])
