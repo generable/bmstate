@@ -65,6 +65,12 @@ test_that("entire workflow works", {
   a <- a |> dplyr::left_join(er, by = "subject_id")
   ci <- c_index(a)
   expect_gt(ci$concordance, 0)
+
+  # Test that reducing to mean works
+  mfit <- fit$mean_fit()
+  expect_equal(mfit$num_draws(), 1)
+  p_mfit <- generate_paths(mfit, n_rep = 1)
+  expect_equal(p_mfit$n_paths(), jd$train$paths$n_paths())
 })
 
 
