@@ -21,7 +21,7 @@ test_that("fitting with Stan works (single transition)", {
     chains = options$chains
   )
 
-  expect_true(inherits(fit, "MultistateModelStanFit"))
+  expect_true(inherits(fit, "MultistateModelFit"))
 
   # Plots
   expect_s3_class(fit$plot_basisfun(), "ggplot")
@@ -49,7 +49,7 @@ test_that("fitting with Stan works (multi-transition)", {
     chains = options$chains
   )
 
-  expect_true(inherits(fit, "MultistateModelStanFit"))
+  expect_true(inherits(fit, "MultistateModelFit"))
   expect_s3_class(fit$plot_h0(), "ggplot")
 
   # Pathgen

@@ -36,7 +36,7 @@ test_that("entire workflow works", {
     return_stanfit = TRUE
   )
   fit <- a$fit
-  expect_true(inherits(fit, "MultistateModelStanFit"))
+  expect_true(inherits(fit, "MultistateModelFit"))
 
   # Computing hazard multipliers
   log_m <- msmsf_log_hazard_multipliers(fit)
@@ -65,6 +65,12 @@ test_that("entire workflow works", {
   a <- a |> dplyr::left_join(er, by = "subject_id")
   ci <- c_index(a)
   expect_gt(ci$concordance, 0)
+
+  # Test that reducing to mean works
+  mfit <- fit$mean_fit()
+  expect_equal(mfit$num_draws(), 1)
+  p_mfit <- generate_paths(mfit, n_rep = 1)
+  expect_equal(p_mfit$n_paths(), jd$train$paths$n_paths())
 })
 
 
@@ -89,7 +95,7 @@ test_that("entire workflow works (with PK)", {
     adapt_delta = 0.95,
     init = 0.1
   )
-  expect_true(inherits(fit, "MultistateModelStanFit"))
+  expect_true(inherits(fit, "MultistateModelFit"))
 
   # Plot baseline hazards
   p0 <- fit$plot_h0()
