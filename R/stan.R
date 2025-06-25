@@ -60,7 +60,12 @@ fit_stan <- function(model, data, prior_only = FALSE, filepath = NULL,
   stan_fit <- stan_model$sample(data = sd, ...)
 
   # Return
-  fit <- MultistateModelStanFit$new(data, stan_fit, sd, model)
+  pars <- c(
+    "weights", "log_w0", "beta_ka", "beta_V2", "beta_CL", "beta_oth",
+    "beta_auc", "sigma_pk", "log_z_pk", "log_mu_pk", "log_sig_pk", "lp__"
+  )
+  draws <- create_rv_list(stan_fit, pars)
+  fit <- MultistateModelFit$new(data, sd, model, draws)
   if (!return_stanfit) {
     return(fit)
   }

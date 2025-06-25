@@ -3,7 +3,7 @@
 export(DosingData)
 export(JointData)
 export(MultistateModel)
-export(MultistateModelStanFit)
+export(MultistateModelFit)
 export(MultistateSystem)
 export(PKModel)
 export(PathData)

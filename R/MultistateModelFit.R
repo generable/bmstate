@@ -19,12 +19,25 @@ create_rv_list <- function(stan_fit, names) {
   out
 }
 
+# Rvar to an rvar with a single draw corresponding to the mean of original draws
+rvar_to_mean_rvar <- function(rv) {
+  mrv <- mean(rv)
+  D <- dim(mrv)
+  if (is.null(D)) {
+    L <- length(mrv)
+    out <- posterior::rvar(array(mrv, dim = c(1, L)), dim = L)
+  } else {
+    out <- posterior::rvar(array(mrv, dim = c(1, D)), dim = D)
+  }
+  out
+}
+
 #' Minimal fit class
 #'
 #' @export
 #' @field model The \code{\link{MultistateModel}}
 #' @field data A  \code{\link{JointData}} object
-MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
+MultistateModelFit <- R6::R6Class("MultistateModelFit",
   private = list(
     draws = NULL,
     stan_data = NULL
@@ -37,21 +50,24 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
     #' Create model fit object
     #'
     #' @param data Data used to create the fit.
-    #' @param stan_fit A 'Stan' fit object
+    #' @param draws A named list of rvars.
     #' @param stan_data The used 'Stan' data list.
     #' @param model A \code{\link{MultistateModel}}
-    initialize = function(data, stan_fit, stan_data, model) {
+    initialize = function(data, stan_data, model, draws) {
       checkmate::assert_class(data, "JointData")
       checkmate::assert_class(model, "MultistateModel")
-      pars <- c(
-        "weights", "log_w0", "beta_ka", "beta_V2", "beta_CL", "beta_oth",
-        "beta_auc",
-        "sigma_pk", "log_z_pk", "log_mu_pk", "log_sig_pk", "lp__"
-      )
       self$data <- data
       self$model <- model
-      private$draws <- create_rv_list(stan_fit, pars)
+      private$draws <- draws
       private$stan_data <- stan_data
+    },
+
+    #' @description Create a reduced version with only a single draw, corresponding
+    #' to the mean of original draws.
+    #' @return A new \code{\link{MultistateModelFit}} object.
+    mean_fit = function() {
+      draws <- lapply(private$draws, rvar_to_mean_rvar)
+      MultistateModelFit$new(self$data, private$stan_data, self$model, draws)
     },
 
     #' @description Extract data list
@@ -80,7 +96,7 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
     #' @return nothing
     print = function() {
       S <- self$num_draws()
-      x1 <- paste0("A MultistateModelStanFit with ", S, " draws.")
+      x1 <- paste0("A MultistateModelFit with ", S, " draws.")
       msg <- paste(x1, "\n", sep = "\n")
       cat(msg)
     },
@@ -156,7 +172,7 @@ MultistateModelStanFit <- R6::R6Class("MultistateModelStanFit",
 
 # Helper
 msmsf_stan_data <- function(fit, data = NULL) {
-  checkmate::assert_class(fit, "MultistateModelStanFit")
+  checkmate::assert_class(fit, "MultistateModelFit")
   if (is.null(data)) {
     sd <- fit$get_data()
   } else {
@@ -174,7 +190,7 @@ mat2list <- function(mat) {
 
 #' Evaluate PK parameters
 #' @export
-#' @param fit A \code{\link{MultistateModelStanFit}} object
+#' @param fit A \code{\link{MultistateModelFit}} object
 #' @param data A \code{\link{JointData}} object. If \code{NULL}, the
 #' data used to fit the model is used. If not \code{NULL}, out-of-sample
 #' mode is assumed (new subjects).
@@ -302,7 +318,7 @@ msmsf_log_hazard_multipliers <- function(fit, data = NULL) {
 
 # Log baseline hazard distribution at times t
 msmsf_log_baseline_hazard <- function(fit, t = NULL) {
-  checkmate::assert_class(fit, "MultistateModelStanFit")
+  checkmate::assert_class(fit, "MultistateModelFit")
   sys <- fit$model$system
   if (is.null(t)) {
     t <- seq(0, sys$get_tmax(), length.out = 30)
@@ -358,7 +374,7 @@ msmsf_inst_hazard_param_draws <- function(fit, data = NULL) {
 }
 
 
-#' Path generation for 'MultistateModelStanFit'
+#' Path generation for 'MultistateModelFit'
 #'
 #' @export
 #' @inheritParams msmsf_pk_params
@@ -369,7 +385,7 @@ msmsf_inst_hazard_param_draws <- function(fit, data = NULL) {
 #' @return A \code{\link{PathData}} object.
 generate_paths <- function(fit, init_state = 1, t_max = NULL, n_rep = 10,
                            data = NULL) {
-  checkmate::assert_class(fit, "MultistateModelStanFit")
+  checkmate::assert_class(fit, "MultistateModelFit")
   checkmate::assert_integerish(n_rep, lower = 1, len = 1)
   sd <- msmsf_stan_data(fit, data)
   log_m <- msmsf_log_hazard_multipliers(fit, data)
@@ -419,7 +435,7 @@ generate_paths <- function(fit, init_state = 1, t_max = NULL, n_rep = 10,
   )
 }
 
-#' Solve transition probabilities for each subject in 'MultistateModelStanFit'
+#' Solve transition probabilities for each subject in 'MultistateModelFit'
 #'
 #' @export
 #' @inheritParams msmsf_pk_params
@@ -431,7 +447,7 @@ generate_paths <- function(fit, init_state = 1, t_max = NULL, n_rep = 10,
 #' \code{init_state} at \code{t_init}
 solve_trans_prob_fit <- function(fit, init_state = 1, t_init = 0, t_end = NULL,
                                  data = NULL) {
-  checkmate::assert_class(fit, "MultistateModelStanFit")
+  checkmate::assert_class(fit, "MultistateModelFit")
   S <- fit$model$system$num_states()
   checkmate::assert_integerish(init_state, len = 1, lower = 1, upper = S)
   message("Solving transition probabilities")
@@ -453,7 +469,7 @@ solve_trans_prob_fit <- function(fit, init_state = 1, t_init = 0, t_end = NULL,
   df
 }
 
-#' Solve transition probabilities for each subject in 'MultistateModelStanFit'
+#' Solve transition probabilities for each subject in 'MultistateModelFit'
 #'
 #' @inheritParams msmsf_pk_params
 #' @param t_init Initial time
@@ -464,7 +480,7 @@ solve_trans_prob_fit <- function(fit, init_state = 1, t_init = 0, t_end = NULL,
 #' given that it is in state \code{i} at time \code{t_init}
 solve_trans_prob_matrix_each_subject <- function(fit, t_init = 0, t_end = NULL,
                                                  data = NULL) {
-  checkmate::assert_class(fit, "MultistateModelStanFit")
+  checkmate::assert_class(fit, "MultistateModelFit")
 
   # Get and reshape draws
   sys <- fit$model$system

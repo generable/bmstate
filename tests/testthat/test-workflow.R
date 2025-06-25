@@ -36,7 +36,7 @@ test_that("entire workflow works", {
     return_stanfit = TRUE
   )
   fit <- a$fit
-  expect_true(inherits(fit, "MultistateModelStanFit"))
+  expect_true(inherits(fit, "MultistateModelFit"))
 
   # Computing hazard multipliers
   log_m <- msmsf_log_hazard_multipliers(fit)
