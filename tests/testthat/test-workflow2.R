@@ -1,6 +1,6 @@
 # Options
 params <- list(
-  N_subject = 20,
+  N_subject = 200,
   iter_warmup = 400,
   iter_sampling = 200,
   chains = 1,
@@ -80,7 +80,7 @@ test_that("entire workflow works with more complex model", {
     tidyr::pivot_longer(cols = -event, names_to = "covariate", values_to = "beta")
 
   df_beta <- t(fit$get_draws("beta_oth"))
-  rownames(df_beta) <- paste0("Effect on ", sn)
+  rownames(df_beta) <- paste0("Effect on ", sn_event)
   colnames(df_beta) <- mod$covs()
   df_beta_long <- data.frame(df_beta) |>
     rownames_to_column("event") |>
@@ -100,7 +100,7 @@ test_that("entire workflow works with more complex model", {
     )[, c("subject_index", ev)]
 
     er <- event_risk(paths, ev)
-    a <- as_survival(test_data$paths, ev)
+    a <- as_survival(dat$paths, ev)
     a <- a |> dplyr::left_join(er, by = "subject_id")
     a <- a |> dplyr::select(-"path_id")
     a$dose_amt <- as.factor(a$dose_amt)
@@ -114,6 +114,8 @@ test_that("entire workflow works with more complex model", {
 
   r1 <- predict_death_risk(fit_pm, test_data, params$n_rep)
   r2 <- predict_death_risk(fit_tte_pm, test_data_tte, params$n_rep)
+  r3 <- predict_death_risk(fit_pm, train_data, params$n_rep)
+  r4 <- predict_death_risk(fit_tte_pm, train_data_tte, params$n_rep)
 
   risk_plots <- function(a1, a2) {
     a <- rbind(a1, a2)
@@ -158,6 +160,8 @@ test_that("entire workflow works with more complex model", {
     )
   }
 
-  pr <- risk_plots(r1$df, r2$df)
-  expect_true(is_ggplot(pr$b))
+  pr_test <- risk_plots(r1$df, r2$df)
+  pr_train <- risk_plots(r3$df, r4$df)
+  expect_true(is_ggplot(pr_test$b))
+  expect_true(is_ggplot(pr_train$b))
 })
