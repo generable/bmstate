@@ -9,7 +9,8 @@ params <- list(
 
 test_that("entire workflow works with more complex model", {
   # Create transition matrix
-
+  sn <- c("Randomization", "Bleed", "Stroke", "Death")
+  tm <- transmat_diamond(state_names = sn)
   t3yr <- 3 * 365.25
   mod <- create_msm(tm,
     hazard_covs = c("age", "dose_amt"), num_knots = 4,
@@ -26,10 +27,10 @@ test_that("entire workflow works with more complex model", {
   bh_true[1, 2] <- -1.5
   bh_true[2, 2] <- 0.5
   bh_true[3, 1] <- 0.3
-  sn <- tm$states_df() |>
+  sn_event <- tm$states_df() |>
     dplyr::filter(!source) |>
     dplyr::pull(state)
-  rownames(bh_true) <- paste0("Effect on ", sn)
+  rownames(bh_true) <- paste0("Effect on ", sn_event)
   colnames(bh_true) <- mod$covs()
 
   h0_true <- 0.5 * 1e-3
