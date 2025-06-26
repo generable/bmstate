@@ -22,6 +22,7 @@ Minimal fit class
 \itemize{
 \item \href{#method-MultistateModelFit-new}{\code{MultistateModelFit$new()}}
 \item \href{#method-MultistateModelFit-mean_fit}{\code{MultistateModelFit$mean_fit()}}
+\item \href{#method-MultistateModelFit-is_point_estimate}{\code{MultistateModelFit$is_point_estimate()}}
 \item \href{#method-MultistateModelFit-get_data}{\code{MultistateModelFit$get_data()}}
 \item \href{#method-MultistateModelFit-get_draws}{\code{MultistateModelFit$get_draws()}}
 \item \href{#method-MultistateModelFit-get_draws_of}{\code{MultistateModelFit$get_draws_of()}}
@@ -69,6 +70,19 @@ to the mean of original draws.
 
 \subsection{Returns}{
 A new \code{\link{MultistateModelFit}} object.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModelFit-is_point_estimate"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModelFit-is_point_estimate}{}}}
+\subsection{Method \code{is_point_estimate()}}{
+Check if fit is a point estimate
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModelFit$is_point_estimate()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+a logical value
 }
 }
 \if{html}{\out{<hr>}}
