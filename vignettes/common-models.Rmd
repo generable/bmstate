@@ -195,7 +195,13 @@ of follow up based on paths and
 ensure that it is correct.
 
 ```{r, fig.width=5}
-w0 <- 0.1 * rep(w0, 7)
+h0_true <- 0.5 * 1e-3
+h0_true_vec <- rep(h0_true, 7)
+h0_true_vec[3] <- 0.1 * h0_true
+h0_true_vec[5] <- 5 * h0_true
+h0_true_vec[7] <- 20 * h0_true
+
+w0 <- h0_true_vec
 pd <- mod$simulate_data(N_sub, w0 = w0)
 p <- solve_p(mod, w0)
 p_death1 <- p_event(pd$paths)$prob[3]
