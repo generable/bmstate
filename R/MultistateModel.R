@@ -1,7 +1,8 @@
 #' Create a multistate model
 #'
 #' @export
-#' @param tm A \code{\link{TransitionMatrix}}.
+#' @param tm A \code{\link{TransitionMatrix}}. See \code{\link{transmat}}
+#' for how to create common transition matrices.
 #' @param hazard_covs Covariates that affect the hazard. A character vector.
 #' @param categ_covs Names of covariates that are categorical or binary.
 #' @param pk_covs Covariates that affect the PK parameters. A list with

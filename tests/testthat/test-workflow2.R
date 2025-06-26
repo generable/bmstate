@@ -9,18 +9,7 @@ params <- list(
 
 test_that("entire workflow works with more complex model", {
   # Create transition matrix
-  mat <- matrix(0, 4, 4)
-  mat[1, 2] <- 1
-  mat[2, 3] <- 1
-  mat[3, 2] <- 1
-  mat[3, 4] <- 1
-  mat[2, 4] <- 1
-  mat[1, 4] <- 1
-  mat[1, 3] <- 1
-  mat[2, 2] <- 0
-  mat[3, 3] <- 0
-  sn <- c("Randomization", "Bleed", "Stroke", "Death")
-  tm <- TransitionMatrix$new(mat, sn)
+
   t3yr <- 3 * 365.25
   mod <- create_msm(tm,
     hazard_covs = c("age", "dose_amt"), num_knots = 4,
