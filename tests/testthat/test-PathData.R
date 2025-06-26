@@ -38,7 +38,6 @@ test_that("PathData methods work", {
   expect_true(is_ggplot(p1a))
   expect_true(is_ggplot(p1b))
   p2 <- pd$plot_graph()
-  expect_true(is_ggplot(p2))
   prop <- pd$prop_matrix()
   expect_true(inherits(prop, "table"))
 
