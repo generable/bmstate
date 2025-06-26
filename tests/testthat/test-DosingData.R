@@ -15,7 +15,7 @@ test_that("DosingData init and methods work", {
   }
   a <- dd1$simulate_pk(ts, theta)
   b <- dd1$plot(a)
-  expect_s3_class(b, "ggplot")
+  expect_true(is_ggplot(b))
   r <- dd1$filter()
   expect_equal(r$num_subjects(), N)
 })
@@ -41,5 +41,5 @@ test_that("DosingData works with zero steady-state doses", {
   }
   a <- dd1$simulate_pk(ts, theta)
   b <- dd1$plot(a)
-  expect_s3_class(b, "ggplot")
+  expect_true(is_ggplot(b))
 })

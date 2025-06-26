@@ -82,29 +82,25 @@ test_that("entire workflow works with more complex model", {
 
   plt1 <- fit$plot_h0() + geom_hline(data = df_h0t, aes(yintercept = h0_true), lty = 2)
   plt2 <- fit_pm$plot_h0() + geom_hline(data = df_h0t, aes(yintercept = h0_true), lty = 2)
+  expect_true(is_ggplot(plt1))
+  expect_true(is_ggplot(plt2))
 
   df_beta_true <- data.frame(bh_true) |>
     rownames_to_column("event") |>
-    pivot_longer(cols = -event, names_to = "covariate", values_to = "beta")
+    tidyr::pivot_longer(cols = -event, names_to = "covariate", values_to = "beta")
 
   df_beta <- t(fit$get_draws("beta_oth"))
   rownames(df_beta) <- paste0("Effect on ", sn)
   colnames(df_beta) <- mod$covs()
   df_beta_long <- data.frame(df_beta) |>
     rownames_to_column("event") |>
-    pivot_longer(cols = -event, names_to = "covariate", values_to = "beta")
+    tidyr::pivot_longer(cols = -event, names_to = "covariate", values_to = "beta")
   plt_beta <- ggplot(df_beta_long, aes(y = "", dist = beta)) +
     stat_dist_halfeye(color = "gray10", fill = "firebrick", alpha = 0.8) +
     labs(x = "Coefficient", y = "Posterior density") +
     facet_wrap(. ~ covariate + event) +
     geom_vline(data = df_beta_true, mapping = aes(xintercept = beta), lty = 2)
-  plt_beta
-
-  a <- fit_tte$get_draws("beta_oth")
-  names(a) <- mod$covs()
-  a <- data.frame(t(a))
-  rownames(a) <- paste0("Effect on ", "Death")
-  a
+  expect_true(is_ggplot(plt_beta))
 
   predict_death_risk <- function(fit, dat, n_rep = 100) {
     paths <- generate_paths(fit, data = dat, n_rep = n_rep)
@@ -126,21 +122,8 @@ test_that("entire workflow works with more complex model", {
     )
   }
 
-
   r1 <- predict_death_risk(fit_pm, test_data, params$n_rep)
   r2 <- predict_death_risk(fit_tte_pm, test_data_tte, params$n_rep)
-
-  df1 <- r1$df
-  df1$risk <- df1$risk_analytic
-  df2 <- r2$df
-  df2$risk <- df2$risk_analytic
-  a1 <- c_index(df1)
-  a2 <- c_index(df2)
-  r <- data.frame(
-    model = c("Multistate", "Time-to-event"),
-    concordance = c(a1$concordance, a2$concordance)
-  )
-  r
 
   risk_plots <- function(a1, a2) {
     a <- rbind(a1, a2)
@@ -186,19 +169,5 @@ test_that("entire workflow works with more complex model", {
   }
 
   pr <- risk_plots(r1$df, r2$df)
-  pr$a
-
-  pr$b
-
-  pf1 <- p_event(r1$p, by = "dose_amt") |>
-    filter(state == "Death") |>
-    select(dose_amt, prob)
-  pf2 <- p_event(r2$p, by = "dose_amt") |> select(dose_amt, prob)
-  of <- p_event(test_data$paths, by = "dose_amt") |>
-    filter(state == "Death") |>
-    select(dose_amt, prob)
-  pf <- pf1 |> left_join(pf2, by = c("dose_amt"))
-  pf <- pf |> left_join(of, by = c("dose_amt"))
-  colnames(pf) <- c("Dose (mg)", "Multistate model", "Time-to-event model", "Observed")
-  round(pf, 3)
+  expect_true(is_ggplot(pr$b))
 })
