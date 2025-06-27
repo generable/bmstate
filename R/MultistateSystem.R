@@ -300,6 +300,7 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
       tm <- self$tm()
       mat <- tm$as_transition_index_matrix()
       H <- self$num_trans()
+      checkmate::assert_numeric(log_w0, len = H)
       S <- self$num_states()
       if (is.null(w)) {
         W <- self$num_weights()
