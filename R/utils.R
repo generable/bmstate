@@ -1,3 +1,21 @@
+find_row_and_col_of_integers <- function(mat) {
+  # Get positions of all elements
+  positions <- which(mat > 0, arr.ind = TRUE)
+
+  # Get the values at those positions
+  values <- mat[positions]
+
+  # Combine and order by value
+  result <- positions[order(values), ]
+
+  # Add values for clarity
+  data.frame(
+    value = sort(values),
+    row = result[, "row"],
+    col = result[, "col"]
+  )
+}
+
 # Default event distribution
 default_event_distribution <- function(t_max) {
   x <- seq(0, t_max, length.out = 100)

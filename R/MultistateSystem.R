@@ -309,10 +309,10 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
       if (is.null(log_m)) {
         log_m <- rep(0, H)
       }
-      ti <- which(mat > 0)
+      ti <- find_row_and_col_of_integers(mat)
       for (idx in seq_len(H)) {
         log_h <- self$log_inst_hazard(t, w[idx, ], log_w0[idx], log_m[idx])
-        mat[ti[idx]] <- exp(log_h)
+        mat[ti$row[idx], ti$col[idx]] <- exp(log_h)
       }
       for (s in seq_len(S)) {
         mat[s, s] <- -sum(mat[s, ])

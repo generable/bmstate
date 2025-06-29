@@ -201,7 +201,7 @@ pd$paths$plot_graph()
 
 Here we again generate paths with a lower hazard so that they can get censored
 before the follow-up ends. We compute the probability of death before the end 
-of follow up based on paths and 
+of follow up based on paths and
 ensure that it is correct.
 
 ```{r, fig.width=5}
@@ -210,6 +210,8 @@ h0_true_vec <- rep(h0_true, 7)
 h0_true_vec[3] <- 0.1 * h0_true
 h0_true_vec[5] <- 5 * h0_true
 h0_true_vec[7] <- 20 * h0_true
+# h0_true_vec <- rep(1e-8, 7)
+# h0_true_vec[3] <- 1e-3
 
 P_true <- solve_P_consthaz(mod, h0_true_vec)
 p_death3 <- P_true[1, 4]
