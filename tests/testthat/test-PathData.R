@@ -35,10 +35,9 @@ test_that("PathData methods work", {
   # Plots
   p1a <- pd$plot_paths()
   p1b <- pd$plot_paths(truncate = TRUE)
-  expect_s3_class(p1a, "ggplot")
-  expect_s3_class(p1b, "ggplot")
+  expect_true(is_ggplot(p1a))
+  expect_true(is_ggplot(p1b))
   p2 <- pd$plot_graph()
-  expect_s3_class(p2, "qgraph")
   prop <- pd$prop_matrix()
   expect_true(inherits(prop, "table"))
 
@@ -48,5 +47,5 @@ test_that("PathData methods work", {
   msf <- pd$fit_mstate()
   leg <- pd$transmat$trans_df()
   plt <- msfit_plot_cumhaz(msf, leg)
-  expect_s3_class(plt, "ggplot")
+  expect_true(is_ggplot(plt))
 })

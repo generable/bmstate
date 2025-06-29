@@ -1,3 +1,14 @@
+# Ordered by value
+find_row_and_col_of_positive_vals <- function(mat) {
+  positions <- which(mat > 0, arr.ind = TRUE)
+  values <- mat[positions]
+  out <- positions[order(values), ]
+  if (is.null(dim(out))) {
+    out <- as.matrix(t(out))
+  }
+  out
+}
+
 # Default event distribution
 default_event_distribution <- function(t_max) {
   x <- seq(0, t_max, length.out = 100)

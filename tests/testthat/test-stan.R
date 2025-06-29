@@ -24,8 +24,8 @@ test_that("fitting with Stan works (single transition)", {
   expect_true(inherits(fit, "MultistateModelFit"))
 
   # Plots
-  expect_s3_class(fit$plot_basisfun(), "ggplot")
-  expect_s3_class(fit$plot_h0(), "ggplot")
+  expect_true(is_ggplot(fit$plot_basisfun()))
+  expect_true(is_ggplot(fit$plot_h0()))
 
   # Pathgen
   p <- generate_paths(fit, n_rep = 3)
@@ -50,7 +50,7 @@ test_that("fitting with Stan works (multi-transition)", {
   )
 
   expect_true(inherits(fit, "MultistateModelFit"))
-  expect_s3_class(fit$plot_h0(), "ggplot")
+  expect_true(is_ggplot(fit$plot_h0()))
 
   # Pathgen
   NR <- 4

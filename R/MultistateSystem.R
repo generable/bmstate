@@ -300,6 +300,7 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
       tm <- self$tm()
       mat <- tm$as_transition_index_matrix()
       H <- self$num_trans()
+      checkmate::assert_numeric(log_w0, len = H)
       S <- self$num_states()
       if (is.null(w)) {
         W <- self$num_weights()
@@ -308,10 +309,10 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
       if (is.null(log_m)) {
         log_m <- rep(0, H)
       }
-      ti <- which(mat > 0)
+      ti <- find_row_and_col_of_positive_vals(mat)
       for (idx in seq_len(H)) {
         log_h <- self$log_inst_hazard(t, w[idx, ], log_w0[idx], log_m[idx])
-        mat[ti[idx]] <- exp(log_h)
+        mat[ti[idx, 1], ti[idx, 2]] <- exp(log_h)
       }
       for (s in seq_len(S)) {
         mat[s, s] <- -sum(mat[s, ])

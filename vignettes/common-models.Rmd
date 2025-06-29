@@ -1,7 +1,7 @@
 ---
 title: "Common multistate models"
 author: Juho Timonen
-date: 14th April 2025
+date: 26th June 2025
 output: 
   rmarkdown::html_vignette:
     toc: true 
@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 library(bmstate)
 library(ggplot2)
 theme_set(theme_bw())
-N_sub <- 300
+N_sub <- 1000
 ```
 
 # Basic survival model
@@ -64,6 +64,27 @@ times <- pd$paths$as_transitions(truncate = TRUE)$time
 plot_time_dist(times) + geom_vline(xintercept = 1 / lambda, color = "firebrick")
 ```
 
+Here generate paths with a lower hazard so that they can get censored
+before the follow-up ends. We compute the risk of death based on paths and 
+ensure that it is correct.
+
+```{r, fig.width=5}
+solve_p <- function(mod, lambda) {
+  solve_trans_prob_matrix(mod$system, log_w0 = log(lambda))[1, ]
+}
+solve_P_consthaz <- function(mod, h0) {
+  Q_true <- mod$system$intensity_matrix(mod$system$get_tmax(), log(h0))
+  Matrix::expm(Q_true * mod$system$get_tmax())
+}
+lambda <- 1e-3
+pd <- mod$simulate_data(N_sub, w0 = lambda)
+p <- solve_p(mod, lambda)
+p_death1 <- p_event(pd$paths)$prob
+p_death2 <- p[2]
+r <- c(p_death1, p_death2)
+names(r) <- c("Paths", "Analytic")
+print(r)
+```
 
 # Competing risks model
 
@@ -108,6 +129,22 @@ times <- pd$paths$as_transitions(truncate = TRUE)$time
 plot_time_dist(times) + geom_vline(xintercept = 1 / sum(w0), color = "firebrick")
 ```
 
+Here we again generate paths with a lower hazard so that they can get censored
+before the follow-up ends. We compute the probability of different terminal
+states at the end of follow up based on paths and 
+ensure that they are correct.
+
+```{r, fig.width=5}
+pd <- mod$simulate_data(N_sub, w0 = 0.01 * w0)
+p <- solve_p(mod, 0.01 * w0)
+p_death1 <- p_event(pd$paths)$prob
+p_death2 <- p[2:4]
+r <- rbind(p_death1, p_death2)
+rownames(r) <- c("Paths", "Analytic")
+print(r)
+```
+
+
 # Illness-death model
 
 The illness-death model is another common multistate model.
@@ -117,11 +154,76 @@ tm <- transmat_illnessdeath()
 print(tm)
 tm$plot()
 mod <- create_msm(tm)
-pd <- mod$simulate_data(N_sub, w0 = 1e-2)
+w0 <- 1e-2
+pd <- mod$simulate_data(N_sub, w0 = w0)
 pd$paths$plot_paths()
 pd$paths$plot_graph()
 ```
 
+
+Here we again generate paths with a lower hazard so that they can get censored
+before the follow-up ends. We compute the probability of death before the end 
+of follow up based on paths and 
+ensure that it is correct.
+
+```{r, fig.width=5}
+h0_true <- 0.5 * 1e-3
+h0_true_vec <- rep(h0_true, 3)
+h0_true_vec[2] <- 0.1 * h0_true
+h0_true_vec[3] <- 5 * h0_true
+pd <- mod$simulate_data(N_sub, w0 = h0_true_vec)
+p <- solve_p(mod, h0_true_vec)
+P_true <- solve_P_consthaz(mod, h0_true_vec)
+p_death1 <- p_event(pd$paths)$prob[2]
+p_death2 <- p[3]
+p_death3 <- P_true[1, 3]
+r <- c(p_death1, p_death2, p_death3)
+
+names(r) <- c("Paths", "Analytic", "Analytic2")
+print(r)
+```
+
+
+# Diamond model
+
+This model is a more complex multistate model.
+
+```{r, fig.width=5}
+tm <- transmat_diamond()
+print(tm)
+tm$plot()
+mod <- create_msm(tm)
+w0 <- 1e-2
+pd <- mod$simulate_data(N_sub, w0 = w0)
+pd$paths$plot_paths()
+pd$paths$plot_graph()
+```
+
+Here we again generate paths with a lower hazard so that they can get censored
+before the follow-up ends. We compute the probability of death before the end 
+of follow up based on paths and
+ensure that it is correct.
+
+```{r, fig.width=5}
+h0_true <- 0.5 * 1e-3
+h0_true_vec <- rep(h0_true, 7)
+h0_true_vec[3] <- 0.1 * h0_true
+h0_true_vec[5] <- 5 * h0_true
+h0_true_vec[7] <- 20 * h0_true
+# h0_true_vec <- rep(1e-8, 7)
+# h0_true_vec[3] <- 1e-3
+
+P_true <- solve_P_consthaz(mod, h0_true_vec)
+p_death3 <- P_true[1, 4]
+w0 <- h0_true_vec
+pd <- mod$simulate_data(N_sub, w0 = w0)
+p <- solve_p(mod, w0)
+p_death1 <- p_event(pd$paths)$prob[3]
+p_death2 <- p[4]
+r <- c(p_death1, p_death2, p_death3)
+names(r) <- c("Paths", "Analytic", "Analytic2")
+print(r)
+```
 
 # General multistate models
 

@@ -56,7 +56,7 @@ test_that("entire workflow works", {
 
   # Baseline hazard viz
   plot_h0 <- fit$plot_h0() # should be at h0_base level
-  expect_s3_class(plot_h0, "ggplot")
+  expect_true(is_ggplot(plot_h0))
 
   # Scoring
   ev <- "Death"
@@ -121,7 +121,7 @@ test_that("entire workflow works (with PK)", {
 
   # Plot baseline hazards
   p0 <- fit$plot_h0()
-  expect_s3_class(p0, "ggplot")
+  expect_true(is_ggplot(p0))
 
   # Pk params
   pkpar <- msmsf_pk_params(fit)

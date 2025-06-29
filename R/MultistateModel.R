@@ -1,7 +1,8 @@
 #' Create a multistate model
 #'
 #' @export
-#' @param tm A \code{\link{TransitionMatrix}}.
+#' @param tm A \code{\link{TransitionMatrix}}. See \code{\link{transmat}}
+#' for how to create common transition matrices.
 #' @param hazard_covs Covariates that affect the hazard. A character vector.
 #' @param categ_covs Names of covariates that are categorical or binary.
 #' @param pk_covs Covariates that affect the PK parameters. A list with
@@ -9,8 +10,8 @@
 #' will not be created.
 #' @param ... Arguments passed to \code{\link{MultistateModel}} init
 #' @return A \code{\link{MultistateModel}} object.
-create_msm <- function(tm, hazard_covs = NULL, pk_covs = NULL, categ_covs = NULL,
-                       ...) {
+create_msm <- function(tm, hazard_covs = NULL, pk_covs = NULL,
+                       categ_covs = NULL, ...) {
   mss <- MultistateSystem$new(tm)
   if (!is.null(pk_covs)) {
     pk <- PKModel$new(pk_covs)
@@ -18,7 +19,7 @@ create_msm <- function(tm, hazard_covs = NULL, pk_covs = NULL, categ_covs = NULL
     pk <- NULL
   }
   MultistateModel$new(mss, hazard_covs, pk,
-    categorica = categ_covs,
+    categorical = categ_covs,
     ...
   )
 }

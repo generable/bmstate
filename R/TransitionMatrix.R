@@ -201,17 +201,30 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
 )
 
 
-#' Create "full" transition matrix
+#' Create a common transition matrix
 #'
-#' @export
+#' @description
+#' \itemize{
+#' \item \code{full}: All possible transitions
+#' between non-terminal and non-source states are added, as well as transition
+#' to terminal states from all states.
+#' \item \code{survival}: basic survival model with single transition
+#' \item \code{comprisk}: competing risks transition matrix
+#' \item \code{illnessdeath}: Illness-Death model
+#' \item \code{diamond}: Two intermediate states both leading to same terminal
+#' state
+#' }
 #' @param state_names Names of the states. The length of this character
 #' vector defines the number of states.
 #' @param sources Indices of source states.
 #' @param terminal Indices of terminal states
 #' @param self_loops Add self-loops to non-terminal and non-source states?
-#' @return A \code{\link{TransitionMatrix}}, where all possible transitions
-#' between non-terminal and non-source states are added, as well as transition
-#' to terminal states from all states.
+#' @return A \code{\link{TransitionMatrix}}
+#' @name transmat
+NULL
+
+#' @export
+#' @rdname transmat
 transmat_full <- function(state_names = LETTERS[1:4], sources = 1,
                           terminal = length(state_names), self_loops = TRUE) {
   N <- length(state_names)
@@ -230,12 +243,8 @@ transmat_full <- function(state_names = LETTERS[1:4], sources = 1,
   TransitionMatrix$new(mat, state_names)
 }
 
-#' Create a competing risks transition matrix
-#'
 #' @export
-#' @param state_names Names of the states. The length of this character
-#' vector defines the number of states.
-#' @return A \code{\link{TransitionMatrix}}.
+#' @rdname transmat
 transmat_comprisk <- function(state_names = LETTERS[1:4]) {
   N <- length(state_names)
   checkmate::assert_character(state_names, min.len = 3)
@@ -244,26 +253,38 @@ transmat_comprisk <- function(state_names = LETTERS[1:4]) {
   TransitionMatrix$new(mat, state_names)
 }
 
-#' Basic alive-dead survival model transition matrix
-#'
 #' @export
-#' @param state_names Names of the states.
-#' @return A \code{\link{TransitionMatrix}}
+#' @rdname transmat
 transmat_survival <- function(state_names = c("Alive", "Dead")) {
   checkmate::assert_character(state_names, len = 2)
   transmat_full(state_names, self_loops = F)
 }
 
-#' Illness-death model transition matrix
-#'
 #' @export
-#' @param state_names Names of the states.
-#' @return A \code{\link{TransitionMatrix}}
+#' @rdname transmat
 transmat_illnessdeath <- function(state_names =
                                     c("Randomization", "Illness", "Death")) {
   checkmate::assert_character(state_names, len = 3)
   transmat_full(state_names, self_loops = F)
 }
+
+#' @export
+#' @rdname transmat
+transmat_diamond <- function(state_names = LETTERS[1:4]) {
+  checkmate::assert_character(state_names, len = 4)
+  mat <- matrix(0, 4, 4)
+  mat[1, 2] <- 1
+  mat[2, 3] <- 1
+  mat[3, 2] <- 1
+  mat[3, 4] <- 1
+  mat[2, 4] <- 1
+  mat[1, 4] <- 1
+  mat[1, 3] <- 1
+  mat[2, 2] <- 0
+  mat[3, 3] <- 0
+  TransitionMatrix$new(mat, state_names)
+}
+
 
 # Check that two transition matrices are the same
 check_equal_transmats <- function(tm1, tm2) {

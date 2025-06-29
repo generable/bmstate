@@ -7,7 +7,8 @@
 create_msm(tm, hazard_covs = NULL, pk_covs = NULL, categ_covs = NULL, ...)
 }
 \arguments{
-\item{tm}{A \code{\link{TransitionMatrix}}.}
+\item{tm}{A \code{\link{TransitionMatrix}}. See \code{\link{transmat}}
+for how to create common transition matrices.}
 
 \item{hazard_covs}{Covariates that affect the hazard. A character vector.}
 

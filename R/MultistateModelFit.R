@@ -70,6 +70,12 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
       MultistateModelFit$new(self$data, private$stan_data, self$model, draws)
     },
 
+    #' @description Check if fit is a point estimate
+    #' @return a logical value
+    is_point_estimate = function() {
+      self$num_draws() == 1
+    },
+
     #' @description Extract data list
     #'
     get_data = function() {
@@ -95,8 +101,12 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
     #'
     #' @return nothing
     print = function() {
-      S <- self$num_draws()
-      x1 <- paste0("A MultistateModelFit with ", S, " draws.")
+      if (self$is_point_estimate()) {
+        x1 <- paste0("A point-estimate MultistateModelFit.")
+      } else {
+        S <- self$num_draws()
+        x1 <- paste0("A MultistateModelFit with ", S, " draws.")
+      }
       msg <- paste(x1, "\n", sep = "\n")
       cat(msg)
     },
@@ -122,7 +132,12 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
       legend <- self$model$system$tm()$trans_df()
       df <- df |> dplyr::left_join(legend, by = "trans_idx")
       df$trans_type <- as.factor(df$trans_type)
-      capt <- paste0("Median and ", 100 * ci_alpha, "% CrI")
+      if (!self$is_point_estimate()) {
+        capt <- paste0("Median and ", 100 * ci_alpha, "% CrI")
+      } else {
+        capt <- paste0("Point-estimate fit")
+      }
+
       ggplot(df, aes(
         x = .data$time, y = .data$median, ymin = .data$lower,
         ymax = .data$upper, color = .data$trans_type, fill = .data$trans_type
