@@ -1,19 +1,8 @@
-find_row_and_col_of_integers <- function(mat) {
-  # Get positions of all elements
+# Ordered by value
+find_row_and_col_of_positive_vals <- function(mat) {
   positions <- which(mat > 0, arr.ind = TRUE)
-
-  # Get the values at those positions
   values <- mat[positions]
-
-  # Combine and order by value
-  result <- positions[order(values), ]
-
-  # Add values for clarity
-  data.frame(
-    value = sort(values),
-    row = result[, "row"],
-    col = result[, "col"]
-  )
+  positions[order(values), ]
 }
 
 # Default event distribution
