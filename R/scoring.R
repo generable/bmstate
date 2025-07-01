@@ -17,8 +17,10 @@ event_risk <- function(p, event) {
 #' Compute C index
 #'
 #' @export
+#' @param risk_col Name of risk column to use.
 #' @param df A \code{data.frame} with \code{surv} and \code{risk} columns
-c_index <- function(df) {
-  df$p_noevent <- 1 - df$risk
+c_index <- function(df, risk_col = "risk") {
+  checkmate::assert_character(risk_col)
+  df$p_noevent <- 1 - df[[risk_col]]
   survival::concordance(df$surv ~ df$p_noevent)
 }

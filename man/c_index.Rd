@@ -4,10 +4,12 @@
 \alias{c_index}
 \title{Compute C index}
 \usage{
-c_index(df)
+c_index(df, risk_col = "risk")
 }
 \arguments{
 \item{df}{A \code{data.frame} with \code{surv} and \code{risk} columns}
+
+\item{risk_col}{Name of risk column to use.}
 }
 \description{
 Compute C index

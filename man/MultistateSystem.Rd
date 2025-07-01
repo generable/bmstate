@@ -258,7 +258,7 @@ Evaluate log instant hazard
 \if{html}{\out{<a id="method-MultistateSystem-intensity_matrix"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateSystem-intensity_matrix}{}}}
 \subsection{Method \code{intensity_matrix()}}{
-Evaluate transition intensity matrix at time t
+Evaluate transition intensity (generator) matrix at time t
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$intensity_matrix(t, log_w0, w = NULL, log_m = NULL)}\if{html}{\out{</div>}}
 }

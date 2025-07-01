@@ -332,12 +332,9 @@ PathData <- R6::R6Class(
     #' @param covariates Covariates to include.
     #' @param ... Arguments passed to \code{survival::coxph}.
     fit_mstate = function(covariates = NULL, ...) {
-      message("Formatting as msdata")
       msdat <- self$as_msdata(covariates = covariates)
-      message("Calling survival::coxph()")
       cph <- self$fit_coxph(covariates, ...)
       msdat$strata <- msdat$trans
-      message("Calling mstate::msfit()")
       mstate::msfit(
         object = cph, newdata = msdat, variance = FALSE,
         trans = attr(msdat, "trans")
@@ -411,10 +408,10 @@ msfit_plot_cumhaz <- function(msfit, legend = NULL) {
 #' @param msfit An \code{msfit} object
 msfit_average_hazard <- function(msfit) {
   msfit$Haz |>
-    dplyr::group_by(trans) |>
+    dplyr::group_by(.data$trans) |>
     summarise(
-      avg_haz = (dplyr::last(Haz) - dplyr::first(Haz)) /
-        (dplyr::last(time) - dplyr::first(time))
+      avg_haz = (dplyr::last(.data$Haz) - dplyr::first(.data$Haz)) /
+        (dplyr::last(.data$time) - dplyr::first(.data$time))
     )
 }
 
@@ -457,6 +454,7 @@ to_mstate_format <- function(df, transmat) {
 #' @export
 #' @param pd A \code{\link{PathData}} object
 #' @param possible Possible covariates to look for (character vector)
+#' @param ... Arguments passed to \code{fit_coxph()}
 #' @return A \code{data.frame}
 potential_covariates <- function(pd, possible = NULL, ...) {
   checkmate::assert_class(pd, "PathData")
@@ -511,18 +509,17 @@ as_single_event <- function(pd, event) {
       df <- df[c(1, ri[1]), ]
       df$state[2] <- 2
     }
-    path_df_new <- rbind(path_df_new, df |> dplyr::select(-row_num))
+    path_df_new <- rbind(path_df_new, df |> dplyr::select(-"row_num"))
   }
   path_df_new$trans_idx <- as.numeric(path_df_new$trans_idx > 0)
 
   link_df <- pd$link_df |> dplyr::left_join(
-    pd$subject_df |> dplyr::select(subject_id, subject_id),
+    pd$subject_df |> dplyr::select("subject_id"),
     by = "subject_id"
   )
   tm <- transmat_survival(state_names = c("Randomization", event))
   PathData$new(
-    pd$subject_df, path_df_new, link_df,
-    tm, pd$covs
+    pd$subject_df, path_df_new, link_df, tm, pd$covs
   )
 }
 
@@ -543,7 +540,7 @@ as_survival <- function(pd, event) {
     dplyr::ungroup()
   ppd$surv <- Surv(ppd$time, ppd$is_event)
   dd <- pd$link_df |>
-    dplyr::select(path_id, subject_id) |>
+    dplyr::select("path_id", "subject_id") |>
     dplyr::left_join(pd$subject_df, by = "subject_id")
   ppd <- ppd |>
     dplyr::left_join(dd, by = "path_id") |>

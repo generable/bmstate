@@ -154,14 +154,11 @@ test_that("entire workflow works with more complex model", {
         data = data.frame(x = c(0, 1), y = c(0, 1)), aes(x, y), lty = 2,
         inherit.aes = FALSE
       )
-    list(
-      a = ggpubr::ggarrange(p1, p2, nrow = 2, labels = "auto"),
-      b = p3
-    )
+    list(p1, p2, p3)
   }
 
   pr_test <- risk_plots(r1$df, r2$df)
   pr_train <- risk_plots(r3$df, r4$df)
-  expect_true(is_ggplot(pr_test$b))
-  expect_true(is_ggplot(pr_train$b))
+  expect_true(is_ggplot(pr_test[[1]]))
+  expect_true(is_ggplot(pr_train[[2]]))
 })

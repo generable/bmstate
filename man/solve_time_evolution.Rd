@@ -17,6 +17,9 @@ solve_time_evolution(system, t, log_w0, w = NULL, log_m = NULL)
 
 \item{log_m}{A vector of length \code{n_trans}}
 }
+\value{
+Value given by \code{deSolve::ode}.
+}
 \description{
 Solve the Kolmogorov forward equation of a Markovian multistate system
 }

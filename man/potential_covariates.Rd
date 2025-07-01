@@ -10,6 +10,8 @@ potential_covariates(pd, possible = NULL, ...)
 \item{pd}{A \code{\link{PathData}} object}
 
 \item{possible}{Possible covariates to look for (character vector)}
+
+\item{...}{Arguments passed to \code{fit_coxph()}}
 }
 \value{
 A \code{data.frame}

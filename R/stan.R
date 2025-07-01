@@ -40,7 +40,7 @@ ensure_exposed_stan_functions <- function(...) {
 #' @param filepath Passed to \code{\link{create_stan_model}}.
 #' @param ... Arguments passed to \code{sample} method of the
 #' 'CmdStanR' model.
-#' @return A \code{\link{MultistateModelStanFit}} object.
+#' @return A \code{\link{MultistateModelFit}} object.
 fit_stan <- function(model, data, prior_only = FALSE, filepath = NULL,
                      return_stanfit = FALSE, ...) {
   checkmate::assert_class(model, "MultistateModel")
@@ -331,8 +331,7 @@ create_stan_data_intervalidx <- function(t_start, t_end, t_grid, delta_grid) {
   )
 }
 
-
-# Average hazard per transition type, ignoring transitions that didnt
+# Average hazard per transition type, ignoring transitions that did not
 # occur
 average_haz_per_ttype <- function(pd) {
   msfit <- pd$fit_mstate()
@@ -342,11 +341,11 @@ average_haz_per_ttype <- function(pd) {
   df_ttype$trans <- df_ttype$trans_idx
   h0 <- h0 |> left_join(df_ttype, by = "trans")
   df_mean_log_h0 <- h0 |>
-    dplyr::filter(avg_haz > 0) |>
-    dplyr::group_by(trans_type) |>
-    mutate(log_haz = log(avg_haz)) |>
-    summarize(log_h0_avg = mean(log_haz)) |>
-    dplyr::arrange(trans_type)
+    dplyr::filter(.data$avg_haz > 0) |>
+    dplyr::group_by(.data$trans_type) |>
+    mutate(log_haz = log(.data$avg_haz)) |>
+    summarize(log_h0_avg = mean(.data$log_haz)) |>
+    dplyr::arrange(.data$trans_type)
   df_ttype |> left_join(df_mean_log_h0, by = "trans_type")
 }
 

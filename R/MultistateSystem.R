@@ -286,7 +286,7 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
       log_m + self$log_baseline_hazard(t, log_w0, w, SBF)
     },
 
-    #' @description Evaluate transition intensity matrix at time t
+    #' @description Evaluate transition intensity (generator) matrix at time t
     #'
     #' @param t A number (time point)
     #' @param w An array of shape \code{n_trans} x \code{n_weights}

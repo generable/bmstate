@@ -6,6 +6,7 @@
 #' @param w An array of shape \code{n_trans} x \code{n_weights}
 #' @param log_w0 A vector of length \code{n_trans}
 #' @param log_m A vector of length \code{n_trans}
+#' @return Value given by \code{deSolve::ode}.
 solve_time_evolution <- function(system, t, log_w0, w = NULL, log_m = NULL) {
   checkmate::assert_class(system, "MultistateSystem")
   S <- system$num_states()

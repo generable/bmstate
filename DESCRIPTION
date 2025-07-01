@@ -1,13 +1,12 @@
 Package: bmstate
 Type: Package
 Title: Bayesian multistate modeling using Stan
-Version: 0.0.13
+Version: 0.0.14
 Author: Juho Timonen and Jacqueline Buros
 Maintainer: Juho Timonen <juho.timonen@iki.fi>
 Description: Bayesian multistate modeling using 'Stan'. Option to estimate
     drug exposure as covariate using a PK model and use it as a predictor
     for different hazards.
-License: What license is it under?
 Encoding: UTF-8
 LazyData: true
 Suggests: 
@@ -29,6 +28,7 @@ Imports:
     dplyr,
     ggdist (>= 3.1),
     ggplot2,
+    Matrix,
     mstate,
     posterior,
     progress,

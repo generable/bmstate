@@ -28,7 +28,7 @@ fit_stan(
 'CmdStanR' model.}
 }
 \value{
-A \code{\link{MultistateModelStanFit}} object.
+A \code{\link{MultistateModelFit}} object.
 }
 \description{
 **NOTE:** This function has a side effect of setting normalizers.
