@@ -1,3 +1,8 @@
+# Utility
+rv <- function(fit, name) {
+  posterior::as_draws_rvars(fit$draws(name))[[name]]
+}
+
 # Ordered by value
 find_row_and_col_of_positive_vals <- function(mat) {
   positions <- which(mat > 0, arr.ind = TRUE)
@@ -13,14 +18,6 @@ find_row_and_col_of_positive_vals <- function(mat) {
 default_event_distribution <- function(t_max) {
   x <- seq(0, t_max, length.out = 100)
   max(x) * x^2 / (max(x^2))
-}
-
-# Find index of x in vector y, expecting exactly one match
-find_one <- function(x, y) {
-  idx <- which(y == x)
-  stopifnot(length(idx) == 1)
-  checkmate::assert_integerish(idx, len = 1)
-  idx
 }
 
 # Subject ids for simulated data

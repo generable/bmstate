@@ -106,19 +106,3 @@ split_data <- function(dat, p_test = 0.25) {
     train = dat$filter(train_sub)
   )
 }
-
-#' Plot event time distribution
-#'
-#' @export
-#' @param t a vector of event times
-plot_time_dist <- function(t) {
-  checkmate::assert_numeric(t)
-  ggplot(data.frame(Time = t), aes(x = .data$Time)) +
-    ggdist::stat_halfeye() +
-    geom_vline(
-      mapping = NULL,
-      xintercept = mean(t),
-      color = "gray20",
-      lty = 2
-    )
-}

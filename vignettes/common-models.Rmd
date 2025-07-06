@@ -25,6 +25,19 @@ library(bmstate)
 library(ggplot2)
 theme_set(theme_bw())
 N_sub <- 1000
+
+# Plot event time distribution
+plot_time_dist <- function(t) {
+  checkmate::assert_numeric(t)
+  ggplot(data.frame(Time = t), aes(x = .data$Time)) +
+    ggdist::stat_halfeye() +
+    geom_vline(
+      mapping = NULL,
+      xintercept = mean(t),
+      color = "gray20",
+      lty = 2
+    )
+}
 ```
 
 # Basic survival model
