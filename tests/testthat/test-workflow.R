@@ -146,8 +146,8 @@ test_that("entire workflow works (with PK)", {
   expect_equal(nrow(P_oos), 25)
 
   # PK fit plot
-  pf1 <- fit$plot_pk(L = 60)
-  pf2 <- fit$plot_pk(data = jd$test, L = 60)
+  pf1 <- fit$plot_pk()
+  pf2 <- fit$plot_pk(data = jd$test)
   expect_true(is_ggplot(pf1))
   expect_true(is_ggplot(pf2))
 })

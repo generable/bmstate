@@ -94,7 +94,7 @@ DosingData <- R6::R6Class(
     #' @param df_fit Fit data frame.
     #' @param subject_df Subject data frame.
     #' @param max_num_subjects Max number of subjects to plot.
-    plot = function(df_fit = NULL, subject_df = NULL, max_num_subjects = 20) {
+    plot = function(df_fit = NULL, subject_df = NULL, max_num_subjects = 12) {
       dos <- self$as_data_frame()
       fitcolor <- "steelblue"
       if (is.null(max_num_subjects)) {
@@ -176,8 +176,16 @@ simulate_dosing <- function(df_subjects, tau = 24) {
   dose_ss <- c(15, 30, 60)[sample.int(3, N, replace = TRUE)]
   t1 <- 100 + 100 * stats::runif(N)
   t2 <- t1 + (1 - 0.5 * stats::runif(N)) * tau
-  d1 <- c(30, 30, 30, 30, 0)[sample.int(2, N, replace = TRUE)]
-  d2 <- c(60, 60, 60, 60, 0)[sample.int(2, N, replace = TRUE)]
+  d1 <- dose_ss
+  d2 <- dose_ss
+  for (j in seq_len(N)) {
+    if (stats::runif(1) < 0.2) {
+      d1[j] <- 0
+    }
+    if (stats::runif(1) < 0.2) {
+      d2[j] <- 0
+    }
+  }
   times <- as.list(data.frame(t(matrix(c(t1, t2), ncol = 2))))
   doses <- as.list(data.frame(t(matrix(c(d1, d2), ncol = 2))))
   sid <- df_subjects$subject_id

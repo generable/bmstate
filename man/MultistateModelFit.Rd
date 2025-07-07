@@ -165,7 +165,7 @@ Plot PK fit.
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModelFit$plot_pk(
   max_num_subjects = 12,
   data = NULL,
-  L = 30,
+  L = 100,
   timescale = 24,
   n_prev = 3
 )}\if{html}{\out{</div>}}

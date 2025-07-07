@@ -96,7 +96,7 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
     #' @param L number of grid points for each subject
     #' @param timescale scale of time
     #' @param n_prev number of previous doses to show fit for
-    plot_pk = function(max_num_subjects = 12, data = NULL, L = 30,
+    plot_pk = function(max_num_subjects = 12, data = NULL, L = 100,
                        timescale = 24, n_prev = 3) {
       checkmate::assert_integerish(L, len = 1)
       if (is.null(data)) {
