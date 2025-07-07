@@ -146,15 +146,8 @@ test_that("entire workflow works (with PK)", {
   expect_equal(nrow(P_oos), 25)
 
   # PK fit plot
-  theta <- pkpar[[1]]
-  tmax <- max(sapply(jd$train$dosing$times, max))
-  ttt <- seq(100, tmax, by = 1)
-  N <- nrow(theta)
-  ts <- list()
-  for (j in 1:N) {
-    ts[[j]] <- ttt
-  }
-  pksim <- jd$train$dosing$simulate_pk(ts, theta)
-  pltd <- jd$train$plot_dosing(df_fit = pksim, max_num_subjects = 12)
-  expect_true(is_ggplot(pltd))
+  pf1 <- fit$plot_pk(L = 60)
+  pf2 <- fit$plot_pk(data = jd$test, L = 60)
+  expect_true(is_ggplot(pf1))
+  expect_true(is_ggplot(pf2))
 })
