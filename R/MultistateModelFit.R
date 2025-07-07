@@ -1,37 +1,3 @@
-# Helper
-create_rv_list <- function(stan_fit, names) {
-  out <- list()
-  j <- 0
-  names_out <- NULL
-  for (name in names) {
-    tryCatch(
-      {
-        rv <- rv(stan_fit, name)
-        j <- j + 1
-        out[[j]] <- rv
-        names_out <- c(names_out, name)
-      },
-      error = function(e) {
-      }
-    )
-  }
-  names(out) <- names_out
-  out
-}
-
-# Rvar to an rvar with a single draw corresponding to the mean of original draws
-rvar_to_mean_rvar <- function(rv) {
-  mrv <- mean(rv)
-  D <- dim(mrv)
-  if (is.null(D)) {
-    L <- length(mrv)
-    out <- posterior::rvar(array(mrv, dim = c(1, L)), dim = L)
-  } else {
-    out <- posterior::rvar(array(mrv, dim = c(1, D)), dim = D)
-  }
-  out
-}
-
 #' Minimal fit class
 #'
 #' @export
@@ -133,7 +99,7 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
       if (is.null(data)) {
         data <- self$data
       }
-      pkpar <- msmsf_pk_params(fit, data = data)
+      pkpar <- msmsf_pk_params(self, data = data)
       theta <- pkpar[[1]]
       trange <- sapply(data$dosing$times, range)
       N <- nrow(theta)
@@ -141,7 +107,7 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
       for (j in 1:N) {
         ts[[j]] <- seq(trange[1, j], trange[2, j], length.out = L)
       }
-      pksim <- data()$dosing$simulate_pk(ts, theta)
+      pksim <- data$dosing$simulate_pk(ts, theta)
       pltd <- data$plot_dosing(df_fit = pksim, max_num_subjects = max_num_subjects)
       pltd
     },

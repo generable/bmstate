@@ -3,6 +3,41 @@ rv <- function(fit, name) {
   posterior::as_draws_rvars(fit$draws(name))[[name]]
 }
 
+# Helper
+create_rv_list <- function(stan_fit, names) {
+  out <- list()
+  j <- 0
+  names_out <- NULL
+  for (name in names) {
+    tryCatch(
+      {
+        rv <- rv(stan_fit, name)
+        j <- j + 1
+        out[[j]] <- rv
+        names_out <- c(names_out, name)
+      },
+      error = function(e) {
+      }
+    )
+  }
+  names(out) <- names_out
+  out
+}
+
+# Rvar to an rvar with a single draw corresponding to the mean of original draws
+rvar_to_mean_rvar <- function(rv) {
+  mrv <- mean(rv)
+  D <- dim(mrv)
+  if (is.null(D)) {
+    L <- length(mrv)
+    out <- posterior::rvar(array(mrv, dim = c(1, L)), dim = L)
+  } else {
+    out <- posterior::rvar(array(mrv, dim = c(1, D)), dim = D)
+  }
+  out
+}
+
+
 # Ordered by value
 find_row_and_col_of_positive_vals <- function(mat) {
   positions <- which(mat > 0, arr.ind = TRUE)
