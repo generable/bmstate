@@ -115,7 +115,7 @@ DosingData <- R6::R6Class(
         x = .data$time, y = .data$val,
         group = .data$subject_id
       )) +
-        facet_wrap(. ~ .data$subject_id) +
+        facet_wrap(. ~ .data$subject_id, scales = "free_x") +
         geom_vline(
           data = dos, mapping = aes(xintercept = time),
           col = "firebrick", lty = 2
@@ -176,8 +176,8 @@ simulate_dosing <- function(df_subjects, tau = 24) {
   dose_ss <- c(15, 30, 60)[sample.int(3, N, replace = TRUE)]
   t1 <- 100 + 100 * stats::runif(N)
   t2 <- t1 + (1 - 0.5 * stats::runif(N)) * tau
-  d1 <- c(30, 0)[sample.int(2, N, replace = TRUE)]
-  d2 <- c(60, 0)[sample.int(2, N, replace = TRUE)]
+  d1 <- c(30, 30, 30, 30, 0)[sample.int(2, N, replace = TRUE)]
+  d2 <- c(60, 60, 60, 60, 0)[sample.int(2, N, replace = TRUE)]
   times <- as.list(data.frame(t(matrix(c(t1, t2), ncol = 2))))
   doses <- as.list(data.frame(t(matrix(c(d1, d2), ncol = 2))))
   sid <- df_subjects$subject_id

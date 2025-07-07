@@ -94,7 +94,10 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
     #' @param data Data for which to predict the concentration. If \code{NULL},
     #' training data is used.
     #' @param L number of grid points for each subject
-    plot_pk = function(max_num_subjects = 12, data = NULL, L = 30) {
+    #' @param timescale scale of time
+    #' @param n_prev number of previous doses to show fit for
+    plot_pk = function(max_num_subjects = 12, data = NULL, L = 30,
+                       timescale = 24, n_prev = 3) {
       checkmate::assert_integerish(L, len = 1)
       if (is.null(data)) {
         data <- self$data
@@ -105,7 +108,11 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
       N <- nrow(theta)
       ts <- list()
       for (j in 1:N) {
-        ts[[j]] <- seq(trange[1, j], trange[2, j], length.out = L)
+        ts[[j]] <- seq(
+          trange[1, j] - timescale * n_prev,
+          trange[2, j],
+          length.out = L
+        ) + timescale
       }
       pksim <- data$dosing$simulate_pk(ts, theta)
       pltd <- data$plot_dosing(df_fit = pksim, max_num_subjects = max_num_subjects)

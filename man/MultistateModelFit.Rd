@@ -162,7 +162,13 @@ Plot used basis functions (grid)
 \subsection{Method \code{plot_pk()}}{
 Plot PK fit.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModelFit$plot_pk(max_num_subjects = 12, data = NULL, L = 30)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModelFit$plot_pk(
+  max_num_subjects = 12,
+  data = NULL,
+  L = 30,
+  timescale = 24,
+  n_prev = 3
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -173,7 +179,11 @@ Plot PK fit.
 \item{\code{data}}{Data for which to predict the concentration. If \code{NULL},
 training data is used.}
 
-\item{\code{L}}{number of grid points for each subject
+\item{\code{L}}{number of grid points for each subject}
+
+\item{\code{timescale}}{scale of time}
+
+\item{\code{n_prev}}{number of previous doses to show fit for
 Plot baseline hazard distribution}
 }
 \if{html}{\out{</div>}}
