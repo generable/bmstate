@@ -155,6 +155,6 @@ test_that("entire workflow works (with PK)", {
     ts[[j]] <- ttt
   }
   pksim <- jd$train$dosing$simulate_pk(ts, theta)
-  pltd <- jd$train$plot_dosing(df_fit = pksim)
+  pltd <- jd$train$plot_dosing(df_fit = pksim, max_num_subjects = 12)
   expect_true(is_ggplot(pltd))
 })

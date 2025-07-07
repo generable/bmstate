@@ -123,6 +123,29 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
         ggtitle("Basis functions")
     },
 
+    #' @description Plot PK fit.
+    #' @param max_num_subjects Max number of subjects to show.
+    #' @param data Data for which to predict the concentration. If \code{NULL},
+    #' training data is used.
+    #' @param L number of grid points for each subject
+    plot_pk = function(max_num_subjects = 12, data = NULL, L = 30) {
+      checkmate::assert_integerish(L, len = 1)
+      if (is.null(data)) {
+        data <- self$data
+      }
+      pkpar <- msmsf_pk_params(fit, data = data)
+      theta <- pkpar[[1]]
+      trange <- sapply(data$dosing$times, range)
+      N <- nrow(theta)
+      ts <- list()
+      for (j in 1:N) {
+        ts[[j]] <- seq(trange[1, j], trange[2, j], length.out = L)
+      }
+      pksim <- data()$dosing$simulate_pk(ts, theta)
+      pltd <- data$plot_dosing(df_fit = pksim, max_num_subjects = max_num_subjects)
+      pltd
+    },
+
     #' Plot baseline hazard distribution
     #'
     #' @param t times where to evaluate the baseline hazards
