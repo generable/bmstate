@@ -24,6 +24,7 @@ Initialize}
 \item \href{#method-JointData-new}{\code{JointData$new()}}
 \item \href{#method-JointData-filter}{\code{JointData$filter()}}
 \item \href{#method-JointData-print}{\code{JointData$print()}}
+\item \href{#method-JointData-plot_dosing}{\code{JointData$plot_dosing()}}
 \item \href{#method-JointData-clone}{\code{JointData$clone()}}
 }
 }
@@ -72,6 +73,28 @@ Print info
 \if{html}{\out{<div class="r">}}\preformatted{JointData$print()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-JointData-plot_dosing"></a>}}
+\if{latex}{\out{\hypertarget{method-JointData-plot_dosing}{}}}
+\subsection{Method \code{plot_dosing()}}{
+Plot dosing
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{JointData$plot_dosing(df_fit = NULL, max_num_subjects = 20)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{df_fit}}{Fit data frame.}
+
+\item{\code{max_num_subjects}}{Max number of subjects to plot.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+a \code{ggplot}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-JointData-clone"></a>}}

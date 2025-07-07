@@ -91,14 +91,24 @@ DosingData <- R6::R6Class(
 
     #' Plot dosing (and PK) data
     #'
-    #' @param df A data frame simulated using \code{simulate_pk}.
-    plot = function(df = NULL) {
+    #' @param df_fit Fit data frame.
+    #' @param subject_df Subject data frame.
+    #' @param max_num_subjects Max number of subjects to plot.
+    plot = function(df_fit = NULL, subject_df = NULL, max_num_subjects = 20) {
       dos <- self$as_data_frame()
-      if (self$num_subjects() > 12) {
-        sid <- unique(dos$subject_id)[1:12]
+      fitcolor <- "steelblue"
+      if (is.null(max_num_subjects)) {
+        max_num_subjects <- self$num_subjects()
+      }
+      checkmate::assert_integerish(max_num_subjects, len = 1, lower = 1)
+      if (self$num_subjects() > max_num_subjects) {
+        sid <- sample(unique(dos$subject_id), max_num_subjects)
         dos <- dos |> dplyr::filter(.data$subject_id %in% sid)
-        if (!is.null(df)) {
-          df <- df |> dplyr::filter(.data$subject_id %in% sid)
+        if (!is.null(df_fit)) {
+          df_fit <- df_fit |> dplyr::filter(.data$subject_id %in% sid)
+        }
+        if (!is.null(subject_df)) {
+          subject_df <- subject_df |> dplyr::filter(.data$subject_id %in% sid)
         }
       }
       plt <- ggplot(NULL, aes(
@@ -110,8 +120,26 @@ DosingData <- R6::R6Class(
           data = dos, mapping = aes(xintercept = time),
           col = "firebrick", lty = 2
         )
-      if (!is.null(df)) {
-        plt <- plt + geom_line(data = df)
+      if (!is.null(df_fit)) {
+        if (!is.null(df_fit$lower)) {
+          plt <- plt + geom_ribbon(
+            data = df_fit, mapping = aes(ymin = lower, ymax = upper),
+            fill = fitcolor, alpha = 0.7
+          )
+        }
+        plt <- plt + geom_line(data = df_fit, color = fitcolor)
+      }
+      if (!is.null(subject_df)) {
+        sdf <- subject_df
+        df_conc <- data.frame(
+          subject_id = rep(sdf$subject_id, 2),
+          time = c(sdf$t_pre, sdf$t_post),
+          conc = c(sdf$conc_pre, sdf$conc_post)
+        )
+        plt <- plt + geom_point(data = df_conc, mapping = aes(
+          x = .data$time, y = .data$conc,
+          group = .data$subject_id
+        ))
       }
 
       plt + ylab("Concentration in central compartment")

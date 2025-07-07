@@ -117,6 +117,7 @@ test_that("entire workflow works (with PK)", {
     adapt_delta = 0.95,
     init = 0.1
   )
+  fit <- fit$mean_fit()
   expect_true(inherits(fit, "MultistateModelFit"))
 
   # Plot baseline hazards
@@ -126,8 +127,8 @@ test_that("entire workflow works (with PK)", {
   # Pk params
   pkpar <- msmsf_pk_params(fit)
   pkpar_oos <- msmsf_pk_params(fit, jd$test)
-  expect_true(length(pkpar) == 30)
-  expect_true(length(pkpar_oos) == 30)
+  expect_true(length(pkpar) == 1)
+  expect_true(length(pkpar_oos) == 1)
 
   # Hazard multipliers
   log_m <- msmsf_log_hazard_multipliers(fit)
@@ -143,4 +144,17 @@ test_that("entire workflow works (with PK)", {
   P_oos <- solve_trans_prob_fit(fit, data = jd$test)
   expect_equal(nrow(P), 75)
   expect_equal(nrow(P_oos), 25)
+
+  # PK fit plot
+  theta <- pkpar[[1]]
+  tmax <- max(sapply(jd$train$dosing$times, max))
+  ttt <- seq(100, tmax, by = 1)
+  N <- nrow(theta)
+  ts <- list()
+  for (j in 1:N) {
+    ts[[j]] <- ttt
+  }
+  pksim <- jd$train$dosing$simulate_pk(ts, theta)
+  pltd <- jd$train$plot_dosing(df_fit = pksim)
+  expect_true(is_ggplot(pltd))
 })

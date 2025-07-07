@@ -287,7 +287,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       categ <- self$categ_covs()
       idx_cat <- which(covs %in% categ)
       N_covs <- length(covs)
-      A <- 100 + 30 * matrix(rnorm(N_subject * N_covs), N_subject, N_covs)
+      A <- 60 + 15 * matrix(rnorm(N_subject * N_covs), N_subject, N_covs)
 
       # Discretize covariates
       for (idx in idx_cat) {

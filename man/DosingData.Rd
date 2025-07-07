@@ -119,13 +119,17 @@ Plot dosing (and PK) data
 \if{latex}{\out{\hypertarget{method-DosingData-plot}{}}}
 \subsection{Method \code{plot()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DosingData$plot(df = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DosingData$plot(df_fit = NULL, subject_df = NULL, max_num_subjects = 20)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{df}}{A data frame simulated using \code{simulate_pk}.}
+\item{\code{df_fit}}{Fit data frame.}
+
+\item{\code{subject_df}}{Subject data frame.}
+
+\item{\code{max_num_subjects}}{Max number of subjects to plot.}
 }
 \if{html}{\out{</div>}}
 }
