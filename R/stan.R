@@ -52,6 +52,13 @@ fit_stan <- function(model, data, prior_only = FALSE, filepath = NULL,
 
   # Set normalizing locations and scales (side effect)
   model$set_normalizers(data)
+  if (!is.null(data$dosing)) {
+    mu_CL <- exp(-2)
+    aaa <- data$dosing$dose_ss / mu_CL
+    loc <- mean(aaa)
+    sca <- stats::sd(aaa)
+    model$set_auc_normalizers(loc, sca)
+  }
 
   # Create Stan input list
   sd <- create_stan_data(model, data, prior_only)
@@ -229,6 +236,7 @@ create_stan_data_pk <- function(data, model) {
   t_obs_pk <- pk_obs[, 1:2]
   conc_pk <- pk_obs[, 3:4]
   pk_lloq <- as.numeric(pk_obs[, 5])
+  an <- model$get_auc_normalizers()
 
   # Return
   sd <- list(
@@ -239,7 +247,9 @@ create_stan_data_pk <- function(data, model) {
     last_two_doses = last_two_doses,
     pk_lloq = pk_lloq,
     I_auc = as.numeric(model$has_pk()),
-    tau_ss = tau_ss
+    tau_ss = tau_ss,
+    auc_loc = an$loc,
+    auc_scale = an$scale
   )
   c(sd, create_stan_data_time_since_last_pk(sd))
 }

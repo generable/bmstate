@@ -124,7 +124,7 @@ test_that("entire workflow works (with PK)", {
   p0 <- fit$plot_h0()
   expect_true(is_ggplot(p0))
 
-  # Pk params
+  # PK params
   pkpar <- msmsf_pk_params(fit)
   pkpar_oos <- msmsf_pk_params(fit, jd$test)
   expect_true(length(pkpar) == 1)

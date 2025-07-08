@@ -299,6 +299,7 @@ msmsf_log_hazard_multipliers <- function(fit, data = NULL) {
   } else {
     x_haz_long <- array(0, dim = c(0, sd$N_int))
   }
+  an <- fit$model$get_auc_normalizers()
 
   for (s in seq_len(S)) {
     if (sd$do_pk == 1) {
@@ -317,6 +318,8 @@ msmsf_log_hazard_multipliers <- function(fit, data = NULL) {
         ba,
         mat2list(t(x_haz_long)),
         aa,
+        an$loc,
+        an$scale,
         sd$ttype
       )
       r <- r[first_indices, , drop = FALSE]
