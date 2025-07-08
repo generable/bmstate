@@ -58,18 +58,21 @@ functions {
     int N_id = size(log_z);
     matrix[N_id, 3] log_theta;
     for(n in 1:N_id) {
+      real v1 = -2 + log_mu[1] + log_z[n][1] * log_sig[1] +
+        sum(beta_ka .* x_ka[n]);
+      real v2 = -2 + log_mu[2] + log_z[n][2] * log_sig[2] +
+        sum(beta_CL .* x_CL[n]);
+      real v3 = -2 + log_mu[3] + log_z[n][3] * log_sig[3] +
+        sum(beta_V2 .* x_V2[n]);
 
       // ka
-      log_theta[n, 1] = -2 + log_mu[1] + log_z[n][1] * log_sig[1] +
-        sum(beta_ka .* x_ka[n]);
+      log_theta[n, 1] = min(v1, 4);
 
       // CL
-      log_theta[n, 2] = -2 + log_mu[2] + log_z[n][2] * log_sig[2] +
-        sum(beta_CL .* x_CL[n]);
+      log_theta[n, 2] = min(v2, 4);
 
       // V2
-      log_theta[n, 3] = -2 + log_mu[3] + log_z[n][3] * log_sig[3] +
-        sum(beta_V2 .* x_V2[n]);
+      log_theta[n, 3] = min(v3, 4);
 
     }
     return(exp(log_theta));

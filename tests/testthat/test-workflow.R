@@ -1,8 +1,8 @@
 # Options
 options <- list(
-  N_subject = 100,
-  iter_warmup = 100,
-  iter_sampling = 30,
+  N_subject = 1000,
+  iter_warmup = 600,
+  iter_sampling = 100,
   chains = 1
 )
 
