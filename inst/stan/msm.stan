@@ -66,13 +66,13 @@ functions {
         sum(beta_V2 .* x_V2[n]);
 
       // ka
-      log_theta[n, 1] = min(v1, 4);
+      log_theta[n, 1] = fmin(v1, 4);
 
       // CL
-      log_theta[n, 2] = min(v2, 4);
+      log_theta[n, 2] = fmin(v2, 4);
 
       // V2
-      log_theta[n, 3] = min(v3, 4);
+      log_theta[n, 3] = fmin(v3, 4);
 
     }
     return(exp(log_theta));
