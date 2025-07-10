@@ -7,6 +7,8 @@ functions {
       array[] vector beta_auc,
       data array[] vector x_haz,
       array[] vector x_auc,
+      real auc_loc,
+      real auc_scale,
       data array[] int ttype
   ) {
     int N_trans = size(ttype);
@@ -20,7 +22,7 @@ functions {
         }
       }
       if(size(beta_auc)==1){
-        log_C_haz[,j] += beta_auc[1][h] * x_auc[1];
+        log_C_haz[,j] += beta_auc[1][h] * ((x_auc[1] - auc_loc) / auc_scale);
       }
     }
     return(log_C_haz);
@@ -56,18 +58,21 @@ functions {
     int N_id = size(log_z);
     matrix[N_id, 3] log_theta;
     for(n in 1:N_id) {
+      real v1 = -2 + log_mu[1] + log_z[n][1] * log_sig[1] +
+        sum(beta_ka .* x_ka[n]);
+      real v2 = -2 + log_mu[2] + log_z[n][2] * log_sig[2] +
+        sum(beta_CL .* x_CL[n]);
+      real v3 = -2 + log_mu[3] + log_z[n][3] * log_sig[3] +
+        sum(beta_V2 .* x_V2[n]);
 
       // ka
-      log_theta[n, 1] = -2 + log_mu[1] + log_z[n][1] * log_sig[1] +
-        sum(beta_ka .* x_ka[n]);
+      log_theta[n, 1] = v1;
 
       // CL
-      log_theta[n, 2] = 1 + log_mu[2] + log_z[n][2] * log_sig[2] +
-        sum(beta_CL .* x_CL[n]);
+      log_theta[n, 2] = v2;
 
       // V2
-      log_theta[n, 3] = -2 + log_mu[3] + log_z[n][3] * log_sig[3] +
-        sum(beta_V2 .* x_V2[n]);
+      log_theta[n, 3] = v3;
 
     }
     return(exp(log_theta));
@@ -367,6 +372,10 @@ data {
   array[N_sub] vector[nc_CL] x_CL; // covs that affect CL
   array[N_sub] vector[nc_V2] x_V2; // covs that affect V2
 
+  // AUC normalization
+  real<lower=0> auc_loc;
+  real<lower=0> auc_scale;
+
 }
 
 transformed data {
@@ -447,8 +456,7 @@ transformed parameters {
 
     // Find drug amounts in both compartments at last two dose times
     last_two_amounts_pk[1] = pop_2cpt_partly_ss_stage1(
-      dose_ss, last_two_times, last_two_doses, theta_pk[1],
-      tau_ss
+      dose_ss, last_two_times, last_two_doses, theta_pk[1], tau_ss
     );
 
     // Drug concentration estimated at t_obs
@@ -471,7 +479,8 @@ transformed parameters {
 
   // log of hazard multiplier on each interval
   matrix[N_int, N_trans] log_C_haz = compute_log_hazard_multiplier(
-    N_int, beta_oth, beta_auc, x_haz_long, x_auc_long, ttype
+    N_int, beta_oth, beta_auc, x_haz_long, x_auc_long, auc_loc, auc_scale,
+    ttype
   );
 }
 

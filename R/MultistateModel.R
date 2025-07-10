@@ -39,6 +39,8 @@ MultistateModel <- R6::R6Class("MultistateModel",
     categorical = NULL,
     normalizer_locations = NULL,
     normalizer_scales = NULL,
+    auc_normalizer_loc = 300,
+    auc_normalizer_scale = 100,
     simulate_log_hazard_multipliers = function(df_subjects, beta) {
       ts <- self$target_states()
       x <- self$covs()
@@ -72,12 +74,21 @@ MultistateModel <- R6::R6Class("MultistateModel",
     pk_model = NULL,
     delta_grid = 1,
 
-    #' @description Get normalization constant for each variable
+    #' @description Get normalization constants for each variable
     #' @return list
     get_normalizers = function() {
       list(
         locations = private$normalizer_locations,
         scales = private$normalizer_scales
+      )
+    },
+
+    #' @description Get normalization constants for AUC (PK)
+    #' @return list
+    get_auc_normalizers = function() {
+      list(
+        loc = private$auc_normalizer_loc,
+        scale = private$auc_normalizer_scale
       )
     },
 
@@ -90,6 +101,18 @@ MultistateModel <- R6::R6Class("MultistateModel",
       num_cols <- which(sapply(df_sub, is.numeric))
       private$normalizer_locations <- lapply(df_sub[, num_cols], mean)
       private$normalizer_scales <- lapply(df_sub[, num_cols], stats::sd)
+      NULL
+    },
+
+    #' Set normalization constants for AUC (side effect)
+    #'
+    #' @param loc Location
+    #' @param scale Scale
+    set_auc_normalizers = function(loc = 0, scale = 1) {
+      checkmate::assert_numeric(loc, lower = 0, len = 1)
+      checkmate::assert_numeric(scale, lower = 0, len = 1)
+      private$auc_normalizer_loc <- loc
+      private$auc_normalizer_scale <- scale
       NULL
     },
 
@@ -287,7 +310,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       categ <- self$categ_covs()
       idx_cat <- which(covs %in% categ)
       N_covs <- length(covs)
-      A <- 100 + 30 * matrix(rnorm(N_subject * N_covs), N_subject, N_covs)
+      A <- 60 + 15 * matrix(rnorm(N_subject * N_covs), N_subject, N_covs)
 
       # Discretize covariates
       for (idx in idx_cat) {

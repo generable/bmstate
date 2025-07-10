@@ -1,7 +1,7 @@
 Package: bmstate
 Type: Package
 Title: Bayesian multistate modeling using Stan
-Version: 0.0.14
+Version: 0.0.15
 Author: Juho Timonen and Jacqueline Buros
 Maintainer: Juho Timonen <juho.timonen@iki.fi>
 Description: Bayesian multistate modeling using 'Stan'. Option to estimate

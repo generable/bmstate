@@ -49,6 +49,18 @@ JointData <- R6::R6Class(
       } else {
         self$dosing$print()
       }
+    },
+
+    #' @description Plot dosing
+    #' @param df_fit Fit data frame.
+    #' @param max_num_subjects Max number of subjects to plot.
+    #' @return a \code{ggplot}
+    plot_dosing = function(df_fit = NULL, max_num_subjects = 12) {
+      if (is.null(self$dosing)) {
+        stop("No dosing data.")
+      }
+      sdf <- self$paths$subject_df
+      self$dosing$plot(df_fit, sdf, max_num_subjects)
     }
   )
 )

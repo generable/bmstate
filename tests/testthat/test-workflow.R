@@ -117,17 +117,18 @@ test_that("entire workflow works (with PK)", {
     adapt_delta = 0.95,
     init = 0.1
   )
+  fit <- fit$mean_fit()
   expect_true(inherits(fit, "MultistateModelFit"))
 
   # Plot baseline hazards
   p0 <- fit$plot_h0()
   expect_true(is_ggplot(p0))
 
-  # Pk params
+  # PK params
   pkpar <- msmsf_pk_params(fit)
   pkpar_oos <- msmsf_pk_params(fit, jd$test)
-  expect_true(length(pkpar) == 30)
-  expect_true(length(pkpar_oos) == 30)
+  expect_true(length(pkpar) == 1)
+  expect_true(length(pkpar_oos) == 1)
 
   # Hazard multipliers
   log_m <- msmsf_log_hazard_multipliers(fit)
@@ -143,4 +144,10 @@ test_that("entire workflow works (with PK)", {
   P_oos <- solve_trans_prob_fit(fit, data = jd$test)
   expect_equal(nrow(P), 75)
   expect_equal(nrow(P_oos), 25)
+
+  # PK fit plot
+  pf1 <- fit$plot_pk()
+  pf2 <- fit$plot_pk(data = jd$test)
+  expect_true(is_ggplot(pf1))
+  expect_true(is_ggplot(pf2))
 })

@@ -48,15 +48,18 @@
 #' @param beta_haz see the documentation of \code{\link{MultistateModel}}
 #' @param beta_pk see the documentation of \code{\link{MultistateModel}}
 #' @param w0 see the documentation of \code{\link{MultistateModel}}
+#' @param tm A \code{\link{TransitionMatrix}}
 simulate_example_data <- function(N = 10, beta_haz = NULL,
-                                  beta_pk = NULL, w0 = 1e-3) {
+                                  beta_pk = NULL, w0 = 1e-3, tm = NULL) {
   covs <- c("sex", "age")
   pk_covs <- list(
     ka = "age",
     CL = "CrCL",
     V2 = c("weight", "sex")
   )
-  tm <- transmat_full(self_loops = FALSE)
+  if (is.null(tm)) {
+    tm <- transmat_survival()
+  }
   tmax <- 3 * 365.25
   mod <- create_msm(tm, covs, pk_covs, tmax = tmax)
   dat <- mod$simulate_data(N, beta_haz, beta_pk, w0)
@@ -105,20 +108,4 @@ split_data <- function(dat, p_test = 0.25) {
     test = dat$filter(test_sub),
     train = dat$filter(train_sub)
   )
-}
-
-#' Plot event time distribution
-#'
-#' @export
-#' @param t a vector of event times
-plot_time_dist <- function(t) {
-  checkmate::assert_numeric(t)
-  ggplot(data.frame(Time = t), aes(x = .data$Time)) +
-    ggdist::stat_halfeye() +
-    geom_vline(
-      mapping = NULL,
-      xintercept = mean(t),
-      color = "gray20",
-      lty = 2
-    )
 }

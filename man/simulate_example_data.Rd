@@ -4,7 +4,13 @@
 \alias{simulate_example_data}
 \title{Simulate example data}
 \usage{
-simulate_example_data(N = 10, beta_haz = NULL, beta_pk = NULL, w0 = 0.001)
+simulate_example_data(
+  N = 10,
+  beta_haz = NULL,
+  beta_pk = NULL,
+  w0 = 0.001,
+  tm = NULL
+)
 }
 \arguments{
 \item{N}{number of subjects}
@@ -14,6 +20,8 @@ simulate_example_data(N = 10, beta_haz = NULL, beta_pk = NULL, w0 = 0.001)
 \item{beta_pk}{see the documentation of \code{\link{MultistateModel}}}
 
 \item{w0}{see the documentation of \code{\link{MultistateModel}}}
+
+\item{tm}{A \code{\link{TransitionMatrix}}}
 }
 \description{
 Simulate example data

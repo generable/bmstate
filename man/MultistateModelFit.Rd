@@ -28,6 +28,7 @@ Minimal fit class
 \item \href{#method-MultistateModelFit-get_draws_of}{\code{MultistateModelFit$get_draws_of()}}
 \item \href{#method-MultistateModelFit-print}{\code{MultistateModelFit$print()}}
 \item \href{#method-MultistateModelFit-plot_basisfun}{\code{MultistateModelFit$plot_basisfun()}}
+\item \href{#method-MultistateModelFit-plot_pk}{\code{MultistateModelFit$plot_pk()}}
 \item \href{#method-MultistateModelFit-plot_h0}{\code{MultistateModelFit$plot_h0()}}
 \item \href{#method-MultistateModelFit-h0_dist}{\code{MultistateModelFit$h0_dist()}}
 \item \href{#method-MultistateModelFit-log_z_pars}{\code{MultistateModelFit$log_z_pars()}}
@@ -150,11 +151,43 @@ nothing
 \if{latex}{\out{\hypertarget{method-MultistateModelFit-plot_basisfun}{}}}
 \subsection{Method \code{plot_basisfun()}}{
 Plot used basis functions (grid)
-Plot baseline hazard distribution
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModelFit$plot_basisfun()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModelFit-plot_pk"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModelFit-plot_pk}{}}}
+\subsection{Method \code{plot_pk()}}{
+Plot PK fit.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModelFit$plot_pk(
+  max_num_subjects = 12,
+  data = NULL,
+  L = 100,
+  timescale = 24,
+  n_prev = 3
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{max_num_subjects}}{Max number of subjects to show.}
+
+\item{\code{data}}{Data for which to predict the concentration. If \code{NULL},
+training data is used.}
+
+\item{\code{L}}{number of grid points for each subject}
+
+\item{\code{timescale}}{scale of time}
+
+\item{\code{n_prev}}{number of previous doses to show fit for
+Plot baseline hazard distribution}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateModelFit-plot_h0"></a>}}

@@ -24,7 +24,9 @@ hazards.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-MultistateModel-get_normalizers}{\code{MultistateModel$get_normalizers()}}
+\item \href{#method-MultistateModel-get_auc_normalizers}{\code{MultistateModel$get_auc_normalizers()}}
 \item \href{#method-MultistateModel-set_normalizers}{\code{MultistateModel$set_normalizers()}}
+\item \href{#method-MultistateModel-set_auc_normalizers}{\code{MultistateModel$set_auc_normalizers()}}
 \item \href{#method-MultistateModel-new}{\code{MultistateModel$new()}}
 \item \href{#method-MultistateModel-set_knots}{\code{MultistateModel$set_knots()}}
 \item \href{#method-MultistateModel-get_states}{\code{MultistateModel$get_states()}}
@@ -45,9 +47,22 @@ hazards.}
 \if{html}{\out{<a id="method-MultistateModel-get_normalizers"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateModel-get_normalizers}{}}}
 \subsection{Method \code{get_normalizers()}}{
-Get normalization constant for each variable
+Get normalization constants for each variable
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModel$get_normalizers()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+list
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-get_auc_normalizers"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-get_auc_normalizers}{}}}
+\subsection{Method \code{get_auc_normalizers()}}{
+Get normalization constants for AUC (PK)
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$get_auc_normalizers()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -66,7 +81,26 @@ Set normalization constant for each variable (side effect)
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{data}}{A \code{\link{JointData}} object}
+\item{\code{data}}{A \code{\link{JointData}} object
+Set normalization constants for AUC (side effect)}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-set_auc_normalizers"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-set_auc_normalizers}{}}}
+\subsection{Method \code{set_auc_normalizers()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$set_auc_normalizers(loc = 0, scale = 1)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{loc}}{Location}
+
+\item{\code{scale}}{Scale}
 }
 \if{html}{\out{</div>}}
 }

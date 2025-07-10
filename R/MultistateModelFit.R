@@ -1,37 +1,3 @@
-# Helper
-create_rv_list <- function(stan_fit, names) {
-  out <- list()
-  j <- 0
-  names_out <- NULL
-  for (name in names) {
-    tryCatch(
-      {
-        rv <- rv(stan_fit, name)
-        j <- j + 1
-        out[[j]] <- rv
-        names_out <- c(names_out, name)
-      },
-      error = function(e) {
-      }
-    )
-  }
-  names(out) <- names_out
-  out
-}
-
-# Rvar to an rvar with a single draw corresponding to the mean of original draws
-rvar_to_mean_rvar <- function(rv) {
-  mrv <- mean(rv)
-  D <- dim(mrv)
-  if (is.null(D)) {
-    L <- length(mrv)
-    out <- posterior::rvar(array(mrv, dim = c(1, L)), dim = L)
-  } else {
-    out <- posterior::rvar(array(mrv, dim = c(1, D)), dim = D)
-  }
-  out
-}
-
 #' Minimal fit class
 #'
 #' @export
@@ -121,6 +87,36 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
       ggplot(df, aes(.data$t, .data$y, color = .data$idx)) +
         geom_line() +
         ggtitle("Basis functions")
+    },
+
+    #' @description Plot PK fit.
+    #' @param max_num_subjects Max number of subjects to show.
+    #' @param data Data for which to predict the concentration. If \code{NULL},
+    #' training data is used.
+    #' @param L number of grid points for each subject
+    #' @param timescale scale of time
+    #' @param n_prev number of previous doses to show fit for
+    plot_pk = function(max_num_subjects = 12, data = NULL, L = 100,
+                       timescale = 24, n_prev = 3) {
+      checkmate::assert_integerish(L, len = 1)
+      if (is.null(data)) {
+        data <- self$data
+      }
+      pkpar <- msmsf_pk_params(self, data = data)
+      theta <- pkpar[[1]]
+      trange <- sapply(data$dosing$times, range)
+      N <- nrow(theta)
+      ts <- list()
+      for (j in 1:N) {
+        ts[[j]] <- seq(
+          trange[1, j] - timescale * n_prev,
+          trange[2, j],
+          length.out = L
+        ) + timescale
+      }
+      pksim <- data$dosing$simulate_pk(ts, theta)
+      pltd <- data$plot_dosing(df_fit = pksim, max_num_subjects = max_num_subjects)
+      pltd
     },
 
     #' Plot baseline hazard distribution
@@ -303,6 +299,7 @@ msmsf_log_hazard_multipliers <- function(fit, data = NULL) {
   } else {
     x_haz_long <- array(0, dim = c(0, sd$N_int))
   }
+  an <- fit$model$get_auc_normalizers()
 
   for (s in seq_len(S)) {
     if (sd$do_pk == 1) {
@@ -321,6 +318,8 @@ msmsf_log_hazard_multipliers <- function(fit, data = NULL) {
         ba,
         mat2list(t(x_haz_long)),
         aa,
+        an$loc,
+        an$scale,
         sd$ttype
       )
       r <- r[first_indices, , drop = FALSE]
