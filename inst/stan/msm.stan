@@ -337,8 +337,9 @@ data {
   // Which covariates to include in model
   int<lower=0,upper=1> I_auc;
 
-  // Skips PK evaluation completely if this is 0
+  // Flags
   int<lower=0,upper=1> do_pk;
+  int<lower=0,upper=1> do_haz;
 
   // Number of basis functions
   int<lower=1> N_sbf;
@@ -350,7 +351,7 @@ data {
   matrix[N_grid, N_sbf] SBF_grid;
 
   // Which likelihoods to include
-  int<lower=0, upper=1> omit_lik_hazard;
+  int<lower=0, upper=1> omit_lik_haz;
   int<lower=0, upper=1> omit_lik_pk;
 
   // PK model data
@@ -397,19 +398,19 @@ transformed data {
 parameters {
 
   // Aux params ~ N(0,1)
-  matrix[N_sbf, N_trans] z_weights; // SBF weights
-  vector[N_trans] z_w0;
+  array[do_haz] matrix[N_sbf, N_trans] z_weights; // SBF weights
+  array[do_haz] vector[N_trans] z_w0;
 
   // Means
-  matrix<lower=-2, upper=2>[N_sbf, N_trans_types] mu_weights;
+  array[do_haz] matrix<lower=-3, upper=3>[N_sbf, N_trans_types] mu_weights;
 
   // Stds
-  matrix<lower=0, upper=2>[N_sbf, N_trans_types] sig_weights;
-  real<lower=0> sig_w0;
+  array[do_haz] matrix<lower=0, upper=3>[N_sbf, N_trans_types] sig_weights;
+  array[do_haz] real<lower=0> sig_w0;
 
   // Covariate effects
-  array[nc_haz] vector[N_trans_types] beta_oth;
-  array[I_auc] vector[N_trans_types] beta_auc;
+  array[do_haz, nc_haz] vector[N_trans_types] beta_oth;
+  array[do_haz, I_auc] vector[N_trans_types] beta_auc;
 
   // PK model
   array[do_pk, N_sub] vector[3] log_z_pk;
@@ -425,15 +426,16 @@ parameters {
 transformed parameters {
 
   // Baseline hazard
-  array[N_trans] real log_w0;
-  array[N_trans] vector[N_sbf] weights;
+  array[do_haz, N_trans] real log_w0;
+  array[do_haz, N_trans] vector[N_sbf] weights;
 
   // Baseline hazard
-  for(j in 1:N_trans){
-    weights[j,] = mu_weights[:,ttype[j]] +
-      sig_weights[:,ttype[j]] .* z_weights[:,j];
-
-    log_w0[j] = mu_w0[j] + sig_w0 * z_w0[j];
+  if(do_haz == 1) {
+    for(j in 1:N_trans){
+      weights[1,j] = mu_weights[1][:,ttype[j]] +
+        sig_weights[1][:,ttype[j]] .* z_weights[1][:,j];
+      log_w0[1,j] = mu_w0[j] + sig_w0[1] * z_w0[1][j];
+    }
   }
 
   // PK quantities (in-sample)
@@ -476,27 +478,29 @@ transformed parameters {
       x_auc_long[1][n] = ss_auc[1][idx_sub[n]];
     }
   }
-
-  // log of hazard multiplier on each interval
-  matrix[N_int, N_trans] log_C_haz = compute_log_hazard_multiplier(
-    N_int, beta_oth, beta_auc, x_haz_long, x_auc_long, auc_loc, auc_scale,
-    ttype
-  );
 }
 
 model {
 
   // Prior
-  if(nc_haz > 0){
-    for(k in 1:nc_haz){
-      beta_oth[k] ~ normal(0, 1);
+  if(do_haz == 1){
+    if(nc_haz > 0){
+      for(k in 1:nc_haz){
+        beta_oth[1, k] ~ normal(0, 1);
+      }
     }
-  }
-  if(I_auc==1){
-    beta_auc[1] ~ normal(0, 1);
+    if(I_auc==1){
+      beta_auc[1, 1] ~ normal(0, 1);
+    }
+
+    sig_w0[1] ~ normal(0, 5);
+    to_vector(z_w0[1]) ~ std_normal();
+    to_vector(mu_weights[1]) ~ normal(0, 1);
+    to_vector(sig_weights[1]) ~ normal(0, 0.3);
+    to_vector(z_weights[1]) ~ std_normal();
   }
 
-  // PK model
+  // Prior
   if(do_pk == 1){
     for(n in 1:size(log_z_pk[1])){
       log_z_pk[1, n] ~ normal(0, 1);
@@ -509,16 +513,15 @@ model {
     sigma_pk[1] ~ normal(0, 0.5);
   }
 
-  // Weights
-  sig_w0 ~ normal(0, 5);
-  to_vector(z_w0) ~ std_normal();
-  to_vector(mu_weights) ~ normal(0, 1);
-  to_vector(sig_weights) ~ normal(0, 0.3);
-  to_vector(z_weights) ~ std_normal();
-
   // Hazard model likelihood
-  if (omit_lik_hazard == 0) {
+  if (omit_lik_haz == 0 && do_haz == 1) {
     for(h in 1:N_trans){
+
+      // log of hazard multiplier on each interval
+      matrix[N_int, N_trans] log_C_haz = compute_log_hazard_multiplier(
+        N_int, beta_oth[1], beta_auc[1], x_haz_long, x_auc_long, auc_loc, auc_scale,
+        ttype
+      );
 
       // Ragged array access
       array[sum_risk[h]] int idx_atr = which_risk[h, 1:sum_risk[h]];
@@ -526,12 +529,12 @@ model {
 
       // Occurred transitions (log hazard at interval end time)
       target += log_hazard(
-        log_C_haz[idx_occ, h], SBF[idx_occ,:], weights[h], log_w0[h]
+        log_C_haz[idx_occ, h], SBF[idx_occ,:], weights[1,h], log_w0[1,h]
       );
 
       // Evaluate baseline hazard at grid, prepad with zero
       vector[N_grid+1] h0_grid = rep_vector(0.0, N_grid+1);
-      h0_grid[2:(N_grid+1)] = exp(log_basehaz(SBF_grid, weights[h], log_w0[h]));
+      h0_grid[2:(N_grid+1)] = exp(log_basehaz(SBF_grid, weights[1,h], log_w0[1,h]));
 
       // Integrated baseline hazard at grid
       vector[N_grid+1] h0_int = cumulative_sum(h0_grid) * delta_grid;
@@ -550,7 +553,7 @@ model {
   if (omit_lik_pk == 0 && do_pk == 1) {
     for(n in 1:N_sub){
       for(k in 1:2){
-        real val = conc_mu_pk[1][n][k] + 1e-7;
+        real val = conc_mu_pk[1][n][k] + 1e-8;
         if(conc_pk[n][k] >= pk_lloq[n]){
           target += lognormal_lpdf(conc_pk[n][k] | log(val), sigma_pk[1]);
         } else {

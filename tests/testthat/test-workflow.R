@@ -151,3 +151,45 @@ test_that("entire workflow works (with PK)", {
   expect_true(is_ggplot(pf1))
   expect_true(is_ggplot(pf2))
 })
+
+
+test_that("PK-only works", {
+  # Setup
+  h0_base <- 1e-3
+
+  # Simulate data
+  sim <- simulate_example_data(N = options$N_subject)
+  mod <- sim$model
+  jd <- sim$data
+
+  # Split
+  jd <- split_data(jd)
+
+  # Fit the model
+  fit <- fit_stan(mod, jd$train,
+    iter_warmup = options$iter_warmup,
+    iter_sampling = options$iter_sampling,
+    chains = options$chains,
+    refresh = 5,
+    adapt_delta = 0.95,
+    init = 0.1,
+    pk_only = TRUE
+  )
+  fit <- fit$mean_fit()
+  expect_true(inherits(fit, "MultistateModelFit"))
+
+  # Plot baseline hazards
+  expect_error(fit$plot_h0(), "This is a PK-only fit")
+
+  # PK params
+  pkpar <- msmsf_pk_params(fit)
+  pkpar_oos <- msmsf_pk_params(fit, jd$test)
+  expect_true(length(pkpar) == 1)
+  expect_true(length(pkpar_oos) == 1)
+
+  # PK fit plot
+  pf1 <- fit$plot_pk()
+  pf2 <- fit$plot_pk(data = jd$test)
+  expect_true(is_ggplot(pf1))
+  expect_true(is_ggplot(pf2))
+})

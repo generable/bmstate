@@ -36,23 +36,31 @@ ensure_exposed_stan_functions <- function(...) {
 #' @param model A \code{\link{MultistateModel}} object.
 #' @param data A \code{\link{JointData}} object of observed paths and dosing.
 #' @param prior_only Sample from prior only?
+#' @param pk_only Do not fit hazard model parameters?
 #' @param return_stanfit Return also the raw 'Stan' fit object?
+#' @param set_auc_normalizers Set AUC normalization based on SS doses.
 #' @param filepath Passed to \code{\link{create_stan_model}}.
 #' @param ... Arguments passed to \code{sample} method of the
 #' 'CmdStanR' model.
 #' @return A \code{\link{MultistateModelFit}} object.
-fit_stan <- function(model, data, prior_only = FALSE, filepath = NULL,
+fit_stan <- function(model, data, prior_only = FALSE,
+                     pk_only = FALSE,
+                     set_auc_normalizers = TRUE,
+                     filepath = NULL,
                      return_stanfit = FALSE, ...) {
   checkmate::assert_class(model, "MultistateModel")
   checkmate::assert_class(data, "JointData")
   checkmate::assert_logical(return_stanfit, len = 1)
+  checkmate::assert_logical(prior_only, len = 1)
+  checkmate::assert_logical(pk_only, len = 1)
+  checkmate::assert_logical(set_auc_normalizers, len = 1)
 
   # Get Stan model object
   stan_model <- create_stan_model(filepath = filepath)
 
   # Set normalizing locations and scales (side effect)
   model$set_normalizers(data)
-  if (!is.null(data$dosing)) {
+  if (!is.null(data$dosing) && set_auc_normalizers) {
     mu_CL <- exp(-2)
     aaa <- data$dosing$dose_ss / mu_CL
     loc <- mean(aaa)
@@ -61,7 +69,7 @@ fit_stan <- function(model, data, prior_only = FALSE, filepath = NULL,
   }
 
   # Create Stan input list
-  sd <- create_stan_data(model, data, prior_only)
+  sd <- create_stan_data(model, data, prior_only, pk_only)
 
   # Call 'Stan'
   stan_fit <- stan_model$sample(data = sd, ...)
@@ -88,7 +96,7 @@ fit_stan <- function(model, data, prior_only = FALSE, filepath = NULL,
 #' @export
 #' @inheritParams fit_stan
 #' @return A list of data for Stan.
-create_stan_data <- function(model, data, prior_only = FALSE) {
+create_stan_data <- function(model, data, prior_only = FALSE, pk_only = FALSE) {
   checkmate::assert_class(model, "MultistateModel")
   checkmate::assert_class(data, "JointData")
   pd <- data$paths
@@ -108,9 +116,10 @@ create_stan_data <- function(model, data, prior_only = FALSE) {
 
   # Likelihood flags
   flags <- list(
-    omit_lik_hazard = as.integer(prior_only),
+    omit_lik_haz = as.integer(prior_only),
     omit_lik_pk = as.integer(prior_only),
-    do_pk = as.integer(model$has_pk())
+    do_pk = as.integer(model$has_pk()),
+    do_haz = as.integer(!pk_only)
   )
 
   # Return

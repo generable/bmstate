@@ -1,3 +1,14 @@
+# Access one dimension and drop only that dimension
+access_one_dim <- function(x, dim_index, value) {
+  dims <- rep(list(quote(expr = )), length(dim(x)))
+  dims[[dim_index]] <- value
+  result <- eval(as.call(c(quote(`[`), quote(x), dims, drop = FALSE)))
+
+  # Remove the singleton dimension manually
+  dim(result) <- dim(result)[-dim_index]
+  result
+}
+
 # Utility
 rv <- function(fit, name) {
   posterior::as_draws_rvars(fit$draws(name))[[name]]
