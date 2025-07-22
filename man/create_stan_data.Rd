@@ -4,7 +4,7 @@
 \alias{create_stan_data}
 \title{Creating Stan data list}
 \usage{
-create_stan_data(model, data, prior_only = FALSE)
+create_stan_data(model, data, prior_only = FALSE, pk_only = FALSE)
 }
 \arguments{
 \item{model}{A \code{\link{MultistateModel}} object.}
@@ -12,6 +12,8 @@ create_stan_data(model, data, prior_only = FALSE)
 \item{data}{A \code{\link{JointData}} object of observed paths and dosing.}
 
 \item{prior_only}{Sample from prior only?}
+
+\item{pk_only}{Do not fit hazard model parameters?}
 }
 \value{
 A list of data for Stan.
