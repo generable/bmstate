@@ -21,6 +21,8 @@ Minimal fit class
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-MultistateModelFit-new}{\code{MultistateModelFit$new()}}
+\item \href{#method-MultistateModelFit-is_pk_only}{\code{MultistateModelFit$is_pk_only()}}
+\item \href{#method-MultistateModelFit-assert_hazard_fit}{\code{MultistateModelFit$assert_hazard_fit()}}
 \item \href{#method-MultistateModelFit-mean_fit}{\code{MultistateModelFit$mean_fit()}}
 \item \href{#method-MultistateModelFit-is_point_estimate}{\code{MultistateModelFit$is_point_estimate()}}
 \item \href{#method-MultistateModelFit-get_data}{\code{MultistateModelFit$get_data()}}
@@ -58,6 +60,29 @@ Create model fit object
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModelFit-is_pk_only"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModelFit-is_pk_only}{}}}
+\subsection{Method \code{is_pk_only()}}{
+Is this a PK-only fit?
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModelFit$is_pk_only()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+logical
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModelFit-assert_hazard_fit"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModelFit-assert_hazard_fit}{}}}
+\subsection{Method \code{assert_hazard_fit()}}{
+Require that fit is not PK-only
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModelFit$assert_hazard_fit()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateModelFit-mean_fit"></a>}}

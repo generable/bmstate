@@ -28,6 +28,20 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
       private$stan_data <- stan_data
     },
 
+    #' @description Is this a PK-only fit?
+    #' @return logical
+    is_pk_only = function() {
+      !as.logical(self$get_data()$do_haz)
+    },
+
+    #' @description Require that fit is not PK-only
+    assert_hazard_fit = function() {
+      if (self$is_pk_only()) {
+        stop("This is a PK-only fit")
+      }
+      TRUE
+    },
+
     #' @description Create a reduced version with only a single draw, corresponding
     #' to the mean of original draws.
     #' @return A new \code{\link{MultistateModelFit}} object.
@@ -90,6 +104,7 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
     },
 
     #' @description Plot PK fit.
+    #'
     #' @param max_num_subjects Max number of subjects to show.
     #' @param data Data for which to predict the concentration. If \code{NULL},
     #' training data is used.
@@ -124,6 +139,7 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
     #' @param t times where to evaluate the baseline hazards
     #' @param ci_alpha width of credible interval
     plot_h0 = function(t = NULL, ci_alpha = 0.95) {
+      self$assert_hazard_fit()
       df <- self$h0_dist(t, ci_alpha)
       legend <- self$model$system$tm()$trans_df()
       df <- df |> dplyr::left_join(legend, by = "trans_idx")
@@ -152,6 +168,7 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
     #' @param t times where to evaluate the baseline hazards
     #' @param ci_alpha width of credible interval
     h0_dist = function(t = NULL, ci_alpha = 0.95) {
+      self$assert_hazard_fit()
       checkmate::assert_number(ci_alpha, lower = 0, upper = 1)
       LB <- (1 - ci_alpha) / 2
       UB <- 1 - LB
@@ -276,6 +293,7 @@ msmsf_exposure <- function(fit, data = NULL) {
 #' @return A list of length \code{n_draws} where each element is a
 #' matrix of shape \code{n_subject} x \code{n_transitions}
 msmsf_log_hazard_multipliers <- function(fit, data = NULL) {
+  fit$assert_hazard_fit()
   # Get draws
   sd <- msmsf_stan_data(fit, data)
   auc <- msmsf_exposure(fit, data)
@@ -332,6 +350,7 @@ msmsf_log_hazard_multipliers <- function(fit, data = NULL) {
 
 # Log baseline hazard distribution at times t
 msmsf_log_baseline_hazard <- function(fit, t = NULL) {
+  fit$assert_hazard_fit()
   checkmate::assert_class(fit, "MultistateModelFit")
   sys <- fit$model$system
   if (is.null(t)) {
@@ -369,6 +388,7 @@ msmsf_log_baseline_hazard <- function(fit, t = NULL) {
 #' of which is an array where the first dimension is number of subjects times
 #' number of draws
 msmsf_inst_hazard_param_draws <- function(fit, data = NULL) {
+  fit$assert_hazard_fit()
   sd <- msmsf_stan_data(fit, data)
   log_m <- msmsf_log_hazard_multipliers(fit, data)
   S <- fit$num_draws()
@@ -399,6 +419,7 @@ msmsf_inst_hazard_param_draws <- function(fit, data = NULL) {
 #' @return A \code{\link{PathData}} object.
 generate_paths <- function(fit, init_state = 1, t_max = NULL, n_rep = 10,
                            data = NULL) {
+  fit$assert_hazard_fit()
   checkmate::assert_class(fit, "MultistateModelFit")
   checkmate::assert_integerish(n_rep, lower = 1, len = 1)
   sd <- msmsf_stan_data(fit, data)
