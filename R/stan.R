@@ -48,13 +48,15 @@ fit_stan <- function(model, data, prior_only = FALSE,
                      pk_only = FALSE,
                      set_auc_normalizers = TRUE,
                      filepath = NULL,
-                     return_stanfit = FALSE, pathfinder = FALSE, ...) {
+                     return_stanfit = FALSE,
+                     pathfinder = FALSE, ...) {
   checkmate::assert_class(model, "MultistateModel")
   checkmate::assert_class(data, "JointData")
   checkmate::assert_logical(return_stanfit, len = 1)
   checkmate::assert_logical(prior_only, len = 1)
   checkmate::assert_logical(pk_only, len = 1)
   checkmate::assert_logical(set_auc_normalizers, len = 1)
+  checkmate::assert_logical(pathfinder, len = 1)
 
   # Get Stan model object
   stan_model <- create_stan_model(filepath = filepath)
@@ -74,10 +76,10 @@ fit_stan <- function(model, data, prior_only = FALSE,
 
   # Call 'Stan'
   if (pathfinder) {
-    stan_fit <- stan_model$pathfinder(data = sd)
-    return(stan_fit)
+    stan_fit <- stan_model$pathfinder(data = sd, ...)
+  } else {
+    stan_fit <- stan_model$sample(data = sd, ...)
   }
-  stan_fit <- stan_model$sample(data = sd, ...)
 
   # Return
   pars <- c(
