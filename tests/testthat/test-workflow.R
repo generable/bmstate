@@ -27,13 +27,11 @@ test_that("entire workflow works", {
 
   # Fit the model
   a <- fit_stan(mod, jd$train,
-    iter_warmup = options$iter_warmup,
-    iter_sampling = options$iter_sampling,
-    chains = options$chains,
     refresh = 5,
-    adapt_delta = 0.95,
     init = 0.1,
-    return_stanfit = TRUE
+    return_stanfit = TRUE,
+    pathfinder = TRUE,
+    draws = options$iter_sampling
   )
   fit <- a$fit
   expect_true(inherits(fit, "MultistateModelFit"))

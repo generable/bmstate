@@ -14,7 +14,8 @@ solve_trans_prob_matrix_each_subject(
 \arguments{
 \item{fit}{A \code{\link{MultistateModelFit}} object}
 
-\item{t_init}{Initial time}
+\item{t_init}{Initial time. A single value or a vector with length equal
+to number of subjects.}
 
 \item{t_end}{End time}
 

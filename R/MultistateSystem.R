@@ -10,7 +10,7 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
     transmat = NULL,
 
     # Generate a path starting from time 0
-    generate_path = function(w, log_w0, log_m, t_max, init_state) {
+    generate_path = function(w, log_w0, log_m, t_start, t_max, init_state) {
       if (is.vector(w)) {
         w <- matrix(w, nrow = 1)
       }
@@ -18,7 +18,7 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
 
       # Setup
       states <- init_state
-      times <- 0
+      times <- t_start
       tidx <- 0
       j <- 0
 
@@ -345,18 +345,34 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
     #' \code{n_weights}
     #' @param log_w0 An array of shape \code{n_draws} x \code{n_trans}
     #' @param log_m An array of shape \code{n_draws} x \code{n_trans}
-    #' @param init_state Integer index of starting state.
-    #' @param t_max Max time. If not given, \code{self$get_tmax()} is used.
-    #' @param n_rep Number of repetitions.
+    #' @param init_state Index of starting state. A single value or a vector
+    #' with length equal to \code{n_draws}.
+    #' @param t_start Start time. A single value or a vector
+    #' with length equal to \code{n_draws}.
+    #' @param t_max Max time. If \code{NULL}, the max
+    #' time of the model is used.
+    #' @param n_rep Number of repetitions to do for each draw.
     #' @return A data frame with \code{n_draws} x \code{n_rep} paths.
-    simulate = function(w, log_w0, log_m, init_state = 1, t_max = NULL, n_rep = 1) {
+    simulate = function(w, log_w0, log_m, init_state = 1, t_start = 0,
+                        t_max = NULL, n_rep = 1) {
       checkmate::assert_array(w, d = 3)
       n_draws <- dim(w)[1]
       checkmate::assert_true(dim(w)[3] == self$num_weights())
       checkmate::assert_matrix(log_w0, nrows = n_draws)
       checkmate::assert_matrix(log_m, nrows = n_draws)
       S <- self$num_states()
-      checkmate::assert_integerish(init_state, len = 1, lower = 1, upper = S)
+      checkmate::assert_integerish(init_state, lower = 1, upper = S)
+      if (length(init_state) == 1) {
+        init_state <- rep(init_state, n_draws)
+      } else {
+        stopifnot(length(init_state) == n_draws)
+      }
+      checkmate::assert_numeric(t_start, lower = 0)
+      if (length(t_start) == 1) {
+        t_start <- rep(t_start, n_draws)
+      } else {
+        stopifnot(length(t_start) == n_draws)
+      }
       checkmate::assert_integerish(n_rep, len = 1, lower = 1)
       n_paths <- n_draws * n_rep
       pb <- progress::progress_bar$new(total = n_paths)
@@ -376,7 +392,7 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
           cnt <- cnt + 1
           pb$tick()
           p <- private$generate_path(
-            w[j, , ], log_w0[j, ], log_m[j, ], t_max, init_state
+            w[j, , ], log_w0[j, ], log_m[j, ], t_start[j], t_max, init_state[j]
           )
           p <- cbind(p, rep(cnt, nrow(p)))
           out <- rbind(out, p)

@@ -12,6 +12,7 @@ fit_stan(
   set_auc_normalizers = TRUE,
   filepath = NULL,
   return_stanfit = FALSE,
+  pathfinder = FALSE,
   ...
 )
 }
@@ -29,6 +30,8 @@ fit_stan(
 \item{filepath}{Passed to \code{\link{create_stan_model}}.}
 
 \item{return_stanfit}{Return also the raw 'Stan' fit object?}
+
+\item{pathfinder}{Use pathfinder instead of MCMC?}
 
 \item{...}{Arguments passed to \code{sample} method of the
 'CmdStanR' model.}

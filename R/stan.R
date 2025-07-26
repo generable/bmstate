@@ -40,6 +40,7 @@ ensure_exposed_stan_functions <- function(...) {
 #' @param return_stanfit Return also the raw 'Stan' fit object?
 #' @param set_auc_normalizers Set AUC normalization based on SS doses.
 #' @param filepath Passed to \code{\link{create_stan_model}}.
+#' @param pathfinder Use pathfinder instead of MCMC?
 #' @param ... Arguments passed to \code{sample} method of the
 #' 'CmdStanR' model.
 #' @return A \code{\link{MultistateModelFit}} object.
@@ -47,13 +48,15 @@ fit_stan <- function(model, data, prior_only = FALSE,
                      pk_only = FALSE,
                      set_auc_normalizers = TRUE,
                      filepath = NULL,
-                     return_stanfit = FALSE, ...) {
+                     return_stanfit = FALSE,
+                     pathfinder = FALSE, ...) {
   checkmate::assert_class(model, "MultistateModel")
   checkmate::assert_class(data, "JointData")
   checkmate::assert_logical(return_stanfit, len = 1)
   checkmate::assert_logical(prior_only, len = 1)
   checkmate::assert_logical(pk_only, len = 1)
   checkmate::assert_logical(set_auc_normalizers, len = 1)
+  checkmate::assert_logical(pathfinder, len = 1)
 
   # Get Stan model object
   stan_model <- create_stan_model(filepath = filepath)
@@ -72,7 +75,11 @@ fit_stan <- function(model, data, prior_only = FALSE,
   sd <- create_stan_data(model, data, prior_only, pk_only)
 
   # Call 'Stan'
-  stan_fit <- stan_model$sample(data = sd, ...)
+  if (pathfinder) {
+    stan_fit <- stan_model$pathfinder(data = sd, ...)
+  } else {
+    stan_fit <- stan_model$sample(data = sd, ...)
+  }
 
   # Return
   pars <- c(

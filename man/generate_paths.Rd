@@ -4,14 +4,25 @@
 \alias{generate_paths}
 \title{Path generation for 'MultistateModelFit'}
 \usage{
-generate_paths(fit, init_state = 1, t_max = NULL, n_rep = 10, data = NULL)
+generate_paths(
+  fit,
+  init_state = 1,
+  t_start = 0,
+  t_max = NULL,
+  n_rep = 10,
+  data = NULL
+)
 }
 \arguments{
 \item{fit}{A \code{\link{MultistateModelFit}} object}
 
-\item{init_state}{Index of starting state}
+\item{init_state}{Index of starting state. A single value or a vector
+with length equal to number of subjects.}
 
-\item{t_max}{Max time (start time is always 0). If \code{NULL}, the max
+\item{t_start}{Start time. A single value or a vector
+with length equal to number of subjects.}
+
+\item{t_max}{Max time. If \code{NULL}, the max
 time of the model is used.}
 
 \item{n_rep}{Number of repeats per draw.}

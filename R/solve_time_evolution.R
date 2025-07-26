@@ -77,8 +77,10 @@ solve_trans_prob_matrix <- function(system, log_w0, w = NULL,
 #'
 #' @export
 #' @inheritParams msmsf_pk_params
-#' @param init_state Index of initial state
-#' @param t_init Initial time
+#' @param init_state Index of initial state. A single value or a vector with
+#' length equal to number of subjects.
+#' @param t_init Initial time. A single value or a vector with length equal
+#' to number of subjects.
 #' @param t_end End time
 #' @return A data frame, where each row has the probabilities that a given subject
 #' will be in each state at time \code{t_end} given that they were in
@@ -87,13 +89,19 @@ solve_trans_prob_fit <- function(fit, init_state = 1, t_init = 0, t_end = NULL,
                                  data = NULL) {
   checkmate::assert_class(fit, "MultistateModelFit")
   S <- fit$model$system$num_states()
-  checkmate::assert_integerish(init_state, len = 1, lower = 1, upper = S)
+  checkmate::assert_integerish(init_state, lower = 1, upper = S)
   message("Solving transition probabilities")
   tp <- solve_trans_prob_matrix_each_subject(fit, t_init, t_end, data = data)
   message("Formatting")
   NS <- length(tp$subject_index)
   us <- unique(tp$subject_index)
   N_sub <- max(us)
+  if (length(init_state) == 1) {
+    init_state <- rep(init_state, N_sub)
+  } else {
+    stopifnot(length(init_state) == N_sub)
+  }
+
   df <- matrix(0, N_sub, 1 + S)
   j <- 0
   for (sidx in us) {
@@ -103,7 +111,7 @@ solve_trans_prob_fit <- function(fit, init_state = 1, t_init = 0, t_end = NULL,
     if (length(dim(Pi)) > 2) {
       Pi <- apply(Pi, c(2, 3), mean)
     }
-    Pi <- Pi[init_state, ]
+    Pi <- Pi[init_state[j], ]
     df[j, ] <- c(sidx, Pi)
   }
   df <- data.frame(df)
@@ -113,9 +121,7 @@ solve_trans_prob_fit <- function(fit, init_state = 1, t_init = 0, t_end = NULL,
 
 #' Solve transition probabilities for each subject in 'MultistateModelFit'
 #'
-#' @inheritParams msmsf_pk_params
-#' @param t_init Initial time
-#' @param t_end End time
+#' @inheritParams solve_trans_prob_fit
 #' @return For each subject and each draw, a matrix \code{P} where
 #' \code{P[i,j]} is the probability that the system will be in state
 #' \code{j} at time \code{t_end}
@@ -131,6 +137,11 @@ solve_trans_prob_matrix_each_subject <- function(fit, t_init = 0, t_end = NULL,
   N <- sd$N_sub
   d <- msmsf_inst_hazard_param_draws(fit, data)
   NS <- length(d$subject_index)
+  if (length(t_init) == 1) {
+    t_init <- rep(t_init, NS)
+  } else {
+    stopifnot(length(t_init) == N_sub)
+  }
   pb <- progress::progress_bar$new(total = NS)
   K <- sys$num_states()
   A <- array(0, dim = c(NS, K, K))
@@ -141,7 +152,7 @@ solve_trans_prob_matrix_each_subject <- function(fit, t_init = 0, t_end = NULL,
       wj <- matrix(wj, 1, length(wj))
     }
     A[j, , ] <- solve_trans_prob_matrix(
-      sys, d$log_w0[j, ], wj, d$log_m[j, ], t_init, t_end
+      sys, d$log_w0[j, ], wj, d$log_m[j, ], t_init[j], t_end
     )
   }
   c(list(P = A), d[c("subject_index", "draw_index")])

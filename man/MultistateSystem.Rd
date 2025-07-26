@@ -329,6 +329,7 @@ Generate paths}
   log_w0,
   log_m,
   init_state = 1,
+  t_start = 0,
   t_max = NULL,
   n_rep = 1
 )}\if{html}{\out{</div>}}
@@ -344,11 +345,16 @@ Generate paths}
 
 \item{\code{log_m}}{An array of shape \code{n_draws} x \code{n_trans}}
 
-\item{\code{init_state}}{Integer index of starting state.}
+\item{\code{init_state}}{Index of starting state. A single value or a vector
+with length equal to \code{n_draws}.}
 
-\item{\code{t_max}}{Max time. If not given, \code{self$get_tmax()} is used.}
+\item{\code{t_start}}{Start time. A single value or a vector
+with length equal to \code{n_draws}.}
 
-\item{\code{n_rep}}{Number of repetitions.}
+\item{\code{t_max}}{Max time. If \code{NULL}, the max
+time of the model is used.}
+
+\item{\code{n_rep}}{Number of repetitions to do for each draw.}
 }
 \if{html}{\out{</div>}}
 }

@@ -15,9 +15,11 @@ solve_trans_prob_fit(
 \arguments{
 \item{fit}{A \code{\link{MultistateModelFit}} object}
 
-\item{init_state}{Index of initial state}
+\item{init_state}{Index of initial state. A single value or a vector with
+length equal to number of subjects.}
 
-\item{t_init}{Initial time}
+\item{t_init}{Initial time. A single value or a vector with length equal
+to number of subjects.}
 
 \item{t_end}{End time}
 
