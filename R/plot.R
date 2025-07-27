@@ -1,6 +1,6 @@
 # Visualize a graph
 transition_matrix_plot <- function(f, terminal_states, null_state,
-                                   edge_labs, col_term = "firebrick",
+                                   edge_labs, col_term = "firebrick1",
                                    col_null = "steelblue2", ...) {
   cn <- colnames(f)
   idx_term <- which(colnames(f) %in% terminal_states)
@@ -9,16 +9,16 @@ transition_matrix_plot <- function(f, terminal_states, null_state,
   color <- rep("black", N)
   color[idx_term] <- col_term
   color[idx_null] <- col_null
-  acol <- matrix("black", nrow(f), ncol(f))
-  lcol <- acol
-  lcol[, idx_term] <- col_term
-  lcol[, idx_null] <- col_null
+  lcol <- rep("gray74", nrow(f))
+  lcol[idx_term] <- col_term
+  lcol[idx_null] <- col_null
+  net <- network::network(f, directed = TRUE, loops = TRUE)
 
   # Create plot
-  qgraph::qgraph(f,
-    edge.labels = edge_labs, label.color = color,
-    edge.color = acol,
-    fade = FALSE,
+  qgraph::qgraph(net,
+    color = lcol,
+    edge.labels = edge_labs,
+    labels = cn,
     layout = "circle",
     ...
   )
