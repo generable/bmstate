@@ -1,12 +1,13 @@
 ---
 title: "Multistate models in the bmstate package"
 author: Juho Timonen
+date: 28th July 2025
 output: 
   rmarkdown::html_vignette:
     toc: true 
     toc_depth: 3
     number_sections: true
-    date: last-modified
+    
 bibliography: references.bib
 editor: source
 vignette: >
@@ -35,13 +36,17 @@ theme_set(theme_bw())
 
 In a multistate model, we can represent
 the possible *transitions* between *states* as directed edges of a graph whose
-nodes correspond to states.
+nodes correspond to states. The transitions that start from the same node are
+competing, meaning that occurrence of one censors the remaining ones.
 
-```{r setup}
-a <- transmat_illnessdeath()
-a$plot()
+```{r tmat, fig.width=5, fig.height=4.5}
+tmat <- transmat_full(letters[1:3])
+tmat$plot()
 ```
 
+```{r tmatprint}
+tmat$trans_df()
+```
 
 ### Hazard model
 
@@ -55,16 +60,18 @@ $$
 where 
 
 - $b^{(h)}(t)$ represents the baseline hazard for transition $h$
-- $T_h$ is an integer indexing the transition type of transition $h$
+- $T_h$ is an integer indexing the type (`trans_type`) of transition $h$
 - $\beta_r^{(T_h)}$ is the respective regression coefficient for transition
 type $T_h$
 - $\mathbf{x}_n$ includes time-independent covariates for unit $n$
 
 We group transitions that end in the same state together to have 
-the same transition type. Categorical variables with two levels are first
-made numeric using binary encoding (value 0 or 1). Once all covariates are 
-numeric, they are normalized to have unit variance and zero mean in the training 
-data. Each log baseline hazard $\log b^{(h)}(t)$ is modeled nonparametrically
+the same transition type. 
+
+
+### Baseline hazards
+
+Each log baseline hazard $\log b^{(h)}(t)$ is modeled nonparametrically
 so that
 $$
 \log \left(b^{(h)}(t)\right) = b_0^{(h)} + B^{(h)}(t)
@@ -73,32 +80,7 @@ where $b_0^{(h)}$ is a constant and $B^{(h)}(t)$ is time-dependent variation
 modeled using B-splines. The knot locations for the splines are same for all
 transitions, and are set based on the quantiles of all transition times.
 
-### Bayesian inference
-
-Given the observed data $\mathcal{D}$, containing the events data and 
-covariates, all the unknown parameters $\mathbf{\theta}$ are inferred using Bayesian inference. The parameters $\mathbf{\theta}$ contain the regression coefficients
-$\beta$, the baseline hazard offsets $b_0^{(h)}$ and the spline weights. We 
-sample from the posterior distribution 
-$$
-p(\theta \mid \mathcal{D}) \propto p(\mathcal{D} \mid \theta) p(\theta) 
-$$
-where $p(\mathcal{D} \mid \theta)$ is the likelihood and 
-$p(\theta)$ is the prior. This is done using Markov chain Monte Carlo 
-sampling (MCMC). The log likelihood 
-
-$$
-\log p(\mathcal{D} \mid \theta) = \sum_{i=1}^{N_{\text{sub}}} l_i
-$$
-is defined as a sum of subject contributions $l_i$, which are
-
-$$
-l_i = \sum_{k=1}^{K_i}\sum_{h=1}^H\left[\delta_{k,i}^{(h)}\log\left(\lambda_i^{(h)}(t^{(i)}_k)\right) - \text{I}_{k,i}^{(h)} \int_{t^{(i)}_{k-1}}^{t^{(i)}_{k}} \lambda_i^{(h)}(t) \text{d}t \right]
-$$
-
-Note that the contribution for each event and possible transition is equivalent to the log-likelihood for a survival model, where the first term represents the likelihood of an event occurring at time $t^{(i)}_{k}$ 
-for events that occurred, and the second term represents the likelihood of surviving event-free for the duration of time over transitions for which the subject was at risk.
-We compute the integrals of the hazards numerically using a simple quadrature
-with step size of one day.
+### Priors
 
 We use a standard normal prior for the coefficients $\beta$. The weights of the
 spline basis functions are 
@@ -109,28 +91,44 @@ have a shared mean. This prior mean is estimated from the data using a standard
 Cox proportional hazards model fit.
 
 
-### Event risk prediction and model comparison
+## Event risk prediction and model comparison
 
-We ultimately want the model to be able to predict, for a given subject, the 
+We often ultimately want the model to be able to predict, for a given 
+observation unit, the 
 probability that a particular event
 occurs in a specified time period of length $t$ at least once. 
-For any subject, who does not
+
+
+### Path generation
+
+For any observation unit, which does not
 need to be part of the training data,
 we can estimate it empirically by generating a number of paths 
 according to the data generating process, and computing the proportion of paths
-in which the event occurred up to time $t$.  
-
-We can summarize this
-proportion over the entire posterior by running the path generation for
-all posterior draws of $\theta$, and reduce the Monte Carlo error by running
-multiple paths for each draw. For a given patient, we can also generate 
-counterfactual paths assuming 
-different doses, and summarize rates of 
-different events given a selected dose that was not assigned. This information
-is useful to inform dose recommendations. For drawing the arrival times for a non-homogeneous Poisson process in path 
+in which the event occurred up to time $t$. For drawing the arrival times for 
+a non-homogeneous Poisson process in path 
 generation, we use the thinning algorithm [@lewis1979].
 
+### Kolmogorov forward equations
 
+If the transition matrix of the multistate model has no self-loops, it is
+a continuous-time Markov model. In this special case we can utilize
+the Kolmogorov forward equations.
+
+Let \( P_{ij}(t) \) be the probability that the process is in state \( j \) at time \( t \), given that it started in state \( i \) at time 0. The Kolmogorov forward equations (also known as the forward differential equations) are given by:
+
+\[
+\frac{d}{dt} P_{ij}(t) = \sum_{k} P_{ik}(t) q_{kj}, \quad \text{for all } i, j
+\]
+
+where \( q_{kj} \) is the \emph{transition rate} from state \( k \) to state \( j \), and the generator matrix \( Q = [q_{kj}] \) satisfies:
+
+\[
+q_{kj} \geq 0 \quad \text{for } k \neq j, \quad \text{and} \quad q_{kk} = -\sum_{j \neq k} q_{kj}
+\]
+
+
+## References
 
 
 
