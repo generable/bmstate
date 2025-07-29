@@ -1,7 +1,7 @@
 ---
 title: "Common multistate models"
 author: Juho Timonen
-date: 26th June 2025
+date: 29th July 2025
 output: 
   rmarkdown::html_vignette:
     toc: true 
@@ -12,6 +12,8 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+In this vignette, we illustrate some common multistate models.
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(

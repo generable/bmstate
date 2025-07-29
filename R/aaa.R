@@ -1,9 +1,3 @@
-# MAIN DOCUMENTATION PAGE -------------------------------------------------
-#
-# dev note: see
-#   https://cran.r-project.org/web/packages/dplyr/vignettes/in-packages.html
-# for how to use dplyr in a package
-
 #' The 'bmstate' package.
 #'
 #' @description Bayesian multistate modeling using 'Stan'.
