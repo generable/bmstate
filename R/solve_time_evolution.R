@@ -140,7 +140,7 @@ solve_trans_prob_matrix_each_subject <- function(fit, t_init = 0, t_end = NULL,
   if (length(t_init) == 1) {
     t_init <- rep(t_init, NS)
   } else {
-    stopifnot(length(t_init) == N_sub)
+    stopifnot(length(t_init) == NS)
   }
   pb <- progress::progress_bar$new(total = NS)
   K <- sys$num_states()
