@@ -45,3 +45,4 @@ Imports:
     utils
 RoxygenNote: 7.3.2
 Config/testthat/edition: 3
+License: file LICENSE
