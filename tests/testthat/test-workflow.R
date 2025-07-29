@@ -44,6 +44,8 @@ test_that("entire workflow works", {
   p <- generate_paths(fit, n_rep = 3)
   p_oos <- generate_paths(fit, n_rep = 3, data = jd$test)
 
+  # Path generation starting from
+
   pe <- p_event(p)
   pe_oos <- p_event(p_oos)
   pe_bysex <- p_event(p, by = "sex")

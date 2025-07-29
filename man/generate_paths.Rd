@@ -4,20 +4,10 @@
 \alias{generate_paths}
 \title{Path generation for 'MultistateModelFit'}
 \usage{
-generate_paths(
-  fit,
-  init_state = 1,
-  t_start = 0,
-  t_max = NULL,
-  n_rep = 10,
-  data = NULL
-)
+generate_paths(fit, t_start = 0, t_max = NULL, n_rep = 10, data = NULL)
 }
 \arguments{
 \item{fit}{A \code{\link{MultistateModelFit}} object}
-
-\item{init_state}{Index of starting state. A single value or a vector
-with length equal to number of subjects.}
 
 \item{t_start}{Start time. A single value or a vector
 with length equal to number of subjects.}
@@ -35,5 +25,6 @@ mode is assumed (new subjects).}
 A \code{\link{PathData}} object.
 }
 \description{
-Path generation for 'MultistateModelFit'
+Generates paths for each subject in the data, starting from the state
+that the subject is at the given start time.
 }

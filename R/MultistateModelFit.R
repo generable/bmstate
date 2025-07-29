@@ -415,17 +415,18 @@ msmsf_inst_hazard_param_draws <- function(fit, data = NULL) {
 #' Path generation for 'MultistateModelFit'
 #'
 #' @export
+#' @description
+#' Generates paths for each subject in the data, starting from the state
+#' that the subject is at the given start time.
+#'
 #' @inheritParams msmsf_pk_params
-#' @param init_state Index of starting state. A single value or a vector
-#' with length equal to number of subjects.
 #' @param t_start Start time. A single value or a vector
 #' with length equal to number of subjects.
 #' @param t_max Max time. If \code{NULL}, the max
 #' time of the model is used.
 #' @param n_rep Number of repeats per draw.
 #' @return A \code{\link{PathData}} object.
-generate_paths <- function(fit, init_state = 1, t_start = 0,
-                           t_max = NULL, n_rep = 10,
+generate_paths <- function(fit, t_start = 0, t_max = NULL, n_rep = 10,
                            data = NULL) {
   fit$assert_hazard_fit()
   checkmate::assert_class(fit, "MultistateModelFit")
@@ -443,7 +444,7 @@ generate_paths <- function(fit, init_state = 1, t_start = 0,
   # Generate path df
   message("Generating paths")
   path_df <- sys$simulate(
-    d$w, d$log_w0, d$log_m, init_state, t_start, t_max, n_rep
+    d$w, d$log_w0, d$log_m, init_states, t_start, t_max, n_rep
   )
 
   # Create indices for link

@@ -36,6 +36,7 @@ Initialize}
 \item \href{#method-PathData-unique_subjects}{\code{PathData$unique_subjects()}}
 \item \href{#method-PathData-covariate_names}{\code{PathData$covariate_names()}}
 \item \href{#method-PathData-lengths}{\code{PathData$lengths()}}
+\item \href{#method-PathData-state_at}{\code{PathData$state_at()}}
 \item \href{#method-PathData-n_paths}{\code{PathData$n_paths()}}
 \item \href{#method-PathData-null_state}{\code{PathData$null_state()}}
 \item \href{#method-PathData-state_names}{\code{PathData$state_names()}}
@@ -129,6 +130,26 @@ Get path lengths (among paths that include events)
 }
 \subsection{Returns}{
 a data frame of path ids and counts
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-state_at"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-state_at}{}}}
+\subsection{Method \code{state_at()}}{
+For each path, get the state it is in at time t
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$state_at(t)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{t}}{time}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+a data frame with one row for each path
 }
 }
 \if{html}{\out{<hr>}}
