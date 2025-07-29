@@ -21,6 +21,9 @@ transition_matrix_plot <- function(f, terminal_states, null_state,
     edge.color = "gray10",
     labels = cn,
     layout = "circle",
+    edge.label.bg = "white",
+    edge.label.position = 0.4,
+    edge.label.margin = 0.03,
     ...
   )
 }
