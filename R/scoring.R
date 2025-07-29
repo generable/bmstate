@@ -11,7 +11,7 @@ event_risk <- function(p, event) {
   p_event(p, by = "subject_id") |>
     dplyr::filter(.data$state == event) |>
     dplyr::select("subject_id", "prob") |>
-    dplyr::rename(risk = .data$prob)
+    dplyr::rename(risk = "prob")
 }
 
 #' Compute C index
