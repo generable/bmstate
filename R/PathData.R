@@ -356,9 +356,7 @@ PathData <- R6::R6Class(
       subject_df <- subject_df |> dplyr::filter(subject_id %in%
         unique(link_df$subject_id))
       PathData$new(
-        subject_df, path_df, link_df,
-        self$transmat,
-        self$covs
+        subject_df, path_df, link_df, self$transmat, self$covs
       )
     }
   )
