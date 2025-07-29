@@ -18,6 +18,7 @@ transition_matrix_plot <- function(f, terminal_states, null_state,
   qgraph::qgraph(net,
     color = lcol,
     edge.labels = edge_labs,
+    edge.color = "gray10",
     labels = cn,
     layout = "circle",
     ...
