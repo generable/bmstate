@@ -311,7 +311,7 @@ PathData <- R6::R6Class(
         f,
         self$terminal_states(),
         self$null_state(),
-        edge_labs = f,
+        edge_labs = round(f, digits = digits),
         ...
       )
     },
