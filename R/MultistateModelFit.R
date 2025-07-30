@@ -472,12 +472,12 @@ generate_paths <- function(fit, t_start = 0, t_max = NULL, n_rep = 10,
   )
 
   # Create indices for link
-  subject_index <- rep(d$subject_index, times = n_rep)
-  draw_index <- rep(d$draw_index, times = n_rep)
+  subject_id <- rep(d$df$subject_id, times = n_rep)
+  draw_index <- rep(d$df$draw_index, times = n_rep)
   rep_index <- rep(seq_len(n_rep), each = N * S)
 
   # Check
-  stopifnot(length(subject_index) == N * S * n_rep)
+  stopifnot(length(subject_id) == N * S * n_rep)
   stopifnot(length(draw_index) == N * S * n_rep)
   stopifnot(length(rep_index) == N * S * n_rep)
 
@@ -490,7 +490,7 @@ generate_paths <- function(fit, t_start = 0, t_max = NULL, n_rep = 10,
   sub_df <- dat$paths$subject_df
   link_df <- data.frame(
     path_id = seq_len(N * S * n_rep),
-    subject_id = sub_df$subject_id[subject_index],
+    subject_id = subject_id,
     draw_idx = draw_index,
     rep_idx = rep_index
   )

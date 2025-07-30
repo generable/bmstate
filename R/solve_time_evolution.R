@@ -92,6 +92,7 @@ solve_trans_prob_fit <- function(fit, t_start = 0, t_end = NULL,
   init_states <- msmfit_state_at(t_start, fit, data) |>
     dplyr::select("state", "subject_id")
   N_sub <- nrow(init_states)
+  S <- fit$model$system$num_states()
 
   df <- matrix(0, N_sub, 1 + S)
   for (j in seq_len(N_sub)) {

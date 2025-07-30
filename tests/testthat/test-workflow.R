@@ -44,13 +44,16 @@ test_that("entire workflow works", {
   p <- generate_paths(fit, n_rep = 3)
   p_oos <- generate_paths(fit, n_rep = 3, data = jd$test)
 
-  # Path generation starting from
+  # Path generation starting from later time
+  p1 <- generate_paths(fit, n_rep = 3, t_start = 600)
 
   pe <- p_event(p)
+  pe1 <- p_event(p1)
   pe_oos <- p_event(p_oos)
   pe_bysex <- p_event(p, by = "sex")
   pe_bydose <- p_event(p, by = "dose_amt")
   expect_equal(nrow(pe), 2)
+  expect_equal(nrow(pe1), 2)
   expect_equal(nrow(pe_bysex), 4)
   expect_equal(nrow(pe_bydose), 6)
 
