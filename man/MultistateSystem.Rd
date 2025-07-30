@@ -348,8 +348,7 @@ Generate paths}
 \item{\code{init_state}}{Index of starting state. A single value or a vector
 with length equal to \code{n_draws}.}
 
-\item{\code{t_start}}{Start time. A single value or a vector
-with length equal to \code{n_draws}.}
+\item{\code{t_start}}{Start time.}
 
 \item{\code{t_max}}{Max time. If \code{NULL}, the max
 time of the model is used.}

@@ -107,6 +107,20 @@ PathData <- R6::R6Class(
         dplyr::count()
     },
 
+    #' @description For each path, get the state it is in at time t
+    #' @param t time
+    #' @return a data frame with one row for each path
+    state_at = function(t) {
+      checkmate::assert_number(t, lower = 0)
+      self$path_df |>
+        dplyr::filter(.data$time <= t) |>
+        dplyr::group_by(.data$path_id) |>
+        dplyr::arrange(.data$path_id, -.data$time) |>
+        dplyr::slice(1) |>
+        dplyr::ungroup() |>
+        dplyr::select("path_id", "state")
+    },
+
     #' @description Get number of paths
     #' @return an integer
     n_paths = function() {
@@ -311,7 +325,7 @@ PathData <- R6::R6Class(
         f,
         self$terminal_states(),
         self$null_state(),
-        edge_labs = TRUE,
+        edge_labs = round(f, digits = digits),
         ...
       )
     },
@@ -356,9 +370,7 @@ PathData <- R6::R6Class(
       subject_df <- subject_df |> dplyr::filter(subject_id %in%
         unique(link_df$subject_id))
       PathData$new(
-        subject_df, path_df, link_df,
-        self$transmat,
-        self$covs
+        subject_df, path_df, link_df, self$transmat, self$covs
       )
     }
   )

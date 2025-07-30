@@ -158,14 +158,16 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
 
     #' @description Visualize the matrix as a graph
     #'
-    #' @param ... Arguments passed to \code{qgraph}
+    #' @param edge_labs Edge labels
+    #' @param ... Arguments passed to \code{qgraph::qgraph}
     #' @return \code{qgraph} plot
-    plot = function(...) {
+    plot = function(edge_labs = FALSE, ...) {
       transition_matrix_plot(
         self$as_matrix(),
         self$absorbing_states(),
         self$source_states(),
-        edge_labs = FALSE, ...
+        edge_labs = edge_labs,
+        ...
       )
     },
 

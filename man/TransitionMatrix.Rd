@@ -212,13 +212,15 @@ a \code{data.frame}
 \subsection{Method \code{plot()}}{
 Visualize the matrix as a graph
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{TransitionMatrix$plot(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{TransitionMatrix$plot(edge_labs = FALSE, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{Arguments passed to \code{qgraph}}
+\item{\code{edge_labs}}{Edge labels}
+
+\item{\code{...}}{Arguments passed to \code{qgraph::qgraph}}
 }
 \if{html}{\out{</div>}}
 }

@@ -2,26 +2,16 @@
 % Please edit documentation in R/solve_time_evolution.R
 \name{solve_trans_prob_fit}
 \alias{solve_trans_prob_fit}
-\title{Solve transition probabilities for each subject in 'MultistateModelFit'}
+\title{Solve transition probabilities for each subject using 'MultistateModelFit'}
 \usage{
-solve_trans_prob_fit(
-  fit,
-  init_state = 1,
-  t_init = 0,
-  t_end = NULL,
-  data = NULL
-)
+solve_trans_prob_fit(fit, t_start = 0, t_end = NULL, data = NULL)
 }
 \arguments{
 \item{fit}{A \code{\link{MultistateModelFit}} object}
 
-\item{init_state}{Index of initial state. A single value or a vector with
-length equal to number of subjects.}
+\item{t_start}{Initial time.}
 
-\item{t_init}{Initial time. A single value or a vector with length equal
-to number of subjects.}
-
-\item{t_end}{End time}
+\item{t_end}{End time.}
 
 \item{data}{A \code{\link{JointData}} object. If \code{NULL}, the
 data used to fit the model is used. If not \code{NULL}, out-of-sample
@@ -30,8 +20,8 @@ mode is assumed (new subjects).}
 \value{
 A data frame, where each row has the probabilities that a given subject
 will be in each state at time \code{t_end} given that they were in
-\code{init_state} at \code{t_init}
+\code{init_state} at \code{t_start}
 }
 \description{
-Solve transition probabilities for each subject in 'MultistateModelFit'
+Solve transition probabilities for each subject using 'MultistateModelFit'
 }

@@ -347,8 +347,7 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
     #' @param log_m An array of shape \code{n_draws} x \code{n_trans}
     #' @param init_state Index of starting state. A single value or a vector
     #' with length equal to \code{n_draws}.
-    #' @param t_start Start time. A single value or a vector
-    #' with length equal to \code{n_draws}.
+    #' @param t_start Start time.
     #' @param t_max Max time. If \code{NULL}, the max
     #' time of the model is used.
     #' @param n_rep Number of repetitions to do for each draw.
@@ -367,12 +366,7 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
       } else {
         stopifnot(length(init_state) == n_draws)
       }
-      checkmate::assert_numeric(t_start, lower = 0)
-      if (length(t_start) == 1) {
-        t_start <- rep(t_start, n_draws)
-      } else {
-        stopifnot(length(t_start) == n_draws)
-      }
+      checkmate::assert_number(t_start, lower = 0)
       checkmate::assert_integerish(n_rep, len = 1, lower = 1)
       n_paths <- n_draws * n_rep
       pb <- progress::progress_bar$new(total = n_paths)
@@ -392,7 +386,7 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
           cnt <- cnt + 1
           pb$tick()
           p <- private$generate_path(
-            w[j, , ], log_w0[j, ], log_m[j, ], t_start[j], t_max, init_state[j]
+            w[j, , ], log_w0[j, ], log_m[j, ], t_start, t_max, init_state[j]
           )
           p <- cbind(p, rep(cnt, nrow(p)))
           out <- rbind(out, p)
