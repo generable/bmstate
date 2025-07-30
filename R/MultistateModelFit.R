@@ -211,6 +211,18 @@ msmsf_stan_data <- function(fit, data = NULL) {
 }
 
 # Helper
+msmsf_state_at <- function(t, fit, data = NULL) {
+  checkmate::assert_class(fit, "MultistateModelFit")
+  if (is.null(data)) {
+    data <- fit$data
+  }
+  df <- data$paths$state_at(t)
+  df <- df |> dplyr::left_join(data$paths$link_df, by = "path_id")
+  df
+}
+
+
+# Helper
 mat2list <- function(mat) {
   lapply(seq_len(ncol(mat)), function(j) mat[, j])
 }
@@ -387,12 +399,16 @@ msmsf_log_baseline_hazard <- function(fit, t = NULL) {
 #' @export
 #' @inheritParams msmsf_pk_params
 #' @return a list with elements \code{log_m}, \code{log_w0}, \code{w}, each
-#' of which is an array where the first dimension is number of subjects times
-#' number of draws
+#' of which is an array where the first dimension is the number of subjects times
+#' the number of draws
 msmsf_inst_hazard_param_draws <- function(fit, data = NULL) {
   fit$assert_hazard_fit()
   sd <- msmsf_stan_data(fit, data)
   log_m <- msmsf_log_hazard_multipliers(fit, data)
+  if (is.null(data)) {
+    data <- fit$data
+  }
+  sdf <- data$paths$subject_df
   S <- fit$num_draws()
   N <- sd$N_sub
   w <- fit$get_draws_of("weights")
@@ -402,12 +418,15 @@ msmsf_inst_hazard_param_draws <- function(fit, data = NULL) {
   w_rep <- abind::abind(replicate(N, w, simplify = FALSE), along = 1)
   log_w0_rep <- abind::abind(replicate(N, log_w0, simplify = FALSE), along = 1)
   log_m_reshaped <- do.call(rbind, log_m)
+  df <- data.frame(
+    subject_id = rep(sdf$subject_id, times = S),
+    draw_index = rep(seq_len(S), each = N)
+  )
   list(
     log_m = log_m_reshaped,
     log_w0 = log_w0_rep,
     w = w_rep,
-    subject_index = rep(seq_len(N), times = S),
-    draw_index = rep(seq_len(S), each = N)
+    df = df
   )
 }
 
@@ -434,12 +453,17 @@ generate_paths <- function(fit, t_start = 0, t_max = NULL, n_rep = 10,
   sd <- msmsf_stan_data(fit, data)
   log_m <- msmsf_log_hazard_multipliers(fit, data)
 
-  # Get and reshape draws
+  # Get and reshape draws and state vector at t_start
   sys <- fit$model$system
   S <- fit$num_draws()
   N <- sd$N_sub
   message("Computing hazard multipliers")
   d <- msmsf_inst_hazard_param_draws(fit, data)
+  init_states <- msmsf_state_at(t_start, fit, data)
+  init_states <- d$df |>
+    dplyr::select("subject_id") |>
+    dplyr::left_join(init_states, by = "subject_id") |>
+    dplyr::pull(state)
 
   # Generate path df
   message("Generating paths")

@@ -15,8 +15,8 @@ mode is assumed (new subjects).}
 }
 \value{
 a list with elements \code{log_m}, \code{log_w0}, \code{w}, each
-of which is an array where the first dimension is number of subjects times
-number of draws
+of which is an array where the first dimension is the number of subjects times
+the number of draws
 }
 \description{
 Extract and reshape draws of instant hazard related parameters
