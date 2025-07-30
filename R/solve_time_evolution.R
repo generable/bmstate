@@ -97,7 +97,7 @@ solve_trans_prob_fit <- function(fit, t_start = 0, t_end = NULL,
   df <- matrix(0, N_sub, 1 + S)
   for (j in seq_len(N_sub)) {
     init_state_j <- init_states$state[j]
-    sidx <- init_states$subject_id[j]
+    sid <- init_states$subject_id[j]
     inds <- which(tp$index_df$subject_id == sid)
     Pi <- tp$P[inds, , ]
     if (length(dim(Pi)) > 2) {
