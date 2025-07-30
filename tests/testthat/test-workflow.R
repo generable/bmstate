@@ -37,8 +37,8 @@ test_that("entire workflow works", {
   expect_true(inherits(fit, "MultistateModelFit"))
 
   # Computing hazard multipliers
-  log_m <- msmsf_log_hazard_multipliers(fit)
-  log_m_test <- msmsf_log_hazard_multipliers(fit, data = jd$test)
+  log_m <- msmfit_log_hazard_multipliers(fit)
+  log_m_test <- msmfit_log_hazard_multipliers(fit, data = jd$test)
 
   # Path generation
   p <- generate_paths(fit, n_rep = 3)
@@ -125,14 +125,14 @@ test_that("entire workflow works (with PK)", {
   expect_true(is_ggplot(p0))
 
   # PK params
-  pkpar <- msmsf_pk_params(fit)
-  pkpar_oos <- msmsf_pk_params(fit, jd$test)
+  pkpar <- msmfit_pk_params(fit)
+  pkpar_oos <- msmfit_pk_params(fit, jd$test)
   expect_true(length(pkpar) == 1)
   expect_true(length(pkpar_oos) == 1)
 
   # Hazard multipliers
-  log_m <- msmsf_log_hazard_multipliers(fit)
-  log_m_test <- msmsf_log_hazard_multipliers(fit, jd$test)
+  log_m <- msmfit_log_hazard_multipliers(fit)
+  log_m_test <- msmfit_log_hazard_multipliers(fit, jd$test)
   N_sub_test <- length(jd$test$paths$unique_subjects())
   H <- mod$system$num_trans()
   expect_equal(dim(log_m_test[[1]]), c(N_sub_test, H))
@@ -182,8 +182,8 @@ test_that("PK-only works", {
   expect_error(fit$plot_h0(), "This is a PK-only fit")
 
   # PK params
-  pkpar <- msmsf_pk_params(fit)
-  pkpar_oos <- msmsf_pk_params(fit, jd$test)
+  pkpar <- msmfit_pk_params(fit)
+  pkpar_oos <- msmfit_pk_params(fit, jd$test)
   expect_true(length(pkpar) == 1)
   expect_true(length(pkpar_oos) == 1)
 

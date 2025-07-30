@@ -9,7 +9,7 @@ solve_trans_prob_matrix(
   log_w0,
   w = NULL,
   log_m = NULL,
-  t_init = 0,
+  t_start = 0,
   t_end = NULL
 )
 }
@@ -22,14 +22,14 @@ solve_trans_prob_matrix(
 
 \item{log_m}{A vector of length \code{n_trans}}
 
-\item{t_init}{Initial time}
+\item{t_start}{Initial time}
 
 \item{t_end}{End time}
 }
 \value{
 A matrix \code{P} where \code{P[i,j]} is the probability that
 the system will be in state \code{j} at time \code{t_end} given that it
-is in state \code{i} at time \code{t_init}
+is in state \code{i} at time \code{t_start}
 }
 \description{
 Solve the transition probability matrix

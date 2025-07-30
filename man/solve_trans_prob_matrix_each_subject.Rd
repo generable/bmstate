@@ -6,7 +6,7 @@
 \usage{
 solve_trans_prob_matrix_each_subject(
   fit,
-  t_init = 0,
+  t_start = 0,
   t_end = NULL,
   data = NULL
 )
@@ -14,10 +14,9 @@ solve_trans_prob_matrix_each_subject(
 \arguments{
 \item{fit}{A \code{\link{MultistateModelFit}} object}
 
-\item{t_init}{Initial time. A single value or a vector with length equal
-to number of subjects.}
+\item{t_start}{Initial time.}
 
-\item{t_end}{End time}
+\item{t_end}{End time.}
 
 \item{data}{A \code{\link{JointData}} object. If \code{NULL}, the
 data used to fit the model is used. If not \code{NULL}, out-of-sample
@@ -27,7 +26,7 @@ mode is assumed (new subjects).}
 For each subject and each draw, a matrix \code{P} where
 \code{P[i,j]} is the probability that the system will be in state
 \code{j} at time \code{t_end}
-given that it is in state \code{i} at time \code{t_init}
+given that it is in state \code{i} at time \code{t_start}
 }
 \description{
 Solve transition probabilities for each subject in 'MultistateModelFit'

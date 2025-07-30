@@ -117,7 +117,7 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
       if (is.null(data)) {
         data <- self$data
       }
-      pkpar <- msmsf_pk_params(self, data = data)
+      pkpar <- msmfit_pk_params(self, data = data)
       theta <- pkpar[[1]]
       trange <- sapply(data$dosing$times, range)
       N <- nrow(theta)
@@ -172,7 +172,7 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
       checkmate::assert_number(ci_alpha, lower = 0, upper = 1)
       LB <- (1 - ci_alpha) / 2
       UB <- 1 - LB
-      df <- msmsf_log_baseline_hazard(self, t)
+      df <- msmfit_log_baseline_hazard(self, t)
       df |>
         dplyr::group_by(.data$time, .data$trans_idx) |>
         dplyr::summarize(
@@ -199,7 +199,7 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
 )
 
 # Helper
-msmsf_stan_data <- function(fit, data = NULL) {
+msmfit_stan_data <- function(fit, data = NULL) {
   checkmate::assert_class(fit, "MultistateModelFit")
   if (is.null(data)) {
     sd <- fit$get_data()
@@ -211,7 +211,7 @@ msmsf_stan_data <- function(fit, data = NULL) {
 }
 
 # Helper
-msmsf_state_at <- function(t, fit, data = NULL) {
+msmfit_state_at <- function(t, fit, data = NULL) {
   checkmate::assert_class(fit, "MultistateModelFit")
   if (is.null(data)) {
     data <- fit$data
@@ -235,9 +235,9 @@ mat2list <- function(mat) {
 #' data used to fit the model is used. If not \code{NULL}, out-of-sample
 #' mode is assumed (new subjects).
 #' @return A list with length equal to number of draws.
-msmsf_pk_params <- function(fit, data = NULL) {
+msmfit_pk_params <- function(fit, data = NULL) {
   oos_mode <- is.null(data)
-  sd <- msmsf_stan_data(fit, data)
+  sd <- msmfit_stan_data(fit, data)
   S <- fit$num_draws()
 
   # Extract
@@ -277,11 +277,11 @@ msmsf_pk_params <- function(fit, data = NULL) {
 #' Compute exposure
 #'
 #' @export
-#' @inheritParams msmsf_pk_params
-msmsf_exposure <- function(fit, data = NULL) {
+#' @inheritParams msmfit_pk_params
+msmfit_exposure <- function(fit, data = NULL) {
   # Get draws
-  sd <- msmsf_stan_data(fit, data)
-  pkpar <- msmsf_pk_params(fit, data)
+  sd <- msmfit_stan_data(fit, data)
+  pkpar <- msmfit_pk_params(fit, data)
 
   # Call exposed Stan function
   S <- fit$num_draws()
@@ -301,15 +301,15 @@ msmsf_exposure <- function(fit, data = NULL) {
 #' Compute log_hazard multipliers
 #'
 #' @export
-#' @inheritParams msmsf_pk_params
+#' @inheritParams msmfit_pk_params
 #' @return A list of length \code{n_draws} where each element is a
 #' matrix of shape \code{n_subject} x \code{n_transitions}
-msmsf_log_hazard_multipliers <- function(fit, data = NULL) {
+msmfit_log_hazard_multipliers <- function(fit, data = NULL) {
   fit$assert_hazard_fit()
 
   # Get draws
-  sd <- msmsf_stan_data(fit, data)
-  auc <- msmsf_exposure(fit, data)
+  sd <- msmfit_stan_data(fit, data)
+  auc <- msmfit_exposure(fit, data)
   S <- fit$num_draws()
   beta_oth <- fit$get_draws_of("beta_oth")
   if (is.null(beta_oth)) {
@@ -363,7 +363,7 @@ msmsf_log_hazard_multipliers <- function(fit, data = NULL) {
 
 
 # Log baseline hazard distribution at times t
-msmsf_log_baseline_hazard <- function(fit, t = NULL) {
+msmfit_log_baseline_hazard <- function(fit, t = NULL) {
   fit$assert_hazard_fit()
   checkmate::assert_class(fit, "MultistateModelFit")
   sys <- fit$model$system
@@ -397,14 +397,14 @@ msmsf_log_baseline_hazard <- function(fit, t = NULL) {
 #' Extract and reshape draws of instant hazard related parameters
 #'
 #' @export
-#' @inheritParams msmsf_pk_params
+#' @inheritParams msmfit_pk_params
 #' @return a list with elements \code{log_m}, \code{log_w0}, \code{w}, each
 #' of which is an array where the first dimension is the number of subjects times
 #' the number of draws
-msmsf_inst_hazard_param_draws <- function(fit, data = NULL) {
+msmfit_inst_hazard_param_draws <- function(fit, data = NULL) {
   fit$assert_hazard_fit()
-  sd <- msmsf_stan_data(fit, data)
-  log_m <- msmsf_log_hazard_multipliers(fit, data)
+  sd <- msmfit_stan_data(fit, data)
+  log_m <- msmfit_log_hazard_multipliers(fit, data)
   if (is.null(data)) {
     data <- fit$data
   }
@@ -438,7 +438,7 @@ msmsf_inst_hazard_param_draws <- function(fit, data = NULL) {
 #' Generates paths for each subject in the data, starting from the state
 #' that the subject is at the given start time.
 #'
-#' @inheritParams msmsf_pk_params
+#' @inheritParams msmfit_pk_params
 #' @param t_start Start time. A single value or a vector
 #' with length equal to number of subjects.
 #' @param t_max Max time. If \code{NULL}, the max
@@ -450,16 +450,16 @@ generate_paths <- function(fit, t_start = 0, t_max = NULL, n_rep = 10,
   fit$assert_hazard_fit()
   checkmate::assert_class(fit, "MultistateModelFit")
   checkmate::assert_integerish(n_rep, lower = 1, len = 1)
-  sd <- msmsf_stan_data(fit, data)
-  log_m <- msmsf_log_hazard_multipliers(fit, data)
+  sd <- msmfit_stan_data(fit, data)
+  log_m <- msmfit_log_hazard_multipliers(fit, data)
 
   # Get and reshape draws and state vector at t_start
   sys <- fit$model$system
   S <- fit$num_draws()
   N <- sd$N_sub
-  message("Computing hazard multipliers")
-  d <- msmsf_inst_hazard_param_draws(fit, data)
-  init_states <- msmsf_state_at(t_start, fit, data)
+  message("Computing hazard multipliers and getting state vector")
+  d <- msmfit_inst_hazard_param_draws(fit, data)
+  init_states <- msmfit_state_at(t_start, fit, data)
   init_states <- d$df |>
     dplyr::select("subject_id") |>
     dplyr::left_join(init_states, by = "subject_id") |>
