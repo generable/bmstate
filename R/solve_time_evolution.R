@@ -94,7 +94,8 @@ solve_trans_prob_fit <- function(fit, t_start = 0, t_end = NULL,
   N_sub <- nrow(init_states)
   S <- fit$model$system$num_states()
 
-  df <- matrix(0, N_sub, 1 + S)
+  df <- matrix(0, N_sub, S)
+  sub_ids <- rep("", N_sub)
   for (j in seq_len(N_sub)) {
     init_state_j <- init_states$state[j]
     sid <- init_states$subject_id[j]
@@ -103,11 +104,12 @@ solve_trans_prob_fit <- function(fit, t_start = 0, t_end = NULL,
     if (length(dim(Pi)) > 2) {
       Pi <- apply(Pi, c(2, 3), mean)
     }
-    Pi <- Pi[init_state_j, ]
-    df[j, ] <- c(sid, Pi)
+    sub_ids[j] <- sid
+    df[j, ] <- Pi[init_state_j, ]
   }
   df <- data.frame(df)
-  colnames(df) <- c("subject_id", fit$model$system$tm()$states)
+  colnames(df) <- fit$model$system$tm()$states
+  df$subject_id <- sub_ids
   df
 }
 

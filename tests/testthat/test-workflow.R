@@ -78,6 +78,7 @@ test_that("entire workflow works", {
 
   # Test that solving time evolution with single draw works
   tp2 <- solve_trans_prob_fit(mfit)
+  expect_true(is.numeric(tp2$Illness))
   expect_equal(nrow(tp2), nrow(pes1))
 
   # Single-transition model
