@@ -3,6 +3,7 @@
 #' @export
 #' @field model The \code{\link{MultistateModel}}
 #' @field data A  \code{\link{JointData}} object
+#' @field info Fit info.
 MultistateModelFit <- R6::R6Class("MultistateModelFit",
   private = list(
     draws = NULL,
@@ -11,6 +12,7 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
   public = list(
     model = NULL,
     data = NULL,
+    info = NULL,
 
     #' @description
     #' Create model fit object
@@ -19,11 +21,13 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
     #' @param draws A named list of rvars.
     #' @param stan_data The used 'Stan' data list.
     #' @param model A \code{\link{MultistateModel}}
-    initialize = function(data, stan_data, model, draws) {
+    #' @param info Fit info.
+    initialize = function(data, stan_data, model, draws, info = NULL) {
       checkmate::assert_class(data, "JointData")
       checkmate::assert_class(model, "MultistateModel")
       self$data <- data
       self$model <- model
+      self$info <- info
       private$draws <- draws
       private$stan_data <- stan_data
     },
@@ -47,7 +51,8 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
     #' @return A new \code{\link{MultistateModelFit}} object.
     mean_fit = function() {
       draws <- lapply(private$draws, rvar_to_mean_rvar)
-      MultistateModelFit$new(self$data, private$stan_data, self$model, draws)
+      i <- "Fit created by averaging parameters over draws of another fit"
+      MultistateModelFit$new(self$data, private$stan_data, self$model, draws, i)
     },
 
     #' @description Check if fit is a point estimate

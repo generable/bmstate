@@ -41,8 +41,8 @@ ensure_exposed_stan_functions <- function(...) {
 #' @param set_auc_normalizers Set AUC normalization based on SS doses.
 #' @param filepath Passed to \code{\link{create_stan_model}}.
 #' @param pathfinder Use pathfinder instead of MCMC?
-#' @param ... Arguments passed to \code{sample} method of the
-#' 'CmdStanR' model.
+#' @param ... Arguments passed to the \code{sample} or \code{pathfinder}
+#' method of the CmdStanR' model.
 #' @return A \code{\link{MultistateModelFit}} object.
 fit_stan <- function(model, data, prior_only = FALSE,
                      pk_only = FALSE,
@@ -87,7 +87,16 @@ fit_stan <- function(model, data, prior_only = FALSE,
     "beta_auc", "sigma_pk", "log_z_pk", "log_mu_pk", "log_sig_pk", "lp__"
   )
   draws <- create_rv_list(stan_fit, pars)
-  fit <- MultistateModelFit$new(data, sd, model, draws)
+  diag <- NULL
+  if (isFALSE(pathfinder)) {
+    diag <- stan_fit$diagnostic_summary()
+  }
+  info <- list(
+    diag = diag,
+    runset = stan_fit$runset,
+    summary = stan_fit$summary()
+  )
+  fit <- MultistateModelFit$new(data, sd, model, draws, info)
   if (!return_stanfit) {
     return(fit)
   }

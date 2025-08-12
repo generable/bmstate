@@ -33,8 +33,8 @@ fit_stan(
 
 \item{pathfinder}{Use pathfinder instead of MCMC?}
 
-\item{...}{Arguments passed to \code{sample} method of the
-'CmdStanR' model.}
+\item{...}{Arguments passed to the \code{sample} or \code{pathfinder}
+method of the CmdStanR' model.}
 }
 \value{
 A \code{\link{MultistateModelFit}} object.

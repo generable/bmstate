@@ -14,6 +14,8 @@ Minimal fit class
 \item{\code{model}}{The \code{\link{MultistateModel}}}
 
 \item{\code{data}}{A  \code{\link{JointData}} object}
+
+\item{\code{info}}{Fit info.}
 }
 \if{html}{\out{</div>}}
 }
@@ -44,7 +46,7 @@ Minimal fit class
 \subsection{Method \code{new()}}{
 Create model fit object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModelFit$new(data, stan_data, model, draws)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModelFit$new(data, stan_data, model, draws, info = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -57,6 +59,8 @@ Create model fit object
 \item{\code{model}}{A \code{\link{MultistateModel}}}
 
 \item{\code{draws}}{A named list of rvars.}
+
+\item{\code{info}}{Fit info.}
 }
 \if{html}{\out{</div>}}
 }
