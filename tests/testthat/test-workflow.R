@@ -156,6 +156,73 @@ test_that("entire workflow works (with PK)", {
   expect_true(is_ggplot(pf2))
 })
 
+test_that("entire workflow works (with single transition PK)", {
+  # Setup
+  h0_base <- 1e-3
+
+  # Create model
+  sn <- c("Alive", "Death")
+  tm <- transmat_survival(state_names = sn)
+  t3yr <- 3 * 365.25
+  covs <- c("age")
+  pk_covs <- list(
+    ka = "age",
+    CL = "CrCL",
+    V2 = c("weight")
+  )
+  mod <- create_msm(tm, covs, pk_covs, num_knots = 5, tmax = t3yr)
+  bh_true <- matrix(0, 1, 2)
+  bh_true[1, 1] <- 0.5 # age effect on death
+  bh_true[1, 2] <- -0.5 # dose effect on death
+  sn <- "Death"
+  rownames(bh_true) <- paste0("Effect on ", sn)
+  colnames(bh_true) <- mod$covs()
+
+  h0_true <- 1e-3
+  beta_pk <- list(ka = -1, CL = 1, V2 = 1)
+
+  # Simulate data
+  simdat <- mod$simulate_data(
+    options$N_subject,
+    beta_haz = bh_true,
+    beta_pk = beta_pk,
+    w0 = h0_true
+  )
+
+  # Split
+  jd <- simdat
+  jd <- split_data(jd)
+
+  # Fit the model
+  fit <- fit_stan(mod, jd$train,
+    iter_warmup = options$iter_warmup,
+    iter_sampling = options$iter_sampling,
+    chains = options$chains,
+    refresh = 5,
+    adapt_delta = 0.95,
+    init = 0.1
+  )
+  fit <- fit$mean_fit()
+  expect_true(inherits(fit, "MultistateModelFit"))
+
+  # Plot baseline hazards
+  p0 <- fit$plot_h0()
+  expect_true(is_ggplot(p0))
+
+  # PK params
+  pkpar <- msmfit_pk_params(fit)
+  pkpar_oos <- msmfit_pk_params(fit, jd$test)
+  expect_true(length(pkpar) == 1)
+  expect_true(length(pkpar_oos) == 1)
+
+  # Hazard multipliers
+  log_m <- msmfit_log_hazard_multipliers(fit)
+  log_m_test <- msmfit_log_hazard_multipliers(fit, jd$test)
+  N_sub_test <- length(jd$test$paths$unique_subjects())
+  H <- mod$system$num_trans()
+  expect_equal(dim(log_m_test[[1]]), c(N_sub_test, H))
+})
+
 
 test_that("PK-only works", {
   # Setup

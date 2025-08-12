@@ -330,7 +330,7 @@ msmfit_log_hazard_multipliers <- function(fit, data = NULL) {
   N_sub <- sd$N_sub
   first_indices <- sapply(seq_len(N_sub), function(x) which(sd$idx_sub == x)[1])
   if (sd$nc_haz > 0) {
-    x_haz_long <- sd$x_haz[, sd$idx_sub]
+    x_haz_long <- sd$x_haz[, sd$idx_sub, drop = FALSE]
   } else {
     x_haz_long <- array(0, dim = c(0, sd$N_int))
   }
