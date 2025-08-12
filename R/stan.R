@@ -91,10 +91,13 @@ fit_stan <- function(model, data, prior_only = FALSE,
   if (isFALSE(pathfinder)) {
     diag <- stan_fit$diagnostic_summary()
   }
+  smr <- capture.output({
+    smr <- stan_fit$summary()
+  })
   info <- list(
     diag = diag,
     runset = stan_fit$runset,
-    summary = stan_fit$summary()
+    summary = smr
   )
   fit <- MultistateModelFit$new(data, sd, model, draws, info)
   if (!return_stanfit) {
