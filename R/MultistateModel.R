@@ -204,6 +204,9 @@ MultistateModel <- R6::R6Class("MultistateModel",
           x <- c(x, self$pk_model$covs())
         }
       } else {
+        if (!self$has_pk()) {
+          return(NULL)
+        }
         if (which == "ka") {
           x <- self$pk_model$ka_covs()
         } else if (which == "CL") {
