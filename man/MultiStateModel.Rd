@@ -212,9 +212,16 @@ if PK model is included)
 \subsection{Method \code{data_covs()}}{
 Get all covariates that need to be given as data
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$data_covs()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$data_covs(which = NULL)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{Which subset to get?}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateModel-categ_covs"></a>}}

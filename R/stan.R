@@ -286,9 +286,9 @@ create_stan_data_time_since_last_pk <- function(sd) {
   )
 }
 
-# Normalized covariates to stan data
+# Normalized covariates to Stan data
 standata_scaled_covariates <- function(pd, model, name) {
-  covs <- model$data_covs()
+  covs <- model$data_covs(name)
   sub_df <- pd$subject_df
   x <- list()
   nc <- length(covs)

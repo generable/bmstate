@@ -196,7 +196,21 @@ MultistateModel <- R6::R6Class("MultistateModel",
     },
 
     #' @description Get all covariates that need to be given as data
-    data_covs = function() {
+    #' @param which Which subset to get?
+    data_covs = function(which = NULL) {
+      if (which == "ka") {
+        return(self$pk_model$ka_covs())
+      } else if (which == "CL") {
+        return(self$pk_model$CL_covs())
+      } else if (which == "V2") {
+        return(self$pk_model$V2_covs())
+      } else if (which == "haz") {
+        return(private$hazard_covariates)
+      } else {
+        if (!is.null(which)) {
+          stop("invalid 'which' argument")
+        }
+      }
       x <- private$hazard_covariates
       if (self$has_pk()) {
         x <- c(x, self$pk_model$covs())
