@@ -30,6 +30,7 @@ Imports:
     network,
     posterior,
     progress,
+    purrr,
     qgraph,
     R6,
     rlang,
