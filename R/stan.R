@@ -318,7 +318,7 @@ standata_scaled_covariates <- function(pd, model, name) {
     x[[j]] <- (xx - xj_loc) / xj_scale
   }
   x <- sapply(x, function(x) x)
-  if (length(dim(x) != 2)) {
+  if (length(dim(x)) != 2) {
     x <- array(dim = c(N, 0))
   }
   if (nrow(x) != N) {
