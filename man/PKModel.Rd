@@ -66,7 +66,7 @@ Get the covariates affecting the CL parameter.
 \if{html}{\out{<a id="method-PKModel-V2_covs"></a>}}
 \if{latex}{\out{\hypertarget{method-PKModel-V2_covs}{}}}
 \subsection{Method \code{V2_covs()}}{
-Get the covariates affecting the V_2 parameter.
+Get the covariates affecting the V2 parameter.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PKModel$V2_covs()}\if{html}{\out{</div>}}
 }

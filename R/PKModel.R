@@ -18,9 +18,9 @@ PKModel <- R6::R6Class("PKModel",
     #' \code{CL}, and \code{V2}
     initialize = function(covariates) {
       checkmate::assert_list(covariates)
-      checkmate::assert_character(covariates$ka)
-      checkmate::assert_character(covariates$CL)
-      checkmate::assert_character(covariates$V2)
+      checkmate::assert_character(covariates$ka, null.ok = TRUE)
+      checkmate::assert_character(covariates$CL, null.ok = TRUE)
+      checkmate::assert_character(covariates$V2, null.ok = TRUE)
       private$covariates <- covariates
     },
 
@@ -34,7 +34,7 @@ PKModel <- R6::R6Class("PKModel",
       private$covariates$CL
     },
 
-    #' @description Get the covariates affecting the V_2 parameter.
+    #' @description Get the covariates affecting the V2 parameter.
     V2_covs = function() {
       private$covariates$V2
     },
@@ -114,23 +114,24 @@ PKModel <- R6::R6Class("PKModel",
       N <- nrow(df_subjects)
       dd <- simulate_dosing(df_subjects, tau = tau)
       THETA <- matrix(0, N, 3)
+      xu <- unique(c(self$ka_covs(), self$CL_covs(), self$V2_covs()))
+      x <- data.frame(normalize_columns(as.matrix(df_subjects[, xu])))
 
       # Simulate observation times and parameters
       t_obs <- list()
       SUB_ID <- rep("s", N)
       for (n in seq_len(N)) {
-        row <- df_subjects[n, ]
         theta_n <- list(
-          ka = exp(-2 + sum(row[, self$ka_covs()] * beta_pk$ka)),
-          CL = exp(-2 + sum(row[, self$CL_covs()] * beta_pk$CL)),
-          V2 = exp(-2 + sum(row[, self$V2_covs()] * beta_pk$V2))
+          ka = exp(-2 + sum(x[n, self$ka_covs()] * beta_pk$ka)),
+          CL = exp(-2 + sum(x[n, self$CL_covs()] * beta_pk$CL)),
+          V2 = exp(-2 + sum(x[n, self$V2_covs()] * beta_pk$V2))
         )
         t_last <- max(dd$times[[n]])
         t_pre <- t_last - (0.02 + 0.05) * runif(1) * tau
         t_post <- t_last + (0.1 + 0.2 * runif(1)) * tau
         t_obs[[n]] <- c(t_pre, t_post)
         THETA[n, ] <- unlist(theta_n)
-        SUB_ID[n] <- row$subject_id
+        SUB_ID[n] <- df_subjects$subject_id[n]
       }
 
       # Simulate observed concentration
