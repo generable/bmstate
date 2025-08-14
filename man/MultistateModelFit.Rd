@@ -28,6 +28,7 @@ Minimal fit class
 \item \href{#method-MultistateModelFit-mean_fit}{\code{MultistateModelFit$mean_fit()}}
 \item \href{#method-MultistateModelFit-is_point_estimate}{\code{MultistateModelFit$is_point_estimate()}}
 \item \href{#method-MultistateModelFit-get_data}{\code{MultistateModelFit$get_data()}}
+\item \href{#method-MultistateModelFit-draws_names}{\code{MultistateModelFit$draws_names()}}
 \item \href{#method-MultistateModelFit-get_draws}{\code{MultistateModelFit$get_draws()}}
 \item \href{#method-MultistateModelFit-get_draws_of}{\code{MultistateModelFit$get_draws_of()}}
 \item \href{#method-MultistateModelFit-print}{\code{MultistateModelFit$print()}}
@@ -122,6 +123,16 @@ a logical value
 Extract data list
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModelFit$get_data()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModelFit-draws_names"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModelFit-draws_names}{}}}
+\subsection{Method \code{draws_names()}}{
+Names of the draws list
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModelFit$draws_names()}\if{html}{\out{</div>}}
 }
 
 }

@@ -374,8 +374,16 @@ place_internal_knots <- function(t_max, num_knots, t_event) {
 normalize_columns <- function(A) {
   K <- ncol(A)
   for (j in seq_len(K)) {
-    a <- A[, j]
-    A[, j] <- (a - mean(a)) / stats::sd(a)
+    A[, j] <- normalize(A[, j])
   }
   A
+}
+
+# Normalize
+normalize <- function(a) {
+  sdd <- stats::sd(a)
+  if (sdd == 0) {
+    stop("error in normalization, zero variance")
+  }
+  (a - mean(a)) / sdd
 }

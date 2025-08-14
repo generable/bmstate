@@ -302,6 +302,7 @@ create_stan_data_time_since_last_pk <- function(sd) {
 standata_scaled_covariates <- function(pd, model, name) {
   covs <- model$data_covs(name)
   sub_df <- pd$subject_df
+  N <- nrow(sub_df)
   x <- list()
   nc <- length(covs)
   j <- 0
@@ -316,10 +317,17 @@ standata_scaled_covariates <- function(pd, model, name) {
     }
     x[[j]] <- (xx - xj_loc) / xj_scale
   }
+  x <- sapply(x, function(x) x)
+  if (length(dim(x)) != 2) {
+    x <- array(dim = c(N, 0))
+  }
+  if (nrow(x) != N) {
+    stop("error in standata_scaled_covariates")
+  }
 
   # Return
   out <- list(
-    x = sapply(x, function(x) x),
+    x = x,
     nc = nc
   )
   names(out) <- paste0(names(out), "_", name)

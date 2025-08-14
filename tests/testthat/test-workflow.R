@@ -166,9 +166,8 @@ test_that("entire workflow works (with single transition PK)", {
   t3yr <- 3 * 365.25
   covs <- c("age")
   pk_covs <- list(
-    ka = "age",
     CL = "CrCL",
-    V2 = c("weight")
+    V2 = c("weight", "sex")
   )
   mod <- create_msm(tm, covs, pk_covs, num_knots = 5, tmax = t3yr)
   bh_true <- matrix(0, 1, 2)
@@ -179,7 +178,7 @@ test_that("entire workflow works (with single transition PK)", {
   colnames(bh_true) <- mod$covs()
 
   h0_true <- 1e-3
-  beta_pk <- list(ka = -1, CL = 1, V2 = 1)
+  beta_pk <- list(CL = -0.1, V2 = c(0, 0.1))
 
   # Simulate data
   simdat <- mod$simulate_data(
@@ -210,6 +209,10 @@ test_that("entire workflow works (with single transition PK)", {
   expect_true(is_ggplot(p0))
 
   # PK params
+  pkpar <- msmfit_pk_params(fit)
+  pkpar_oos <- msmfit_pk_params(fit, jd$test)
+  expect_true(length(pkpar) == 1)
+  expect_true(length(pkpar_oos) == 1)
   pkpar <- msmfit_pk_params(fit)
   pkpar_oos <- msmfit_pk_params(fit, jd$test)
   expect_true(length(pkpar) == 1)

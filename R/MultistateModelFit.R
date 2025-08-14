@@ -67,6 +67,12 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
       private$stan_data
     },
 
+    #' @description Names of the draws list
+    #'
+    draws_names = function() {
+      names(private$draws)
+    },
+
     #' @description Extract draws as \code{rvar}s
     #'
     #' @param name Param/quantity name
@@ -253,9 +259,16 @@ msmfit_pk_params <- function(fit, data = NULL) {
   } else {
     log_z <- array(0, dim = c(S, 1, sd$N_sub, 3))
   }
-  beta_ka <- fit$get_draws_of("beta_ka")
-  beta_CL <- fit$get_draws_of("beta_CL")
-  beta_V2 <- fit$get_draws_of("beta_V2")
+  get_beta <- function(fit, name) {
+    b <- fit$get_draws_of(name)
+    if (is.null(b)) {
+      b <- array(0, dim = c(S, 1, 0))
+    }
+    b
+  }
+  beta_ka <- get_beta(fit, "beta_ka")
+  beta_CL <- get_beta(fit, "beta_CL")
+  beta_V2 <- get_beta(fit, "beta_V2")
 
   # Call exposed Stan function for each draw (not optimal)
   out <- list()
