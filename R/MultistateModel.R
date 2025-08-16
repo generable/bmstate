@@ -204,20 +204,22 @@ MultistateModel <- R6::R6Class("MultistateModel",
           x <- c(x, self$pk_model$covs())
         }
       } else {
-        if (!self$has_pk()) {
-          return(NULL)
-        }
-        if (which == "ka") {
-          x <- self$pk_model$ka_covs()
-        } else if (which == "CL") {
-          x <- self$pk_model$CL_covs()
-        } else if (which == "V2") {
-          x <- self$pk_model$V2_covs()
-        } else if (which == "haz") {
+        if (which == "haz") {
           x <- private$hazard_covariates
         } else {
-          if (!is.null(which)) {
-            stop("invalid 'which' argument")
+          if (!self$has_pk()) {
+            return(NULL)
+          }
+          if (which == "ka") {
+            x <- self$pk_model$ka_covs()
+          } else if (which == "CL") {
+            x <- self$pk_model$CL_covs()
+          } else if (which == "V2") {
+            x <- self$pk_model$V2_covs()
+          } else {
+            if (!is.null(which)) {
+              stop("invalid 'which' argument")
+            }
           }
         }
       }
@@ -331,7 +333,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       categ <- self$categ_covs()
       idx_cat <- which(covs %in% categ)
       N_covs <- length(covs)
-      A <- 60 + 15 * matrix(rnorm(N_subject * N_covs), N_subject, N_covs)
+      A <- 60 + 10 * matrix(rnorm(N_subject * N_covs), N_subject, N_covs)
 
       # Discretize covariates
       for (idx in idx_cat) {
