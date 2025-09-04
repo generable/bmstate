@@ -359,7 +359,7 @@ msmfit_log_hazard_multipliers <- function(fit, data = NULL) {
       ba <- NULL
       aa <- NULL
     }
-    if (sd$nc_haz == 0) {
+    if (sd$nc_haz == 0 && sd$do_pk == 0) {
       r <- matrix(0, sd$N_sub, sd$N_trans)
     } else {
       r <- compute_log_hazard_multiplier(
