@@ -170,19 +170,20 @@ DosingData <- R6::R6Class(
 #' @export
 #' @param df_subjects Data frame with one row for each subject
 #' @param tau Dosing interval.
+#' @param p_miss Probability of missing a dose.
 #' @return A \code{\link{DosingData}} object
-simulate_dosing <- function(df_subjects, tau = 24) {
+simulate_dosing <- function(df_subjects, tau = 24, p_miss = 0.2) {
   N <- nrow(df_subjects)
-  dose_ss <- c(15, 30, 60)[sample.int(3, N, replace = TRUE)]
+  dose_ss <- df_subjects$dose
   t1 <- 100 + 100 * stats::runif(N)
   t2 <- t1 + (1 - 0.5 * stats::runif(N)) * tau
   d1 <- dose_ss
   d2 <- dose_ss
   for (j in seq_len(N)) {
-    if (stats::runif(1) < 0.2) {
+    if (stats::runif(1) < p_miss) {
       d1[j] <- 0
     }
-    if (stats::runif(1) < 0.2) {
+    if (stats::runif(1) < p_miss) {
       d2[j] <- 0
     }
   }
