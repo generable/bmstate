@@ -44,6 +44,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
     simulate_log_hazard_multipliers = function(df_subjects, beta) {
       ts <- self$target_states()
       x <- self$covs()
+      auc_norm <- self$get_auc_normalizers()
       B <- length(ts)
       K <- length(x)
       checkmate::assert_matrix(beta, nrows = B, ncols = K)
@@ -52,7 +53,12 @@ MultistateModel <- R6::R6Class("MultistateModel",
       out <- matrix(0, N, S)
       tf <- self$system$tm()$trans_df()
       X <- df_subjects |> dplyr::select(tidyselect::all_of(x))
-      X_norm <- normalize_columns(as.matrix(X))
+      X <- as.matrix(X)
+      X_norm <- normalize_columns(X)
+      if ("ss_auc" %in% x) {
+        idx <- which(x == "ss_auc")
+        X_norm[, idx] <- (X[, idx] - auc_norm$loc) / auc_norm$scale
+      }
       for (s in seq_len(S)) {
         target_state <- tf$state[s]
         idx_in_beta <- which(ts == target_state)
