@@ -28,6 +28,8 @@ Imports:
     ggdist (>= 3.1),
     ggplot2,
     network,
+    Matrix,
+    mstate,
     posterior,
     progress,
     purrr,
