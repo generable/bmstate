@@ -1,7 +1,7 @@
 ---
 title: "Common multistate models"
 author: Juho Timonen
-date: 29th July 2025
+date: 1st Oct 2025
 output: 
   rmarkdown::html_vignette:
     toc: true 
@@ -44,11 +44,17 @@ plot_time_dist <- function(t) {
 
 # Basic survival model
 
-First we create a `TransitionMatrix`. The transition matrix is a directed
+```{r}
+tm <- transmat_survival()
+s <- tm$states
+```
+
+The basic survival model can be seen as a multistate model with two states:
+`r s[1]` and `r s[2]`. The death *event* corresponds to transitioning from
+the state `r s[1]` to the terminal state `r s[2]`. First we create a `TransitionMatrix`. The transition matrix is a directed
 graph encoded by a binary matrix.
 
 ```{r, fig.width=5}
-tm <- transmat_survival()
 print(tm)
 tm$plot()
 ```
@@ -61,7 +67,7 @@ mod <- create_msm(tm, tmax = tmax)
 print(mod)
 ```
 
-Now we can simulate events with known constant hazard rate `lambda`. For this
+Now we can simulate death events with known constant hazard rate `lambda`. For this
 model, we are simulating from a homogeneous Poisson process with rate $\lambda$,
 meaning that the event times should follow an exponential distribution with
 mean $\frac{1}{\lambda}$.
@@ -73,7 +79,8 @@ pd$paths$plot_paths()
 pd$paths$plot_graph()
 ```
 
-We plot the distribution of event times and the theoretical mean (red line).
+We plot the distribution of event times (i.e., transition times) and the theoretical mean (red line).
+
 ```{r, fig.width=5}
 times <- pd$paths$as_transitions(truncate = TRUE)$time
 plot_time_dist(times) + geom_vline(xintercept = 1 / lambda, color = "firebrick")

@@ -1,7 +1,7 @@
 Package: bmstate
 Type: Package
 Title: Bayesian multistate modeling using Stan
-Version: 0.0.26
+Version: 0.0.27
 Author: Juho Timonen and Jacqueline Buros
 Maintainer: Juho Timonen <juho.timonen@iki.fi>
 Description: Bayesian multistate modeling using 'Stan'. Includes the option to 
@@ -28,6 +28,8 @@ Imports:
     ggdist (>= 3.1),
     ggplot2,
     network,
+    Matrix,
+    mstate,
     posterior,
     progress,
     purrr,

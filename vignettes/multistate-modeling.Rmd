@@ -1,7 +1,7 @@
 ---
 title: "Multistate models in the bmstate package"
 author: Juho Timonen
-date: 29th July 2025
+date: 1st Oct 2025
 output: 
   rmarkdown::html_vignette:
     toc: true 
@@ -107,13 +107,14 @@ Cox proportional hazards model fit.
 
 ### Events
 
-For example if the multistate system is modeling medical patients
+Transitioning from one state to another (or even the same one) can be called a 
+*transition event*. Additionally, for example if the multistate system is modeling medical patients
 as observation units, 
-transitioning to a state can correspond to a clinical *event*. For now,
-we assume that transitioning to state $e$ means that event $e \in {1, \ldots, S}$
-occurs.
+transitioning to a state can correspond to a *clinical event*. For now,
+we assume that transitioning to state $e$ means that (clinical) 
+event $e \in {1, \ldots, S}$ occurs.
 We often ultimately want the model to be able to predict, for a given 
-observation unit, the probability that a particular event $e$
+observation unit, the probability that a particular (clinical) event $e$
 occurs in a specified time period of length $T$ at least once, given
 an initial state $s$ at time $t = 0$. We denote this probability
 by $p(e \mid s, T)$.
