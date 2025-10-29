@@ -62,7 +62,7 @@ test_that("entire workflow works", {
   expect_true(is_ggplot(plot_h0))
 
   # Scoring
-  ev <- "Death"
+  ev <- "Dead"
   a <- create_scoring_df(jd$train$paths, p, ev)
 
   ci <- c_index(a)
@@ -73,7 +73,7 @@ test_that("entire workflow works", {
   expect_equal(mfit$num_draws(), 1)
   p_mfit <- generate_paths(mfit, n_rep = 100)
   expect_equal(p_mfit$n_paths(), 100 * jd$train$paths$n_paths())
-  pes1 <- p_state_visit_per_subject(p_mfit, "Death")
+  pes1 <- p_state_visit_per_subject(p_mfit, ev)
 
   # Test that solving time evolution with single draw works
   tp2 <- solve_trans_prob_fit(mfit)
@@ -81,7 +81,7 @@ test_that("entire workflow works", {
   expect_equal(nrow(tp2), nrow(pes1))
 
   # Single-transition model
-  tds <- as_single_event(jd$train$paths, event = "Death")
+  tds <- as_single_event(jd$train$paths, event = ev)
   tds <- JointData$new(tds, jd$train$dosing)
   mod_tte <- create_msm(tds$paths$transmat)
   a <- fit_stan(mod_tte, tds,

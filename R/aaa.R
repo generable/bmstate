@@ -21,9 +21,17 @@
 #' you are using the experimental feature of fitting a PK submodel, the
 #' latter should be \code{NULL}.
 #'
-#' @section Predicting event risks:
-#' See the functions \code{\link{generate_paths}} and \code{\link{event_risk}}.
+#' @section Prediction with a fitted model:
 #'
+#' \itemize{
+#'
+#' \item For predicting state visit risks using state path simulation,
+#' see the functions \code{\link{generate_paths}}, \code{\link{p_state_visit}},
+#' and \code{\link{p_state_visit_per_subject}}.
+#'
+#' \item For analytically solving state occupancy probabilities after some time,
+#'   see \code{\link{solve_trans_prob_fit}}.
+#' }
 #' @section Vignettes:
 #' See the vignettes for more information.
 #'
