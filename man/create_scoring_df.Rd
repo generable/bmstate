@@ -12,8 +12,9 @@ create_scoring_df(paths_obs, paths_pred, state_name)
 \item{paths_pred}{A \code{\link{PathData}} object of predicted paths.}
 
 \item{state_name}{Name of the state of interest.}
-
-\item{df}{A \code{data.frame} with \code{surv} and \code{risk} columns}
+}
+\value{
+A \code{data.frame} with \code{surv} and \code{pred_prob} columns
 }
 \description{
 Create a data frame to evaluate state visit probability predictions

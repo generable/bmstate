@@ -481,7 +481,7 @@ generate_paths <- function(fit, t_start = 0, t_max = NULL, n_rep = 10,
   init_states <- d$df |>
     dplyr::select("subject_id") |>
     dplyr::left_join(init_states, by = "subject_id") |>
-    dplyr::pull(state)
+    dplyr::pull(.data$state)
 
   # Generate path df
   message("Generating paths")

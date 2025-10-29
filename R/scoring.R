@@ -15,7 +15,7 @@ c_index <- function(df) {
 #' @param paths_obs A \code{\link{PathData}} object of observed paths.
 #' @param paths_pred A \code{\link{PathData}} object of predicted paths.
 #' @param state_name Name of the state of interest.
-#' @param df A \code{data.frame} with \code{surv} and \code{risk} columns
+#' @return A \code{data.frame} with \code{surv} and \code{pred_prob} columns
 create_scoring_df <- function(paths_obs, paths_pred, state_name) {
   checkmate::assert_character(state_name, len = 1)
   checkmate::assert_class(paths_obs, "PathData")
