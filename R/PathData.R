@@ -12,8 +12,18 @@ check_columns <- function(df, needed_columns) {
 #' @export
 #' @field subject_df Data frame with one row per subject. Must have
 #' \code{subject_id} and all covariates as columns.
-#' @field path_df Data frame of actual paths. Must have \code{path_id},
-#' \code{state}, \code{time}, and \code{is_event} as columns.
+#' @field path_df Data frame of actual paths. Each row corresponds to
+#' one time interval. Must have \code{path_id},
+#' \code{state}, \code{time}, and \code{is_event} as columns. These are
+#' \itemize{
+#'   \item \code{path_id}: path identifier
+#'   \item \code{state}: integer index of the state at the end of the interval
+#'   \item \code{time}: interval end time (the first time interval of each path
+#'   can be thought of as an interval starting from -Inf)
+#'   \item \code{is_event}: binary variable indicating if the interval ended in
+#'   a state transition "event". If the interval ended in censoring, this should
+#'   be 0.
+#' }
 #' @field link_df Links the path and subject data frames. Must have
 #' \code{path_id}, \code{draw_idx}, \code{rep_idx}, and \code{subject_id} as
 #' columns.
@@ -97,8 +107,8 @@ PathData <- R6::R6Class(
       self$covs
     },
 
-    #' @description Get path lengths (among paths that include events)
-    #' @param truncate Remove rows after terminal events first?
+    #' @description Get path lengths (among paths that include transition events)
+    #' @param truncate Remove rows after terminal states first?
     #' @return a data frame of path ids and counts
     lengths = function(truncate = FALSE) {
       self$get_path_df(truncate) |>
@@ -490,11 +500,11 @@ potential_covariates <- function(pd, possible = NULL, ...) {
   df
 }
 
-#' PathData to single event format
+#' PathData to time-to-event data format with a single event
 #'
 #' @export
 #' @param pd A \code{\link{PathData}} object
-#' @param event Name of the event of interest (character)
+#' @param event Name of the state corresponding to the event of interest (character)
 #' @return A \code{\link{PathData}} object
 as_single_event <- function(pd, event) {
   checkmate::assert_class(pd, "PathData")
@@ -576,15 +586,29 @@ count_paths_with_event <- function(c, t, S) {
   df
 }
 
+#' For each subject, compute probability of visiting a given state
+#' at least once before given time
+#'
+#' @export
+#' @description Convenient wrapper for \code{\link{p_state_visit}}.
+#' @inheritParams p_state_visit
+#' @param state_name Name of the state (character).
+#' @return A data frame
+p_state_visit_per_subject <- function(pd, state_name, t = NULL) {
+  checkmate::assert_character(state_name, len = 1)
+  p_state_visit(pd, t, by = "subject_id") |>
+    dplyr::filter(state == state_name) |>
+    dplyr::select(c("subject_id", "prob"))
+}
 
-#' Compute probability of each event before given time
+#' For each state, compute probability of visiting it at least once before given time
 #'
 #' @export
 #' @param pd A \code{\link{PathData}} object.
-#' @param t The given time.
+#' @param t The given time. If \code{NULL}, is set to \code{max(pd$get_path_df()$time)}.
 #' @param by Factor to summarize over.
 #' @return A data frame
-p_event <- function(pd, t = NULL, by = NULL) {
+p_state_visit <- function(pd, t = NULL, by = NULL) {
   checkmate::assert_class(pd, "PathData")
   S <- pd$transmat$num_states()
   if (is.null(t)) {

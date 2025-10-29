@@ -5,7 +5,7 @@
 #' for how to create common transition matrices.
 #' @param hazard_covs Covariates that affect the hazard. A character vector.
 #' @param categ_covs Names of covariates that are categorical or binary.
-#' @param pk_covs Covariates that affect the PK parameters. A list with
+#' @param pk_covs \emph{Experimental}. Covariates that affect the PK parameters. A list with
 #' elements \code{ka} \code{CL}, and \code{V2}. If \code{NULL}, a PK model
 #' will not be created.
 #' @param ... Arguments passed to \code{\link{MultistateModel}} init
@@ -28,7 +28,7 @@ create_msm <- function(tm, hazard_covs = NULL, pk_covs = NULL,
 #'
 #' @export
 #' @field system A \code{\link{MultistateSystem}}
-#' @field pk_model A \code{\link{PKModel}} or NULL
+#' @field pk_model \emph{Experimental}. A \code{\link{PKModel}} or NULL.
 #' @field delta_grid Time discretization delta for numerically integrating
 #' hazards.
 MultistateModel <- R6::R6Class("MultistateModel",

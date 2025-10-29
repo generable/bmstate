@@ -2,15 +2,13 @@
 % Please edit documentation in R/scoring.R
 \name{c_index}
 \alias{c_index}
-\title{Compute C index}
+\title{Compute concordance index}
 \usage{
-c_index(df, risk_col = "risk")
+c_index(df)
 }
 \arguments{
-\item{df}{A \code{data.frame} with \code{surv} and \code{risk} columns}
-
-\item{risk_col}{Name of risk column to use.}
+\item{df}{A \code{data.frame} with \code{surv} and \code{pred_prob} columns}
 }
 \description{
-Compute C index
+Compute concordance index
 }

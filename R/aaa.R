@@ -4,17 +4,28 @@
 #' @author Juho Timonen (first.last at iki.fi) and Jacqueline Buros
 #' @keywords multistate Stan Bayesian
 #'
-#' @section Getting started:
-#' See the vignettes. You can create a model using \code{\link{create_msm}}
-#' and fit one using \code{\link{fit_stan}}.
-#' The following classes and their documentation can be useful
+#' @section Creating a model:
+#' A model is represented by a \code{\link{MultistateModel}}
+#' object, which has a \code{\link{MultistateSystem}}, which has a
+#' \code{\link{TransitionMatrix}}. You can create a model using
+#' \code{\link{create_msm}}. For this,
+#' you need to pass in a \code{\link{TransitionMatrix}} defining the
+#' states and transitions. This can be created directly with
+#' \code{TransitionMatrix$new()} or using built-in functions for common
+#' multistate models such as \code{\link{transmat_illnessdeath}}.
 #'
-#' \itemize{
-#'  \item \code{\link{MultistateModel}}
-#'  \item \code{\link{PKModel}}
-#'  \item \code{\link{PathData}}
-#'  \item \code{\link{TransitionMatrix}}.
-#' }
+#' @section Fitting a model:
+#' You can fit a model with 'Stan' using \code{\link{fit_stan}}. You need
+#' to pass in the model object and a \code{\link{JointData}} object, which
+#' consists of \code{\link{PathData}} and \code{\link{DosingData}}. Unless
+#' you are using the experimental feature of fitting a PK submodel, the
+#' latter should be \code{NULL}.
+#'
+#' @section Predicting event risks:
+#' See the functions \code{\link{generate_paths}} and \code{\link{event_risk}}.
+#'
+#' @section Vignettes:
+#' See the vignettes for more information.
 #'
 #' @name bmstate-package
 #' @aliases bmstate

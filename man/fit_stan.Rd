@@ -40,5 +40,5 @@ method of the CmdStanR' model.}
 A \code{\link{MultistateModelFit}} object.
 }
 \description{
-**NOTE:** This function has a side effect of setting normalizers.
+\emph{NOTE:} This function has a side effect of setting normalizers.
 }

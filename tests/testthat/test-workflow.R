@@ -47,11 +47,11 @@ test_that("entire workflow works", {
   # Path generation starting from later time
   p1 <- generate_paths(fit, n_rep = 3, t_start = 600)
 
-  pe <- p_event(p)
-  pe1 <- p_event(p1)
-  pe_oos <- p_event(p_oos)
-  pe_bysex <- p_event(p, by = "sex")
-  pe_bydose <- p_event(p, by = "dose_amt")
+  pe <- p_state_visit(p)
+  pe1 <- p_state_visit(p1)
+  pe_oos <- p_state_visit(p_oos)
+  pe_bysex <- p_state_visit(p, by = "sex")
+  pe_bydose <- p_state_visit(p, by = "dose_amt")
   expect_equal(nrow(pe), 2)
   expect_equal(nrow(pe1), 2)
   expect_equal(nrow(pe_bysex), 4)
@@ -63,9 +63,8 @@ test_that("entire workflow works", {
 
   # Scoring
   ev <- "Death"
-  er <- event_risk(p, ev)
-  a <- as_survival(jd$train$paths, ev)
-  a <- a |> dplyr::left_join(er, by = "subject_id")
+  a <- create_scoring_df(jd$train$paths, p, ev)
+
   ci <- c_index(a)
   expect_gt(ci$concordance, 0)
 
@@ -74,7 +73,7 @@ test_that("entire workflow works", {
   expect_equal(mfit$num_draws(), 1)
   p_mfit <- generate_paths(mfit, n_rep = 100)
   expect_equal(p_mfit$n_paths(), 100 * jd$train$paths$n_paths())
-  pes1 <- event_risk(p_mfit, "Death")
+  pes1 <- p_state_visit_per_subject(p_mfit, "Death")
 
   # Test that solving time evolution with single draw works
   tp2 <- solve_trans_prob_fit(mfit)

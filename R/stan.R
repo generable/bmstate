@@ -30,7 +30,7 @@ ensure_exposed_stan_functions <- function(...) {
 #' Fit a model using 'Stan'
 #'
 #' @description
-#' **NOTE:** This function has a side effect of setting normalizers.
+#' \emph{NOTE:} This function has a side effect of setting normalizers.
 #'
 #' @export
 #' @param model A \code{\link{MultistateModel}} object.

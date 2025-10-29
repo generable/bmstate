@@ -14,8 +14,18 @@ Path data class (R6 class)
 \item{\code{subject_df}}{Data frame with one row per subject. Must have
 \code{subject_id} and all covariates as columns.}
 
-\item{\code{path_df}}{Data frame of actual paths. Must have \code{path_id},
-\code{state}, \code{time}, and \code{is_event} as columns.}
+\item{\code{path_df}}{Data frame of actual paths. Each row corresponds to
+one time interval. Must have \code{path_id},
+\code{state}, \code{time}, and \code{is_event} as columns. These are
+\itemize{
+  \item \code{path_id}: path identifier
+  \item \code{state}: integer index of the state at the end of the interval
+  \item \code{time}: interval end time (the first time interval of each path
+  can be thought of as an interval starting from -Inf)
+  \item \code{is_event}: binary variable indicating if the interval ended in
+  a state transition "event". If the interval ended in censoring, this should
+  be 0.
+}}
 
 \item{\code{link_df}}{Links the path and subject data frames. Must have
 \code{path_id}, \code{draw_idx}, \code{rep_idx}, and \code{subject_id} as
@@ -116,7 +126,7 @@ a character vector
 \if{html}{\out{<a id="method-PathData-lengths"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-lengths}{}}}
 \subsection{Method \code{lengths()}}{
-Get path lengths (among paths that include events)
+Get path lengths (among paths that include transition events)
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$lengths(truncate = FALSE)}\if{html}{\out{</div>}}
 }
@@ -124,7 +134,7 @@ Get path lengths (among paths that include events)
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{truncate}}{Remove rows after terminal events first?}
+\item{\code{truncate}}{Remove rows after terminal states first?}
 }
 \if{html}{\out{</div>}}
 }
