@@ -101,7 +101,7 @@ solve_P_consthaz <- function(mod, h0) {
 lambda <- 1e-3
 pd <- mod$simulate_data(N_sub, w0 = lambda)
 p <- solve_p(mod, lambda)
-p_death1 <- p_event(pd$paths)$prob
+p_death1 <- p_state_visit(pd$paths)$prob
 p_death2 <- p[2]
 r <- c(p_death1, p_death2)
 names(r) <- c("Paths", "Analytic")
@@ -159,7 +159,7 @@ ensure that they are correct.
 ```{r, fig.width=5}
 pd <- mod$simulate_data(N_sub, w0 = 0.01 * w0)
 p <- solve_p(mod, 0.01 * w0)
-p_death1 <- p_event(pd$paths)$prob
+p_death1 <- p_state_visit(pd$paths)$prob
 p_death2 <- p[2:4]
 r <- rbind(p_death1, p_death2)
 rownames(r) <- c("Paths", "Analytic")
@@ -196,7 +196,7 @@ h0_true_vec[3] <- 5 * h0_true
 pd <- mod$simulate_data(N_sub, w0 = h0_true_vec)
 p <- solve_p(mod, h0_true_vec)
 P_true <- solve_P_consthaz(mod, h0_true_vec)
-p_death1 <- p_event(pd$paths)$prob[2]
+p_death1 <- p_state_visit(pd$paths)$prob[2]
 p_death2 <- p[3]
 p_death3 <- P_true[1, 3]
 r <- c(p_death1, p_death2, p_death3)
@@ -240,7 +240,7 @@ p_death3 <- P_true[1, 4]
 w0 <- h0_true_vec
 pd <- mod$simulate_data(N_sub, w0 = w0)
 p <- solve_p(mod, w0)
-p_death1 <- p_event(pd$paths)$prob[3]
+p_death1 <- p_state_visit(pd$paths)$prob[3]
 p_death2 <- p[4]
 r <- c(p_death1, p_death2, p_death3)
 names(r) <- c("Paths", "Analytic", "Analytic2")

@@ -265,7 +265,7 @@ transmat_survival <- function(state_names = c("Alive", "Dead")) {
 #' @export
 #' @rdname transmat
 transmat_illnessdeath <- function(state_names =
-                                    c("Randomization", "Illness", "Death")) {
+                                    c("Healthy", "Diseased", "Dead")) {
   checkmate::assert_character(state_names, len = 3)
   transmat_full(state_names, self_loops = F)
 }

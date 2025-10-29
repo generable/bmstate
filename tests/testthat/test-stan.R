@@ -32,7 +32,7 @@ test_that("fitting with Stan works (single transition)", {
   expect_true(inherits(p, "PathData"))
 
   # P(event)
-  pe <- p_event(p)
+  pe <- p_state_visit(p)
   expect_equal(nrow(pe), 1)
 })
 
@@ -59,7 +59,7 @@ test_that("fitting with Stan works (multi-transition)", {
   expect_equal(p$n_paths(), options$iter_sampling * options$N_subject * NR)
 
   # P(event)
-  pe <- p_event(p)
+  pe <- p_state_visit(p)
   expect_equal(nrow(pe), 2)
 
   # Solve

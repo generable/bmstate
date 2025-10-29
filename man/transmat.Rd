@@ -20,7 +20,7 @@ transmat_comprisk(state_names = LETTERS[1:4])
 
 transmat_survival(state_names = c("Alive", "Dead"))
 
-transmat_illnessdeath(state_names = c("Randomization", "Illness", "Death"))
+transmat_illnessdeath(state_names = c("Healthy", "Diseased", "Dead"))
 
 transmat_diamond(state_names = LETTERS[1:4])
 }
