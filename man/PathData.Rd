@@ -11,31 +11,31 @@ Path data class (R6 class)
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{subject_df}}{Data frame with one row per subject. Must have
+\item{\code{subject_df}}{Data frame with one row per subject. Must have one
+row for each subject, and
 \code{subject_id} and all covariates as columns.}
 
 \item{\code{path_df}}{Data frame of actual paths. Each row corresponds to
-one time interval. Must have \code{path_id},
+one time point. Must have \code{path_id},
 \code{state}, \code{time}, and \code{is_event} as columns. These are
 \itemize{
   \item \code{path_id}: path identifier
-  \item \code{state}: integer index of the state at the end of the interval
-  \item \code{time}: interval end time (the first time interval of each path
-  can be thought of as an interval starting from -Inf)
-  \item \code{is_event}: binary variable indicating if the interval ended in
-  a state transition "event". If the interval ended in censoring, this should
+  \item \code{state}: integer index of the state at the time point, and
+  until the next time point
+  \item \code{time}: time point
+  \item \code{is_event}: binary variable indicating if the time point
+  is a state transition. If the time point corresponds to censoring, this should
   be 0.
 }}
 
 \item{\code{link_df}}{Links the path and subject data frames. Must have
-\code{path_id}, \code{draw_idx}, \code{rep_idx}, and \code{subject_id} as
-columns.}
+one row for each path, and \code{path_id}, \code{draw_idx},
+\code{rep_idx}, and \code{subject_id} as columns.}
 
 \item{\code{covs}}{Covariate column names.}
 
-\item{\code{transmat}}{A \code{\link{TransitionMatrix}} describing the system in to
-which the paths belong.
-Initialize}
+\item{\code{transmat}}{A \code{\link{TransitionMatrix}} describing the system to
+which the paths belong.}
 }
 \if{html}{\out{</div>}}
 }
@@ -73,6 +73,7 @@ Initialize}
 \if{html}{\out{<a id="method-PathData-new"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-new}{}}}
 \subsection{Method \code{new()}}{
+Initialize
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$new(subject_df, path_df, link_df, transmat, covs = NULL)}\if{html}{\out{</div>}}
 }
@@ -80,16 +81,26 @@ Initialize}
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{subject_df}}{Data frame with one row per subject. Must have
+\item{\code{subject_df}}{Data frame with one row per subject. Must have one
+row for each subject, and
 \code{subject_id} and all covariates as columns.}
 
-\item{\code{path_df}}{Data frame of actual paths. Must have \code{path_id},
-\code{state}, \code{time}, \code{is_event}, \code{is_censor}
-and \code{trans_idx} as columns.}
+\item{\code{path_df}}{Data frame of actual paths. Each row corresponds to
+one time point. Must have \code{path_id},
+\code{state}, \code{time}, and \code{is_event} as columns. These are
+\itemize{
+  \item \code{path_id}: path identifier
+  \item \code{state}: integer index of the state at the time point, and
+  until the next time point
+  \item \code{time}: time point
+  \item \code{is_event}: binary variable indicating if the time point
+  is a state transition. If the time point corresponds to censoring, this should
+  be 0.
+}}
 
 \item{\code{link_df}}{Links the path and subject data frames. Must have
-\code{path_id}, \code{draw_idx}, \code{rep_idx}, and \code{subject_id} as
-columns.}
+one row for each path, and \code{path_id}, \code{draw_idx},
+\code{rep_idx}, and \code{subject_id} as columns.}
 
 \item{\code{transmat}}{A \code{\link{TransitionMatrix}} describing the system to
 which the paths belong.}

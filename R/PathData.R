@@ -10,25 +10,26 @@ check_columns <- function(df, needed_columns) {
 #' Path data class (R6 class)
 #'
 #' @export
-#' @field subject_df Data frame with one row per subject. Must have
+#' @field subject_df Data frame with one row per subject. Must have one
+#' row for each subject, and
 #' \code{subject_id} and all covariates as columns.
 #' @field path_df Data frame of actual paths. Each row corresponds to
-#' one time interval. Must have \code{path_id},
+#' one time point. Must have \code{path_id},
 #' \code{state}, \code{time}, and \code{is_event} as columns. These are
 #' \itemize{
 #'   \item \code{path_id}: path identifier
-#'   \item \code{state}: integer index of the state at the end of the interval
-#'   \item \code{time}: interval end time (the first time interval of each path
-#'   can be thought of as an interval starting from -Inf)
-#'   \item \code{is_event}: binary variable indicating if the interval ended in
-#'   a state transition "event". If the interval ended in censoring, this should
+#'   \item \code{state}: integer index of the state at the time point, and
+#'   until the next time point
+#'   \item \code{time}: time point
+#'   \item \code{is_event}: binary variable indicating if the time point
+#'   is a state transition. If the time point corresponds to censoring, this should
 #'   be 0.
 #' }
 #' @field link_df Links the path and subject data frames. Must have
-#' \code{path_id}, \code{draw_idx}, \code{rep_idx}, and \code{subject_id} as
-#' columns.
+#' one row for each path, and \code{path_id}, \code{draw_idx},
+#' \code{rep_idx}, and \code{subject_id} as columns.
 #' @field covs Covariate column names.
-#' @field transmat A \code{\link{TransitionMatrix}} describing the system in to
+#' @field transmat A \code{\link{TransitionMatrix}} describing the system to
 #' which the paths belong.
 PathData <- R6::R6Class(
   classname = "PathData",
@@ -39,15 +40,25 @@ PathData <- R6::R6Class(
     covs = NULL,
     transmat = NULL,
 
-    #' Initialize
-    #' @param subject_df Data frame with one row per subject. Must have
+    #' @description Initialize
+    #' @param subject_df Data frame with one row per subject. Must have one
+    #' row for each subject, and
     #' \code{subject_id} and all covariates as columns.
-    #' @param path_df Data frame of actual paths. Must have \code{path_id},
-    #' \code{state}, \code{time}, \code{is_event}, \code{is_censor}
-    #' and \code{trans_idx} as columns.
+    #' @param path_df Data frame of actual paths. Each row corresponds to
+    #' one time point. Must have \code{path_id},
+    #' \code{state}, \code{time}, and \code{is_event} as columns. These are
+    #' \itemize{
+    #'   \item \code{path_id}: path identifier
+    #'   \item \code{state}: integer index of the state at the time point, and
+    #'   until the next time point
+    #'   \item \code{time}: time point
+    #'   \item \code{is_event}: binary variable indicating if the time point
+    #'   is a state transition. If the time point corresponds to censoring, this should
+    #'   be 0.
+    #' }
     #' @param link_df Links the path and subject data frames. Must have
-    #' \code{path_id}, \code{draw_idx}, \code{rep_idx}, and \code{subject_id} as
-    #' columns.
+    #' one row for each path, and \code{path_id}, \code{draw_idx},
+    #' \code{rep_idx}, and \code{subject_id} as columns.
     #' @param covs Covariate column names.
     #' @param transmat A \code{\link{TransitionMatrix}} describing the system to
     #' which the paths belong.
