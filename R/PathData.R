@@ -557,12 +557,7 @@ as_single_event <- function(pd, event) {
 as_survival <- function(pd, event) {
   N_sub <- length(pd$unique_subjects())
   a <- as_single_event(pd, event)
-  ppd <- a$get_path_df() |>
-    dplyr::arrange(.data$path_id, .data$time) |>
-    dplyr::filter(.data$state == 2 | .data$is_censor) |>
-    dplyr::group_by(.data$path_id) |>
-    dplyr::slice(1) |>
-    dplyr::ungroup()
+  ppd <- a$as_transitions()
   ppd$is_trans <- as.numeric(ppd$trans_idx > 0)
   ppd$surv <- Surv(ppd$time, ppd$is_trans)
   dd <- pd$link_df |>
@@ -570,7 +565,7 @@ as_survival <- function(pd, event) {
     dplyr::left_join(pd$subject_df, by = "subject_id")
   ppd <- ppd |>
     dplyr::left_join(dd, by = "path_id") |>
-    dplyr::select(-"state", -"trans_idx")
+    dplyr::select("path_id", "time", "surv", "is_trans")
   if (nrow(ppd) != N_sub) {
     stop("internal error in as_survival")
   }
