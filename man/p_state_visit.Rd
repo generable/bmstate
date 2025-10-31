@@ -2,7 +2,8 @@
 % Please edit documentation in R/PathData.R
 \name{p_state_visit}
 \alias{p_state_visit}
-\title{For each state, compute probability of visiting it at least once before given time}
+\title{For each non-source state, compute probability of visiting it at least once
+before given time}
 \usage{
 p_state_visit(pd, t = NULL, by = NULL)
 }
@@ -17,5 +18,6 @@ p_state_visit(pd, t = NULL, by = NULL)
 A data frame
 }
 \description{
-For each state, compute probability of visiting it at least once before given time
+For each non-source state, compute probability of visiting it at least once
+before given time
 }

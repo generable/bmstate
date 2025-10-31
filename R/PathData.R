@@ -164,7 +164,7 @@ PathData <- R6::R6Class(
     #'
     #' @return character vector
     get_event_state_names = function() {
-      setdiff(self$state_names(), self$system$tm()$source_states())
+      setdiff(self$state_names(), self$transmat$source_states())
     },
 
     #' @description Get names of terminal states
@@ -605,7 +605,8 @@ p_state_visit_per_subject <- function(pd, state_name, t = NULL) {
     dplyr::select(c("subject_id", "prob"))
 }
 
-#' For each state, compute probability of visiting it at least once before given time
+#' For each non-source state, compute probability of visiting it at least once
+#' before given time
 #'
 #' @export
 #' @param pd A \code{\link{PathData}} object.
@@ -628,7 +629,7 @@ p_state_visit <- function(pd, t = NULL, by = NULL) {
     c <- pd$as_data_frame() |>
       dplyr::group_by(.data$state)
   }
-  estates <- pd$get_event_states()
+  estates <- which(pd$state_names() %in% pd$get_event_state_names())
   df <- count_paths_with_event(c, t, S) |> dplyr::filter(.data$state %in% estates)
   if (!is.null(by)) {
     df_all <- c |> dplyr::ungroup()
