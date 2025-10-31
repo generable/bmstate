@@ -608,7 +608,7 @@ count_paths_with_event <- function(c, t, S) {
 p_state_visit_per_subject <- function(pd, state_name, t = NULL) {
   checkmate::assert_character(state_name, len = 1)
   p_state_visit(pd, t, by = "subject_id") |>
-    dplyr::filter(state == state_name) |>
+    dplyr::filter(.data$state == state_name) |>
     dplyr::select(c("subject_id", "prob"))
 }
 

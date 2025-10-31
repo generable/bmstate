@@ -1,11 +1,9 @@
-library(msm)
-library(dplyr)
 library(ggplot2)
 
 test_that("cav data analysis works", {
   # Modify original data like in
   # https://rviews.rstudio.com/2023/04/19/multistate-models-for-medical-applications/
-  df_full <- as_tibble(cav) |>
+  df_full <- as_tibble(msm::cav) |>
     group_by(PTNUM) |>
     mutate(
       min_age = min(age),
