@@ -2,20 +2,22 @@
 % Please edit documentation in R/PathData.R
 \name{potential_covariates}
 \alias{potential_covariates}
-\title{Look for potential covariates}
+\title{Look for potential covariates that affect transitions}
 \usage{
 potential_covariates(pd, possible = NULL, ...)
 }
 \arguments{
-\item{pd}{A \code{\link{PathData}} object}
+\item{pd}{A \code{\link{PathData}} object.}
 
-\item{possible}{Possible covariates to look for (character vector)}
+\item{possible}{Possible covariates to look for (character vector). If
+\code{NULL} (default) all covariates of the object are tested.}
 
-\item{...}{Arguments passed to \code{fit_coxph()}}
+\item{...}{Arguments passed to \code{fit_coxph()}.}
 }
 \value{
-A \code{data.frame}
+A \code{data.frame} with columns \code{pval}, \code{target_state},
+\code{covariate}.
 }
 \description{
-Look for potential covariates
+Look for potential covariates that affect transitions
 }

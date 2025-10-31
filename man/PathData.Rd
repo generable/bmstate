@@ -44,7 +44,6 @@ which the paths belong.}
 \item \href{#method-PathData-new}{\code{PathData$new()}}
 \item \href{#method-PathData-unique_subjects}{\code{PathData$unique_subjects()}}
 \item \href{#method-PathData-covariate_names}{\code{PathData$covariate_names()}}
-\item \href{#method-PathData-lengths}{\code{PathData$lengths()}}
 \item \href{#method-PathData-state_at}{\code{PathData$state_at()}}
 \item \href{#method-PathData-n_paths}{\code{PathData$n_paths()}}
 \item \href{#method-PathData-state_names}{\code{PathData$state_names()}}
@@ -128,26 +127,6 @@ Get names of covariates
 
 \subsection{Returns}{
 a character vector
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PathData-lengths"></a>}}
-\if{latex}{\out{\hypertarget{method-PathData-lengths}{}}}
-\subsection{Method \code{lengths()}}{
-Get path lengths (among paths that include transitions)
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$lengths(truncate = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{truncate}}{Remove rows after terminal states first?}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-a data frame of path ids and counts
 }
 }
 \if{html}{\out{<hr>}}

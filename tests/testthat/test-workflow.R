@@ -20,6 +20,10 @@ test_that("entire workflow works", {
   expect_true(inherits(jd$test, "JointData"))
   expect_equal(jd$test$paths$n_paths(), options$N_subject * 0.25)
 
+  # Test covariates
+  a <- potential_covariates(jd$train$paths)
+  expect_equal(colnames(a), c("pval", "target_state", "covariate"))
+
   # CoxPH fit
   cph <- jd$train$paths$fit_coxph(covariates = mod$covs())
   msf <- jd$train$paths$fit_mstate()

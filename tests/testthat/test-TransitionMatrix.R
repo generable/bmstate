@@ -14,9 +14,29 @@ test_that("TransitionMatrix init and methods work", {
   expect_equal(nrow(s$trans_df()), 3)
 })
 
-test_that("transmat_full() convenience works", {
+test_that("transmat_full() works", {
   a <- transmat_full()
   b <- transmat_full(LETTERS[1:3], self_loops = F)
   expect_equal(nrow(a$trans_df()), 9)
   expect_equal(nrow(b$trans_df()), 3)
+})
+
+test_that("transmat_diamond() works", {
+  a <- transmat_diamond()
+  expect_equal(nrow(a$trans_df()), 7)
+})
+
+test_that("transmat_comprisk() works", {
+  a <- transmat_comprisk()
+  expect_equal(nrow(a$trans_df()), 3)
+})
+
+test_that("transmat_illnessdeath() works", {
+  a <- transmat_illnessdeath()
+  expect_equal(nrow(a$trans_df()), 3)
+})
+
+test_that("transmat_progression() works", {
+  a <- transmat_progression()
+  expect_equal(nrow(a$trans_df()), 6)
 })
