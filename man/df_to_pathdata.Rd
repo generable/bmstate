@@ -4,14 +4,16 @@
 \alias{df_to_pathdata}
 \title{Data frame of one observed path per subject to PathData}
 \usage{
-df_to_pathdata(df, tm, covs)
+df_to_pathdata(df, tm, covs = NULL)
 }
 \arguments{
-\item{df}{Data frame}
+\item{df}{Data frame, should have columns \code{state} (integer),
+\code{time} (numeric), \code{subject_id} (character) and all the
+columns specified in \code{covs}}
 
 \item{tm}{A transition matrix}
 
-\item{covs}{covariates}
+\item{covs}{covariates (character vector)}
 }
 \value{
 A \code{\link{PathData}} object

@@ -658,10 +658,10 @@ p_state_visit <- function(pd, t = NULL, by = NULL) {
 df_to_subjects_df <- function(dat, covs) {
   sdf <- dat[, c("subject_id", covs)]
   df_unique <- sdf |>
-    group_by(subject_id) |>
-    distinct() |>
-    mutate(n_unique = n()) |>
-    ungroup()
+    dplyr::group_by(.data$subject_id) |>
+    dplyr::distinct() |>
+    dplyr::mutate(n_unique = n()) |>
+    dplyr::ungroup()
 
   if (any(df_unique$n_unique > 1)) {
     stop("Error: Some subjects have more than one unique row.")
@@ -669,8 +669,8 @@ df_to_subjects_df <- function(dat, covs) {
 
   # If no error, keep one row per subject
   df_unique |>
-    distinct(subject_id, .keep_all = TRUE) |>
-    select(-n_unique)
+    dplyr::distinct(.data$subject_id, .keep_all = TRUE) |>
+    dplyr::select(-"n_unique")
 }
 
 # Full df to link data frame
@@ -690,7 +690,7 @@ df_to_link_df <- function(df) {
 df_to_paths_df_part1 <- function(df, link_df) {
   pdf <- df[, c("subject_id", "state", "time")]
   ldf <- link_df[, c("subject_id", "path_id")]
-  pdf <- pdf |> left_join(ldf, by = "subject_id")
+  pdf <- pdf |> dplyr::left_join(ldf, by = "subject_id")
   pdf$subject_id <- NULL
   pdf
 }
@@ -699,15 +699,15 @@ df_to_paths_df_part1 <- function(df, link_df) {
 df_to_paths_df_part2 <- function(pdf, tm) {
   idx_terminal <- tm$absorbing_states(names = FALSE)
   pdf <- pdf |>
-    group_by(path_id) |>
-    mutate(
-      is_event = case_when(
+    dplyr::group_by(.data$path_id) |>
+    dplyr::mutate(
+      is_event = dplyr::case_when(
         row_number() == 1 ~ 0, # first row always 0
-        row_number() == n() & !(state %in% idx_terminal) ~ 0, # last row censor?
+        row_number() == n() & !(.data$state %in% idx_terminal) ~ 0, # last row censor?
         TRUE ~ 1 # otherwise → 1
       )
     ) |>
-    ungroup()
+    dplyr::ungroup()
   pdf
 }
 
@@ -715,14 +715,14 @@ df_to_paths_df_part2 <- function(pdf, tm) {
 df_to_paths_df_part3 <- function(pdf, tm) {
   idx_terminal <- tm$absorbing_states(names = FALSE)
   pdf <- pdf |>
-    group_by(path_id) |>
-    mutate(
-      is_censor = case_when(
-        row_number() == n() & !(state %in% idx_terminal) ~ 1, # last row censor?
+    dplyr::group_by(path_id) |>
+    dplyr::mutate(
+      is_censor = dplyr::case_when(
+        row_number() == n() & !(.data$state %in% idx_terminal) ~ 1, # last row censor?
         TRUE ~ 0
       )
     ) |>
-    ungroup()
+    dplyr::ungroup()
   pdf
 }
 
@@ -730,9 +730,9 @@ df_to_paths_df_part3 <- function(pdf, tm) {
 df_to_paths_df_part4 <- function(pdf, tm) {
   pdf$trans_idx <- 0L
   pdf <- pdf |>
-    group_by(path_id) |>
-    mutate(prev_state = lag(state, default = 0)) |>
-    ungroup()
+    dplyr::group_by(.data$path_id) |>
+    dplyr::mutate(prev_state = lag(.data$state, default = 0)) |>
+    dplyr::ungroup()
   tim <- tm$as_transition_index_matrix()
   for (r in seq_len(nrow(pdf))) {
     if (pdf$is_event[r]) {
@@ -756,11 +756,19 @@ df_to_paths_df_part4 <- function(pdf, tm) {
 
 #' Data frame of one observed path per subject to PathData
 #' @export
-#' @param df Data frame
+#' @param df Data frame, should have columns \code{state} (integer),
+#' \code{time} (numeric), \code{subject_id} (character) and all the
+#' columns specified in \code{covs}
 #' @param tm A transition matrix
-#' @param covs covariates
+#' @param covs covariates (character vector)
 #' @return A \code{\link{PathData}} object
-df_to_pathdata <- function(df, tm, covs) {
+df_to_pathdata <- function(df, tm, covs = NULL) {
+  checkmate::assert_data_frame(df)
+  checkmate::assert_class(tm, "TransitionMatrix")
+  if (!is.null(covs)) {
+    checkmate::assert_character(covs)
+  }
+
   sdf <- df_to_subjects_df(df, covs)
   ldf <- df_to_link_df(df)
   pdf <- df_to_paths_df_part1(df, ldf)
