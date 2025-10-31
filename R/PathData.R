@@ -754,13 +754,18 @@ df_to_paths_df_part4 <- function(pdf, tm) {
   pdf
 }
 
-# Data frame of one observed path per subject to PathData
+#' Data frame of one observed path per subject to PathData
+#' @export
+#' @param df Data frame
+#' @param tm A transition matrix
+#' @param covs covariates
+#' @return A \code{\link{PathData}} object
 df_to_pathdata <- function(df, tm, covs) {
   sdf <- df_to_subjects_df(df, covs)
   ldf <- df_to_link_df(df)
   pdf <- df_to_paths_df_part1(df, ldf)
   pdf <- df_to_paths_df_part2(pdf, tm)
   pdf <- df_to_paths_df_part3(pdf, tm)
-  pdf <- df_to_paths_df_part4(pdf, tm) # remove prev_state
+  pdf <- df_to_paths_df_part4(pdf, tm) |> select(-"prev_state")
   PathData$new(sdf, pdf, ldf, tm, covs)
 }
