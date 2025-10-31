@@ -29,6 +29,8 @@ integrating hazards.}
 \item \href{#method-MultistateModel-set_auc_normalizers}{\code{MultistateModel$set_auc_normalizers()}}
 \item \href{#method-MultistateModel-new}{\code{MultistateModel$new()}}
 \item \href{#method-MultistateModel-set_knots}{\code{MultistateModel$set_knots()}}
+\item \href{#method-MultistateModel-get_knots}{\code{MultistateModel$get_knots()}}
+\item \href{#method-MultistateModel-get_tmax}{\code{MultistateModel$get_tmax()}}
 \item \href{#method-MultistateModel-get_states}{\code{MultistateModel$get_states()}}
 \item \href{#method-MultistateModel-has_pk}{\code{MultistateModel$has_pk()}}
 \item \href{#method-MultistateModel-print}{\code{MultistateModel$print()}}
@@ -165,6 +167,26 @@ Set knot locations based on event times
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-get_knots"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-get_knots}{}}}
+\subsection{Method \code{get_knots()}}{
+Get knots
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$get_knots()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-get_tmax"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-get_tmax}{}}}
+\subsection{Method \code{get_tmax()}}{
+Get max time
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$get_tmax()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateModel-get_states"></a>}}

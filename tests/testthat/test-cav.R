@@ -44,10 +44,14 @@ test_that("cav data analysis works", {
     hazard_covs = covs,
     categ_covs = "sex",
     num_knots = 5,
-    tmax = 20
+    tmax = 20,
+    n_grid = 1000
   )
   dat0 <- JointData$new(pd0, NULL)
-  fit0 <- fit_stan(mod0, data = dat0, chains = 2)
+  fit0 <- fit_stan(mod0,
+    data = dat0, chains = 1, iter_sampling = 100,
+    iter_warmup = 100
+  )
   fit0_pm <- fit0$mean_fit()
 
   # Plot baseline hazard

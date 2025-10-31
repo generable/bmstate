@@ -1,3 +1,33 @@
+# Checks to be made that make sure that the model settings
+# make sense for given data
+prefit_checks <- function(model, data) {
+  tmax <- model$get_tmax()
+  pd <- data$paths
+  lens <- pd$as_transitions() |>
+    dplyr::mutate(time_len = .data$time - .data$time_prev) |>
+    dplyr::pull(.data$time_len)
+  min_len <- min(lens)
+  delta_grid <- tmax / model$n_grid
+  if (min_len < delta_grid) {
+    stop(
+      "Shortest time interval is smaller than delta_grid. ",
+      "Either increase n_grid or decrease t_max of the model."
+    )
+  }
+  max_time <- max(pd$get_path_df()$time)
+  if (t_max < max_time) {
+    stop("Model t_max is smaller than max observed time in data. Increase t_max.")
+  }
+  if (tmax > 2 * max_time) {
+    warning(
+      "Set model t_max is more than twice as large as largest observed time",
+      " in the data. Are you sure you want to do this? If not, set smaller",
+      " t_max."
+    )
+  }
+  TRUE
+}
+
 #' Create the main 'Stan' model
 #'
 #' @export
@@ -57,6 +87,7 @@ fit_stan <- function(model, data, prior_only = FALSE,
   checkmate::assert_logical(pk_only, len = 1)
   checkmate::assert_logical(set_auc_normalizers, len = 1)
   checkmate::assert_logical(pathfinder, len = 1)
+  prefit_checks(model, data)
 
   # Get Stan model object
   stan_model <- create_stan_model(filepath = filepath)

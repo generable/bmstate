@@ -171,6 +171,16 @@ MultistateModel <- R6::R6Class("MultistateModel",
       self$system$set_knots(knots)
     },
 
+    #' @description Get knots
+    get_knots = function() {
+      self$system$get_knots()
+    },
+
+    #' @description Get max time
+    get_tmax = function() {
+      self$system$get_tmax()
+    },
+
     #' @description Get names of the states
     get_states = function() {
       self$system$tm()$states
