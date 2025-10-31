@@ -9,14 +9,21 @@ prefit_checks <- function(model, data) {
   min_len <- min(lens)
   delta_grid <- tmax / model$n_grid
   if (min_len < delta_grid) {
-    stop(
-      "Shortest time interval is smaller than delta_grid. ",
-      "Either increase n_grid or decrease t_max of the model."
+    msg <- paste0(
+      "Shortest time interval (", min_len,
+      ") is smaller than delta_grid (", delta_grid,
+      "). Either increase n_grid or decrease t_max of the model."
     )
+    stop(msg)
   }
   max_time <- max(pd$get_path_df()$time)
-  if (t_max < max_time) {
-    stop("Model t_max is smaller than max observed time in data. Increase t_max.")
+  if (tmax < max_time) {
+    msg <- paste0(
+      "Model t_max (", tmax,
+      ") is smaller than max observed time in data (",
+      max_time, "). Increase t_max."
+    )
+    stop(msg)
   }
   if (tmax > 2 * max_time) {
     warning(

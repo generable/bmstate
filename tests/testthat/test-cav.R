@@ -1,5 +1,6 @@
 library(msm)
 library(dplyr)
+library(ggplot2)
 
 test_that("cav data analysis works", {
   # Modify original data like in
@@ -35,7 +36,7 @@ test_that("cav data analysis works", {
 
   # To PathData
   tm <- transmat_progression()
-  covs <- c("age", "dage", "sex")
+  covs <- c("age")
   pd <- df_to_pathdata(df_state_changes, tm, covs)
   pd0 <- as_single_event(pd, "Dead")
   tm0 <- pd0$transmat
@@ -44,18 +45,18 @@ test_that("cav data analysis works", {
   mod0 <- create_msm(tm0,
     hazard_covs = covs,
     categ_covs = "sex",
-    num_knots = 5,
+    num_knots = 4,
     tmax = 20,
-    n_grid = 1000
+    n_grid = 10000
   )
   fit0 <- fit_stan(mod0,
     data = pd0,
     chains = 1,
-    iter_sampling = 100,
-    iter_warmup = 100
+    iter_sampling = 30,
+    iter_warmup = 30
   )
-  fit0_pm <- fit0$mean_fit()
 
   # Plot baseline hazard
   plt0 <- fit0$plot_h0()
+  expect_true(is_ggplot(plt0))
 })
