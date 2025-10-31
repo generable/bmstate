@@ -15,8 +15,8 @@ Main model class
 
 \item{\code{pk_model}}{\emph{Experimental}. A \code{\link{PKModel}} or NULL.}
 
-\item{\code{delta_grid}}{Time discretization delta for numerically integrating
-hazards.}
+\item{\code{n_grid}}{Number of time discretization grid points for numerically
+integrating hazards.}
 }
 \if{html}{\out{</div>}}
 }
@@ -117,7 +117,8 @@ Create model
   pk_model = NULL,
   tmax = 1000,
   num_knots = 5,
-  categorical = NULL
+  categorical = NULL,
+  n_grid = 1000
 )}\if{html}{\out{</div>}}
 }
 
@@ -137,6 +138,9 @@ exposure estimated from PK model). Do not use reserved names
 \item{\code{num_knots}}{Total number of spline knots.}
 
 \item{\code{categorical}}{Names of categorical covariates.}
+
+\item{\code{n_grid}}{Number of time discretization points for integrating
+hazards.}
 }
 \if{html}{\out{</div>}}
 }

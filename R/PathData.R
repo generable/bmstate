@@ -653,3 +653,114 @@ p_state_visit <- function(pd, t = NULL, by = NULL) {
   sdf <- pd$transmat$states_df()
   df |> dplyr::left_join(sdf, by = "state_idx")
 }
+
+# Subjects data
+df_to_subjects_df <- function(dat, covs) {
+  sdf <- dat[, c("subject_id", covs)]
+  df_unique <- sdf |>
+    group_by(subject_id) |>
+    distinct() |>
+    mutate(n_unique = n()) |>
+    ungroup()
+
+  if (any(df_unique$n_unique > 1)) {
+    stop("Error: Some subjects have more than one unique row.")
+  }
+
+  # If no error, keep one row per subject
+  df_unique |>
+    distinct(subject_id, .keep_all = TRUE) |>
+    select(-n_unique)
+}
+
+# Full df to link data frame
+df_to_link_df <- function(df) {
+  ldf <- df[, "subject_id"]
+  ldf$path_id <- dplyr::dense_rank(ldf$subject_id)
+  ldf <- ldf |>
+    dplyr::group_by(.data$path_id) |>
+    dplyr::slice(1) |>
+    dplyr::ungroup()
+  ldf$rep_idx <- 1L
+  ldf$draw_idx <- 1L
+  ldf
+}
+
+# Creates the df with path_id, state, time columns
+df_to_paths_df_part1 <- function(df, link_df) {
+  pdf <- df[, c("subject_id", "state", "time")]
+  ldf <- link_df[, c("subject_id", "path_id")]
+  pdf <- pdf |> left_join(ldf, by = "subject_id")
+  pdf$subject_id <- NULL
+  pdf
+}
+
+# Adds the is_event column
+df_to_paths_df_part2 <- function(pdf, tm) {
+  idx_terminal <- tm$absorbing_states(names = FALSE)
+  pdf <- pdf |>
+    group_by(path_id) |>
+    mutate(
+      is_event = case_when(
+        row_number() == 1 ~ 0, # first row always 0
+        row_number() == n() & !(state %in% idx_terminal) ~ 0, # last row censor?
+        TRUE ~ 1 # otherwise → 1
+      )
+    ) |>
+    ungroup()
+  pdf
+}
+
+# Adds the is_censor column
+df_to_paths_df_part3 <- function(pdf, tm) {
+  idx_terminal <- tm$absorbing_states(names = FALSE)
+  pdf <- pdf |>
+    group_by(path_id) |>
+    mutate(
+      is_censor = case_when(
+        row_number() == n() & !(state %in% idx_terminal) ~ 1, # last row censor?
+        TRUE ~ 0
+      )
+    ) |>
+    ungroup()
+  pdf
+}
+
+# Adds the trans_idx column
+df_to_paths_df_part4 <- function(pdf, tm) {
+  pdf$trans_idx <- 0L
+  pdf <- pdf |>
+    group_by(path_id) |>
+    mutate(prev_state = lag(state, default = 0)) |>
+    ungroup()
+  tim <- tm$as_transition_index_matrix()
+  for (r in seq_len(nrow(pdf))) {
+    if (pdf$is_event[r]) {
+      s1 <- pdf$prev_state[r]
+      s2 <- pdf$state[r]
+      if (s1 == 0) {
+        stop("internal error, is_event column probably not correct")
+      }
+      t_idx <- tim[s1, s2]
+      if (t_idx == 0) {
+        stop(
+          "going from state ", s1, " to ", s2,
+          " is not a transition in the given transition matrix"
+        )
+      }
+      pdf$trans_idx[r] <- t_idx
+    }
+  }
+  pdf
+}
+
+# Data frame of one observed path per subject to PathData
+df_to_pathdata <- function(df, tm, covs) {
+  sdf <- df_to_subjects_df(df, covs)
+  ldf <- df_to_link_df(df)
+  pdf <- df_to_paths_df_part1(df, ldf)
+  pdf <- df_to_paths_df_part2(pdf, tm)
+  pdf <- df_to_paths_df_part3(pdf, tm)
+  pdf <- df_to_paths_df_part4(pdf, tm) # remove prev_state
+  PathData$new(sdf, pdf, ldf, tm, covs)
+}

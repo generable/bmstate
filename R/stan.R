@@ -122,12 +122,13 @@ create_stan_data <- function(model, data, prior_only = FALSE, pk_only = FALSE) {
   tm <- pd$transmat
   check_equal_transmats(tm, model$system$tm())
   checkmate::assert_logical(prior_only, len = 1)
+  delta_grid <- model$system$get_tmax() / model$n_grid
 
   # Initial Stan data
   stan_dat <- c(
     create_stan_data_idx_sub(pd),
     create_stan_data_transitions(pd),
-    create_stan_data_spline(pd, model, model$delta_grid),
+    create_stan_data_spline(pd, model, delta_grid),
     create_stan_data_covariates(pd, model),
     create_stan_data_trans_types(pd),
     create_stan_data_pk(data, model)
@@ -217,7 +218,7 @@ create_stan_data_spline <- function(pd, model, delta_grid) {
   t <- dat$time
   SBF <- model$system$basisfun_matrix(t)
   t_max <- model$system$get_tmax()
-  if (delta_grid > 10 * t_max) {
+  if (delta_grid > 0.1 * t_max) {
     stop("delta_grid is very large compared to t_max")
   }
 
