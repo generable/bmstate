@@ -1,4 +1,5 @@
 library(ggplot2)
+library(dplyr)
 
 test_that("cav data analysis works", {
   # Modify original data like in
