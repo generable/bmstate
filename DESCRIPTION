@@ -1,10 +1,10 @@
 Package: bmstate
 Type: Package
 Title: Bayesian multistate modeling
-Version: 0.0.31
+Version: 0.1.0.9000
 Author: Juho Timonen and Jacqueline Buros
 Maintainer: Juho Timonen <juho.timonen@iki.fi>
-Description: Bayesian multistate modeling of right-censored time-to-event data,
+Description: Bayesian multistate modeling of time-to-event data,
     using 'Stan' to fit models. 
     Transition hazards between the states are modeled with spline baseline
     hazards and time-indepedent covariate effects.
