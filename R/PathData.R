@@ -560,12 +560,7 @@ as_survival <- function(pd, event) {
   ppd <- a$as_transitions()
   ppd$is_trans <- as.numeric(ppd$trans_idx > 0)
   ppd$surv <- Surv(ppd$time, ppd$is_trans)
-  dd <- pd$link_df |>
-    dplyr::select("path_id", "subject_id") |>
-    dplyr::left_join(pd$subject_df, by = "subject_id")
-  ppd <- ppd |>
-    dplyr::left_join(dd, by = "path_id") |>
-    dplyr::select("path_id", "time", "surv", "is_trans", "subject_id")
+  ppd <- ppd |> dplyr::select("path_id", "time", "surv", "is_trans", "subject_id")
   if (nrow(ppd) != N_sub) {
     stop("internal error in as_survival")
   }
