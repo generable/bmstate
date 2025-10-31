@@ -660,7 +660,7 @@ df_to_subjects_df <- function(dat, covs) {
   df_unique <- sdf |>
     dplyr::group_by(.data$subject_id) |>
     dplyr::distinct() |>
-    dplyr::mutate(n_unique = n()) |>
+    dplyr::mutate(n_unique = dplyr::n()) |>
     dplyr::ungroup()
 
   if (any(df_unique$n_unique > 1)) {
@@ -702,8 +702,8 @@ df_to_paths_df_part2 <- function(pdf, tm) {
     dplyr::group_by(.data$path_id) |>
     dplyr::mutate(
       is_event = dplyr::case_when(
-        row_number() == 1 ~ 0, # first row always 0
-        row_number() == n() & !(.data$state %in% idx_terminal) ~ 0, # last row censor?
+        dplyr::row_number() == 1 ~ 0, # first row always 0
+        dplyr::row_number() == dplyr::n() & !(.data$state %in% idx_terminal) ~ 0, # last row censor?
         TRUE ~ 1 # otherwise → 1
       )
     ) |>
@@ -715,10 +715,10 @@ df_to_paths_df_part2 <- function(pdf, tm) {
 df_to_paths_df_part3 <- function(pdf, tm) {
   idx_terminal <- tm$absorbing_states(names = FALSE)
   pdf <- pdf |>
-    dplyr::group_by(path_id) |>
+    dplyr::group_by(.data$path_id) |>
     dplyr::mutate(
       is_censor = dplyr::case_when(
-        row_number() == n() & !(.data$state %in% idx_terminal) ~ 1, # last row censor?
+        dplyr::row_number() == dplyr::n() & !(.data$state %in% idx_terminal) ~ 1, # last row censor?
         TRUE ~ 0
       )
     ) |>
@@ -731,7 +731,7 @@ df_to_paths_df_part4 <- function(pdf, tm) {
   pdf$trans_idx <- 0L
   pdf <- pdf |>
     dplyr::group_by(.data$path_id) |>
-    dplyr::mutate(prev_state = lag(.data$state, default = 0)) |>
+    dplyr::mutate(prev_state = dplyr::lag(.data$state, default = 0)) |>
     dplyr::ungroup()
   tim <- tm$as_transition_index_matrix()
   for (r in seq_len(nrow(pdf))) {
@@ -774,6 +774,6 @@ df_to_pathdata <- function(df, tm, covs = NULL) {
   pdf <- df_to_paths_df_part1(df, ldf)
   pdf <- df_to_paths_df_part2(pdf, tm)
   pdf <- df_to_paths_df_part3(pdf, tm)
-  pdf <- df_to_paths_df_part4(pdf, tm) |> select(-"prev_state")
+  pdf <- df_to_paths_df_part4(pdf, tm) |> dplyr::select(-"prev_state")
   PathData$new(sdf, pdf, ldf, tm, covs)
 }

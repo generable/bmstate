@@ -14,7 +14,7 @@ prefit_checks <- function(model, data) {
       ") is smaller than delta_grid (", delta_grid,
       "). Either increase n_grid or decrease t_max of the model."
     )
-    stop(msg)
+    warning(msg)
   }
   max_time <- max(pd$get_path_df()$time)
   if (tmax < max_time) {
