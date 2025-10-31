@@ -4,9 +4,8 @@
 \alias{PathData}
 \title{Path data class (R6 class)}
 \description{
-Path data class (R6 class)
-
-Path data class (R6 class)
+It is not recommended for users to try to create data using
+the constructor of this class. Rather use \code{\link{df_to_pathdata}}.
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -17,15 +16,15 @@ row for each subject, and
 
 \item{\code{path_df}}{Data frame of actual paths. Each row corresponds to
 one time point. Must have \code{path_id},
-\code{state}, \code{time}, and \code{is_event} as columns. These are
+\code{state}, \code{time}, and \code{trans_idx} as columns. These are
 \itemize{
   \item \code{path_id}: path identifier
   \item \code{state}: integer index of the state at the time point, and
   until the next time point
   \item \code{time}: time point
-  \item \code{is_event}: binary variable indicating if the time point
-  is a state transition. If the time point corresponds to censoring, this should
-  be 0.
+  \item \code{trans_idx}: Integer indicating which transition this
+  time point corresponds to. If the time point is not a state transition,
+  this should be 0.
 }}
 
 \item{\code{link_df}}{Links the path and subject data frames. Must have
@@ -48,11 +47,9 @@ which the paths belong.}
 \item \href{#method-PathData-lengths}{\code{PathData$lengths()}}
 \item \href{#method-PathData-state_at}{\code{PathData$state_at()}}
 \item \href{#method-PathData-n_paths}{\code{PathData$n_paths()}}
-\item \href{#method-PathData-null_state}{\code{PathData$null_state()}}
 \item \href{#method-PathData-state_names}{\code{PathData$state_names()}}
-\item \href{#method-PathData-terminal_states}{\code{PathData$terminal_states()}}
-\item \href{#method-PathData-get_event_states}{\code{PathData$get_event_states()}}
 \item \href{#method-PathData-get_event_state_names}{\code{PathData$get_event_state_names()}}
+\item \href{#method-PathData-terminal_states}{\code{PathData$terminal_states()}}
 \item \href{#method-PathData-print}{\code{PathData$print()}}
 \item \href{#method-PathData-get_path_df}{\code{PathData$get_path_df()}}
 \item \href{#method-PathData-as_data_frame}{\code{PathData$as_data_frame()}}
@@ -87,15 +84,15 @@ row for each subject, and
 
 \item{\code{path_df}}{Data frame of actual paths. Each row corresponds to
 one time point. Must have \code{path_id},
-\code{state}, \code{time}, and \code{is_event} as columns. These are
+\code{state}, \code{time}, and \code{trans_idx} as columns. These are
 \itemize{
   \item \code{path_id}: path identifier
   \item \code{state}: integer index of the state at the time point, and
   until the next time point
   \item \code{time}: time point
-  \item \code{is_event}: binary variable indicating if the time point
-  is a state transition. If the time point corresponds to censoring, this should
-  be 0.
+  \item \code{trans_idx}: Integer indicating which transition this
+  time point corresponds to. If the time point is not a state transition,
+  this should be 0.
 }}
 
 \item{\code{link_df}}{Links the path and subject data frames. Must have
@@ -137,7 +134,7 @@ a character vector
 \if{html}{\out{<a id="method-PathData-lengths"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-lengths}{}}}
 \subsection{Method \code{lengths()}}{
-Get path lengths (among paths that include transition events)
+Get path lengths (among paths that include transitions)
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$lengths(truncate = FALSE)}\if{html}{\out{</div>}}
 }
@@ -187,22 +184,26 @@ an integer
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PathData-null_state"></a>}}
-\if{latex}{\out{\hypertarget{method-PathData-null_state}{}}}
-\subsection{Method \code{null_state()}}{
-Get name of null state
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$null_state()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-state_names"></a>}}
 \if{latex}{\out{\hypertarget{method-PathData-state_names}{}}}
 \subsection{Method \code{state_names()}}{
 Get names of all states
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$state_names()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+character vector
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-get_event_state_names"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-get_event_state_names}{}}}
+\subsection{Method \code{get_event_state_names()}}{
+Get names of all states to which transitioning
+can be a transition event
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$get_event_state_names()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -220,32 +221,6 @@ Get names of terminal states
 
 \subsection{Returns}{
 character vector
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PathData-get_event_states"></a>}}
-\if{latex}{\out{\hypertarget{method-PathData-get_event_states}{}}}
-\subsection{Method \code{get_event_states()}}{
-Get indices of event states
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$get_event_states()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-integer vector
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PathData-get_event_state_names"></a>}}
-\if{latex}{\out{\hypertarget{method-PathData-get_event_state_names}{}}}
-\subsection{Method \code{get_event_state_names()}}{
-Get names of event states
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PathData$get_event_state_names()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-a character vector
 }
 }
 \if{html}{\out{<hr>}}

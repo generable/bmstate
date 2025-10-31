@@ -74,7 +74,7 @@ sim_subject_ids <- function(N) {
 # Truncate path data frame
 truncate_after_terminal_events <- function(df, term_state_inds) {
   term_events <- df |>
-    dplyr::filter(.data$state %in% term_state_inds, .data$is_event == 1) |>
+    dplyr::filter(.data$state %in% term_state_inds, .data$trans_idx > 0) |>
     dplyr::group_by(.data$path_id) |>
     summarise(term_time = min(.data$time, na.rm = T)) |>
     dplyr::ungroup()

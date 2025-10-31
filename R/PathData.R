@@ -10,20 +10,22 @@ check_columns <- function(df, needed_columns) {
 #' Path data class (R6 class)
 #'
 #' @export
+#' @description It is not recommended for users to try to create data using
+#' the constructor of this class. Rather use \code{\link{df_to_pathdata}}.
 #' @field subject_df Data frame with one row per subject. Must have one
 #' row for each subject, and
 #' \code{subject_id} and all covariates as columns.
 #' @field path_df Data frame of actual paths. Each row corresponds to
 #' one time point. Must have \code{path_id},
-#' \code{state}, \code{time}, and \code{is_event} as columns. These are
+#' \code{state}, \code{time}, and \code{trans_idx} as columns. These are
 #' \itemize{
 #'   \item \code{path_id}: path identifier
 #'   \item \code{state}: integer index of the state at the time point, and
 #'   until the next time point
 #'   \item \code{time}: time point
-#'   \item \code{is_event}: binary variable indicating if the time point
-#'   is a state transition. If the time point corresponds to censoring, this should
-#'   be 0.
+#'   \item \code{trans_idx}: Integer indicating which transition this
+#'   time point corresponds to. If the time point is not a state transition,
+#'   this should be 0.
 #' }
 #' @field link_df Links the path and subject data frames. Must have
 #' one row for each path, and \code{path_id}, \code{draw_idx},
@@ -46,15 +48,15 @@ PathData <- R6::R6Class(
     #' \code{subject_id} and all covariates as columns.
     #' @param path_df Data frame of actual paths. Each row corresponds to
     #' one time point. Must have \code{path_id},
-    #' \code{state}, \code{time}, and \code{is_event} as columns. These are
+    #' \code{state}, \code{time}, and \code{trans_idx} as columns. These are
     #' \itemize{
     #'   \item \code{path_id}: path identifier
     #'   \item \code{state}: integer index of the state at the time point, and
     #'   until the next time point
     #'   \item \code{time}: time point
-    #'   \item \code{is_event}: binary variable indicating if the time point
-    #'   is a state transition. If the time point corresponds to censoring, this should
-    #'   be 0.
+    #'   \item \code{trans_idx}: Integer indicating which transition this
+    #'   time point corresponds to. If the time point is not a state transition,
+    #'   this should be 0.
     #' }
     #' @param link_df Links the path and subject data frames. Must have
     #' one row for each path, and \code{path_id}, \code{draw_idx},
@@ -80,7 +82,7 @@ PathData <- R6::R6Class(
         link_df$rep_idx <- 1
       }
       cols1 <- c("subject_id", covs)
-      cols2 <- c("path_id", "state", "time", "is_event", "is_censor", "trans_idx")
+      cols2 <- c("path_id", "state", "time", "trans_idx")
       cols3 <- c("path_id", "draw_idx", "rep_idx", "subject_id")
       check_columns(subject_df, cols1)
       check_columns(path_df, cols2)
@@ -118,12 +120,12 @@ PathData <- R6::R6Class(
       self$covs
     },
 
-    #' @description Get path lengths (among paths that include transition events)
+    #' @description Get path lengths (among paths that include transitions)
     #' @param truncate Remove rows after terminal states first?
     #' @return a data frame of path ids and counts
     lengths = function(truncate = FALSE) {
       self$get_path_df(truncate) |>
-        dplyr::filter(is_event == TRUE) |>
+        dplyr::filter(trans_idx > 0) |>
         dplyr::group_by(path_id) |>
         dplyr::count()
     },
@@ -150,16 +152,19 @@ PathData <- R6::R6Class(
         dplyr::count())
     },
 
-    #' @description Get name of null state
-    null_state = function() {
-      self$transmat$source_states()
-    },
-
     #' @description Get names of all states
     #'
     #' @return character vector
     state_names = function() {
       self$transmat$states
+    },
+
+    #' @description Get names of all states to which transitioning
+    #' can be a transition event
+    #'
+    #' @return character vector
+    get_event_state_names = function() {
+      setdiff(self$state_names(), self$transmat$source_states())
     },
 
     #' @description Get names of terminal states
@@ -169,32 +174,17 @@ PathData <- R6::R6Class(
       self$transmat$absorbing_states()
     },
 
-    #' @description Get indices of event states
-    #'
-    #' @return integer vector
-    get_event_states = function() {
-      match(self$get_event_state_names(), self$state_names())
-    },
-
-    #' @description Get names of event states
-    #'
-    #' @return a character vector
-    get_event_state_names = function() {
-      setdiff(self$state_names(), self$null_state())
-    },
-
     #' @description Print info
     #'
     #' @return nothing
     print = function() {
       n_path <- self$n_paths()
       covs <- self$covariate_names()
-      sn <- self$get_event_state_names()
+      sn <- self$state_names()
       x1 <- paste0("PathData object with ", n_path, " paths")
-      x2 <- paste0(" * Null state = {", self$null_state(), "}")
-      x3 <- paste0(" * Event states = {", paste0(sn, collapse = ", "), "}")
-      x4 <- paste0(" * Covariates = {", paste0(covs, collapse = ", "), "}")
-      msg <- paste(x1, x2, x3, x4, "\n", sep = "\n")
+      x2 <- paste0(" * States = {", paste0(sn, collapse = ", "), "}")
+      x3 <- paste0(" * Covariates = {", paste0(covs, collapse = ", "), "}")
+      msg <- paste(x1, x2, x3, "\n", sep = "\n")
       cat(msg)
     },
 
@@ -242,22 +232,22 @@ PathData <- R6::R6Class(
     as_transitions = function(covariates = NULL, truncate = FALSE) {
       pdf <- self$get_path_df(truncate)
       pdf$time_prev <- c(0, pdf$time[1:(nrow(pdf) - 1)])
-      pdf$keep <- as.numeric((pdf$trans_idx > 0) | (pdf$is_censor == 1))
       tdf <- self$transmat$trans_df()
       prev_states <- c(NA, tdf$prev_state)
       states <- c(NA, tdf$state)
       out <- pdf |>
-        dplyr::filter(.data$keep == 1) |>
+        dplyr::group_by(.data$path_id) |>
+        dplyr::filter(dplyr::row_number() > 1) |>
+        dplyr::ungroup() |>
         dplyr::select(
-          "path_id", "time", "time_prev", "trans_idx", "is_censor",
-          "state", "is_event"
+          "path_id", "time", "time_prev", "trans_idx", "state"
         )
       out$from <- prev_states[out$trans_idx + 1]
       out$to <- states[out$trans_idx + 1]
-      idx_censor <- which(out$is_censor == 1)
-      out$from[idx_censor] <- out$state[idx_censor]
-      out$to[idx_censor] <- out$state[idx_censor]
-      out <- out |> dplyr::select(-c("state", "is_censor"))
+      idx_notrans <- which(out$trans_idx == 0)
+      out$from[idx_notrans] <- out$state[idx_notrans]
+      out$to[idx_notrans] <- out$state[idx_notrans]
+      out <- out |> dplyr::select(-c("state"))
       fl <- self$full_link(covariates)
       out |> dplyr::left_join(fl, by = "path_id")
     },
@@ -275,9 +265,9 @@ PathData <- R6::R6Class(
       dt$Tstart <- dt$time_prev
       dt$Tstop <- dt$time
       dt$time <- dt$Tstop - dt$Tstart
-      dt$status <- dt$is_event
+      dt$status <- as.numeric(dt$trans_idx > 0)
       dt$trans <- dt$trans_idx
-      dt |> dplyr::select(-c("is_event", "time_prev", "trans_idx"))
+      dt |> dplyr::select(-c("time_prev", "trans_idx"))
     },
 
     #' @description Convert to format used by the 'mstate' package
@@ -299,7 +289,7 @@ PathData <- R6::R6Class(
     #' @param truncate truncate after terminal events?
     plot_paths = function(n_paths = NULL, alpha = 0.5, truncate = FALSE) {
       df <- self$as_data_frame(truncate = truncate)
-      df$is_event <- as.factor(df$is_event)
+      df$Transition <- as.factor(df$trans_idx > 0)
       sn <- self$state_names()
       uid <- unique(df$path_id)
       N <- length(uid)
@@ -317,8 +307,10 @@ PathData <- R6::R6Class(
         )
       ggplot(df, aes(x = .data$time, y = .data$state, group = .data$path_id)) +
         geom_step(direction = "hv", alpha = alpha) +
-        labs(x = "Time", y = "State", title = "State paths") +
-        geom_point(mapping = aes(color = .data$is_event, pch = .data$is_event))
+        labs(
+          x = "Time", y = "State", title = "State paths"
+        ) +
+        geom_point(mapping = aes(color = .data$Transition, pch = .data$Transition))
     },
 
     #' @description Transition proportion matrix
@@ -345,7 +337,7 @@ PathData <- R6::R6Class(
       transition_matrix_plot(
         f,
         self$terminal_states(),
-        self$null_state(),
+        self$transmat$source_states(),
         edge_labs = round(f, digits = digits),
         ...
       )
@@ -520,7 +512,7 @@ potential_covariates <- function(pd, possible = NULL, ...) {
 as_single_event <- function(pd, event) {
   checkmate::assert_class(pd, "PathData")
   checkmate::assert_character(event, len = 1)
-  stopifnot(event %in% pd$get_event_state_names())
+  stopifnot(event %in% pd$state_names())
   state <- which(pd$state_names() == event)
   if (length(state) != 1) {
     stop("invalid event")
@@ -537,7 +529,7 @@ as_single_event <- function(pd, event) {
     if (length(ri) == 0) {
       df <- df[c(1, nrow(df)), ]
       df$state[2] <- 1
-      df$is_event[2] <- 0
+      df$trans_idx[2] <- 0
     } else {
       df <- df[c(1, ri[1]), ]
       df$state[2] <- 2
@@ -565,19 +557,10 @@ as_single_event <- function(pd, event) {
 as_survival <- function(pd, event) {
   N_sub <- length(pd$unique_subjects())
   a <- as_single_event(pd, event)
-  ppd <- a$get_path_df() |>
-    dplyr::arrange(.data$path_id, .data$time) |>
-    dplyr::filter(.data$state == 2 | .data$is_censor) |>
-    dplyr::group_by(.data$path_id) |>
-    dplyr::slice(1) |>
-    dplyr::ungroup()
-  ppd$surv <- Surv(ppd$time, ppd$is_event)
-  dd <- pd$link_df |>
-    dplyr::select("path_id", "subject_id") |>
-    dplyr::left_join(pd$subject_df, by = "subject_id")
-  ppd <- ppd |>
-    dplyr::left_join(dd, by = "path_id") |>
-    dplyr::select(-"state", -"trans_idx")
+  ppd <- a$as_transitions()
+  ppd$is_trans <- as.numeric(ppd$trans_idx > 0)
+  ppd$surv <- Surv(ppd$time, ppd$is_trans)
+  ppd <- ppd |> dplyr::select("path_id", "time", "surv", "is_trans", "subject_id")
   if (nrow(ppd) != N_sub) {
     stop("internal error in as_survival")
   }
@@ -587,7 +570,7 @@ as_survival <- function(pd, event) {
 # Helper
 count_paths_with_event <- function(c, t, S) {
   cnt <- c |>
-    dplyr::filter(.data$is_event == 1 & .data$time <= t) |>
+    dplyr::filter(.data$trans_idx > 0 & .data$time <= t) |>
     dplyr::distinct(.data$path_id) |>
     dplyr::count()
   df <- data.frame(state = seq_len(S)) |> dplyr::left_join(cnt, by = "state")
@@ -612,7 +595,8 @@ p_state_visit_per_subject <- function(pd, state_name, t = NULL) {
     dplyr::select(c("subject_id", "prob"))
 }
 
-#' For each state, compute probability of visiting it at least once before given time
+#' For each non-source state, compute probability of visiting it at least once
+#' before given time
 #'
 #' @export
 #' @param pd A \code{\link{PathData}} object.
@@ -635,7 +619,7 @@ p_state_visit <- function(pd, t = NULL, by = NULL) {
     c <- pd$as_data_frame() |>
       dplyr::group_by(.data$state)
   }
-  estates <- pd$get_event_states()
+  estates <- which(pd$state_names() %in% pd$get_event_state_names())
   df <- count_paths_with_event(c, t, S) |> dplyr::filter(.data$state %in% estates)
   if (!is.null(by)) {
     df_all <- c |> dplyr::ungroup()
@@ -688,46 +672,15 @@ df_to_link_df <- function(df) {
 
 # Creates the df with path_id, state, time columns
 df_to_paths_df_part1 <- function(df, link_df) {
-  pdf <- df[, c("subject_id", "state", "time")]
+  pdf <- df[, c("subject_id", "state", "time", "is_transition")]
   ldf <- link_df[, c("subject_id", "path_id")]
   pdf <- pdf |> dplyr::left_join(ldf, by = "subject_id")
   pdf$subject_id <- NULL
   pdf
 }
 
-# Adds the is_event column
-df_to_paths_df_part2 <- function(pdf, tm) {
-  idx_terminal <- tm$absorbing_states(names = FALSE)
-  pdf <- pdf |>
-    dplyr::group_by(.data$path_id) |>
-    dplyr::mutate(
-      is_event = dplyr::case_when(
-        dplyr::row_number() == 1 ~ 0, # first row always 0
-        dplyr::row_number() == dplyr::n() & !(.data$state %in% idx_terminal) ~ 0, # last row censor?
-        TRUE ~ 1 # otherwise → 1
-      )
-    ) |>
-    dplyr::ungroup()
-  pdf
-}
-
-# Adds the is_censor column
-df_to_paths_df_part3 <- function(pdf, tm) {
-  idx_terminal <- tm$absorbing_states(names = FALSE)
-  pdf <- pdf |>
-    dplyr::group_by(.data$path_id) |>
-    dplyr::mutate(
-      is_censor = dplyr::case_when(
-        dplyr::row_number() == dplyr::n() & !(.data$state %in% idx_terminal) ~ 1, # last row censor?
-        TRUE ~ 0
-      )
-    ) |>
-    dplyr::ungroup()
-  pdf
-}
-
 # Adds the trans_idx column
-df_to_paths_df_part4 <- function(pdf, tm) {
+df_to_paths_df_part2 <- function(pdf, tm) {
   pdf$trans_idx <- 0L
   pdf <- pdf |>
     dplyr::group_by(.data$path_id) |>
@@ -735,18 +688,23 @@ df_to_paths_df_part4 <- function(pdf, tm) {
     dplyr::ungroup()
   tim <- tm$as_transition_index_matrix()
   for (r in seq_len(nrow(pdf))) {
-    if (pdf$is_event[r]) {
+    if (pdf$is_transition[r]) {
       s1 <- pdf$prev_state[r]
-      s2 <- pdf$state[r]
       if (s1 == 0) {
-        stop("internal error, is_event column probably not correct")
+        stop(
+          "Previous state should not be 0. The first row for any subject",
+          " should never be marked as a transition."
+        )
       }
+      s2 <- pdf$state[r]
       t_idx <- tim[s1, s2]
       if (t_idx == 0) {
-        stop(
-          "going from state ", s1, " to ", s2,
-          " is not a transition in the given transition matrix"
+        msg <- paste0(
+          "row ", r, " has is_transition = TRUE but the given",
+          " transition matrix has no transition from state ",
+          s1, " to ", s2
         )
+        stop(msg)
       }
       pdf$trans_idx[r] <- t_idx
     }
@@ -754,16 +712,42 @@ df_to_paths_df_part4 <- function(pdf, tm) {
   pdf
 }
 
-#' Data frame of one observed path per subject to PathData
+#' Create 'PathData' from a data frame of one observed path per subject
+#'
 #' @export
-#' @param df Data frame, should have columns \code{state} (integer),
-#' \code{time} (numeric), \code{subject_id} (character) and all the
-#' columns specified in \code{covs}
-#' @param tm A transition matrix
+#' @param df Data frame. Should have columns
+#' \itemize{
+#'   \item \code{subject_id} (character)
+#'   \item \code{time} (numeric)
+#'   \item \code{state} (integer, same indexing as in \code{tm})
+#'   \item \code{is_transition} (logical)
+#'   \item all the columns specified in \code{covs}
+#' }
+#' Rules:
+#' \itemize{
+#'    \item For each subject, there should be at least two rows, and the rows should
+#'    be contiguous and the time should be non-decreasing.
+#'    \item The \code{is_transition} value should indicate whether the row
+#'    corresponds to a transition.
+#'    \item The first row for each subject should never be a transition.
+#'    \item For each row that is a transition, the transition from the state
+#'    of the previous row to the current state should be a valid transition
+#'    in \code{tm}.
+#' }
+#' @param tm A \code{\link{TransitionMatrix}}
 #' @param covs covariates (character vector)
 #' @return A \code{\link{PathData}} object
 df_to_pathdata <- function(df, tm, covs = NULL) {
+  df <- df |> dplyr::arrange(.data$subject_id, .data$time)
   checkmate::assert_data_frame(df)
+  checkmate::assert_true("state" %in% colnames(df))
+  checkmate::assert_integerish(df$state)
+  checkmate::assert_true("time" %in% colnames(df))
+  checkmate::assert_numeric(df$time)
+  checkmate::assert_true("subject_id" %in% colnames(df))
+  checkmate::assert_character(df$subject_id)
+  checkmate::assert_true("is_transition" %in% colnames(df))
+  checkmate::assert_logical(df$is_transition)
   checkmate::assert_class(tm, "TransitionMatrix")
   if (!is.null(covs)) {
     checkmate::assert_character(covs)
@@ -772,8 +756,6 @@ df_to_pathdata <- function(df, tm, covs = NULL) {
   sdf <- df_to_subjects_df(df, covs)
   ldf <- df_to_link_df(df)
   pdf <- df_to_paths_df_part1(df, ldf)
-  pdf <- df_to_paths_df_part2(pdf, tm)
-  pdf <- df_to_paths_df_part3(pdf, tm)
-  pdf <- df_to_paths_df_part4(pdf, tm) |> dplyr::select(-"prev_state")
+  pdf <- df_to_paths_df_part2(pdf, tm) |> dplyr::select(-"prev_state")
   PathData$new(sdf, pdf, ldf, tm, covs)
 }

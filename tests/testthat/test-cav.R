@@ -1,4 +1,5 @@
 library(ggplot2)
+library(dplyr)
 
 test_that("cav data analysis works", {
   # Modify original data like in
@@ -30,6 +31,12 @@ test_that("cav data analysis works", {
     ) |>
     filter(.first | .last | .chg | is.na(lag(state))) |> # keep first, last, and changes
     select(-.first, -.last, -.chg) |>
+    ungroup()
+
+  # Every row is a transition but the first
+  df_state_changes <- df_state_changes |>
+    group_by(subject_id) |>
+    mutate(is_transition = tidyr::replace_na(state != lag(state), FALSE)) |>
     ungroup()
 
   # To PathData

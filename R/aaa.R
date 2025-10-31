@@ -1,25 +1,30 @@
 #' The 'bmstate' package.
 #'
-#' @description Bayesian multistate modeling using 'Stan'.
+#' @description Bayesian multistate modeling of right-censored time-to-event data.
 #' @author Juho Timonen (first.last at iki.fi) and Jacqueline Buros
 #' @keywords multistate Stan Bayesian
 #'
+#' @section Transition matrix:
+#' For any analysis with this package, you will need a \code{\link{TransitionMatrix}}
+#' which specifies the states and possible transitions between them.
+#' This can be created directly with
+#' \code{TransitionMatrix$new()} or using built-in functions for common
+#' multistate systems such as \code{\link{transmat_illnessdeath}}.
+#'
+#' @section Data format:
+#' See the function \code{\link{df_to_pathdata}} for how to create a
+#' \code{\link{PathData}} object from your data frame and a given
+#' \code{\link{TransitionMatrix}}.
+#'
 #' @section Creating a model:
+#' You can create a model using
+#' \code{\link{create_msm}}.
 #' A model is represented by a \code{\link{MultistateModel}}
 #' object, which has a \code{\link{MultistateSystem}}, which has a
-#' \code{\link{TransitionMatrix}}. You can create a model using
-#' \code{\link{create_msm}}. For this,
-#' you need to pass in a \code{\link{TransitionMatrix}} defining the
-#' states and transitions. This can be created directly with
-#' \code{TransitionMatrix$new()} or using built-in functions for common
-#' multistate models such as \code{\link{transmat_illnessdeath}}.
+#' \code{\link{TransitionMatrix}}.
 #'
 #' @section Fitting a model:
-#' You can fit a model with 'Stan' using \code{\link{fit_stan}}. You need
-#' to pass in the model object and a \code{\link{JointData}} object, which
-#' consists of \code{\link{PathData}} and \code{\link{DosingData}}. Unless
-#' you are using the experimental feature of fitting a PK submodel, the
-#' latter should be \code{NULL}.
+#' You can fit a model with 'Stan' using \code{\link{fit_stan}}.
 #'
 #' @section Prediction with a fitted model:
 #'
