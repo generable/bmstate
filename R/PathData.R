@@ -677,7 +677,7 @@ df_to_link_df <- function(df) {
 
 # Creates the df with path_id, state, time columns
 df_to_paths_df_part1 <- function(df, link_df) {
-  pdf <- df[, c("subject_id", "state", "time")]
+  pdf <- df[, c("subject_id", "state", "time", "is_transition")]
   ldf <- link_df[, c("subject_id", "path_id")]
   pdf <- pdf |> dplyr::left_join(ldf, by = "subject_id")
   pdf$subject_id <- NULL
