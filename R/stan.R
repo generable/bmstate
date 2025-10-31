@@ -64,7 +64,7 @@ ensure_exposed_stan_functions <- function(...) {
 #'
 #' @export
 #' @param model A \code{\link{MultistateModel}} object.
-#' @param data A \code{\link{JointData}} object of observed paths and dosing.
+#' @param data A \code{\link{JointData}} or \code{\link{PathData}} object.
 #' @param prior_only Sample from prior only?
 #' @param pk_only Do not fit hazard model parameters?
 #' @param return_stanfit Return also the raw 'Stan' fit object?
@@ -80,6 +80,10 @@ fit_stan <- function(model, data, prior_only = FALSE,
                      filepath = NULL,
                      return_stanfit = FALSE,
                      pathfinder = FALSE, ...) {
+  if (inherits(data, "PathData")) {
+    # no dosing data, just use path data
+    data <- JointData$new(data, NULL)
+  }
   checkmate::assert_class(model, "MultistateModel")
   checkmate::assert_class(data, "JointData")
   checkmate::assert_logical(return_stanfit, len = 1)

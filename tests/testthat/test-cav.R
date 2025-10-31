@@ -40,6 +40,7 @@ test_that("cav data analysis works", {
   pd0 <- as_single_event(pd, "Dead")
   tm0 <- pd0$transmat
 
+  # Create model and fit
   mod0 <- create_msm(tm0,
     hazard_covs = covs,
     categ_covs = "sex",
@@ -47,9 +48,10 @@ test_that("cav data analysis works", {
     tmax = 20,
     n_grid = 1000
   )
-  dat0 <- JointData$new(pd0, NULL)
   fit0 <- fit_stan(mod0,
-    data = dat0, chains = 1, iter_sampling = 100,
+    data = pd0,
+    chains = 1,
+    iter_sampling = 100,
     iter_warmup = 100
   )
   fit0_pm <- fit0$mean_fit()
