@@ -29,8 +29,8 @@ create_msm <- function(tm, hazard_covs = NULL, pk_covs = NULL,
 #' @export
 #' @field system A \code{\link{MultistateSystem}}
 #' @field pk_model \emph{Experimental}. A \code{\link{PKModel}} or NULL.
-#' @field delta_grid Time discretization delta for numerically integrating
-#' hazards.
+#' @field n_grid Number of time discretization grid points for numerically
+#' integrating hazards.
 MultistateModel <- R6::R6Class("MultistateModel",
 
   # PRIVATE
@@ -78,7 +78,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
   public = list(
     system = NULL,
     pk_model = NULL,
-    delta_grid = 1,
+    n_grid = NULL,
 
     #' @description Get normalization constants for each variable
     #' @return list
@@ -133,13 +133,17 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' @param tmax Max time.
     #' @param num_knots Total number of spline knots.
     #' @param categorical Names of categorical covariates.
+    #' @param n_grid Number of time discretization points for integrating
+    #' hazards.
     initialize = function(system, covariates = NULL, pk_model = NULL,
-                          tmax = 1000, num_knots = 5, categorical = NULL) {
+                          tmax = 1000, num_knots = 5, categorical = NULL,
+                          n_grid = 1000) {
       checkmate::assert_character(covariates, null.ok = TRUE)
       checkmate::assert_character(categorical, null.ok = TRUE)
       checkmate::assert_true(!("ss_auc" %in% covariates)) # special name
       checkmate::assert_true(!("dose" %in% covariates)) # special name
       checkmate::assert_class(system, "MultistateSystem")
+      checkmate::assert_integerish(n_grid, lower = 10, len = 1)
       if (!is.null(pk_model)) {
         checkmate::assert_class(pk_model, "PKModel")
       }
@@ -150,6 +154,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       checkmate::assert_number(tmax, lower = 0)
       checkmate::assert_integerish(num_knots, lower = 3, upper = 20)
       self$set_knots(tmax, default_event_distribution(tmax), num_knots)
+      self$n_grid <- n_grid
     },
 
     #' @description Set knot locations based on event times
@@ -164,6 +169,16 @@ MultistateModel <- R6::R6Class("MultistateModel",
       tk <- place_internal_knots(t_max, num_knots - 2, t_event)
       knots <- c(0, tk, t_max)
       self$system$set_knots(knots)
+    },
+
+    #' @description Get knots
+    get_knots = function() {
+      self$system$get_knots()
+    },
+
+    #' @description Get max time
+    get_tmax = function() {
+      self$system$get_tmax()
     },
 
     #' @description Get names of the states

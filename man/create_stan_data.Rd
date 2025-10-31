@@ -9,7 +9,7 @@ create_stan_data(model, data, prior_only = FALSE, pk_only = FALSE)
 \arguments{
 \item{model}{A \code{\link{MultistateModel}} object.}
 
-\item{data}{A \code{\link{JointData}} object of observed paths and dosing.}
+\item{data}{A \code{\link{JointData}} or \code{\link{PathData}} object.}
 
 \item{prior_only}{Sample from prior only?}
 

@@ -15,8 +15,8 @@ Main model class
 
 \item{\code{pk_model}}{\emph{Experimental}. A \code{\link{PKModel}} or NULL.}
 
-\item{\code{delta_grid}}{Time discretization delta for numerically integrating
-hazards.}
+\item{\code{n_grid}}{Number of time discretization grid points for numerically
+integrating hazards.}
 }
 \if{html}{\out{</div>}}
 }
@@ -29,6 +29,8 @@ hazards.}
 \item \href{#method-MultistateModel-set_auc_normalizers}{\code{MultistateModel$set_auc_normalizers()}}
 \item \href{#method-MultistateModel-new}{\code{MultistateModel$new()}}
 \item \href{#method-MultistateModel-set_knots}{\code{MultistateModel$set_knots()}}
+\item \href{#method-MultistateModel-get_knots}{\code{MultistateModel$get_knots()}}
+\item \href{#method-MultistateModel-get_tmax}{\code{MultistateModel$get_tmax()}}
 \item \href{#method-MultistateModel-get_states}{\code{MultistateModel$get_states()}}
 \item \href{#method-MultistateModel-has_pk}{\code{MultistateModel$has_pk()}}
 \item \href{#method-MultistateModel-print}{\code{MultistateModel$print()}}
@@ -117,7 +119,8 @@ Create model
   pk_model = NULL,
   tmax = 1000,
   num_knots = 5,
-  categorical = NULL
+  categorical = NULL,
+  n_grid = 1000
 )}\if{html}{\out{</div>}}
 }
 
@@ -137,6 +140,9 @@ exposure estimated from PK model). Do not use reserved names
 \item{\code{num_knots}}{Total number of spline knots.}
 
 \item{\code{categorical}}{Names of categorical covariates.}
+
+\item{\code{n_grid}}{Number of time discretization points for integrating
+hazards.}
 }
 \if{html}{\out{</div>}}
 }
@@ -161,6 +167,26 @@ Set knot locations based on event times
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-get_knots"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-get_knots}{}}}
+\subsection{Method \code{get_knots()}}{
+Get knots
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$get_knots()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-get_tmax"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-get_tmax}{}}}
+\subsection{Method \code{get_tmax()}}{
+Get max time
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$get_tmax()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateModel-get_states"></a>}}

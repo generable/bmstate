@@ -6,6 +6,7 @@
 \alias{transmat_comprisk}
 \alias{transmat_survival}
 \alias{transmat_illnessdeath}
+\alias{transmat_progression}
 \alias{transmat_diamond}
 \title{Create a common transition matrix}
 \usage{
@@ -21,6 +22,8 @@ transmat_comprisk(state_names = LETTERS[1:4])
 transmat_survival(state_names = c("Alive", "Dead"))
 
 transmat_illnessdeath(state_names = c("Healthy", "Diseased", "Dead"))
+
+transmat_progression(state_names = c("Healthy", "Mild", "Severe", "Dead"))
 
 transmat_diamond(state_names = LETTERS[1:4])
 }

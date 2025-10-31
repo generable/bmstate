@@ -272,6 +272,18 @@ transmat_illnessdeath <- function(state_names =
 
 #' @export
 #' @rdname transmat
+transmat_progression <- function(state_names =
+                                   c("Healthy", "Mild", "Severe", "Dead")) {
+  mat <- matrix(0, 4, 4)
+  mat[1, 2] <- 1 # Healthy to Mild
+  mat[1, 3] <- 1 # Healthy to Severe
+  mat[2, 3] <- 1 # Mild to Severe
+  mat[c(1, 2, 3), 4] <- 1 # Any -> Dead
+  TransitionMatrix$new(mat, state_names)
+}
+
+#' @export
+#' @rdname transmat
 transmat_diamond <- function(state_names = LETTERS[1:4]) {
   checkmate::assert_character(state_names, len = 4)
   mat <- matrix(0, 4, 4)

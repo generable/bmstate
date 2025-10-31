@@ -1,3 +1,40 @@
+# Checks to be made that make sure that the model settings
+# make sense for given data
+prefit_checks <- function(model, data) {
+  tmax <- model$get_tmax()
+  pd <- data$paths
+  lens <- pd$as_transitions() |>
+    dplyr::mutate(time_len = .data$time - .data$time_prev) |>
+    dplyr::pull(.data$time_len)
+  min_len <- min(lens)
+  delta_grid <- tmax / model$n_grid
+  if (min_len < delta_grid) {
+    msg <- paste0(
+      "Shortest time interval (", min_len,
+      ") is smaller than delta_grid (", delta_grid,
+      "). Either increase n_grid or decrease t_max of the model."
+    )
+    stop(msg)
+  }
+  max_time <- max(pd$get_path_df()$time)
+  if (tmax < max_time) {
+    msg <- paste0(
+      "Model t_max (", tmax,
+      ") is smaller than max observed time in data (",
+      max_time, "). Increase t_max."
+    )
+    stop(msg)
+  }
+  if (tmax > 2 * max_time) {
+    warning(
+      "Set model t_max is more than twice as large as largest observed time",
+      " in the data. Are you sure you want to do this? If not, set smaller",
+      " t_max."
+    )
+  }
+  TRUE
+}
+
 #' Create the main 'Stan' model
 #'
 #' @export
@@ -34,7 +71,7 @@ ensure_exposed_stan_functions <- function(...) {
 #'
 #' @export
 #' @param model A \code{\link{MultistateModel}} object.
-#' @param data A \code{\link{JointData}} object of observed paths and dosing.
+#' @param data A \code{\link{JointData}} or \code{\link{PathData}} object.
 #' @param prior_only Sample from prior only?
 #' @param pk_only Do not fit hazard model parameters?
 #' @param return_stanfit Return also the raw 'Stan' fit object?
@@ -50,6 +87,10 @@ fit_stan <- function(model, data, prior_only = FALSE,
                      filepath = NULL,
                      return_stanfit = FALSE,
                      pathfinder = FALSE, ...) {
+  if (inherits(data, "PathData")) {
+    # no dosing data, just use path data
+    data <- JointData$new(data, NULL)
+  }
   checkmate::assert_class(model, "MultistateModel")
   checkmate::assert_class(data, "JointData")
   checkmate::assert_logical(return_stanfit, len = 1)
@@ -57,6 +98,7 @@ fit_stan <- function(model, data, prior_only = FALSE,
   checkmate::assert_logical(pk_only, len = 1)
   checkmate::assert_logical(set_auc_normalizers, len = 1)
   checkmate::assert_logical(pathfinder, len = 1)
+  prefit_checks(model, data)
 
   # Get Stan model object
   stan_model <- create_stan_model(filepath = filepath)
@@ -122,12 +164,13 @@ create_stan_data <- function(model, data, prior_only = FALSE, pk_only = FALSE) {
   tm <- pd$transmat
   check_equal_transmats(tm, model$system$tm())
   checkmate::assert_logical(prior_only, len = 1)
+  delta_grid <- model$system$get_tmax() / model$n_grid
 
   # Initial Stan data
   stan_dat <- c(
     create_stan_data_idx_sub(pd),
     create_stan_data_transitions(pd),
-    create_stan_data_spline(pd, model, model$delta_grid),
+    create_stan_data_spline(pd, model, delta_grid),
     create_stan_data_covariates(pd, model),
     create_stan_data_trans_types(pd),
     create_stan_data_pk(data, model)
@@ -217,7 +260,7 @@ create_stan_data_spline <- function(pd, model, delta_grid) {
   t <- dat$time
   SBF <- model$system$basisfun_matrix(t)
   t_max <- model$system$get_tmax()
-  if (delta_grid > 10 * t_max) {
+  if (delta_grid > 0.1 * t_max) {
     stop("delta_grid is very large compared to t_max")
   }
 
