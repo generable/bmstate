@@ -10,20 +10,22 @@ check_columns <- function(df, needed_columns) {
 #' Path data class (R6 class)
 #'
 #' @export
+#' @description It is not recommended for users to try to create data using
+#' the constructor of this class. Rather use \code{\link{df_to_pathdata}}.
 #' @field subject_df Data frame with one row per subject. Must have one
 #' row for each subject, and
 #' \code{subject_id} and all covariates as columns.
 #' @field path_df Data frame of actual paths. Each row corresponds to
 #' one time point. Must have \code{path_id},
-#' \code{state}, \code{time}, and \code{is_event} as columns. These are
+#' \code{state}, \code{time}, and \code{trans_idx} as columns. These are
 #' \itemize{
 #'   \item \code{path_id}: path identifier
 #'   \item \code{state}: integer index of the state at the time point, and
 #'   until the next time point
 #'   \item \code{time}: time point
-#'   \item \code{is_event}: binary variable indicating if the time point
-#'   is a state transition. If the time point corresponds to censoring, this should
-#'   be 0.
+#'   \item \code{trans_idx}: Integer indicating which transition this
+#'   time point corresponds to. If the time point is not a state transition,
+#'   this should be 0.
 #' }
 #' @field link_df Links the path and subject data frames. Must have
 #' one row for each path, and \code{path_id}, \code{draw_idx},
@@ -46,15 +48,15 @@ PathData <- R6::R6Class(
     #' \code{subject_id} and all covariates as columns.
     #' @param path_df Data frame of actual paths. Each row corresponds to
     #' one time point. Must have \code{path_id},
-    #' \code{state}, \code{time}, and \code{is_event} as columns. These are
+    #' \code{state}, \code{time}, and \code{trans_idx} as columns. These are
     #' \itemize{
     #'   \item \code{path_id}: path identifier
     #'   \item \code{state}: integer index of the state at the time point, and
     #'   until the next time point
     #'   \item \code{time}: time point
-    #'   \item \code{is_event}: binary variable indicating if the time point
-    #'   is a state transition. If the time point corresponds to censoring, this should
-    #'   be 0.
+    #'   \item \code{trans_idx}: Integer indicating which transition this
+    #'   time point corresponds to. If the time point is not a state transition,
+    #'   this should be 0.
     #' }
     #' @param link_df Links the path and subject data frames. Must have
     #' one row for each path, and \code{path_id}, \code{draw_idx},
@@ -80,7 +82,7 @@ PathData <- R6::R6Class(
         link_df$rep_idx <- 1
       }
       cols1 <- c("subject_id", covs)
-      cols2 <- c("path_id", "state", "time", "is_event", "is_censor", "trans_idx")
+      cols2 <- c("path_id", "state", "time", "trans_idx")
       cols3 <- c("path_id", "draw_idx", "rep_idx", "subject_id")
       check_columns(subject_df, cols1)
       check_columns(path_df, cols2)
@@ -118,12 +120,12 @@ PathData <- R6::R6Class(
       self$covs
     },
 
-    #' @description Get path lengths (among paths that include transition events)
+    #' @description Get path lengths (among paths that include transitions)
     #' @param truncate Remove rows after terminal states first?
     #' @return a data frame of path ids and counts
     lengths = function(truncate = FALSE) {
       self$get_path_df(truncate) |>
-        dplyr::filter(is_event == TRUE) |>
+        dplyr::filter(trans_idx > 0) |>
         dplyr::group_by(path_id) |>
         dplyr::count()
     },
@@ -150,11 +152,6 @@ PathData <- R6::R6Class(
         dplyr::count())
     },
 
-    #' @description Get name of null state
-    null_state = function() {
-      self$transmat$source_states()
-    },
-
     #' @description Get names of all states
     #'
     #' @return character vector
@@ -169,32 +166,17 @@ PathData <- R6::R6Class(
       self$transmat$absorbing_states()
     },
 
-    #' @description Get indices of event states
-    #'
-    #' @return integer vector
-    get_event_states = function() {
-      match(self$get_event_state_names(), self$state_names())
-    },
-
-    #' @description Get names of event states
-    #'
-    #' @return a character vector
-    get_event_state_names = function() {
-      setdiff(self$state_names(), self$null_state())
-    },
-
     #' @description Print info
     #'
     #' @return nothing
     print = function() {
       n_path <- self$n_paths()
       covs <- self$covariate_names()
-      sn <- self$get_event_state_names()
+      sn <- self$state_names()
       x1 <- paste0("PathData object with ", n_path, " paths")
-      x2 <- paste0(" * Null state = {", self$null_state(), "}")
-      x3 <- paste0(" * Event states = {", paste0(sn, collapse = ", "), "}")
-      x4 <- paste0(" * Covariates = {", paste0(covs, collapse = ", "), "}")
-      msg <- paste(x1, x2, x3, x4, "\n", sep = "\n")
+      x2 <- paste0(" * States = {", paste0(sn, collapse = ", "), "}")
+      x3 <- paste0(" * Covariates = {", paste0(covs, collapse = ", "), "}")
+      msg <- paste(x1, x2, x3, "\n", sep = "\n")
       cat(msg)
     },
 
@@ -249,8 +231,7 @@ PathData <- R6::R6Class(
       out <- pdf |>
         dplyr::filter(.data$keep == 1) |>
         dplyr::select(
-          "path_id", "time", "time_prev", "trans_idx", "is_censor",
-          "state", "is_event"
+          "path_id", "time", "time_prev", "trans_idx", "state"
         )
       out$from <- prev_states[out$trans_idx + 1]
       out$to <- states[out$trans_idx + 1]
@@ -275,9 +256,9 @@ PathData <- R6::R6Class(
       dt$Tstart <- dt$time_prev
       dt$Tstop <- dt$time
       dt$time <- dt$Tstop - dt$Tstart
-      dt$status <- dt$is_event
+      dt$status <- as.numeric(dt$trans_idx > 0)
       dt$trans <- dt$trans_idx
-      dt |> dplyr::select(-c("is_event", "time_prev", "trans_idx"))
+      dt |> dplyr::select(-c("time_prev", "trans_idx"))
     },
 
     #' @description Convert to format used by the 'mstate' package
@@ -299,7 +280,7 @@ PathData <- R6::R6Class(
     #' @param truncate truncate after terminal events?
     plot_paths = function(n_paths = NULL, alpha = 0.5, truncate = FALSE) {
       df <- self$as_data_frame(truncate = truncate)
-      df$is_event <- as.factor(df$is_event)
+      df$is_transition <- as.factor(df$trans_idx > 0)
       sn <- self$state_names()
       uid <- unique(df$path_id)
       N <- length(uid)
@@ -318,7 +299,7 @@ PathData <- R6::R6Class(
       ggplot(df, aes(x = .data$time, y = .data$state, group = .data$path_id)) +
         geom_step(direction = "hv", alpha = alpha) +
         labs(x = "Time", y = "State", title = "State paths") +
-        geom_point(mapping = aes(color = .data$is_event, pch = .data$is_event))
+        geom_point(mapping = aes(color = .data$is_trans, pch = .data$is_transition))
     },
 
     #' @description Transition proportion matrix
@@ -537,7 +518,7 @@ as_single_event <- function(pd, event) {
     if (length(ri) == 0) {
       df <- df[c(1, nrow(df)), ]
       df$state[2] <- 1
-      df$is_event[2] <- 0
+      df$trans_idx[2] <- 0
     } else {
       df <- df[c(1, ri[1]), ]
       df$state[2] <- 2
@@ -571,7 +552,8 @@ as_survival <- function(pd, event) {
     dplyr::group_by(.data$path_id) |>
     dplyr::slice(1) |>
     dplyr::ungroup()
-  ppd$surv <- Surv(ppd$time, ppd$is_event)
+  ppd$is_trans <- as.numeric(ppd$trans_idx > 0)
+  ppd$surv <- Surv(ppd$time, ppd$is_trans)
   dd <- pd$link_df |>
     dplyr::select("path_id", "subject_id") |>
     dplyr::left_join(pd$subject_df, by = "subject_id")
@@ -587,7 +569,7 @@ as_survival <- function(pd, event) {
 # Helper
 count_paths_with_event <- function(c, t, S) {
   cnt <- c |>
-    dplyr::filter(.data$is_event == 1 & .data$time <= t) |>
+    dplyr::filter(.data$trans_idx > 0 & .data$time <= t) |>
     dplyr::distinct(.data$path_id) |>
     dplyr::count()
   df <- data.frame(state = seq_len(S)) |> dplyr::left_join(cnt, by = "state")
@@ -695,13 +677,13 @@ df_to_paths_df_part1 <- function(df, link_df) {
   pdf
 }
 
-# Adds the is_event column
+# Adds the is_trans column
 df_to_paths_df_part2 <- function(pdf, tm) {
   idx_terminal <- tm$absorbing_states(names = FALSE)
   pdf <- pdf |>
     dplyr::group_by(.data$path_id) |>
     dplyr::mutate(
-      is_event = dplyr::case_when(
+      is_trans = dplyr::case_when(
         dplyr::row_number() == 1 ~ 0, # first row always 0
         dplyr::row_number() == dplyr::n() & !(.data$state %in% idx_terminal) ~ 0, # last row censor?
         TRUE ~ 1 # otherwise → 1
@@ -735,11 +717,11 @@ df_to_paths_df_part4 <- function(pdf, tm) {
     dplyr::ungroup()
   tim <- tm$as_transition_index_matrix()
   for (r in seq_len(nrow(pdf))) {
-    if (pdf$is_event[r]) {
+    if (pdf$is_trans[r]) {
       s1 <- pdf$prev_state[r]
       s2 <- pdf$state[r]
       if (s1 == 0) {
-        stop("internal error, is_event column probably not correct")
+        stop("internal error, is_trans column probably not correct")
       }
       t_idx <- tim[s1, s2]
       if (t_idx == 0) {
