@@ -2,16 +2,32 @@
 % Please edit documentation in R/PathData.R
 \name{df_to_pathdata}
 \alias{df_to_pathdata}
-\title{Data frame of one observed path per subject to PathData}
+\title{Create 'PathData' from a data frame of one observed path per subject}
 \usage{
 df_to_pathdata(df, tm, covs = NULL)
 }
 \arguments{
-\item{df}{Data frame, should have columns \code{state} (integer),
-\code{time} (numeric), \code{subject_id} (character) and all the
-columns specified in \code{covs}}
+\item{df}{Data frame. Should have columns
+\itemize{
+  \item \code{subject_id} (character)
+  \item \code{time} (numeric)
+  \item \code{state} (integer, same indexing as in \code{tm})
+  \item \code{is_transition} (logical)
+  \item all the columns specified in \code{covs}
+}
+Rules:
+\itemize{
+   \item For each subject, there should be at least two rows, and the rows should
+   be contiguous and the time should be non-decreasing.
+   \item The \code{is_transition} value should indicate whether the row
+   corresponds to a transition.
+   \item The first row for each subject should never be a transition.
+   \item For each row that is a transition, the transition from the state
+   of the previous row to the current state should be a valid transition
+   in \code{tm}.
+}}
 
-\item{tm}{A transition matrix}
+\item{tm}{A \code{\link{TransitionMatrix}}}
 
 \item{covs}{covariates (character vector)}
 }
@@ -19,5 +35,5 @@ columns specified in \code{covs}}
 A \code{\link{PathData}} object
 }
 \description{
-Data frame of one observed path per subject to PathData
+Create 'PathData' from a data frame of one observed path per subject
 }

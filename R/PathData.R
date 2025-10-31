@@ -565,7 +565,7 @@ as_survival <- function(pd, event) {
     dplyr::left_join(pd$subject_df, by = "subject_id")
   ppd <- ppd |>
     dplyr::left_join(dd, by = "path_id") |>
-    dplyr::select("path_id", "time", "surv", "is_trans")
+    dplyr::select("path_id", "time", "surv", "is_trans", "subject_id")
   if (nrow(ppd) != N_sub) {
     stop("internal error in as_survival")
   }
@@ -684,39 +684,8 @@ df_to_paths_df_part1 <- function(df, link_df) {
   pdf
 }
 
-# Adds the is_trans column
-df_to_paths_df_part2 <- function(pdf, tm) {
-  idx_terminal <- tm$absorbing_states(names = FALSE)
-  pdf <- pdf |>
-    dplyr::group_by(.data$path_id) |>
-    dplyr::mutate(
-      is_trans = dplyr::case_when(
-        dplyr::row_number() == 1 ~ 0, # first row always 0
-        dplyr::row_number() == dplyr::n() & !(.data$state %in% idx_terminal) ~ 0, # last row censor?
-        TRUE ~ 1 # otherwise → 1
-      )
-    ) |>
-    dplyr::ungroup()
-  pdf
-}
-
-# Adds the is_censor column
-df_to_paths_df_part3 <- function(pdf, tm) {
-  idx_terminal <- tm$absorbing_states(names = FALSE)
-  pdf <- pdf |>
-    dplyr::group_by(.data$path_id) |>
-    dplyr::mutate(
-      is_censor = dplyr::case_when(
-        dplyr::row_number() == dplyr::n() & !(.data$state %in% idx_terminal) ~ 1, # last row censor?
-        TRUE ~ 0
-      )
-    ) |>
-    dplyr::ungroup()
-  pdf
-}
-
 # Adds the trans_idx column
-df_to_paths_df_part4 <- function(pdf, tm) {
+df_to_paths_df_part2 <- function(pdf, tm) {
   pdf$trans_idx <- 0L
   pdf <- pdf |>
     dplyr::group_by(.data$path_id) |>
@@ -724,18 +693,23 @@ df_to_paths_df_part4 <- function(pdf, tm) {
     dplyr::ungroup()
   tim <- tm$as_transition_index_matrix()
   for (r in seq_len(nrow(pdf))) {
-    if (pdf$is_trans[r]) {
+    if (pdf$is_transition[r]) {
       s1 <- pdf$prev_state[r]
-      s2 <- pdf$state[r]
       if (s1 == 0) {
-        stop("internal error, is_trans column probably not correct")
+        stop(
+          "Previous state should not be 0. The first row for any subject",
+          " should never be marked as a transition."
+        )
       }
+      s2 <- pdf$state[r]
       t_idx <- tim[s1, s2]
       if (t_idx == 0) {
-        stop(
-          "going from state ", s1, " to ", s2,
-          " is not a transition in the given transition matrix"
+        msg <- paste0(
+          "row ", r, " has is_transition = TRUE but the given",
+          " transition matrix has no transition from state ",
+          s1, " to ", s2
         )
+        stop(msg)
       }
       pdf$trans_idx[r] <- t_idx
     }
@@ -743,16 +717,42 @@ df_to_paths_df_part4 <- function(pdf, tm) {
   pdf
 }
 
-#' Data frame of one observed path per subject to PathData
+#' Create 'PathData' from a data frame of one observed path per subject
+#'
 #' @export
-#' @param df Data frame, should have columns \code{state} (integer),
-#' \code{time} (numeric), \code{subject_id} (character) and all the
-#' columns specified in \code{covs}
-#' @param tm A transition matrix
+#' @param df Data frame. Should have columns
+#' \itemize{
+#'   \item \code{subject_id} (character)
+#'   \item \code{time} (numeric)
+#'   \item \code{state} (integer, same indexing as in \code{tm})
+#'   \item \code{is_transition} (logical)
+#'   \item all the columns specified in \code{covs}
+#' }
+#' Rules:
+#' \itemize{
+#'    \item For each subject, there should be at least two rows, and the rows should
+#'    be contiguous and the time should be non-decreasing.
+#'    \item The \code{is_transition} value should indicate whether the row
+#'    corresponds to a transition.
+#'    \item The first row for each subject should never be a transition.
+#'    \item For each row that is a transition, the transition from the state
+#'    of the previous row to the current state should be a valid transition
+#'    in \code{tm}.
+#' }
+#' @param tm A \code{\link{TransitionMatrix}}
 #' @param covs covariates (character vector)
 #' @return A \code{\link{PathData}} object
 df_to_pathdata <- function(df, tm, covs = NULL) {
+  df <- df |> dplyr::arrange(.data$subject_id, .data$time)
   checkmate::assert_data_frame(df)
+  checkmate::assert_true("state" %in% colnames(df))
+  checkmate::assert_integerish(df$state)
+  checkmate::assert_true("time" %in% colnames(df))
+  checkmate::assert_numeric(df$time)
+  checkmate::assert_true("subject_id" %in% colnames(df))
+  checkmate::assert_character(df$subject_id)
+  checkmate::assert_true("is_transition" %in% colnames(df))
+  checkmate::assert_logical(df$is_transition)
   checkmate::assert_class(tm, "TransitionMatrix")
   if (!is.null(covs)) {
     checkmate::assert_character(covs)
@@ -761,8 +761,6 @@ df_to_pathdata <- function(df, tm, covs = NULL) {
   sdf <- df_to_subjects_df(df, covs)
   ldf <- df_to_link_df(df)
   pdf <- df_to_paths_df_part1(df, ldf)
-  pdf <- df_to_paths_df_part2(pdf, tm)
-  pdf <- df_to_paths_df_part3(pdf, tm)
-  pdf <- df_to_paths_df_part4(pdf, tm) |> dplyr::select(-"prev_state")
+  pdf <- df_to_paths_df_part2(pdf, tm) |> dplyr::select(-"prev_state")
   PathData$new(sdf, pdf, ldf, tm, covs)
 }

@@ -210,9 +210,10 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
 #' \item \code{full}: All possible transitions
 #' between non-terminal and non-source states are added, as well as transition
 #' to terminal states from all states.
-#' \item \code{survival}: basic survival model with single transition
-#' \item \code{comprisk}: competing risks transition matrix
+#' \item \code{survival}: Basic survival model with single transition
+#' \item \code{comprisk}: Competing risks transition matrix
 #' \item \code{illnessdeath}: Illness-Death model
+#' \item \code{progression}: Disease progression model
 #' \item \code{diamond}: Two intermediate states both leading to same terminal
 #' state
 #' }
