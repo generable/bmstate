@@ -48,6 +48,7 @@ which the paths belong.}
 \item \href{#method-PathData-state_at}{\code{PathData$state_at()}}
 \item \href{#method-PathData-n_paths}{\code{PathData$n_paths()}}
 \item \href{#method-PathData-state_names}{\code{PathData$state_names()}}
+\item \href{#method-PathData-get_event_state_names}{\code{PathData$get_event_state_names()}}
 \item \href{#method-PathData-terminal_states}{\code{PathData$terminal_states()}}
 \item \href{#method-PathData-print}{\code{PathData$print()}}
 \item \href{#method-PathData-get_path_df}{\code{PathData$get_path_df()}}
@@ -189,6 +190,20 @@ an integer
 Get names of all states
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PathData$state_names()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+character vector
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-get_event_state_names"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-get_event_state_names}{}}}
+\subsection{Method \code{get_event_state_names()}}{
+Get names of all states to which transitioning
+can be a transition event
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$get_event_state_names()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{

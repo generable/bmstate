@@ -159,6 +159,14 @@ PathData <- R6::R6Class(
       self$transmat$states
     },
 
+    #' @description Get names of all states to which transitioning
+    #' can be a transition event
+    #'
+    #' @return character vector
+    get_event_state_names = function() {
+      setdiff(self$state_names(), self$system$tm()$source_states())
+    },
+
     #' @description Get names of terminal states
     #'
     #' @return character vector
@@ -224,21 +232,22 @@ PathData <- R6::R6Class(
     as_transitions = function(covariates = NULL, truncate = FALSE) {
       pdf <- self$get_path_df(truncate)
       pdf$time_prev <- c(0, pdf$time[1:(nrow(pdf) - 1)])
-      pdf$keep <- as.numeric((pdf$trans_idx > 0) | (pdf$is_censor == 1))
       tdf <- self$transmat$trans_df()
       prev_states <- c(NA, tdf$prev_state)
       states <- c(NA, tdf$state)
       out <- pdf |>
-        dplyr::filter(.data$keep == 1) |>
+        dplyr::group_by(.data$path_id) |>
+        dplyr::filter(dplyr::row_number() > 1) |>
+        dplyr::ungroup() |>
         dplyr::select(
           "path_id", "time", "time_prev", "trans_idx", "state"
         )
       out$from <- prev_states[out$trans_idx + 1]
       out$to <- states[out$trans_idx + 1]
-      idx_censor <- which(out$is_censor == 1)
-      out$from[idx_censor] <- out$state[idx_censor]
-      out$to[idx_censor] <- out$state[idx_censor]
-      out <- out |> dplyr::select(-c("state", "is_censor"))
+      idx_notrans <- which(out$trans_idx == 0)
+      out$from[idx_notrans] <- out$state[idx_notrans]
+      out$to[idx_notrans] <- out$state[idx_notrans]
+      out <- out |> dplyr::select(-c("state"))
       fl <- self$full_link(covariates)
       out |> dplyr::left_join(fl, by = "path_id")
     },
@@ -280,7 +289,7 @@ PathData <- R6::R6Class(
     #' @param truncate truncate after terminal events?
     plot_paths = function(n_paths = NULL, alpha = 0.5, truncate = FALSE) {
       df <- self$as_data_frame(truncate = truncate)
-      df$is_transition <- as.factor(df$trans_idx > 0)
+      df$Transition <- as.factor(df$trans_idx > 0)
       sn <- self$state_names()
       uid <- unique(df$path_id)
       N <- length(uid)
@@ -298,8 +307,10 @@ PathData <- R6::R6Class(
         )
       ggplot(df, aes(x = .data$time, y = .data$state, group = .data$path_id)) +
         geom_step(direction = "hv", alpha = alpha) +
-        labs(x = "Time", y = "State", title = "State paths") +
-        geom_point(mapping = aes(color = .data$is_trans, pch = .data$is_transition))
+        labs(
+          x = "Time", y = "State", title = "State paths"
+        ) +
+        geom_point(mapping = aes(color = .data$Transition, pch = .data$Transition))
     },
 
     #' @description Transition proportion matrix
@@ -326,7 +337,7 @@ PathData <- R6::R6Class(
       transition_matrix_plot(
         f,
         self$terminal_states(),
-        self$null_state(),
+        self$transmat$source_states(),
         edge_labs = round(f, digits = digits),
         ...
       )
@@ -501,7 +512,7 @@ potential_covariates <- function(pd, possible = NULL, ...) {
 as_single_event <- function(pd, event) {
   checkmate::assert_class(pd, "PathData")
   checkmate::assert_character(event, len = 1)
-  stopifnot(event %in% pd$get_event_state_names())
+  stopifnot(event %in% pd$state_names())
   state <- which(pd$state_names() == event)
   if (length(state) != 1) {
     stop("invalid event")
