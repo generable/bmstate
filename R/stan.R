@@ -101,7 +101,6 @@ fit_stan <- function(model, data, prior_only = FALSE,
   checkmate::assert_logical(prior_only, len = 1)
   checkmate::assert_logical(pk_only, len = 1)
   checkmate::assert_logical(set_auc_normalizers, len = 1)
-  checkmate::assert_logical(pathfinder, len = 1)
   prefit_checks(model, data)
 
   # Get Stan model object

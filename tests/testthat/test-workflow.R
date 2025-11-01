@@ -34,7 +34,7 @@ test_that("entire workflow works", {
     refresh = 5,
     init = 0.1,
     return_stanfit = TRUE,
-    pathfinder = TRUE,
+    method = "pathfinder",
     draws = options$iter_sampling
   )
   fit <- a$fit

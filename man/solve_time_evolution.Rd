@@ -4,7 +4,7 @@
 \alias{solve_time_evolution}
 \title{Solve the Kolmogorov forward equation of a Markovian multistate system}
 \usage{
-solve_time_evolution(system, t, log_w0, w = NULL, log_m = NULL)
+solve_time_evolution(system, t, log_w0, w = NULL, log_m = NULL, ...)
 }
 \arguments{
 \item{system}{A \code{\link{MultistateSystem}}}
@@ -16,9 +16,11 @@ solve_time_evolution(system, t, log_w0, w = NULL, log_m = NULL)
 \item{w}{An array of shape \code{n_trans} x \code{n_weights}}
 
 \item{log_m}{A vector of length \code{n_trans}}
+
+\item{...}{Arguments passed to \code{deSolve::ode()}.}
 }
 \value{
-Value given by \code{deSolve::ode}.
+Value given by \code{deSolve::ode()}.
 }
 \description{
 Solve the Kolmogorov forward equation of a Markovian multistate system

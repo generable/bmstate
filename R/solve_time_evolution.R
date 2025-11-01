@@ -6,8 +6,10 @@
 #' @param w An array of shape \code{n_trans} x \code{n_weights}
 #' @param log_w0 A vector of length \code{n_trans}
 #' @param log_m A vector of length \code{n_trans}
-#' @return Value given by \code{deSolve::ode}.
-solve_time_evolution <- function(system, t, log_w0, w = NULL, log_m = NULL) {
+#' @param ... Arguments passed to \code{deSolve::ode()}.
+#' @return Value given by \code{deSolve::ode()}.
+solve_time_evolution <- function(system, t, log_w0, w = NULL, log_m = NULL,
+                                 ...) {
   checkmate::assert_class(system, "MultistateSystem")
   S <- system$num_states()
   H <- system$num_trans()
@@ -31,29 +33,29 @@ solve_time_evolution <- function(system, t, log_w0, w = NULL, log_m = NULL) {
   }
   P0 <- diag(1, S, S)
   y0 <- as.vector(P0)
-  deSolve::ode(y0, t, odefun, NULL, method = "ode45")
+  deSolve::ode(y0, t, odefun, NULL, method = "ode45", ...)
 }
 
-#' Solve the transition probability matrix
+#' Solve the transition probability matrix for each given output time
 #'
 #' @export
 #' @param system A \code{\link{MultistateSystem}}
 #' @param log_w0 A vector of length \code{n_trans}
 #' @param t_start Initial time
-#' @param t_end End time
+#' @param t_out End times (vector)
 #' @param w An array of shape \code{n_trans} x \code{n_weights}
 #' @param log_m A vector of length \code{n_trans}
-#' @return A matrix \code{P} where \code{P[i,j]} is the probability that
-#' the system will be in state \code{j} at time \code{t_end} given that it
-#' is in state \code{i} at time \code{t_start}
-solve_trans_prob_matrix <- function(system, log_w0, w = NULL,
-                                    log_m = NULL, t_start = 0, t_end = NULL) {
+#' @param ... Arguments passed to \code{deSolve::ode()}.
+#' @return An array \code{P} where \code{P[k,i,j]} is the probability that
+#' the system will be in state \code{j} at the \code{k}th time point of
+#' \code{t_out} given that it is in state \code{i} at time \code{t_start}.
+solve_trans_prob_matrix <- function(system, t_out, log_w0, w = NULL,
+                                    log_m = NULL, t_start = 0,
+                                    ...) {
   checkmate::assert_class(system, "MultistateSystem")
-  if (is.null(t_end)) {
-    t_end <- system$get_tmax()
-  }
+  checkmate::assert_numeric(t_out)
+  K <- length(t_out)
   checkmate::assert_number(t_start, lower = 0)
-  checkmate::assert_number(t_end, lower = t_start + 1e-9)
   H <- system$num_trans()
   W <- system$num_weights()
   S <- system$num_states()
@@ -63,87 +65,56 @@ solve_trans_prob_matrix <- function(system, log_w0, w = NULL,
   if (is.null(log_m)) {
     log_m <- rep(0, H)
   }
-  t <- c(t_start, t_end)
-  kfe <- solve_time_evolution(system, t, log_w0, w, log_m)
-  P <- matrix(kfe[2, 2:ncol(kfe)], S, S)
-  cn <- system$tm()$states
-  colnames(P) <- cn
-  rownames(P) <- cn
+  kfe <- solve_time_evolution(system, t_out, log_w0, w, log_m, ...)
+  P <- array(0, dim = c(K, S, S))
+  for (k in seq_len(K)) {
+    P[k, , ] <- matrix(kfe[k, 2:ncol(kfe)], S, S)
+  }
   P
 }
 
-
-#' Solve transition probabilities for each subject using 'MultistateModelFit'
+#' Solve transition probability matrices for each subject and draw in
+#' 'MultistateModelFit'
 #'
-#' @export
-#' @inheritParams msmfit_pk_params
-#' @param t_start Initial time.
-#' @param t_end End time.
-#' @return A data frame, where each row has the probabilities that a given subject
-#' will be in each state at time \code{t_end} given that they were in
-#' \code{init_state} at \code{t_start}
-solve_trans_prob_fit <- function(fit, t_start = 0, t_end = NULL,
-                                 data = NULL) {
-  checkmate::assert_class(fit, "MultistateModelFit")
-  message("Solving transition probabilities")
-  tp <- solve_trans_prob_matrix_each_subject(fit, t_start, t_end, data = data)
-  message("Formatting")
-
-  init_states <- msmfit_state_at(t_start, fit, data) |>
-    dplyr::select("state", "subject_id")
-  N_sub <- nrow(init_states)
-  S <- fit$model$system$num_states()
-
-  df <- matrix(0, N_sub, S)
-  sub_ids <- rep("", N_sub)
-  for (j in seq_len(N_sub)) {
-    init_state_j <- init_states$state[j]
-    sid <- init_states$subject_id[j]
-    inds <- which(tp$index_df$subject_id == sid)
-    Pi <- tp$P[inds, , ]
-    if (length(dim(Pi)) > 2) {
-      Pi <- apply(Pi, c(2, 3), mean)
-    }
-    sub_ids[j] <- sid
-    df[j, ] <- Pi[init_state_j, ]
-  }
-  df <- data.frame(df)
-  colnames(df) <- fit$model$system$tm()$states
-  df$subject_id <- sub_ids
-  df
-}
-
-#' Solve transition probabilities for each subject in 'MultistateModelFit'
-#'
-#' @inheritParams solve_trans_prob_fit
-#' @return For each subject and each draw, a matrix \code{P} where
-#' \code{P[i,j]} is the probability that the system will be in state
-#' \code{j} at time \code{t_end}
-#' given that it is in state \code{i} at time \code{t_start}
-solve_trans_prob_matrix_each_subject <- function(fit, t_start = 0, t_end = NULL,
-                                                 data = NULL) {
+#' @param fit A \code{\link{MultistateModelFit}} object
+#' @inheritParams solve_trans_prob_matrix
+#' @param ... Arguments passed to \code{deSolve::ode()}.
+#' @return A list with
+#' \itemize{
+#'   \item A 4-dimensional array \code{P} where \code{P[n,,,]} is the
+#'     \code{P} matrix returned by \code{\link{solve_trans_prob_matrix}} for
+#'     subject-draw combination \code{n}
+#'    \item Index data frame
+#'    \item The numeric vector \code{t_out}
+#'  }
+solve_trans_prob_matrix_each_subject <- function(fit, t_start = 0, t_out = NULL,
+                                                 data = NULL, ...) {
   checkmate::assert_class(fit, "MultistateModelFit")
   checkmate::assert_number(t_start, lower = 0)
+  sys <- fit$model$system
+  if (is.null(t_out)) {
+    t_out <- seq(t_start, sys$get_tmax(), length.out = 30)
+  }
 
   # Get and reshape draws
-  sys <- fit$model$system
   S <- fit$num_draws()
   sd <- msmfit_stan_data(fit, data)
   N <- sd$N_sub
   d <- msmfit_inst_hazard_param_draws(fit, data)
   NS <- nrow(d$df)
   pb <- progress::progress_bar$new(total = NS)
-  K <- sys$num_states()
-  A <- array(0, dim = c(NS, K, K))
+  S <- sys$num_states()
+  K <- length(t_out)
+  A <- array(0, dim = c(NS, K, S, S))
   for (j in seq_len(NS)) {
     pb$tick()
     wj <- d$w[j, , ]
     if (is.null(dim(wj))) {
       wj <- matrix(wj, 1, length(wj))
     }
-    A[j, , ] <- solve_trans_prob_matrix(
-      sys, d$log_w0[j, ], wj, d$log_m[j, ], t_start, t_end
+    A[j, , , ] <- solve_trans_prob_matrix(
+      sys, t_out, d$log_w0[j, ], wj, d$log_m[j, ], t_start, ...
     )
   }
-  list(P = A, index_df = d$df)
+  list(P = A, index_df = d$df, t_out = t_out)
 }

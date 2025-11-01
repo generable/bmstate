@@ -2,32 +2,37 @@
 % Please edit documentation in R/solve_time_evolution.R
 \name{solve_trans_prob_matrix_each_subject}
 \alias{solve_trans_prob_matrix_each_subject}
-\title{Solve transition probabilities for each subject in 'MultistateModelFit'}
+\title{Solve transition probability matrices for each subject and draw in
+'MultistateModelFit'}
 \usage{
 solve_trans_prob_matrix_each_subject(
   fit,
   t_start = 0,
-  t_end = NULL,
-  data = NULL
+  t_out = NULL,
+  data = NULL,
+  ...
 )
 }
 \arguments{
 \item{fit}{A \code{\link{MultistateModelFit}} object}
 
-\item{t_start}{Initial time.}
+\item{t_start}{Initial time}
 
-\item{t_end}{End time.}
+\item{t_out}{End times (vector)}
 
-\item{data}{A \code{\link{JointData}} object. If \code{NULL}, the
-data used to fit the model is used. If not \code{NULL}, out-of-sample
-mode is assumed (new subjects).}
+\item{...}{Arguments passed to \code{deSolve::ode()}.}
 }
 \value{
-For each subject and each draw, a matrix \code{P} where
-\code{P[i,j]} is the probability that the system will be in state
-\code{j} at time \code{t_end}
-given that it is in state \code{i} at time \code{t_start}
+A list with
+\itemize{
+  \item A 4-dimensional array \code{P} where \code{P[n,,,]} is the
+    \code{P} matrix returned by \code{\link{solve_trans_prob_matrix}} for
+    subject-draw combination \code{n}
+   \item Index data frame
+   \item The numeric vector \code{t_out}
+ }
 }
 \description{
-Solve transition probabilities for each subject in 'MultistateModelFit'
+Solve transition probability matrices for each subject and draw in
+'MultistateModelFit'
 }
