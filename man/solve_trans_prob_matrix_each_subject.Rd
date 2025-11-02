@@ -25,10 +25,10 @@ solve_trans_prob_matrix_each_subject(
 \value{
 A list with
 \itemize{
-  \item A 4-dimensional array \code{P} where \code{P[n,,,]} is the
-    \code{P} matrix returned by \code{\link{solve_trans_prob_matrix}} for
-    subject-draw combination \code{n}
-   \item Index data frame
+  \item A 4-dimensional \code{rvar} array \code{P} where \code{P[n,k,,]} is the
+    transition matrix for subject \code{n} at the \code{k}th output time
+    point
+   \item Subject ids in the same order as in the first dimension of \code{P}
    \item The numeric vector \code{t_out}
  }
 }

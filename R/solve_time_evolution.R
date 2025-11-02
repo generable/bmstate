@@ -81,10 +81,10 @@ solve_trans_prob_matrix <- function(system, t_out, log_w0, w = NULL,
 #' @param ... Arguments passed to \code{deSolve::ode()}.
 #' @return A list with
 #' \itemize{
-#'   \item A 4-dimensional array \code{P} where \code{P[n,,,]} is the
-#'     \code{P} matrix returned by \code{\link{solve_trans_prob_matrix}} for
-#'     subject-draw combination \code{n}
-#'    \item Index data frame
+#'   \item A 4-dimensional \code{rvar} array \code{P} where \code{P[n,k,,]} is the
+#'     transition matrix for subject \code{n} at the \code{k}th output time
+#'     point
+#'    \item Subject ids in the same order as in the first dimension of \code{P}
 #'    \item The numeric vector \code{t_out}
 #'  }
 solve_trans_prob_matrix_each_subject <- function(fit, t_start = 0, t_out = NULL,
@@ -101,20 +101,28 @@ solve_trans_prob_matrix_each_subject <- function(fit, t_start = 0, t_out = NULL,
   sd <- msmfit_stan_data(fit, data)
   N <- sd$N_sub
   d <- msmfit_inst_hazard_param_draws(fit, data)
-  NS <- nrow(d$df)
-  pb <- progress::progress_bar$new(total = NS)
-  S <- sys$num_states()
+  pb <- progress::progress_bar$new(total = N)
+  L <- sys$num_states()
   K <- length(t_out)
-  A <- array(0, dim = c(NS, K, S, S))
-  for (j in seq_len(NS)) {
+  A <- array(0, dim = c(S, N, K, L, L))
+  subs <- unique(d$df$subject_id)
+  n <- 0
+  messag("calling solve_trans_prob_matrix() ", N, " x ", S, "times")
+  for (sid in subs) {
+    n <- n + 1
     pb$tick()
-    wj <- d$w[j, , ]
-    if (is.null(dim(wj))) {
-      wj <- matrix(wj, 1, length(wj))
+    rows <- which(d$df$subject_id == sid)
+    r <- 0
+    for (j in rows) {
+      r <- r + 1
+      wj <- d$w[j, , ]
+      if (is.null(dim(wj))) {
+        wj <- matrix(wj, 1, length(wj))
+      }
+      A[r, n, , , ] <- solve_trans_prob_matrix(
+        sys, t_out, d$log_w0[j, ], wj, d$log_m[j, ], t_start, ...
+      )
     }
-    A[j, , , ] <- solve_trans_prob_matrix(
-      sys, t_out, d$log_w0[j, ], wj, d$log_m[j, ], t_start, ...
-    )
   }
-  list(P = A, index_df = d$df, t_out = t_out)
+  list(P = posterior::rvar(A), subject_ids = subs, t_out = t_out)
 }
