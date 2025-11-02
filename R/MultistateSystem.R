@@ -407,3 +407,78 @@ bspline_basis <- function(t, k, knots, BK) {
     Boundary.knots = BK
   )
 }
+
+#' Solve the Kolmogorov forward equation of a Markovian multistate system
+#'
+#' @export
+#' @param system A \code{\link{MultistateSystem}}
+#' @param t A time grid
+#' @param w An array of shape \code{n_trans} x \code{n_weights}
+#' @param log_w0 A vector of length \code{n_trans}
+#' @param log_m A vector of length \code{n_trans}
+#' @param ... Arguments passed to \code{deSolve::ode()}.
+#' @return Value given by \code{deSolve::ode()}.
+solve_time_evolution <- function(system, t, log_w0, w = NULL, log_m = NULL,
+                                 ...) {
+  checkmate::assert_class(system, "MultistateSystem")
+  S <- system$num_states()
+  H <- system$num_trans()
+  W <- system$num_weights()
+  if (is.null(w)) {
+    w <- matrix(0, H, W)
+  }
+  if (is.null(log_m)) {
+    log_m <- rep(0, H)
+  }
+  checkmate::assert_numeric(t, min.len = 1)
+  checkmate::assert_matrix(w, ncols = W, nrows = H)
+  checkmate::assert_numeric(log_w0, len = H)
+  checkmate::assert_numeric(log_m, len = H)
+
+  odefun <- function(time, y, parms) {
+    P <- matrix(y, S, S)
+    Lambda <- system$intensity_matrix(time, log_w0, w, log_m)
+    dydt <- as.vector(P %*% Lambda)
+    list(dydt)
+  }
+  P0 <- diag(1, S, S)
+  y0 <- as.vector(P0)
+  deSolve::ode(y0, t, odefun, NULL, method = "ode45", ...)
+}
+
+#' Solve the transition probability matrix for each given output time
+#'
+#' @export
+#' @param system A \code{\link{MultistateSystem}}
+#' @param log_w0 A vector of length \code{n_trans}
+#' @param t_start Initial time
+#' @param t_out End times (vector)
+#' @param w An array of shape \code{n_trans} x \code{n_weights}
+#' @param log_m A vector of length \code{n_trans}
+#' @param ... Arguments passed to \code{deSolve::ode()}.
+#' @return An array \code{P} where \code{P[k,i,j]} is the probability that
+#' the system will be in state \code{j} at the \code{k}th time point of
+#' \code{t_out} given that it is in state \code{i} at time \code{t_start}.
+solve_trans_prob_matrix <- function(system, t_out, log_w0, w = NULL,
+                                    log_m = NULL, t_start = 0,
+                                    ...) {
+  checkmate::assert_class(system, "MultistateSystem")
+  checkmate::assert_numeric(t_out)
+  K <- length(t_out)
+  checkmate::assert_number(t_start, lower = 0)
+  H <- system$num_trans()
+  W <- system$num_weights()
+  S <- system$num_states()
+  if (is.null(w)) {
+    w <- matrix(0, H, W)
+  }
+  if (is.null(log_m)) {
+    log_m <- rep(0, H)
+  }
+  kfe <- solve_time_evolution(system, t_out, log_w0, w, log_m, ...)
+  P <- array(0, dim = c(K, S, S))
+  for (k in seq_len(K)) {
+    P[k, , ] <- matrix(kfe[k, 2:ncol(kfe)], S, S)
+  }
+  P
+}

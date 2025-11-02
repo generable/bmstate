@@ -80,7 +80,7 @@ test_that("entire workflow works", {
   pes1 <- p_state_visit_per_subject(p_mfit, ev)
 
   # Test that solving time evolution with single draw works
-  tp2 <- solve_trans_prob_fit(mfit)
+  tp2 <- solve_trans_prob_matrix_each_subject(mfit)
   expect_true(is.numeric(tp2$Diseased))
   expect_equal(nrow(tp2), nrow(pes1))
 

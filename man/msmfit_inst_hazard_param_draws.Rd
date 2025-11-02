@@ -4,14 +4,18 @@
 \alias{msmfit_inst_hazard_param_draws}
 \title{Extract and reshape draws of instant hazard related parameters}
 \usage{
-msmfit_inst_hazard_param_draws(fit, data = NULL)
+msmfit_inst_hazard_param_draws(fit, oos, data = NULL)
 }
 \arguments{
 \item{fit}{A \code{\link{MultistateModelFit}} object}
 
+\item{oos}{Out-of-sample mode? If \code{FALSE}, the \code{data} input
+should be \code{NULL}, and in this case possible, subject specific
+fitted parameters are used. If \code{TRUE}, acting
+as if the subjects are new.}
+
 \item{data}{A \code{\link{JointData}} object. If \code{NULL}, the
-data used to fit the model is used. If not \code{NULL}, out-of-sample
-mode is assumed (new subjects).}
+data used to fit the model is used.}
 }
 \value{
 a list with elements \code{log_m}, \code{log_w0}, \code{w}, each

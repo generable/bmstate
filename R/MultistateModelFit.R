@@ -243,20 +243,26 @@ mat2list <- function(mat) {
 #' @export
 #' @param fit A \code{\link{MultistateModelFit}} object
 #' @param data A \code{\link{JointData}} object. If \code{NULL}, the
-#' data used to fit the model is used. If not \code{NULL}, out-of-sample
-#' mode is assumed (new subjects).
+#' data used to fit the model is used.
+#' @param oos Out-of-sample mode? If \code{FALSE}, the \code{data} input
+#' should be \code{NULL}, and in this case possible, subject specific
+#' fitted parameters are used. If \code{TRUE}, acting
+#' as if the subjects are new.
 #' @return A list with length equal to number of draws.
-msmfit_pk_params <- function(fit, data = NULL) {
-  oos_mode <- is.null(data)
+msmfit_pk_params <- function(fit, oos, data = NULL) {
+  oos_mode <- checkmate::assert_logical(oos, len = 1)
   sd <- msmfit_stan_data(fit, data)
   S <- fit$num_draws()
 
   # Extract
   log_mu <- fit$get_draws_of("log_mu_pk")
   log_sig <- fit$get_draws_of("log_sig_pk")
-  if (oos_mode) {
+  if (oos) {
     log_z <- fit$get_draws_of("log_z_pk")
   } else {
+    if (!is.null(data)) {
+      stop("data should be NULL if oos = FALSE")
+    }
     log_z <- array(0, dim = c(S, 1, sd$N_sub, 3))
   }
   get_beta <- function(fit, name) {
@@ -296,10 +302,10 @@ msmfit_pk_params <- function(fit, data = NULL) {
 #'
 #' @export
 #' @inheritParams msmfit_pk_params
-msmfit_exposure <- function(fit, data = NULL) {
+msmfit_exposure <- function(fit, oos, data = NULL) {
   # Get draws
   sd <- msmfit_stan_data(fit, data)
-  pkpar <- msmfit_pk_params(fit, data)
+  pkpar <- msmfit_pk_params(fit, oos, data)
 
   # Call exposed Stan function
   S <- fit$num_draws()
@@ -322,12 +328,12 @@ msmfit_exposure <- function(fit, data = NULL) {
 #' @inheritParams msmfit_pk_params
 #' @return A list of length \code{n_draws} where each element is a
 #' matrix of shape \code{n_subject} x \code{n_transitions}
-msmfit_log_hazard_multipliers <- function(fit, data = NULL) {
+msmfit_log_hazard_multipliers <- function(fit, oos, data = NULL) {
   fit$assert_hazard_fit()
 
   # Get draws
   sd <- msmfit_stan_data(fit, data)
-  auc <- msmfit_exposure(fit, data)
+  auc <- msmfit_exposure(fit, oos, data)
   S <- fit$num_draws()
   beta_oth <- fit$get_draws_of("beta_oth")
   if (is.null(beta_oth)) {
@@ -419,10 +425,10 @@ msmfit_log_baseline_hazard <- function(fit, t = NULL) {
 #' @return a list with elements \code{log_m}, \code{log_w0}, \code{w}, each
 #' of which is an array where the first dimension is the number of subjects times
 #' the number of draws
-msmfit_inst_hazard_param_draws <- function(fit, data = NULL) {
+msmfit_inst_hazard_param_draws <- function(fit, oos, data = NULL) {
   fit$assert_hazard_fit()
   sd <- msmfit_stan_data(fit, data)
-  log_m <- msmfit_log_hazard_multipliers(fit, data)
+  log_m <- msmfit_log_hazard_multipliers(fit, oos, data)
   if (is.null(data)) {
     data <- fit$data
   }
@@ -463,20 +469,20 @@ msmfit_inst_hazard_param_draws <- function(fit, data = NULL) {
 #' time of the model is used.
 #' @param n_rep Number of repeats per draw.
 #' @return A \code{\link{PathData}} object.
-generate_paths <- function(fit, t_start = 0, t_max = NULL, n_rep = 10,
+generate_paths <- function(fit, oos, t_start = 0, t_max = NULL, n_rep = 10,
                            data = NULL) {
   fit$assert_hazard_fit()
   checkmate::assert_class(fit, "MultistateModelFit")
   checkmate::assert_integerish(n_rep, lower = 1, len = 1)
   sd <- msmfit_stan_data(fit, data)
-  log_m <- msmfit_log_hazard_multipliers(fit, data)
+  log_m <- msmfit_log_hazard_multipliers(fit, oos, data)
 
   # Get and reshape draws and state vector at t_start
   sys <- fit$model$system
   S <- fit$num_draws()
   N <- sd$N_sub
   message("Computing hazard multipliers and getting state vector")
-  d <- msmfit_inst_hazard_param_draws(fit, data)
+  d <- msmfit_inst_hazard_param_draws(fit, oos, data)
   init_states <- msmfit_state_at(t_start, fit, data)
   init_states <- d$df |>
     dplyr::select("subject_id") |>
@@ -521,4 +527,90 @@ generate_paths <- function(fit, t_start = 0, t_max = NULL, n_rep = 10,
     transmat = fit$model$system$tm(),
     covs = fit$model$data_covs()
   )
+}
+
+
+
+#' Solve transition probability matrices for each subject and draw in
+#' 'MultistateModelFit'
+#'
+#' @export
+#' @param fit A \code{\link{MultistateModelFit}} object
+#' @inheritParams solve_trans_prob_matrix
+#' @inheritParams msmfit_pk_params
+#' @param ... Arguments passed to \code{deSolve::ode()}.
+#' @return A list with
+#' \itemize{
+#'   \item A 4-dimensional \code{rvar} array \code{P} where \code{P[n,k,,]} is the
+#'     transition matrix for subject \code{n} at the \code{k}th output time
+#'     point
+#'    \item Subject ids in the same order as in the first dimension of \code{P}
+#'    \item The numeric vector \code{t_out}
+#'  }
+trans_prob_matrices <- function(fit, oos, t_start = 0, t_out = NULL,
+                                data = NULL, ...) {
+  checkmate::assert_class(fit, "MultistateModelFit")
+  checkmate::assert_number(t_start, lower = 0)
+  sys <- fit$model$system
+  if (is.null(t_out)) {
+    t_out <- seq(t_start, sys$get_tmax(), length.out = 30)
+  }
+
+  # Get and reshape draws
+  S <- fit$num_draws()
+  sd <- msmfit_stan_data(fit, data)
+  N <- sd$N_sub
+  d <- msmfit_inst_hazard_param_draws(fit, data)
+  pb <- progress::progress_bar$new(total = N)
+  L <- sys$num_states()
+  K <- length(t_out)
+  A <- array(0, dim = c(S, N, K, L, L))
+  subs <- unique(d$df$subject_id)
+  n <- 0
+  message("calling solve_trans_prob_matrix ", N, " x ", S, " times")
+  for (sid in subs) {
+    n <- n + 1
+    pb$tick()
+    rows <- which(d$df$subject_id == sid)
+    r <- 0
+    for (j in rows) {
+      r <- r + 1
+      wj <- d$w[j, , ]
+      if (is.null(dim(wj))) {
+        wj <- matrix(wj, 1, length(wj))
+      }
+      A[r, n, , , ] <- solve_trans_prob_matrix(
+        sys, t_out, d$log_w0[j, ], wj, d$log_m[j, ], t_start, ...
+      )
+    }
+  }
+  list(P = posterior::rvar(A), subject_ids = subs, t_out = t_out)
+}
+
+#' Solve state occupancy probabilities for each subject and draw in
+#' 'MultistateModelFit'
+#'
+#' @param fit A \code{\link{MultistateModelFit}} object
+#' @inheritParams trans_prob_matrices
+#' @param ... Arguments passed to \code{deSolve::ode()}.
+#' @return A list with
+#' \itemize{
+#'   \item A 4-dimensional \code{rvar} array \code{P} where \code{P[n,k,,]} is the
+#'     transition matrix for subject \code{n} at the \code{k}th output time
+#'     point
+#'    \item Subject ids in the same order as in the first dimension of \code{P}
+#'    \item The numeric vector \code{t_out}
+#'  }
+p_state_occupancy <- function(fit, oos, t_start = 0, t_out = NULL,
+                              data = NULL, ...) {
+  if (is.null(data)) {
+    data <- fit$data
+  } else {
+    checkmate::assert_class(data, "JointData")
+  }
+  init_states <- msmfit_state_at(t_start, fit, data)
+  df_start <- d$df |>
+    dplyr::select("subject_id") |>
+    dplyr::left_join(init_states, by = "subject_id") |>
+    dplyr::pull(.data$state)
 }

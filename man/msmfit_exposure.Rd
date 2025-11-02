@@ -4,14 +4,18 @@
 \alias{msmfit_exposure}
 \title{Compute exposure}
 \usage{
-msmfit_exposure(fit, data = NULL)
+msmfit_exposure(fit, oos, data = NULL)
 }
 \arguments{
 \item{fit}{A \code{\link{MultistateModelFit}} object}
 
+\item{oos}{Out-of-sample mode? If \code{FALSE}, the \code{data} input
+should be \code{NULL}, and in this case possible, subject specific
+fitted parameters are used. If \code{TRUE}, acting
+as if the subjects are new.}
+
 \item{data}{A \code{\link{JointData}} object. If \code{NULL}, the
-data used to fit the model is used. If not \code{NULL}, out-of-sample
-mode is assumed (new subjects).}
+data used to fit the model is used.}
 }
 \description{
 Compute exposure
