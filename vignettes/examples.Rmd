@@ -63,7 +63,7 @@ Then we create a `MultistateModel` using this graph.
 
 ```{r}
 tmax <- 3 * 365.25
-mod <- create_msm(tm, tmax = tmax)
+mod <- create_msm(tm, t_max = tmax)
 print(mod)
 ```
 
@@ -118,7 +118,7 @@ The transition matrix is for a competing risks model can be created like so.
 tm <- transmat_comprisk()
 print(tm)
 tm$plot()
-mod <- create_msm(tm, tmax = tmax)
+mod <- create_msm(tm, t_max = tmax)
 ```
 
 This model has 3 possible transitions. 

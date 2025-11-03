@@ -61,6 +61,7 @@ mod$get_knots()
 ```{r}
 fit <- fit_stan(mod, simdat,
   chains = 1, adapt_delta = 0.975,
+  iter_warmup = 600,
   iter_sampling = 200
 )
 ```
