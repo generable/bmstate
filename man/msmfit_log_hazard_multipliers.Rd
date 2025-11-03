@@ -4,7 +4,7 @@
 \alias{msmfit_log_hazard_multipliers}
 \title{Compute log_hazard multipliers}
 \usage{
-msmfit_log_hazard_multipliers(fit, oos, data = NULL)
+msmfit_log_hazard_multipliers(fit, oos = FALSE, data = NULL)
 }
 \arguments{
 \item{fit}{A \code{\link{MultistateModelFit}} object}

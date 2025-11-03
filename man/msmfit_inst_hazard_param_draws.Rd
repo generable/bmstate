@@ -4,7 +4,7 @@
 \alias{msmfit_inst_hazard_param_draws}
 \title{Extract and reshape draws of instant hazard related parameters}
 \usage{
-msmfit_inst_hazard_param_draws(fit, oos, data = NULL)
+msmfit_inst_hazard_param_draws(fit, oos = FALSE, data = NULL)
 }
 \arguments{
 \item{fit}{A \code{\link{MultistateModelFit}} object}

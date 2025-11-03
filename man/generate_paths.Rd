@@ -4,7 +4,14 @@
 \alias{generate_paths}
 \title{Path generation for 'MultistateModelFit'}
 \usage{
-generate_paths(fit, oos, t_start = 0, t_max = NULL, n_rep = 10, data = NULL)
+generate_paths(
+  fit,
+  oos = FALSE,
+  t_start = 0,
+  t_max = NULL,
+  n_rep = 10,
+  data = NULL
+)
 }
 \arguments{
 \item{fit}{A \code{\link{MultistateModelFit}} object}

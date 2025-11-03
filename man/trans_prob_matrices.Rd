@@ -5,7 +5,14 @@
 \title{Solve transition probability matrices for each subject and draw in
 'MultistateModelFit'}
 \usage{
-trans_prob_matrices(fit, oos, t_start = 0, t_out = NULL, data = NULL, ...)
+trans_prob_matrices(
+  fit,
+  oos = FALSE,
+  t_start = 0,
+  t_out = NULL,
+  data = NULL,
+  ...
+)
 }
 \arguments{
 \item{fit}{A \code{\link{MultistateModelFit}} object}

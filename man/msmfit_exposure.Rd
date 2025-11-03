@@ -4,7 +4,7 @@
 \alias{msmfit_exposure}
 \title{Compute exposure}
 \usage{
-msmfit_exposure(fit, oos, data = NULL)
+msmfit_exposure(fit, oos = FALSE, data = NULL)
 }
 \arguments{
 \item{fit}{A \code{\link{MultistateModelFit}} object}

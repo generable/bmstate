@@ -222,7 +222,7 @@ msmfit_stan_data <- function(fit, data = NULL) {
 }
 
 # Helper
-msmfit_state_at <- function(t, fit, data = NULL) {
+msmfit_state_at <- function(t, fit, data) {
   checkmate::assert_class(fit, "MultistateModelFit")
   if (is.null(data)) {
     data <- fit$data
@@ -249,8 +249,8 @@ mat2list <- function(mat) {
 #' fitted parameters are used. If \code{TRUE}, acting
 #' as if the subjects are new.
 #' @return A list with length equal to number of draws.
-msmfit_pk_params <- function(fit, oos, data = NULL) {
-  oos_mode <- checkmate::assert_logical(oos, len = 1)
+msmfit_pk_params <- function(fit, oos = FALSE, data = NULL) {
+  check_oos(oos, data)
   sd <- msmfit_stan_data(fit, data)
   S <- fit$num_draws()
 
@@ -302,7 +302,9 @@ msmfit_pk_params <- function(fit, oos, data = NULL) {
 #'
 #' @export
 #' @inheritParams msmfit_pk_params
-msmfit_exposure <- function(fit, oos, data = NULL) {
+msmfit_exposure <- function(fit, oos = FALSE, data = NULL) {
+  check_oos(oos, data)
+
   # Get draws
   sd <- msmfit_stan_data(fit, data)
   pkpar <- msmfit_pk_params(fit, oos, data)
@@ -322,14 +324,24 @@ msmfit_exposure <- function(fit, oos, data = NULL) {
 }
 
 
+check_oos <- function(oos, data) {
+  checkmate::assert_logical(oos, len = 1)
+  if (!is.null(data)) {
+    if (isFALSE(oos)) {
+      stop("data was not NULL, oos must be TRUE")
+    }
+  }
+}
+
 #' Compute log_hazard multipliers
 #'
 #' @export
 #' @inheritParams msmfit_pk_params
 #' @return A list of length \code{n_draws} where each element is a
 #' matrix of shape \code{n_subject} x \code{n_transitions}
-msmfit_log_hazard_multipliers <- function(fit, oos, data = NULL) {
+msmfit_log_hazard_multipliers <- function(fit, oos = FALSE, data = NULL) {
   fit$assert_hazard_fit()
+  check_oos(oos, data)
 
   # Get draws
   sd <- msmfit_stan_data(fit, data)
@@ -425,14 +437,12 @@ msmfit_log_baseline_hazard <- function(fit, t = NULL) {
 #' @return a list with elements \code{log_m}, \code{log_w0}, \code{w}, each
 #' of which is an array where the first dimension is the number of subjects times
 #' the number of draws
-msmfit_inst_hazard_param_draws <- function(fit, oos, data = NULL) {
+msmfit_inst_hazard_param_draws <- function(fit, oos = FALSE, data = NULL) {
   fit$assert_hazard_fit()
+  check_oos(oos, data)
   sd <- msmfit_stan_data(fit, data)
   log_m <- msmfit_log_hazard_multipliers(fit, oos, data)
-  if (is.null(data)) {
-    data <- fit$data
-  }
-  sdf <- data$paths$subject_df
+
   S <- fit$num_draws()
   N <- sd$N_sub
   w <- fit$get_draws_of("weights")
@@ -442,10 +452,18 @@ msmfit_inst_hazard_param_draws <- function(fit, oos, data = NULL) {
   w_rep <- abind::abind(replicate(N, w, simplify = FALSE), along = 1)
   log_w0_rep <- abind::abind(replicate(N, log_w0, simplify = FALSE), along = 1)
   log_m_reshaped <- do.call(rbind, log_m)
+
+  # Subject-draw df
+  if (is.null(data)) {
+    data <- fit$data
+  }
+  sdf <- data$paths$subject_df
   df <- data.frame(
     subject_id = rep(sdf$subject_id, times = S),
     draw_index = rep(seq_len(S), each = N)
   )
+
+  # Return
   list(
     log_m = log_m_reshaped,
     log_w0 = log_w0_rep,
@@ -469,9 +487,10 @@ msmfit_inst_hazard_param_draws <- function(fit, oos, data = NULL) {
 #' time of the model is used.
 #' @param n_rep Number of repeats per draw.
 #' @return A \code{\link{PathData}} object.
-generate_paths <- function(fit, oos, t_start = 0, t_max = NULL, n_rep = 10,
+generate_paths <- function(fit, oos = FALSE, t_start = 0, t_max = NULL, n_rep = 10,
                            data = NULL) {
   fit$assert_hazard_fit()
+  check_oos(oos, data)
   checkmate::assert_class(fit, "MultistateModelFit")
   checkmate::assert_integerish(n_rep, lower = 1, len = 1)
   sd <- msmfit_stan_data(fit, data)
@@ -481,7 +500,7 @@ generate_paths <- function(fit, oos, t_start = 0, t_max = NULL, n_rep = 10,
   sys <- fit$model$system
   S <- fit$num_draws()
   N <- sd$N_sub
-  message("Computing hazard multipliers and getting state vector")
+  message("Computing hazard multipliers and getting state vector at t_start")
   d <- msmfit_inst_hazard_param_draws(fit, oos, data)
   init_states <- msmfit_state_at(t_start, fit, data)
   init_states <- d$df |>
@@ -547,8 +566,9 @@ generate_paths <- function(fit, oos, t_start = 0, t_max = NULL, n_rep = 10,
 #'    \item Subject ids in the same order as in the first dimension of \code{P}
 #'    \item The numeric vector \code{t_out}
 #'  }
-trans_prob_matrices <- function(fit, oos, t_start = 0, t_out = NULL,
+trans_prob_matrices <- function(fit, oos = FALSE, t_start = 0, t_out = NULL,
                                 data = NULL, ...) {
+  check_oos(oos, data)
   checkmate::assert_class(fit, "MultistateModelFit")
   checkmate::assert_number(t_start, lower = 0)
   sys <- fit$model$system
@@ -560,7 +580,7 @@ trans_prob_matrices <- function(fit, oos, t_start = 0, t_out = NULL,
   S <- fit$num_draws()
   sd <- msmfit_stan_data(fit, data)
   N <- sd$N_sub
-  d <- msmfit_inst_hazard_param_draws(fit, data)
+  d <- msmfit_inst_hazard_param_draws(fit, oos, data)
   pb <- progress::progress_bar$new(total = N)
   L <- sys$num_states()
   K <- length(t_out)
@@ -601,13 +621,9 @@ trans_prob_matrices <- function(fit, oos, t_start = 0, t_out = NULL,
 #'    \item Subject ids in the same order as in the first dimension of \code{P}
 #'    \item The numeric vector \code{t_out}
 #'  }
-p_state_occupancy <- function(fit, oos, t_start = 0, t_out = NULL,
+p_state_occupancy <- function(fit, oos = FALSE, t_start = 0, t_out = NULL,
                               data = NULL, ...) {
-  if (is.null(data)) {
-    data <- fit$data
-  } else {
-    checkmate::assert_class(data, "JointData")
-  }
+  check_oos(oos, data)
   init_states <- msmfit_state_at(t_start, fit, data)
   df_start <- d$df |>
     dplyr::select("subject_id") |>

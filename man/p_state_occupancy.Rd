@@ -5,7 +5,14 @@
 \title{Solve state occupancy probabilities for each subject and draw in
 'MultistateModelFit'}
 \usage{
-p_state_occupancy(fit, oos, t_start = 0, t_out = NULL, data = NULL, ...)
+p_state_occupancy(
+  fit,
+  oos = FALSE,
+  t_start = 0,
+  t_out = NULL,
+  data = NULL,
+  ...
+)
 }
 \arguments{
 \item{fit}{A \code{\link{MultistateModelFit}} object}

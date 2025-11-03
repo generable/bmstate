@@ -4,7 +4,7 @@
 \alias{msmfit_pk_params}
 \title{Evaluate PK parameters}
 \usage{
-msmfit_pk_params(fit, oos, data = NULL)
+msmfit_pk_params(fit, oos = FALSE, data = NULL)
 }
 \arguments{
 \item{fit}{A \code{\link{MultistateModelFit}} object}
