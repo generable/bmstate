@@ -39,10 +39,11 @@ The version update can be done with `usethis::use_version()`.
 
 When starting a new feature or a bug fix, create a branch off the `develop` branch. The version in the `development` branch should be
 something like `MAJOR.MINOR.PATCH.9000` where `MAJOR.MINOR.PATCH` is the version that exists in the `main` branch. This increment can be done with `usethis::use_dev_version()`.
-When finishing the edits, create a PR to `develop`. Before the `develop` branch is merged to `main`, the patch version should be incremented. Also, check that
+When finishing the edits, create a PR to `develop`. Before the `develop` branch is merged to `main`, the patch version should be incremented. Also, make sure to run
 
-- You run `styler::style_dir()` in the package root directory.
-- `R CMD check` passes
+- `styler::style_dir()` in the package root directory.
+- `devtools::document()`
+- `R CMD check`
 
 ### Known issues in R CMD check
 
