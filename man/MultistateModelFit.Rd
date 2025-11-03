@@ -204,6 +204,7 @@ Plot PK fit.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModelFit$plot_pk(
   max_num_subjects = 12,
+  oos = FALSE,
   data = NULL,
   L = 100,
   timescale = 24,
@@ -216,6 +217,9 @@ Plot PK fit.
 \describe{
 \item{\code{max_num_subjects}}{Max number of subjects to show.}
 
+\item{\code{oos}}{Out-of-sample subjects?
+Plot baseline hazard distribution}
+
 \item{\code{data}}{Data for which to predict the concentration. If \code{NULL},
 training data is used.}
 
@@ -223,8 +227,7 @@ training data is used.}
 
 \item{\code{timescale}}{scale of time}
 
-\item{\code{n_prev}}{number of previous doses to show fit for
-Plot baseline hazard distribution}
+\item{\code{n_prev}}{number of previous doses to show fit for}
 }
 \if{html}{\out{</div>}}
 }

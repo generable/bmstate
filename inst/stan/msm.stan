@@ -304,11 +304,13 @@ data {
   array[N_int] int<lower=1,upper=N_sub> idx_sub; // which subject is interval for
   int<lower=1> N_grid;      // number of integration grid points
   real<lower=0> delta_grid; // grid step size
-  vector<lower=0>[N_int] correction_multiplier;
 
   // which value in t_grid does each t_start and t_end time correspond to
   array[N_int] int<lower=1,upper=N_grid> t_start_idx_m1;
   array[N_int] int<lower=2,upper=N_grid+1> t_end_idx;
+
+  // how much we need to "correct" the integral for each interval
+  vector<lower=0>[N_int] correction_multiplier;
 
   // Transitions / intervals data
   int<lower=1> N_trans; // number of possible transitions

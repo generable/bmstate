@@ -12,7 +12,7 @@ fit_stan(
   set_auc_normalizers = TRUE,
   filepath = NULL,
   return_stanfit = FALSE,
-  pathfinder = FALSE,
+  method = "sample",
   ...
 )
 }
@@ -31,10 +31,12 @@ fit_stan(
 
 \item{return_stanfit}{Return also the raw 'Stan' fit object?}
 
-\item{pathfinder}{Use pathfinder instead of MCMC?}
+\item{method}{Must be one of \code{"sample"} (default),
+\code{"pathfinder"} or \code{"optimize"}.}
 
-\item{...}{Arguments passed to the \code{sample} or \code{pathfinder}
-method of the CmdStanR' model.}
+\item{...}{Arguments passed to the \code{sample},
+\code{pathfinder} or \code{optimize}
+method of the 'CmdStanR' model.}
 }
 \value{
 A \code{\link{MultistateModelFit}} object.

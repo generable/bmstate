@@ -20,6 +20,10 @@ test_that("entire workflow works", {
   expect_true(inherits(jd$test, "JointData"))
   expect_equal(jd$test$paths$n_paths(), options$N_subject * 0.25)
 
+  # Test covariates
+  a <- potential_covariates(jd$train$paths)
+  expect_equal(colnames(a), c("pval", "target_state", "covariate"))
+
   # CoxPH fit
   cph <- jd$train$paths$fit_coxph(covariates = mod$covs())
   msf <- jd$train$paths$fit_mstate()
@@ -30,7 +34,7 @@ test_that("entire workflow works", {
     refresh = 5,
     init = 0.1,
     return_stanfit = TRUE,
-    pathfinder = TRUE,
+    method = "pathfinder",
     draws = options$iter_sampling
   )
   fit <- a$fit
@@ -38,11 +42,11 @@ test_that("entire workflow works", {
 
   # Computing hazard multipliers
   log_m <- msmfit_log_hazard_multipliers(fit)
-  log_m_test <- msmfit_log_hazard_multipliers(fit, data = jd$test)
+  log_m_test <- msmfit_log_hazard_multipliers(fit, oos = TRUE, data = jd$test)
 
   # Path generation
   p <- generate_paths(fit, n_rep = 3)
-  p_oos <- generate_paths(fit, n_rep = 3, data = jd$test)
+  p_oos <- generate_paths(fit, n_rep = 3, oos = TRUE, data = jd$test)
 
   # Path generation starting from later time
   p1 <- generate_paths(fit, n_rep = 3, t_start = 600)
@@ -76,9 +80,9 @@ test_that("entire workflow works", {
   pes1 <- p_state_visit_per_subject(p_mfit, ev)
 
   # Test that solving time evolution with single draw works
-  tp2 <- solve_trans_prob_fit(mfit)
-  expect_true(is.numeric(tp2$Diseased))
-  expect_equal(nrow(tp2), nrow(pes1))
+  tp2 <- p_state_occupancy(mfit)
+  pp <- plot_state_occupancy(tp2)
+  expect_true(is_ggplot(pp))
 
   # Single-transition model
   tds <- as_single_event(jd$train$paths, event = ev)
@@ -94,8 +98,9 @@ test_that("entire workflow works", {
     return_stanfit = TRUE
   )
   fit_tte <- a$fit$mean_fit()
-  r <- solve_trans_prob_fit(fit_tte)
-  expect_equal(nrow(r), 75)
+  r <- p_state_occupancy(fit_tte)
+  pp <- plot_state_occupancy(r)
+  expect_true(is_ggplot(pp))
 })
 
 
@@ -129,28 +134,28 @@ test_that("entire workflow works (with PK)", {
 
   # PK params
   pkpar <- msmfit_pk_params(fit)
-  pkpar_oos <- msmfit_pk_params(fit, jd$test)
+  pkpar_oos <- msmfit_pk_params(fit, oos = TRUE, data = jd$test)
   expect_true(length(pkpar) == 1)
   expect_true(length(pkpar_oos) == 1)
 
   # Hazard multipliers
   log_m <- msmfit_log_hazard_multipliers(fit)
-  log_m_test <- msmfit_log_hazard_multipliers(fit, jd$test)
+  log_m_test <- msmfit_log_hazard_multipliers(fit, oos = TRUE, jd$test)
   N_sub_test <- length(jd$test$paths$unique_subjects())
   H <- mod$system$num_trans()
   expect_equal(dim(log_m_test[[1]]), c(N_sub_test, H))
 
-  # Path prediction
+  # Path simulation
   p <- generate_paths(fit)
-  p_oos <- generate_paths(fit, data = jd$test)
-  P <- solve_trans_prob_fit(fit)
-  P_oos <- solve_trans_prob_fit(fit, data = jd$test)
-  expect_equal(nrow(P), 75)
-  expect_equal(nrow(P_oos), 25)
+  p_oos <- generate_paths(fit, oos = TRUE, data = jd$test)
+  P <- p_state_occupancy(fit)
+  P_oos <- p_state_occupancy(fit, oos = TRUE, data = jd$test)
+  expect_equal(nrow(P), 75 * 2 * 30)
+  expect_equal(nrow(P_oos), 25 * 2 * 30)
 
   # PK fit plot
   pf1 <- fit$plot_pk()
-  pf2 <- fit$plot_pk(data = jd$test)
+  pf2 <- fit$plot_pk(oos = TRUE, data = jd$test)
   expect_true(is_ggplot(pf1))
   expect_true(is_ggplot(pf2))
 })
@@ -168,7 +173,7 @@ test_that("entire workflow works (with single transition PK)", {
     CL = "CrCL",
     V2 = c("weight", "sex")
   )
-  mod <- create_msm(tm, covs, pk_covs, num_knots = 5, tmax = t3yr)
+  mod <- create_msm(tm, covs, pk_covs, num_knots = 5, t_max = t3yr)
   bh_true <- matrix(0, 1, 2)
   bh_true[1, 1] <- 0.5 # age effect on death
   bh_true[1, 2] <- -0.5 # dose effect on death
@@ -209,17 +214,13 @@ test_that("entire workflow works (with single transition PK)", {
 
   # PK params
   pkpar <- msmfit_pk_params(fit)
-  pkpar_oos <- msmfit_pk_params(fit, jd$test)
-  expect_true(length(pkpar) == 1)
-  expect_true(length(pkpar_oos) == 1)
-  pkpar <- msmfit_pk_params(fit)
-  pkpar_oos <- msmfit_pk_params(fit, jd$test)
+  pkpar_oos <- msmfit_pk_params(fit, oos = TRUE, jd$test)
   expect_true(length(pkpar) == 1)
   expect_true(length(pkpar_oos) == 1)
 
   # Hazard multipliers
   log_m <- msmfit_log_hazard_multipliers(fit)
-  log_m_test <- msmfit_log_hazard_multipliers(fit, jd$test)
+  log_m_test <- msmfit_log_hazard_multipliers(fit, oos = TRUE, data = jd$test)
   N_sub_test <- length(jd$test$paths$unique_subjects())
   H <- mod$system$num_trans()
   expect_equal(dim(log_m_test[[1]]), c(N_sub_test, H))
@@ -256,13 +257,13 @@ test_that("PK-only works", {
 
   # PK params
   pkpar <- msmfit_pk_params(fit)
-  pkpar_oos <- msmfit_pk_params(fit, jd$test)
+  pkpar_oos <- msmfit_pk_params(fit, oos = TRUE, data = jd$test)
   expect_true(length(pkpar) == 1)
   expect_true(length(pkpar_oos) == 1)
 
   # PK fit plot
   pf1 <- fit$plot_pk()
-  pf2 <- fit$plot_pk(data = jd$test)
+  pf2 <- fit$plot_pk(data = jd$test, oos = TRUE)
   expect_true(is_ggplot(pf1))
   expect_true(is_ggplot(pf2))
 })

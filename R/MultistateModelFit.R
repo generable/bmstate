@@ -122,14 +122,16 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
     #' @param L number of grid points for each subject
     #' @param timescale scale of time
     #' @param n_prev number of previous doses to show fit for
-    plot_pk = function(max_num_subjects = 12, data = NULL, L = 100,
+    #' @param oos Out-of-sample subjects?
+    plot_pk = function(max_num_subjects = 12, oos = FALSE, data = NULL, L = 100,
                        timescale = 24, n_prev = 3) {
+      check_oos(oos, data)
       checkmate::assert_integerish(L, len = 1)
+      pkpar <- msmfit_pk_params(self, oos, data = data)
+      theta <- pkpar[[1]]
       if (is.null(data)) {
         data <- self$data
       }
-      pkpar <- msmfit_pk_params(self, data = data)
-      theta <- pkpar[[1]]
       trange <- sapply(data$dosing$times, range)
       N <- nrow(theta)
       ts <- list()
@@ -222,7 +224,7 @@ msmfit_stan_data <- function(fit, data = NULL) {
 }
 
 # Helper
-msmfit_state_at <- function(t, fit, data = NULL) {
+msmfit_state_at <- function(t, fit, data) {
   checkmate::assert_class(fit, "MultistateModelFit")
   if (is.null(data)) {
     data <- fit$data
@@ -243,21 +245,23 @@ mat2list <- function(mat) {
 #' @export
 #' @param fit A \code{\link{MultistateModelFit}} object
 #' @param data A \code{\link{JointData}} object. If \code{NULL}, the
-#' data used to fit the model is used. If not \code{NULL}, out-of-sample
-#' mode is assumed (new subjects).
+#' data used to fit the model is used.
+#' @param oos Out-of-sample mode? If \code{FALSE}, the possible subject-specific
+#' fitted parameters are used. If \code{TRUE}, acting
+#' as if the subjects are new.
 #' @return A list with length equal to number of draws.
-msmfit_pk_params <- function(fit, data = NULL) {
-  oos_mode <- is.null(data)
+msmfit_pk_params <- function(fit, oos = FALSE, data = NULL) {
+  check_oos(oos, data)
   sd <- msmfit_stan_data(fit, data)
   S <- fit$num_draws()
 
   # Extract
   log_mu <- fit$get_draws_of("log_mu_pk")
   log_sig <- fit$get_draws_of("log_sig_pk")
-  if (oos_mode) {
-    log_z <- fit$get_draws_of("log_z_pk")
-  } else {
+  if (oos) {
     log_z <- array(0, dim = c(S, 1, sd$N_sub, 3))
+  } else {
+    log_z <- fit$get_draws_of("log_z_pk")
   }
   get_beta <- function(fit, name) {
     b <- fit$get_draws_of(name)
@@ -296,10 +300,12 @@ msmfit_pk_params <- function(fit, data = NULL) {
 #'
 #' @export
 #' @inheritParams msmfit_pk_params
-msmfit_exposure <- function(fit, data = NULL) {
+msmfit_exposure <- function(fit, oos = FALSE, data = NULL) {
+  check_oos(oos, data)
+
   # Get draws
   sd <- msmfit_stan_data(fit, data)
-  pkpar <- msmfit_pk_params(fit, data)
+  pkpar <- msmfit_pk_params(fit, oos, data)
 
   # Call exposed Stan function
   S <- fit$num_draws()
@@ -315,6 +321,21 @@ msmfit_exposure <- function(fit, data = NULL) {
   out
 }
 
+# Helper
+check_oos <- function(oos, data) {
+  checkmate::assert_logical(oos, len = 1)
+  if (!is.null(data)) {
+    checkmate::assert_class(data, "JointData")
+    if (isFALSE(oos)) {
+      message(
+        "data is NULL but oos is FALSE. This should be done only if",
+        " testing new covariates for the same subjects but still using ",
+        " their subject-specific (PK) parameters"
+      )
+    }
+  }
+  TRUE
+}
 
 #' Compute log_hazard multipliers
 #'
@@ -322,12 +343,13 @@ msmfit_exposure <- function(fit, data = NULL) {
 #' @inheritParams msmfit_pk_params
 #' @return A list of length \code{n_draws} where each element is a
 #' matrix of shape \code{n_subject} x \code{n_transitions}
-msmfit_log_hazard_multipliers <- function(fit, data = NULL) {
+msmfit_log_hazard_multipliers <- function(fit, oos = FALSE, data = NULL) {
   fit$assert_hazard_fit()
+  check_oos(oos, data)
 
   # Get draws
   sd <- msmfit_stan_data(fit, data)
-  auc <- msmfit_exposure(fit, data)
+  auc <- msmfit_exposure(fit, oos, data)
   S <- fit$num_draws()
   beta_oth <- fit$get_draws_of("beta_oth")
   if (is.null(beta_oth)) {
@@ -419,14 +441,12 @@ msmfit_log_baseline_hazard <- function(fit, t = NULL) {
 #' @return a list with elements \code{log_m}, \code{log_w0}, \code{w}, each
 #' of which is an array where the first dimension is the number of subjects times
 #' the number of draws
-msmfit_inst_hazard_param_draws <- function(fit, data = NULL) {
+msmfit_inst_hazard_param_draws <- function(fit, oos = FALSE, data = NULL) {
   fit$assert_hazard_fit()
+  check_oos(oos, data)
   sd <- msmfit_stan_data(fit, data)
-  log_m <- msmfit_log_hazard_multipliers(fit, data)
-  if (is.null(data)) {
-    data <- fit$data
-  }
-  sdf <- data$paths$subject_df
+  log_m <- msmfit_log_hazard_multipliers(fit, oos, data)
+
   S <- fit$num_draws()
   N <- sd$N_sub
   w <- fit$get_draws_of("weights")
@@ -436,10 +456,18 @@ msmfit_inst_hazard_param_draws <- function(fit, data = NULL) {
   w_rep <- abind::abind(replicate(N, w, simplify = FALSE), along = 1)
   log_w0_rep <- abind::abind(replicate(N, log_w0, simplify = FALSE), along = 1)
   log_m_reshaped <- do.call(rbind, log_m)
+
+  # Subject-draw df
+  if (is.null(data)) {
+    data <- fit$data
+  }
+  sdf <- data$paths$subject_df
   df <- data.frame(
     subject_id = rep(sdf$subject_id, times = S),
     draw_index = rep(seq_len(S), each = N)
   )
+
+  # Return
   list(
     log_m = log_m_reshaped,
     log_w0 = log_w0_rep,
@@ -463,20 +491,21 @@ msmfit_inst_hazard_param_draws <- function(fit, data = NULL) {
 #' time of the model is used.
 #' @param n_rep Number of repeats per draw.
 #' @return A \code{\link{PathData}} object.
-generate_paths <- function(fit, t_start = 0, t_max = NULL, n_rep = 10,
+generate_paths <- function(fit, oos = FALSE, t_start = 0, t_max = NULL, n_rep = 10,
                            data = NULL) {
   fit$assert_hazard_fit()
+  check_oos(oos, data)
   checkmate::assert_class(fit, "MultistateModelFit")
   checkmate::assert_integerish(n_rep, lower = 1, len = 1)
   sd <- msmfit_stan_data(fit, data)
-  log_m <- msmfit_log_hazard_multipliers(fit, data)
+  log_m <- msmfit_log_hazard_multipliers(fit, oos, data)
 
   # Get and reshape draws and state vector at t_start
   sys <- fit$model$system
   S <- fit$num_draws()
   N <- sd$N_sub
-  message("Computing hazard multipliers and getting state vector")
-  d <- msmfit_inst_hazard_param_draws(fit, data)
+  message("Computing hazard multipliers and getting state vector at t_start")
+  d <- msmfit_inst_hazard_param_draws(fit, oos, data)
   init_states <- msmfit_state_at(t_start, fit, data)
   init_states <- d$df |>
     dplyr::select("subject_id") |>
@@ -521,4 +550,102 @@ generate_paths <- function(fit, t_start = 0, t_max = NULL, n_rep = 10,
     transmat = fit$model$system$tm(),
     covs = fit$model$data_covs()
   )
+}
+
+#' Solve state occupancy probabilities for each subject and draw in
+#' 'MultistateModelFit'
+#'
+#' @export
+#' @param fit A \code{\link{MultistateModelFit}} object
+#' @inheritParams solve_trans_prob_matrix
+#' @inheritParams msmfit_pk_params
+#' @param t_start Start time. The results are transition probabilities to each
+#' state, evaluated at each time point of \code{t_out}, given that the
+#' that the subject is in the state they are in \code{data} at \code{t_start}.
+#' @param ... Arguments passed to \code{deSolve::ode()}.
+#' @return A data frame with columns
+#' \itemize{
+#'   \item \code{subject_id} (character)
+#'    \item \code{time} (numeric)
+#'    \item \code{state} (character)
+#'    \item \code{prob} state occupancy probability for given subject at given time
+#'  }
+#'  Note that \code{prob} is an \code{rvar} over all parameter draws.
+p_state_occupancy <- function(fit, oos = FALSE, t_start = 0, t_out = NULL,
+                              data = NULL, ...) {
+  check_oos(oos, data)
+  checkmate::assert_class(fit, "MultistateModelFit")
+  checkmate::assert_number(t_start, lower = 0)
+  init_states <- msmfit_state_at(t_start, fit, data)
+
+  sys <- fit$model$system
+  if (is.null(t_out)) {
+    t_out <- seq(t_start, sys$get_tmax(), length.out = 30)
+  }
+
+  # Get and reshape draws
+  S <- fit$num_draws()
+  sd <- msmfit_stan_data(fit, data)
+  N <- sd$N_sub
+  d <- msmfit_inst_hazard_param_draws(fit, oos, data)
+  pb <- progress::progress_bar$new(total = N)
+  L <- sys$num_states()
+  K <- length(t_out)
+  A <- array(0, dim = c(S, N, K, L))
+  subs <- unique(d$df$subject_id)
+  n <- 0
+  message("calling solve_trans_prob_matrix ", N, " x ", S, " times")
+  out <- list()
+  for (sid in subs) {
+    n <- n + 1
+    pb$tick()
+    rows <- which(d$df$subject_id == sid)
+    row2 <- which(init_states$subject_id == sid)
+    if (length(row2) != 1) {
+      stop("internal error")
+    }
+    r <- 0
+    for (j in rows) {
+      r <- r + 1
+      wj <- d$w[j, , ]
+      if (is.null(dim(wj))) {
+        wj <- matrix(wj, 1, length(wj))
+      }
+      AA <- solve_trans_prob_matrix(
+        sys, t_out, d$log_w0[j, ], wj, d$log_m[j, ], t_start, ...
+      )
+      A[r, n, , ] <- AA[, init_states$state[row2], ]
+    }
+  }
+
+  # A 3-dimensional \code{rvar} array \code{P} where \code{P[n,k,]} are the
+  # state occupancy probabilities for subject \code{n} at the \code{k}th
+  P <- posterior::rvar(A)
+
+  # Format to data frame
+  df <- NULL
+  for (s in seq_len(L)) {
+    for (k in seq_len(K)) {
+      df_sk <- data.frame(
+        subject_id = subs,
+        time = t_out[k],
+        state_idx = s,
+        prob = as.vector(P[, k, s])
+      )
+      df <- rbind(df, df_sk)
+    }
+  }
+  ss <- fit$model$system$tm()$states_df() |> dplyr::select("state_idx", "state")
+  df |> dplyr::left_join(ss, by = "state_idx")
+}
+
+#' Plot mean state occupancy probabilities over time for each subject
+#'
+#' @export
+#' @param df Data frame returned by \code{\link{p_state_occupancy}}
+plot_state_occupancy <- function(df) {
+  ggplot(df, aes(x = .data$time, group = .data$subject_id, y = mean(.data$prob))) +
+    facet_wrap(. ~ .data$state) +
+    geom_line() +
+    ylab("Mean probability")
 }

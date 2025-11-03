@@ -77,16 +77,20 @@ ensure_exposed_stan_functions <- function(...) {
 #' @param return_stanfit Return also the raw 'Stan' fit object?
 #' @param set_auc_normalizers Set AUC normalization based on SS doses.
 #' @param filepath Passed to \code{\link{create_stan_model}}.
-#' @param pathfinder Use pathfinder instead of MCMC?
-#' @param ... Arguments passed to the \code{sample} or \code{pathfinder}
-#' method of the CmdStanR' model.
+#' @param method Must be one of \code{"sample"} (default),
+#' \code{"pathfinder"} or \code{"optimize"}.
+#' @param ... Arguments passed to the \code{sample},
+#' \code{pathfinder} or \code{optimize}
+#' method of the 'CmdStanR' model.
 #' @return A \code{\link{MultistateModelFit}} object.
 fit_stan <- function(model, data, prior_only = FALSE,
                      pk_only = FALSE,
                      set_auc_normalizers = TRUE,
                      filepath = NULL,
                      return_stanfit = FALSE,
-                     pathfinder = FALSE, ...) {
+                     method = "sample", ...) {
+  checkmate::assert_character(method, len = 1, min.chars = 1)
+  checkmate::assert_choice(method, c("sample", "pathfinder", "optimize"))
   if (inherits(data, "PathData")) {
     # no dosing data, just use path data
     data <- JointData$new(data, NULL)
@@ -97,7 +101,6 @@ fit_stan <- function(model, data, prior_only = FALSE,
   checkmate::assert_logical(prior_only, len = 1)
   checkmate::assert_logical(pk_only, len = 1)
   checkmate::assert_logical(set_auc_normalizers, len = 1)
-  checkmate::assert_logical(pathfinder, len = 1)
   prefit_checks(model, data)
 
   # Get Stan model object
@@ -117,8 +120,10 @@ fit_stan <- function(model, data, prior_only = FALSE,
   sd <- create_stan_data(model, data, prior_only, pk_only)
 
   # Call 'Stan'
-  if (pathfinder) {
+  if (method == "pathfinder") {
     stan_fit <- stan_model$pathfinder(data = sd, ...)
+  } else if (method == "optimize") {
+    stan_fit <- stan_model$optimize(data = sd, ...)
   } else {
     stan_fit <- stan_model$sample(data = sd, ...)
   }
@@ -130,7 +135,7 @@ fit_stan <- function(model, data, prior_only = FALSE,
   )
   draws <- create_rv_list(stan_fit, pars)
   diag <- NULL
-  if (isFALSE(pathfinder)) {
+  if (method == "sample") {
     diag <- stan_fit$diagnostic_summary()
   }
   sfun <- function(x) x$summary()
@@ -260,7 +265,7 @@ create_stan_data_spline <- function(pd, model, delta_grid) {
   t <- dat$time
   SBF <- model$system$basisfun_matrix(t)
   t_max <- model$system$get_tmax()
-  if (delta_grid > 0.1 * t_max) {
+  if (delta_grid > 0.25 * t_max) {
     stop("delta_grid is very large compared to t_max")
   }
 

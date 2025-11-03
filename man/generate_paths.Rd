@@ -4,10 +4,21 @@
 \alias{generate_paths}
 \title{Path generation for 'MultistateModelFit'}
 \usage{
-generate_paths(fit, t_start = 0, t_max = NULL, n_rep = 10, data = NULL)
+generate_paths(
+  fit,
+  oos = FALSE,
+  t_start = 0,
+  t_max = NULL,
+  n_rep = 10,
+  data = NULL
+)
 }
 \arguments{
 \item{fit}{A \code{\link{MultistateModelFit}} object}
+
+\item{oos}{Out-of-sample mode? If \code{FALSE}, the possible subject-specific
+fitted parameters are used. If \code{TRUE}, acting
+as if the subjects are new.}
 
 \item{t_start}{Start time. A single value or a vector
 with length equal to number of subjects.}
@@ -18,8 +29,7 @@ time of the model is used.}
 \item{n_rep}{Number of repeats per draw.}
 
 \item{data}{A \code{\link{JointData}} object. If \code{NULL}, the
-data used to fit the model is used. If not \code{NULL}, out-of-sample
-mode is assumed (new subjects).}
+data used to fit the model is used.}
 }
 \value{
 A \code{\link{PathData}} object.

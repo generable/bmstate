@@ -4,14 +4,17 @@
 \alias{msmfit_pk_params}
 \title{Evaluate PK parameters}
 \usage{
-msmfit_pk_params(fit, data = NULL)
+msmfit_pk_params(fit, oos = FALSE, data = NULL)
 }
 \arguments{
 \item{fit}{A \code{\link{MultistateModelFit}} object}
 
+\item{oos}{Out-of-sample mode? If \code{FALSE}, the possible subject-specific
+fitted parameters are used. If \code{TRUE}, acting
+as if the subjects are new.}
+
 \item{data}{A \code{\link{JointData}} object. If \code{NULL}, the
-data used to fit the model is used. If not \code{NULL}, out-of-sample
-mode is assumed (new subjects).}
+data used to fit the model is used.}
 }
 \value{
 A list with length equal to number of draws.

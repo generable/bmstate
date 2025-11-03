@@ -45,15 +45,15 @@ test_that("cav data analysis works", {
   pd <- df_to_pathdata(df_state_changes, tm, covs)
   pd0 <- as_single_event(pd, "Dead")
   tm0 <- pd0$transmat
+  t_ev <- pd0$transition_times()
 
   # Create model and fit
   mod0 <- create_msm(tm0,
     hazard_covs = covs,
     categ_covs = "sex",
-    num_knots = 4,
-    tmax = 20,
     n_grid = 10000
   )
+  mod0$set_knots(t_max = 20, t_event = t_ev, num_knots = 3)
   fit0 <- fit_stan(mod0,
     data = pd0,
     chains = 1,
@@ -64,4 +64,10 @@ test_that("cav data analysis works", {
   # Plot baseline hazard
   plt0 <- fit0$plot_h0()
   expect_true(is_ggplot(plt0))
+
+  # State occupancy
+  f0 <- fit0$mean_fit()
+  a <- p_state_occupancy(f0, data = f0$data, oos = TRUE)
+  plt <- plot_state_occupancy(a)
+  expect_true(is_ggplot(plt))
 })

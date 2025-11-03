@@ -120,16 +120,6 @@ PathData <- R6::R6Class(
       self$covs
     },
 
-    #' @description Get path lengths (among paths that include transitions)
-    #' @param truncate Remove rows after terminal states first?
-    #' @return a data frame of path ids and counts
-    lengths = function(truncate = FALSE) {
-      self$get_path_df(truncate) |>
-        dplyr::filter(trans_idx > 0) |>
-        dplyr::group_by(path_id) |>
-        dplyr::count()
-    },
-
     #' @description For each path, get the state it is in at time t
     #' @param t time
     #' @return a data frame with one row for each path
@@ -142,6 +132,20 @@ PathData <- R6::R6Class(
         dplyr::slice(1) |>
         dplyr::ungroup() |>
         dplyr::select("path_id", "state")
+    },
+
+    #' @description Get all transition times
+    #' @param trans_inds Indices of transition whose occurrence times are
+    #' requested. Default is \code{NULL}, in which case all transitions are
+    #' considered.
+    #' @return a numeric vector
+    transition_times = function(trans_inds = NULL) {
+      if (is.null(trans_inds)) {
+        trans_inds <- self$transmat$trans_df()$trans_idx
+      }
+      self$as_transitions(truncate = TRUE) |>
+        dplyr::filter(.data$trans_idx %in% trans_inds) |>
+        dplyr::pull(.data$time)
     },
 
     #' @description Get number of paths
@@ -474,13 +478,15 @@ to_mstate_format <- function(df, transmat) {
 }
 
 
-#' Look for potential covariates
+#' Look for potential covariates that affect transitions
 #'
 #' @export
-#' @param pd A \code{\link{PathData}} object
-#' @param possible Possible covariates to look for (character vector)
-#' @param ... Arguments passed to \code{fit_coxph()}
-#' @return A \code{data.frame}
+#' @param pd A \code{\link{PathData}} object.
+#' @param possible Possible covariates to look for (character vector). If
+#' \code{NULL} (default) all covariates of the object are tested.
+#' @param ... Arguments passed to \code{fit_coxph()}.
+#' @return A \code{data.frame} with columns \code{pval}, \code{target_state},
+#' \code{covariate}.
 potential_covariates <- function(pd, possible = NULL, ...) {
   checkmate::assert_class(pd, "PathData")
   if (is.null(possible)) {
@@ -490,14 +496,14 @@ potential_covariates <- function(pd, possible = NULL, ...) {
   events <- pd$get_event_state_names()
   df <- NULL
   for (e in events) {
-    message("Looking for covariates that affect ", e)
+    message("Looking for covariates that affect transition to ", e)
     a <- as_single_event(pd, e)
     r <- a$fit_coxph(covariates = possible, ...)
     s <- summary(r)
     pval <- summary(r)$coefficients[, 5]
     df <- rbind(df, data.frame(
-      pval = as.numeric(pval), event = e,
-      variable = names(pval)
+      pval = as.numeric(pval), target_state = e,
+      covariate = names(pval)
     ))
   }
   df
