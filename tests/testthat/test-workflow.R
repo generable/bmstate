@@ -173,7 +173,7 @@ test_that("entire workflow works (with single transition PK)", {
     CL = "CrCL",
     V2 = c("weight", "sex")
   )
-  mod <- create_msm(tm, covs, pk_covs, num_knots = 5, tmax = t3yr)
+  mod <- create_msm(tm, covs, pk_covs, num_knots = 5, t_max = t3yr)
   bh_true <- matrix(0, 1, 2)
   bh_true[1, 1] <- 0.5 # age effect on death
   bh_true[1, 2] <- -0.5 # dose effect on death

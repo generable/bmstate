@@ -77,7 +77,7 @@ simulate_example_data <- function(N = 10, beta_haz = NULL,
     tm <- transmat_survival()
   }
   tmax <- 3 * 365.25
-  mod <- create_msm(tm, covs, pk_covs, tmax = tmax)
+  mod <- create_msm(tm, covs, pk_covs, t_max = tmax)
   dat <- mod$simulate_data(N, beta_haz, beta_pk, w0)
   list(model = mod, data = dat)
 }
