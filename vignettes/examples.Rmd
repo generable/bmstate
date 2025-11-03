@@ -92,7 +92,9 @@ ensure that it is correct.
 
 ```{r, fig.width=5}
 solve_p <- function(mod, lambda) {
-  solve_trans_prob_matrix(mod$system, log_w0 = log(lambda))[1, ]
+  tt <- c(0, mod$system$get_tmax())
+  P <- solve_trans_prob_matrix(mod$system, t_out = tt, log_w0 = log(lambda))
+  P[2, 1, ]
 }
 solve_P_consthaz <- function(mod, h0) {
   Q_true <- mod$system$intensity_matrix(mod$system$get_tmax(), log(h0))
