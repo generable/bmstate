@@ -151,7 +151,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       private$categorical <- categorical
       self$pk_model <- pk_model
       self$system <- system
-      checkmate::assert_number(tmax, lower = 0)
+      checkmate::assert_number(t_max, lower = 0)
       checkmate::assert_integerish(num_knots, lower = 3, upper = 20)
       self$set_knots(t_max, default_event_distribution(t_max), num_knots)
       self$n_grid <- n_grid
