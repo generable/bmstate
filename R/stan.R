@@ -12,9 +12,9 @@ prefit_checks <- function(model, data) {
     msg <- paste0(
       "Shortest time interval (", min_len,
       ") is smaller than delta_grid (", delta_grid,
-      "). Either increase n_grid or decrease t_max of the model."
+      "). Consider increasing n_grid or decreasing t_max of the model."
     )
-    warning(msg)
+    message(msg)
   }
   max_time <- max(pd$get_path_df()$time)
   if (tmax < max_time) {

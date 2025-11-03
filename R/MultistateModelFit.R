@@ -386,7 +386,7 @@ msmfit_log_hazard_multipliers <- function(fit, oos = FALSE, data = NULL) {
     } else {
       r <- compute_log_hazard_multiplier(
         sd$N_int,
-        mat2list(t(beta_oth[s, 1, , ])),
+        mat2list(t(array(beta_oth[s, 1, , ], dim = c(sd$nc_haz, sd$N_trans_types)))),
         ba,
         mat2list(t(x_haz_long)),
         aa,
@@ -581,6 +581,8 @@ p_state_occupancy <- function(fit, oos = FALSE, t_start = 0, t_out = NULL,
   sys <- fit$model$system
   if (is.null(t_out)) {
     t_out <- seq(t_start, sys$get_tmax(), length.out = 30)
+  } else {
+    checkmate::assert_numeric(t_out, min.len = 2)
   }
 
   # Get and reshape draws
