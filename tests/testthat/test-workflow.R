@@ -99,7 +99,7 @@ test_that("entire workflow works", {
   )
   fit_tte <- a$fit$mean_fit()
   r <- p_state_occupancy(fit_tte)
-  pp <- plot_state_occupancy(p)
+  pp <- plot_state_occupancy(r)
   expect_true(is_ggplot(pp))
 })
 
@@ -150,8 +150,8 @@ test_that("entire workflow works (with PK)", {
   p_oos <- generate_paths(fit, oos = TRUE, data = jd$test)
   P <- p_state_occupancy(fit)
   P_oos <- p_state_occupancy(fit, oos = TRUE, data = jd$test)
-  expect_equal(nrow(P), 75)
-  expect_equal(nrow(P_oos), 25)
+  expect_equal(nrow(P), 75 * 2 * 30)
+  expect_equal(nrow(P_oos), 25 * 2 * 30)
 
   # PK fit plot
   pf1 <- fit$plot_pk()

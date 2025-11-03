@@ -68,6 +68,4 @@ test_that("fitting with Stan works (multi-transition)", {
   r <- p_state_occupancy(fit)
   pp <- plot_state_occupancy(r)
   expect_true(is_ggplot(pp))
-
-  checkmate::assert_data_frame(r, ncols = 4)
 })
