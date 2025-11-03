@@ -260,7 +260,7 @@ test_that("PK-only works", {
 
   # PK params
   pkpar <- msmfit_pk_params(fit)
-  pkpar_oos <- msmfit_pk_params(fit, jd$test)
+  pkpar_oos <- msmfit_pk_params(fit, oos = TRUE, data = jd$test)
   expect_true(length(pkpar) == 1)
   expect_true(length(pkpar_oos) == 1)
 

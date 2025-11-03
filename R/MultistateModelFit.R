@@ -250,7 +250,44 @@ mat2list <- function(mat) {
 #' as if the subjects are new.
 #' @return A list with length equal to number of draws.
 msmfit_pk_params <- function(fit, oos = FALSE, data = NULL) {
-  check_oos(oos, data)
+  # Setup
+  h0_base <- 1e-3
+
+  # Simulate data
+  sim <- simulate_example_data(N = options$N_subject)
+  mod <- sim$model
+  jd <- sim$data
+
+  # Split
+  jd <- split_data(jd)
+
+  # Fit the model
+  fit <- fit_stan(mod, jd$train,
+    iter_warmup = options$iter_warmup,
+    iter_sampling = options$iter_sampling,
+    chains = options$chains,
+    refresh = 5,
+    adapt_delta = 0.95,
+    init = 0.1,
+    pk_only = TRUE
+  )
+  fit <- fit$mean_fit()
+  expect_true(inherits(fit, "MultistateModelFit"))
+
+  # Plot baseline hazards
+  expect_error(fit$plot_h0(), "This is a PK-only fit")
+
+  # PK params
+  pkpar <- msmfit_pk_params(fit)
+  pkpar_oos <- msmfit_pk_params(fit, jd$test)
+  expect_true(length(pkpar) == 1)
+  expect_true(length(pkpar_oos) == 1)
+
+  # PK fit plot
+  pf1 <- fit$plot_pk()
+  pf2 <- fit$plot_pk(data = jd$test)
+  expect_true(is_ggplot(pf1))
+  expect_true(is_ggplot(pf2))
   sd <- msmfit_stan_data(fit, data)
   S <- fit$num_draws()
 
@@ -328,7 +365,7 @@ check_oos <- function(oos, data) {
   checkmate::assert_logical(oos, len = 1)
   if (!is.null(data)) {
     if (isFALSE(oos)) {
-      stop("data was not NULL, oos must be TRUE")
+      stop("oos must be TRUE if data is not NULL")
     }
   }
 }

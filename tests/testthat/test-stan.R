@@ -63,8 +63,8 @@ test_that("fitting with Stan works (multi-transition)", {
   expect_equal(nrow(pe), 2)
 
   # Solve
-  P <- solve_trans_prob_matrix(mod$system, c(-7, -7, -7))
-  checkmate::assert_matrix(P, ncols = 3, nrows = 3)
-  r <- solve_trans_prob_fit(fit)
+  P <- solve_trans_prob_matrix(mod$system, c(0, 1), c(-7, -7, -7))
+  checkmate::assert_matrix(P[1, , ], ncols = 3, nrows = 3)
+  r <- p_state_occupancy(fit)
   checkmate::assert_data_frame(r, ncols = 4)
 })
