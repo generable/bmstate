@@ -134,6 +134,20 @@ PathData <- R6::R6Class(
         dplyr::select("path_id", "state")
     },
 
+    #' @description Get all transition times
+    #' @param trans_inds Indices of transition whose occurrence times are
+    #' requested. Default is \code{NULL}, in which case all transitions are
+    #' considered.
+    #' @return a numeric vector
+    transition_times = function(trans_inds = NULL) {
+      if (is.null(trans_inds)) {
+        trans_inds <- self$transmat$trans_df()$trans_idx
+      }
+      self$as_transitions(truncate = TRUE) |>
+        dplyr::filter(.data$trans_idx %in% trans_inds) |>
+        dplyr::pull(.data$time)
+    },
+
     #' @description Get number of paths
     #' @return an integer
     n_paths = function() {

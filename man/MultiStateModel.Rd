@@ -117,7 +117,7 @@ Create model
   system,
   covariates = NULL,
   pk_model = NULL,
-  tmax = 1000,
+  t_max = 1000,
   num_knots = 5,
   categorical = NULL,
   n_grid = 1000
@@ -135,7 +135,7 @@ exposure estimated from PK model). Do not use reserved names
 
 \item{\code{pk_model}}{A \code{\link{PKModel}} or NULL.}
 
-\item{\code{tmax}}{Max time.}
+\item{\code{t_max}}{Max time.}
 
 \item{\code{num_knots}}{Total number of spline knots.}
 

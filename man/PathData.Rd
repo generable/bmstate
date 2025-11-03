@@ -45,6 +45,7 @@ which the paths belong.}
 \item \href{#method-PathData-unique_subjects}{\code{PathData$unique_subjects()}}
 \item \href{#method-PathData-covariate_names}{\code{PathData$covariate_names()}}
 \item \href{#method-PathData-state_at}{\code{PathData$state_at()}}
+\item \href{#method-PathData-transition_times}{\code{PathData$transition_times()}}
 \item \href{#method-PathData-n_paths}{\code{PathData$n_paths()}}
 \item \href{#method-PathData-state_names}{\code{PathData$state_names()}}
 \item \href{#method-PathData-get_event_state_names}{\code{PathData$get_event_state_names()}}
@@ -147,6 +148,28 @@ For each path, get the state it is in at time t
 }
 \subsection{Returns}{
 a data frame with one row for each path
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-transition_times"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-transition_times}{}}}
+\subsection{Method \code{transition_times()}}{
+Get all transition times
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$transition_times(trans_inds = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{trans_inds}}{Indices of transition whose occurrence times are
+requested. Default is \code{NULL}, in which case all transitions are
+considered.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+a numeric vector
 }
 }
 \if{html}{\out{<hr>}}

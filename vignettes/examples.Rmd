@@ -82,7 +82,7 @@ pd$paths$plot_graph()
 We plot the distribution of event times (i.e., transition times) and the theoretical mean (red line).
 
 ```{r, fig.width=5}
-times <- pd$paths$as_transitions(truncate = TRUE)$time
+times <- pd$paths$transition_times()
 plot_time_dist(times) + geom_vline(xintercept = 1 / lambda, color = "firebrick")
 ```
 

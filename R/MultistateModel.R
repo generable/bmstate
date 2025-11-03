@@ -130,13 +130,13 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' exposure estimated from PK model). Do not use reserved names
     #' \code{ss_auc} or \code{dose}.
     #' @param pk_model A \code{\link{PKModel}} or NULL.
-    #' @param tmax Max time.
+    #' @param t_max Max time.
     #' @param num_knots Total number of spline knots.
     #' @param categorical Names of categorical covariates.
     #' @param n_grid Number of time discretization points for integrating
     #' hazards.
     initialize = function(system, covariates = NULL, pk_model = NULL,
-                          tmax = 1000, num_knots = 5, categorical = NULL,
+                          t_max = 1000, num_knots = 5, categorical = NULL,
                           n_grid = 1000) {
       checkmate::assert_character(covariates, null.ok = TRUE)
       checkmate::assert_character(categorical, null.ok = TRUE)
@@ -153,7 +153,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       self$system <- system
       checkmate::assert_number(tmax, lower = 0)
       checkmate::assert_integerish(num_knots, lower = 3, upper = 20)
-      self$set_knots(tmax, default_event_distribution(tmax), num_knots)
+      self$set_knots(t_max, default_event_distribution(t_max), num_knots)
       self$n_grid <- n_grid
     },
 

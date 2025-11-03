@@ -211,6 +211,7 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
     #' @param locations A numeric vector
     set_knots = function(locations) {
       checkmate::assert_numeric(locations, min.len = 2)
+      names(locations) <- NULL
       private$knots <- locations
     },
 
