@@ -29,7 +29,7 @@ The package mostly conforms to [semantic versioning](https://semver.org/). The v
 
 - `MAJOR` is incremented if incompatible API changes are made
 - `MINOR` version is incremented if significant new functionality is added
-- `PATCH` version is incremented when making small bug fixes or very minor new functionality
+- `PATCH` version is incremented when making small bug fixes, very minor new functionality, improved documentation or new or improved vignettes
 
 The version update can be done with `usethis::use_version()`.
 
