@@ -21,7 +21,8 @@ p_state_occupancy(
 fitted parameters are used. If \code{TRUE}, acting
 as if the subjects are new.}
 
-\item{t_start}{Initial time}
+\item{t_start}{Start time. Initial state is for each subject the state
+at this time.}
 
 \item{t_out}{End times (vector)}
 

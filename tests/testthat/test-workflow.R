@@ -147,7 +147,7 @@ test_that("entire workflow works (with PK)", {
   # Path simulation
   p <- generate_paths(fit)
   p_oos <- generate_paths(fit, oos = TRUE, data = jd$test)
-  P <- solve_trans_prob_fit(fit)
+  P <- p_state_occupancy(fit)
   P_oos <- p_state_occupancy(fit, oos = TRUE, data = jd$test)
   expect_equal(nrow(P), 75)
   expect_equal(nrow(P_oos), 25)
@@ -219,7 +219,7 @@ test_that("entire workflow works (with single transition PK)", {
 
   # Hazard multipliers
   log_m <- msmfit_log_hazard_multipliers(fit)
-  log_m_test <- msmfit_log_hazard_multipliers(fit, jd$test)
+  log_m_test <- msmfit_log_hazard_multipliers(fit, oos = TRUE, data = jd$test)
   N_sub_test <- length(jd$test$paths$unique_subjects())
   H <- mod$system$num_trans()
   expect_equal(dim(log_m_test[[1]]), c(N_sub_test, H))

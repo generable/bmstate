@@ -321,10 +321,11 @@ msmfit_exposure <- function(fit, oos = FALSE, data = NULL) {
   out
 }
 
-
+# Helper
 check_oos <- function(oos, data) {
   checkmate::assert_logical(oos, len = 1)
   if (!is.null(data)) {
+    checkmate::assert_class(data, "JointData")
     if (isFALSE(oos)) {
       warning(
         "data is NULL but oos is FALSE. This should be done only if ",
@@ -616,6 +617,8 @@ trans_prob_matrices <- function(fit, oos = FALSE, t_start = 0, t_out = NULL,
 #' @param fit A \code{\link{MultistateModelFit}} object
 #' @inheritParams trans_prob_matrices
 #' @param ... Arguments passed to \code{deSolve::ode()}.
+#' @param t_start Start time. Initial state is for each subject the state
+#' at this time.
 #' @return A list with
 #' \itemize{
 #'   \item A 4-dimensional \code{rvar} array \code{P} where \code{P[n,k,,]} is the
@@ -627,9 +630,11 @@ trans_prob_matrices <- function(fit, oos = FALSE, t_start = 0, t_out = NULL,
 p_state_occupancy <- function(fit, oos = FALSE, t_start = 0, t_out = NULL,
                               data = NULL, ...) {
   check_oos(oos, data)
+  checkmate::assert_number(t_start)
   init_states <- msmfit_state_at(t_start, fit, data)
-  df_start <- d$df |>
-    dplyr::select("subject_id") |>
-    dplyr::left_join(init_states, by = "subject_id") |>
-    dplyr::pull(.data$state)
+  tm <- trans_prob_matrices(fit, oos, t_start, t_out, data, ...)
+  list(
+    tm = tm,
+    init_states = init_states
+  )
 }
