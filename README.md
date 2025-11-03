@@ -45,9 +45,33 @@ When finishing the edits, create a PR to `develop`. Before the `develop` branch 
 - `devtools::document()`
 - `R CMD check`
 
-### Known issues in R CMD check
+### Known NOTEs in R CMD check
 
-- A warning can be raised because of a too small `delta_grid` which is due to randomness in simulation of test data for unit tests
 - The exported Stan functions seem to have no bindings in R code
 
-These are acceptable warnings/notes that can be ignored for now.
+```
+   Undefined global functions or variables:
+     compute_log_hazard_multiplier compute_theta_pk
+     pop_2cpt_partly_ss_stage1 pop_2cpt_partly_ss_stage2
+```
+
+- Other
+
+```
+❯ checking package dependencies ... NOTE
+  Imports includes 22 non-default packages.
+  Importing from so many packages makes the package vulnerable to any of
+  them becoming unavailable.  Move as many as possible to Suggests and
+  use conditionally.
+
+❯ checking for future file timestamps ... NOTE
+  unable to verify current time
+
+❯ checking dependencies in R code ... NOTE
+  Namespaces in Imports field not imported from:
+    ‘Matrix’ ‘msm’ ‘mstate’
+    All declared Imports should be used.
+```
+
+There should not be errors or warnings.
+
