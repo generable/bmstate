@@ -64,7 +64,7 @@ $$
 \lambda^{(h)}_n(t) = b^{(h)}(t)\exp\left(\beta_{T_h}^{\top} \mathbf{x}_n \right)
 $$
 
-where 
+where
 
 - $b^{(h)}(t)$ represents the baseline hazard for transition $h$
 - $T_h$ is an integer indexing the type (`trans_type`) of transition $h$

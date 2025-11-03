@@ -644,7 +644,7 @@ p_state_occupancy <- function(fit, oos = FALSE, t_start = 0, t_out = NULL,
 #' @export
 #' @param df Data frame returned by \code{\link{p_state_occupancy}}
 plot_state_occupancy <- function(df) {
-  ggplot(df, aes(x = .data$time, group = .data$subject_id, y = mean(prob))) +
+  ggplot(df, aes(x = .data$time, group = .data$subject_id, y = mean(.data$prob))) +
     facet_wrap(. ~ .data$state) +
     geom_line() +
     ylab("Mean probability")
