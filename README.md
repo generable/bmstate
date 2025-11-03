@@ -15,11 +15,13 @@ Building the vignettes can take some time, so consider using `build_vignettes = 
 
 ## Getting started
 
- More info is in documentation, that you can view with
+ More info is in the documentation, which you can view with
 ```r
 library(bmstate)
 ?bmstate
 ```
+
+See also the vignettes.
 
 ## Development
 
