@@ -246,8 +246,7 @@ mat2list <- function(mat) {
 #' @param fit A \code{\link{MultistateModelFit}} object
 #' @param data A \code{\link{JointData}} object. If \code{NULL}, the
 #' data used to fit the model is used.
-#' @param oos Out-of-sample mode? If \code{FALSE}, the \code{data} input
-#' should be \code{NULL}, and in this case possible, subject specific
+#' @param oos Out-of-sample mode? If \code{FALSE}, the possible subject-specific
 #' fitted parameters are used. If \code{TRUE}, acting
 #' as if the subjects are new.
 #' @return A list with length equal to number of draws.
@@ -262,9 +261,6 @@ msmfit_pk_params <- function(fit, oos = FALSE, data = NULL) {
   if (oos) {
     log_z <- fit$get_draws_of("log_z_pk")
   } else {
-    if (!is.null(data)) {
-      stop("data should be NULL if oos = FALSE")
-    }
     log_z <- array(0, dim = c(S, 1, sd$N_sub, 3))
   }
   get_beta <- function(fit, name) {

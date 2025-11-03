@@ -16,8 +16,7 @@ generate_paths(
 \arguments{
 \item{fit}{A \code{\link{MultistateModelFit}} object}
 
-\item{oos}{Out-of-sample mode? If \code{FALSE}, the \code{data} input
-should be \code{NULL}, and in this case possible, subject specific
+\item{oos}{Out-of-sample mode? If \code{FALSE}, the possible subject-specific
 fitted parameters are used. If \code{TRUE}, acting
 as if the subjects are new.}
 

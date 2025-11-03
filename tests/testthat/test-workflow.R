@@ -80,7 +80,7 @@ test_that("entire workflow works", {
   pes1 <- p_state_visit_per_subject(p_mfit, ev)
 
   # Test that solving time evolution with single draw works
-  tp2 <- solve_trans_prob_matrix_each_subject(mfit)
+  tp2 <- p_state_occupancy(mfit)
   expect_true(is.numeric(tp2$Diseased))
   expect_equal(nrow(tp2), nrow(pes1))
 
@@ -98,7 +98,7 @@ test_that("entire workflow works", {
     return_stanfit = TRUE
   )
   fit_tte <- a$fit$mean_fit()
-  r <- solve_trans_prob_fit(fit_tte)
+  r <- p_state_occupancy(fit_tte)
   expect_equal(nrow(r), 75)
 })
 
@@ -133,13 +133,13 @@ test_that("entire workflow works (with PK)", {
 
   # PK params
   pkpar <- msmfit_pk_params(fit)
-  pkpar_oos <- msmfit_pk_params(fit, jd$test)
+  pkpar_oos <- msmfit_pk_params(fit, oos = TRUE, jd$test)
   expect_true(length(pkpar) == 1)
   expect_true(length(pkpar_oos) == 1)
 
   # Hazard multipliers
   log_m <- msmfit_log_hazard_multipliers(fit)
-  log_m_test <- msmfit_log_hazard_multipliers(fit, jd$test)
+  log_m_test <- msmfit_log_hazard_multipliers(fit, oos = TRUE, jd$test)
   N_sub_test <- length(jd$test$paths$unique_subjects())
   H <- mod$system$num_trans()
   expect_equal(dim(log_m_test[[1]]), c(N_sub_test, H))
