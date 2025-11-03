@@ -64,7 +64,10 @@ test_that("fitting with Stan works (multi-transition)", {
 
   # Solve
   P <- solve_trans_prob_matrix(mod$system, c(0, 1), c(-7, -7, -7))
-  checkmate::assert_matrix(P[1, , ], ncols = 3, nrows = 3)
+  expect_equal(dim(P), c(2, 3, 3))
   r <- p_state_occupancy(fit)
+  pp <- plot_state_occupancy(r)
+  expect_true(is_ggplot(pp))
+
   checkmate::assert_data_frame(r, ncols = 4)
 })

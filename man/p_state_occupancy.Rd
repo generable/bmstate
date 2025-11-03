@@ -32,14 +32,14 @@ data used to fit the model is used.}
 \item{...}{Arguments passed to \code{deSolve::ode()}.}
 }
 \value{
-A list with
+A data frame with columns
 \itemize{
-  \item A 4-dimensional \code{rvar} array \code{P} where \code{P[n,k,,]} is the
-    transition matrix for subject \code{n} at the \code{k}th output time
-    point
-   \item Subject ids in the same order as in the first dimension of \code{P}
-   \item The numeric vector \code{t_out}
+  \item \code{subject_id} (character)
+   \item \code{time} (numeric)
+   \item \code{state} (character)
+   \item \code{prob} state occupancy probability for given subject at given time
  }
+ Note that \code{prob} is an \code{rvar} over all parameter draws.
 }
 \description{
 Solve state occupancy probabilities for each subject and draw in

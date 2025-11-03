@@ -552,29 +552,31 @@ generate_paths <- function(fit, oos = FALSE, t_start = 0, t_max = NULL, n_rep = 
   )
 }
 
-
-
-#' Solve transition probability matrices for each subject and draw in
+#' Solve state occupancy probabilities for each subject and draw in
 #' 'MultistateModelFit'
 #'
 #' @export
 #' @param fit A \code{\link{MultistateModelFit}} object
 #' @inheritParams solve_trans_prob_matrix
 #' @inheritParams msmfit_pk_params
+#' @param t_start Start time. Initial state is for each subject the state
+#' at this time.
 #' @param ... Arguments passed to \code{deSolve::ode()}.
-#' @return A list with
+#' @return A data frame with columns
 #' \itemize{
-#'   \item A 4-dimensional \code{rvar} array \code{P} where \code{P[n,k,,]} is the
-#'     transition matrix for subject \code{n} at the \code{k}th output time
-#'     point
-#'    \item Subject ids in the same order as in the first dimension of \code{P}
-#'    \item The numeric vector \code{t_out}
+#'   \item \code{subject_id} (character)
+#'    \item \code{time} (numeric)
+#'    \item \code{state} (character)
+#'    \item \code{prob} state occupancy probability for given subject at given time
 #'  }
-trans_prob_matrices <- function(fit, oos = FALSE, t_start = 0, t_out = NULL,
-                                data = NULL, ...) {
+#'  Note that \code{prob} is an \code{rvar} over all parameter draws.
+p_state_occupancy <- function(fit, oos = FALSE, t_start = 0, t_out = NULL,
+                              data = NULL, ...) {
   check_oos(oos, data)
   checkmate::assert_class(fit, "MultistateModelFit")
   checkmate::assert_number(t_start, lower = 0)
+  init_states <- msmfit_state_at(t_start, fit, data)
+
   sys <- fit$model$system
   if (is.null(t_out)) {
     t_out <- seq(t_start, sys$get_tmax(), length.out = 30)
@@ -588,14 +590,19 @@ trans_prob_matrices <- function(fit, oos = FALSE, t_start = 0, t_out = NULL,
   pb <- progress::progress_bar$new(total = N)
   L <- sys$num_states()
   K <- length(t_out)
-  A <- array(0, dim = c(S, N, K, L, L))
+  A <- array(0, dim = c(S, N, K, L))
   subs <- unique(d$df$subject_id)
   n <- 0
   message("calling solve_trans_prob_matrix ", N, " x ", S, " times")
+  out <- list()
   for (sid in subs) {
     n <- n + 1
     pb$tick()
     rows <- which(d$df$subject_id == sid)
+    row2 <- which(init_states$subject_id == sid)
+    if (length(row2) != 1) {
+      stop("internal error")
+    }
     r <- 0
     for (j in rows) {
       r <- r + 1
@@ -603,38 +610,41 @@ trans_prob_matrices <- function(fit, oos = FALSE, t_start = 0, t_out = NULL,
       if (is.null(dim(wj))) {
         wj <- matrix(wj, 1, length(wj))
       }
-      A[r, n, , , ] <- solve_trans_prob_matrix(
+      AA <- solve_trans_prob_matrix(
         sys, t_out, d$log_w0[j, ], wj, d$log_m[j, ], t_start, ...
       )
+      A[r, n, , ] <- AA[, init_states$state[row2], ]
     }
   }
-  list(P = posterior::rvar(A), subject_ids = subs, t_out = t_out)
+
+  # A 3-dimensional \code{rvar} array \code{P} where \code{P[n,k,]} are the
+  # state occupancy probabilities for subject \code{n} at the \code{k}th
+  P <- posterior::rvar(A)
+
+  # Format to data frame
+  df <- NULL
+  for (s in seq_len(L)) {
+    for (k in seq_len(K)) {
+      df_sk <- data.frame(
+        subject_id = subs,
+        time = t_out[k],
+        state_idx = s,
+        prob = as.vector(P[, k, s])
+      )
+      df <- rbind(df, df_sk)
+    }
+  }
+  ss <- fit$model$system$tm()$states_df() |> dplyr::select("state_idx", "state")
+  df |> dplyr::left_join(ss, by = "state_idx")
 }
 
-#' Solve state occupancy probabilities for each subject and draw in
-#' 'MultistateModelFit'
+#' Plot mean state occupancy probabilities over time for each subject
 #'
-#' @param fit A \code{\link{MultistateModelFit}} object
-#' @inheritParams trans_prob_matrices
-#' @param ... Arguments passed to \code{deSolve::ode()}.
-#' @param t_start Start time. Initial state is for each subject the state
-#' at this time.
-#' @return A list with
-#' \itemize{
-#'   \item A 4-dimensional \code{rvar} array \code{P} where \code{P[n,k,,]} is the
-#'     transition matrix for subject \code{n} at the \code{k}th output time
-#'     point
-#'    \item Subject ids in the same order as in the first dimension of \code{P}
-#'    \item The numeric vector \code{t_out}
-#'  }
-p_state_occupancy <- function(fit, oos = FALSE, t_start = 0, t_out = NULL,
-                              data = NULL, ...) {
-  check_oos(oos, data)
-  checkmate::assert_number(t_start)
-  init_states <- msmfit_state_at(t_start, fit, data)
-  tm <- trans_prob_matrices(fit, oos, t_start, t_out, data, ...)
-  list(
-    tm = tm,
-    init_states = init_states
-  )
+#' @export
+#' @param df Data frame returned by \code{\link{p_state_occupancy}}
+plot_state_occupancy <- function(df) {
+  ggplot(df, aes(x = .data$time, group = .data$subject_id, y = mean(prob))) +
+    facet_wrap(. ~ .data$state) +
+    geom_line() +
+    ylab("Mean probability")
 }

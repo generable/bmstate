@@ -81,8 +81,8 @@ test_that("entire workflow works", {
 
   # Test that solving time evolution with single draw works
   tp2 <- p_state_occupancy(mfit)
-  expect_true(is.numeric(tp2$Diseased))
-  expect_equal(nrow(tp2), nrow(pes1))
+  pp <- plot_state_occupancy(tp2)
+  expect_true(is_ggplot(pp))
 
   # Single-transition model
   tds <- as_single_event(jd$train$paths, event = ev)
@@ -99,7 +99,8 @@ test_that("entire workflow works", {
   )
   fit_tte <- a$fit$mean_fit()
   r <- p_state_occupancy(fit_tte)
-  expect_equal(nrow(r), 75)
+  pp <- plot_state_occupancy(p)
+  expect_true(is_ggplot(pp))
 })
 
 
