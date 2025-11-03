@@ -11,7 +11,7 @@ R package for Bayesian multistate modeling.
 remotes::install_github("generable/bmstate", ref = "main", build_vignettes = TRUE)
 ```
 
-Building the vignettes can take some time, so consider using `build_vignettes = FALSE`.
+Building the vignettes can take some time, so consider using `build_vignettes = FALSE`. Use `ref = "develop"` if you want the current development version.
 
 ## Getting started
 
@@ -35,9 +35,9 @@ The version update can be done with `usethis::use_version()`.
 
 ### Development branches
 
-When starting a new feature or a bug fix, create a branch off the `development` branch. The version in the `development` branch should be
+When starting a new feature or a bug fix, create a branch off the `develop` branch. The version in the `development` branch should be
 something like `MAJOR.MINOR.PATCH.9000` where `MAJOR.MINOR.PATCH` is the version that exists in the `main` branch. This increment can be done with `usethis::use_dev_version()`.
-When finishing the edits, create a PR to `development`. Before the `development` branch is merged to `main`, the patch version should be incremented. Also, check that
+When finishing the edits, create a PR to `develop`. Before the `develop` branch is merged to `main`, the patch version should be incremented. Also, check that
 
 - You run `styler::style_dir()` in the package root directory.
 - `R CMD check` passes
