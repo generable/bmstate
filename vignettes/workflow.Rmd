@@ -40,7 +40,7 @@ h0_true <- 0.1 # true baseline hazard
 beta_age_true <- 0.5 # true effect size of age
 mod <- create_msm(transmat_survival(),
   hazard_covs = "age",
-  tmax = tmax
+  t_max = tmax
 )
 simdat <- mod$simulate_data(w0 = h0_true, beta_haz = matrix(beta_age_true))
 simdat$paths$plot_graph()
@@ -59,7 +59,10 @@ mod$get_knots()
 ## Fitting a model
 
 ```{r}
-fit <- fit_stan(mod, simdat, chains = 1, adapt_delta = 0.975)
+fit <- fit_stan(mod, simdat,
+  chains = 1, adapt_delta = 0.975,
+  iter_sampling = 200
+)
 ```
 
 ## Sampling diagnostics
@@ -72,4 +75,31 @@ print(max(fit$info$summary$rhat))
 ```
 
 
-## sd
+## Inferred baseline hazard
+
+```{r}
+fit$plot_h0() + geom_hline(yintercept = h0_true, lty = 2)
+```
+
+## Inferred covariate effect
+
+```{r}
+beta_age <- fit$get_draws(name = "beta_oth")
+print(beta_age) # compare to beta_age_true
+```
+
+## State occupancy probabilities
+
+```{r}
+mfit <- fit$mean_fit() # use point estimate for speed here
+p <- p_state_occupancy(mfit)
+p <- p |> dplyr::left_join(fit$data$paths$subject_df, by = "subject_id")
+ggplot(p, aes(
+  x = .data$time, group = .data$subject_id, y = mean(.data$prob),
+  color = .data$age
+)) +
+  facet_wrap(. ~ .data$state) +
+  geom_line() +
+  ylab("State probability") +
+  scale_color_viridis_c()
+```

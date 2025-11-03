@@ -60,7 +60,7 @@ find_row_and_col_of_positive_vals <- function(mat) {
   out
 }
 
-# Default event distribution
+# Default event time distribution
 default_event_distribution <- function(t_max) {
   x <- seq(0, t_max, length.out = 100)
   max(x) * x^2 / (max(x^2))
