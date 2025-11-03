@@ -133,7 +133,7 @@ test_that("entire workflow works (with PK)", {
 
   # PK params
   pkpar <- msmfit_pk_params(fit)
-  pkpar_oos <- msmfit_pk_params(fit, oos = TRUE, jd$test)
+  pkpar_oos <- msmfit_pk_params(fit, oos = TRUE, data = jd$test)
   expect_true(length(pkpar) == 1)
   expect_true(length(pkpar_oos) == 1)
 
@@ -144,17 +144,17 @@ test_that("entire workflow works (with PK)", {
   H <- mod$system$num_trans()
   expect_equal(dim(log_m_test[[1]]), c(N_sub_test, H))
 
-  # Path prediction
+  # Path simulation
   p <- generate_paths(fit)
-  p_oos <- generate_paths(fit, data = jd$test)
+  p_oos <- generate_paths(fit, oos = TRUE, data = jd$test)
   P <- solve_trans_prob_fit(fit)
-  P_oos <- solve_trans_prob_fit(fit, data = jd$test)
+  P_oos <- p_state_occupancy(fit, oos = TRUE, data = jd$test)
   expect_equal(nrow(P), 75)
   expect_equal(nrow(P_oos), 25)
 
   # PK fit plot
   pf1 <- fit$plot_pk()
-  pf2 <- fit$plot_pk(data = jd$test)
+  pf2 <- fit$plot_pk(oos = TRUE, data = jd$test)
   expect_true(is_ggplot(pf1))
   expect_true(is_ggplot(pf2))
 })
@@ -262,7 +262,7 @@ test_that("PK-only works", {
 
   # PK fit plot
   pf1 <- fit$plot_pk()
-  pf2 <- fit$plot_pk(data = jd$test)
+  pf2 <- fit$plot_pk(data = jd$test, oos = TRUE)
   expect_true(is_ggplot(pf1))
   expect_true(is_ggplot(pf2))
 })

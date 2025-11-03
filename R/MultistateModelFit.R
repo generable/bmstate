@@ -259,9 +259,9 @@ msmfit_pk_params <- function(fit, oos = FALSE, data = NULL) {
   log_mu <- fit$get_draws_of("log_mu_pk")
   log_sig <- fit$get_draws_of("log_sig_pk")
   if (oos) {
-    log_z <- fit$get_draws_of("log_z_pk")
-  } else {
     log_z <- array(0, dim = c(S, 1, sd$N_sub, 3))
+  } else {
+    log_z <- fit$get_draws_of("log_z_pk")
   }
   get_beta <- function(fit, name) {
     b <- fit$get_draws_of(name)
