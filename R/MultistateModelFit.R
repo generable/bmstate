@@ -122,14 +122,16 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
     #' @param L number of grid points for each subject
     #' @param timescale scale of time
     #' @param n_prev number of previous doses to show fit for
-    plot_pk = function(max_num_subjects = 12, data = NULL, L = 100,
+    #' @param oos Out-of-sample subjects?
+    plot_pk = function(max_num_subjects = 12, oos = FALSE, data = NULL, L = 100,
                        timescale = 24, n_prev = 3) {
+      check_oos(oos, data)
       checkmate::assert_integerish(L, len = 1)
+      pkpar <- msmfit_pk_params(self, oos, data = data)
+      theta <- pkpar[[1]]
       if (is.null(data)) {
         data <- self$data
       }
-      pkpar <- msmfit_pk_params(self, data = data)
-      theta <- pkpar[[1]]
       trange <- sapply(data$dosing$times, range)
       N <- nrow(theta)
       ts <- list()
@@ -328,9 +330,14 @@ check_oos <- function(oos, data) {
   checkmate::assert_logical(oos, len = 1)
   if (!is.null(data)) {
     if (isFALSE(oos)) {
-      stop("oos must be TRUE if data is not NULL")
+      warning(
+        "data is NULL but oos is FALSE. This should be done only if ",
+        " testing new covariates for the same subjects but still using ",
+        " their subject-specific (PK) parameters"
+      )
     }
   }
+  TRUE
 }
 
 #' Compute log_hazard multipliers

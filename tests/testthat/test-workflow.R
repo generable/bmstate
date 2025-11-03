@@ -42,11 +42,11 @@ test_that("entire workflow works", {
 
   # Computing hazard multipliers
   log_m <- msmfit_log_hazard_multipliers(fit)
-  log_m_test <- msmfit_log_hazard_multipliers(fit, data = jd$test)
+  log_m_test <- msmfit_log_hazard_multipliers(fit, oos = TRUE, data = jd$test)
 
   # Path generation
   p <- generate_paths(fit, n_rep = 3)
-  p_oos <- generate_paths(fit, n_rep = 3, data = jd$test)
+  p_oos <- generate_paths(fit, n_rep = 3, oos = TRUE, data = jd$test)
 
   # Path generation starting from later time
   p1 <- generate_paths(fit, n_rep = 3, t_start = 600)
@@ -213,11 +213,7 @@ test_that("entire workflow works (with single transition PK)", {
 
   # PK params
   pkpar <- msmfit_pk_params(fit)
-  pkpar_oos <- msmfit_pk_params(fit, jd$test)
-  expect_true(length(pkpar) == 1)
-  expect_true(length(pkpar_oos) == 1)
-  pkpar <- msmfit_pk_params(fit)
-  pkpar_oos <- msmfit_pk_params(fit, jd$test)
+  pkpar_oos <- msmfit_pk_params(fit, oos = TRUE, jd$test)
   expect_true(length(pkpar) == 1)
   expect_true(length(pkpar_oos) == 1)
 
