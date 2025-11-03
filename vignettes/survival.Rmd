@@ -1,5 +1,5 @@
 ---
-title: "Time-to-event data analysis with the bmstate package"
+title: "Survival data analysis with the bmstate package"
 author: Juho Timonen
 date: 3rd Nov 2025
 output: 
@@ -11,7 +11,7 @@ output:
 bibliography: references.bib
 editor: source
 vignette: >
-  %\VignetteIndexEntry{Time-to-event data analysis with the bmstate package}
+  %\VignetteIndexEntry{Survival data analysis with the bmstate package}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -90,7 +90,7 @@ print(beta_age) # compare to beta_age_true
 
 ## State occupancy probabilities
 
-```{r}
+```{r, fig.width=6}
 mfit <- fit$mean_fit() # use point estimate for speed here
 p <- p_state_occupancy(mfit)
 p <- p |> dplyr::left_join(fit$data$paths$subject_df, by = "subject_id")
