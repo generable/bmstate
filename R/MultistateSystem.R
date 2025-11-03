@@ -151,7 +151,6 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
 
   # PUBLIC
   public = list(
-
     #' @description
     #' Create model
     #'
