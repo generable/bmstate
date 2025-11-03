@@ -45,6 +45,6 @@ When finishing the edits, create a PR to `develop`. Before the `develop` branch 
 ### Known issues in R CMD check
 
 - A warning can be raised because of a too small `delta_grid` which is due to randomness in simulation of test data for unit tests
-- The exported Stan functions seem to have no bindings
+- The exported Stan functions seem to have no bindings in R code
 
 These are acceptable warnings/notes that can be ignored for now.
