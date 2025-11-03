@@ -29,13 +29,11 @@
 #' @section Prediction with a fitted model:
 #'
 #' \itemize{
-#'
-#' \item For predicting state visit risks using state path simulation,
-#' see the functions \code{\link{generate_paths}}, \code{\link{p_state_visit}},
-#' and \code{\link{p_state_visit_per_subject}}.
-#'
-#' \item For analytically solving state occupancy probabilities after some time,
-#'   see \code{\link{solve_trans_prob_fit}}.
+#'   \item For predicting state visit risks over a time period using state path
+#'  simulation, see the functions \code{\link{generate_paths}},
+#'  \code{\link{p_state_visit}}, and \code{\link{p_state_visit_per_subject}}.
+#'   \item For analytically solving state occupancy probabilities after some time,
+#'   see \code{\link{p_state_occupancy}}.
 #' }
 #' @section Vignettes:
 #' See the vignettes for more information.

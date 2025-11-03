@@ -559,8 +559,9 @@ generate_paths <- function(fit, oos = FALSE, t_start = 0, t_max = NULL, n_rep = 
 #' @param fit A \code{\link{MultistateModelFit}} object
 #' @inheritParams solve_trans_prob_matrix
 #' @inheritParams msmfit_pk_params
-#' @param t_start Start time. Initial state is for each subject the state
-#' at this time.
+#' @param t_start Start time. The results are transition probabilities to each
+#' state, evaluated at each time point of \code{t_out}, given that the
+#' that the subject is in the state they are in \code{data} at \code{t_start}.
 #' @param ... Arguments passed to \code{deSolve::ode()}.
 #' @return A data frame with columns
 #' \itemize{
