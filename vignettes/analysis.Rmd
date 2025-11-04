@@ -45,7 +45,6 @@ df_full <- as_tibble(msm::cav) |>
     min_age = min(age),
     state = cummax(state)
   )
-df_full$PTNUM <- as.character(df_full$PTNUM)
 head(df_full)
 ```
 
@@ -54,9 +53,10 @@ transition times. Only the death times are exact. We make an assumption that
 all state transitions happen exactly at the first time the new state is seen
 in the data.
 
-We select only the needed columns and rename them.
+We select only needed columns and rename them.
 
 ```{r}
+df_full$PTNUM <- as.character(df_full$PTNUM)
 df_snapshots <- df_full |> select(PTNUM, state, years, min_age, dage, sex)
 df_snapshots <- df_snapshots |> rename(
   subject_id = PTNUM,
@@ -92,7 +92,7 @@ head(df_state_changes)
 
 ## Transition matrix
 
-We use the following transition matrix, that is built into the package.
+We use the following transition matrix, which is built into the package.
 
 ```{r}
 tm <- transmat_progression()
