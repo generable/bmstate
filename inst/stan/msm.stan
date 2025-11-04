@@ -299,19 +299,19 @@ functions {
 
 data {
 
-  // ---------- Model properties ----------
+  // ------ Model properties (should not be modified after fitting) ----------
 
   int<lower=1> N_trans; // number of possible transitions
   int<lower=1> N_trans_types;
   int<lower=1> N_grid;      // number of integration grid points
   real<lower=0> delta_grid; // grid step size
-  vector[N_trans] mu_w0; // Assumed mean h0
   int<lower=0> nc_haz; // number of hazard covariates
   int<lower=1> N_sbf; // number of spline basis functions
   int<lower=0, upper=1> do_pk; // flag
   int<lower=0, upper=1> do_haz; //flag
   int<lower=0, upper=1> omit_lik_haz; // flag
   int<lower=0, upper=1> omit_lik_pk; //flag
+  vector[N_trans] mu_w0; // Assumed mean h0
 
   // Transition type (for example can be same as the target state)
   array[N_trans] int<lower=1,upper=N_trans_types> ttype;
@@ -325,7 +325,7 @@ data {
   int<lower=0> nc_CL; // num of predictors for CL
   int<lower=0> nc_V2; // num of predictors for V2
 
-  // ---------- Data properties ----------
+  // --- Actual data (can be modified or re-created when predicting) ----------
 
   // Intervals data
   int<lower=1> N_int; // total number of intervals
