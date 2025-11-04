@@ -32,6 +32,8 @@ theme_set(theme_minimal())
 theme_set(theme_bw())
 ```
 
+# Data
+
 ## Data preprocessing
 
 Here we analyse the `cav` data from the `msm` package. First we modify the original data like [here](https://rviews.rstudio.com/2023/04/19/multistate-models-for-medical-applications/).
@@ -94,7 +96,7 @@ We use the following transition matrix, that is built into the package.
 
 ```{r}
 tm <- transmat_progression()
-tm$plot()
+tm
 ```
 
 ## The PathData format
@@ -107,41 +109,28 @@ pd <- df_to_pathdata(df_state_changes, tm, covs)
 pd
 ```
 
-We can also create a version where we are interested only in one event.
-
-```{r}
-pd0 <- as_single_event(pd, "Dead")
-tm0 <- pd0$transmat
-print(pd0)
-print(tm0)
-```
+# Analysis
 
 ## Fitting a model
 
+We create a model and set the spline knot locations based on quantiles of
+the observed transition times.
+
 ```{r}
-# Create model and fit
-mod0 <- create_msm(tm0,
-  hazard_covs = covs,
-  n_grid = 10000,
-  t_max = 20
-)
-
-mod0$set_knots(t_max = 20, t_event = t_event, num_knots = 3)
-fit0 <- fit_stan(mod0, data = pd0, method = "optimize")
-
-# Plot baseline hazard
-plt0 <- fit0$plot_h0()
-
-# Get weights
-w <- fit0$get_draws("weights")
-
 # MSM
 mod <- create_msm(tm,
   hazard_covs = covs,
   n_grid = 10000,
   t_max = 20
 )
-mod$set_knots(t_max = 20, t_event = t_event, num_knots = 3)
+t_trans <- pd$transition_times()
+mod$set_knots(t_max = 20, t_event = t_trans, num_knots = 3)
+mod$get_knots()
+```
+
+We fit the model by optimizing.
+
+```{r}
 fit <- fit_stan(mod, data = pd, method = "optimize")
 ```
 
@@ -164,13 +153,14 @@ plt
 
 ## State occupancy probabilities
 
-```{r, fig.width=6}
+```{r}
 # Solve state occupancy probabilities
 df <- p_state_occupancy(fit)
 df <- df |> left_join(fit$data$paths$subject_df, by = "subject_id")
 ```
 
-```{r, fig.width=6}
+
+```{r, fig.width=7, fig.height=4}
 # Plot by age
 plt_age <- ggplot(df, aes(x = time, y = mean(prob), group = subject_id, color = age)) +
   facet_wrap(. ~ state) +
@@ -180,7 +170,7 @@ plt_age
 ```
 
 
-```{r, fig.width=6}
+```{r, fig.width=7, fig.height=4}
 # By sex
 df$sex <- as.factor(df$sex)
 plt_sex <- ggplot(df, aes(x = time, y = mean(prob), group = subject_id, color = sex)) +
@@ -190,7 +180,7 @@ plt_sex
 ```
 
 
-```{r, fig.width=6}
+```{r, fig.width=7, fig.height=4}
 # By donor age
 plt_dage <- ggplot(df, aes(x = time, y = mean(prob), group = subject_id, color = dage)) +
   facet_wrap(. ~ state) +
