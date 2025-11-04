@@ -134,16 +134,6 @@ We fit the model by optimizing.
 fit <- fit_stan(mod, data = pd, method = "optimize")
 ```
 
-## Sampling diagnostics
-
-```{r}
-print(fit$info$diag)
-```
-```{r}
-print(max(fit$info$summary$rhat))
-```
-
-
 ## Inferred baseline hazards
 
 ```{r, fig.width=7, fig.height=4}
@@ -151,14 +141,24 @@ plt <- fit$plot_h0()
 plt
 ```
 
+## Inferred covariate effects
+
+```{r, fig.width=7, fig.height=4}
+fit$covariate_effects()
+```
+
 ## State occupancy probabilities
 
+For each subject, we compute the probability that they are in a given state
+at time $t$.
+
 ```{r}
-# Solve state occupancy probabilities
 df <- p_state_occupancy(fit)
 df <- df |> left_join(fit$data$paths$subject_df, by = "subject_id")
 ```
 
+We plot the state occupancy probabilities, coloring by different covariate
+values.
 
 ```{r, fig.width=7, fig.height=4}
 # Plot by age
