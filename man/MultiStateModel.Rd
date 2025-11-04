@@ -139,7 +139,10 @@ exposure estimated from PK model). Do not use reserved names
 
 \item{\code{num_knots}}{Total number of spline knots.}
 
-\item{\code{categorical}}{Names of categorical covariates.}
+\item{\code{categorical}}{Names of covariates that are binary.
+This only has an effect when simulating data. When fitting a model, all
+covariates are treated as continuous, so you should use a binary encoding
+for categories if there is more than two.}
 
 \item{\code{n_grid}}{Number of time discretization points for integrating
 hazards.}
@@ -362,13 +365,10 @@ Simulate subject data
 \describe{
 \item{\code{N_subject}}{Number of subjects.}
 
-\item{\code{doses}}{Possible doses. Only has effect if a PK submodel exists.}
+\item{\code{doses}}{Possible doses.
+Get indices of states that are not source states}
 }
 \if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-A \code{tibble}
-Get indices of states that are not source states
 }
 }
 \if{html}{\out{<hr>}}

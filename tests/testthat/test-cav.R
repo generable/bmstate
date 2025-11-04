@@ -50,7 +50,6 @@ test_that("cav data analysis works", {
   # Create model and fit
   mod0 <- create_msm(tm0,
     hazard_covs = covs,
-    categ_covs = "sex",
     n_grid = 10000
   )
   mod0$set_knots(t_max = 20, t_event = t_ev, num_knots = 3)

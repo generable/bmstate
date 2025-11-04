@@ -36,6 +36,7 @@ Minimal fit class
 \item \href{#method-MultistateModelFit-plot_pk}{\code{MultistateModelFit$plot_pk()}}
 \item \href{#method-MultistateModelFit-plot_h0}{\code{MultistateModelFit$plot_h0()}}
 \item \href{#method-MultistateModelFit-h0_dist}{\code{MultistateModelFit$h0_dist()}}
+\item \href{#method-MultistateModelFit-covariate_effects}{\code{MultistateModelFit$covariate_effects()}}
 \item \href{#method-MultistateModelFit-log_z_pars}{\code{MultistateModelFit$log_z_pars()}}
 \item \href{#method-MultistateModelFit-num_draws}{\code{MultistateModelFit$num_draws()}}
 \item \href{#method-MultistateModelFit-clone}{\code{MultistateModelFit$clone()}}
@@ -264,9 +265,31 @@ Baseline hazard distribution}
 \describe{
 \item{\code{t}}{times where to evaluate the baseline hazards}
 
-\item{\code{ci_alpha}}{width of credible interval}
+\item{\code{ci_alpha}}{width of credible interval
+Extract covariate effects}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModelFit-covariate_effects"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModelFit-covariate_effects}{}}}
+\subsection{Method \code{covariate_effects()}}{
+Currently not implemented for models that have a PK submodel.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModelFit$covariate_effects()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+A data frame which has columns
+\itemize{
+ \item \code{covariate} Name of the covariate
+ \item \code{beta} The covariate effect parameter estimate (\code{rvar}).
+ NOTE: this is the regression coefficient for \emph{normalized} covariates.
+ \item \code{target_state} Name of the target state. The corresponding
+ beta is the covariate effect on all transitions that end in this
+ target state.
+}
 }
 }
 \if{html}{\out{<hr>}}

@@ -10,13 +10,17 @@ create_msm(tm, hazard_covs = NULL, pk_covs = NULL, categ_covs = NULL, ...)
 \item{tm}{A \code{\link{TransitionMatrix}}. See \code{\link{transmat}}
 for how to create common transition matrices.}
 
-\item{hazard_covs}{Covariates that affect the hazard. A character vector.}
+\item{hazard_covs}{Covariates that affect the hazard. A character vector.
+The name \code{"dose_amt"} is special if simulating data using the model.}
 
 \item{pk_covs}{\emph{Experimental}. Covariates that affect the PK parameters. A list with
 elements \code{ka} \code{CL}, and \code{V2}. If \code{NULL}, a PK model
 will not be created.}
 
-\item{categ_covs}{Names of covariates that are categorical or binary.}
+\item{categ_covs}{Names of covariates that are binary.
+This only has an effect when simulating data. When fitting a model, all
+covariates are treated as continuous, so you should use a binary encoding
+for categories if there is more than two.}
 
 \item{...}{Arguments passed to \code{\link{MultistateModel}} init}
 }

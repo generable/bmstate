@@ -1,0 +1,190 @@
+---
+title: "Time-to-event data analysis with the bmstate package"
+author: Juho Timonen
+date: 4th Nov 2025
+output: 
+  rmarkdown::html_vignette:
+    toc: true 
+    toc_depth: 3
+    number_sections: true
+    
+bibliography: references.bib
+editor: source
+vignette: >
+  %\VignetteIndexEntry{Time-to-event data analysis with the bmstate package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(bmstate)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+theme_set(theme_minimal())
+theme_set(theme_bw())
+```
+
+# Data
+
+## Data preprocessing
+
+Here we analyse the `cav` data from the `msm` package. First we modify the original data like [here](https://rviews.rstudio.com/2023/04/19/multistate-models-for-medical-applications/).
+
+```{r}
+df_full <- as_tibble(msm::cav) |>
+  group_by(PTNUM) |>
+  mutate(
+    min_age = min(age),
+    state = cummax(state)
+  )
+head(df_full)
+```
+
+This is snapshot data of the state at given time rather than exactly observed
+transition times. Only the death times are exact. We make an assumption that
+all state transitions happen exactly at the first time the new state is seen
+in the data.
+
+We select only needed columns and rename them.
+
+```{r}
+df_full$PTNUM <- as.character(df_full$PTNUM)
+df_snapshots <- df_full |> select(PTNUM, state, years, min_age, dage, sex)
+df_snapshots <- df_snapshots |> rename(
+  subject_id = PTNUM,
+  age = min_age,
+  time = years
+)
+head(df_snapshots)
+```
+
+We remove the unnecessary snapshot rows that are not needed after
+making the simplifying assumption.
+
+```{r}
+df_state_changes <- df_snapshots |>
+  arrange(subject_id, time) |>
+  group_by(subject_id) |>
+  mutate(
+    .first = row_number() == 1,
+    .last  = row_number() == n(),
+    .chg   = state != lag(state) # TRUE at the first row of each new state run
+  ) |>
+  filter(.first | .last | .chg | is.na(lag(state))) |> # keep first, last, and changes
+  select(-.first, -.last, -.chg) |>
+  ungroup()
+
+# Every row is a transition but the first
+df_state_changes <- df_state_changes |>
+  group_by(subject_id) |>
+  mutate(is_transition = tidyr::replace_na(state != lag(state), FALSE)) |>
+  ungroup()
+head(df_state_changes)
+```
+
+## Transition matrix
+
+We use the following transition matrix, which is built into the package.
+
+```{r}
+tm <- transmat_progression()
+tm
+```
+
+## The PathData format
+
+We format the data as `PathData`.
+
+```{r}
+covs <- c("age", "dage", "sex")
+pd <- df_to_pathdata(df_state_changes, tm, covs)
+pd
+```
+
+# Analysis
+
+## Fitting a model
+
+We create a model and set the spline knot locations based on quantiles of
+the observed transition times.
+
+```{r}
+# MSM
+mod <- create_msm(tm,
+  hazard_covs = covs,
+  n_grid = 10000,
+  t_max = 20
+)
+t_trans <- pd$transition_times()
+mod$set_knots(t_max = 20, t_event = t_trans, num_knots = 3)
+mod$get_knots()
+```
+
+We fit the model by optimizing.
+
+```{r}
+fit <- fit_stan(mod, data = pd, method = "optimize")
+```
+
+## Inferred baseline hazards
+
+```{r, fig.width=7, fig.height=4}
+plt <- fit$plot_h0()
+plt
+```
+
+## Inferred covariate effects
+
+```{r, fig.width=7, fig.height=4}
+fit$covariate_effects()
+```
+
+## State occupancy probabilities
+
+For each subject, we compute the probability that they are in a given state
+at time $t$.
+
+```{r}
+df <- p_state_occupancy(fit)
+df <- df |> left_join(fit$data$paths$subject_df, by = "subject_id")
+```
+
+We plot the state occupancy probabilities, coloring by different covariate
+values.
+
+```{r, fig.width=7, fig.height=4}
+# Plot by age
+plt_age <- ggplot(df, aes(x = time, y = mean(prob), group = subject_id, color = age)) +
+  facet_wrap(. ~ state) +
+  geom_line(alpha = 0.25) +
+  scale_color_viridis_c()
+plt_age
+```
+
+
+```{r, fig.width=7, fig.height=4}
+# By sex
+df$sex <- as.factor(df$sex)
+plt_sex <- ggplot(df, aes(x = time, y = mean(prob), group = subject_id, color = sex)) +
+  facet_wrap(. ~ state) +
+  geom_line(alpha = 0.25)
+plt_sex
+```
+
+
+```{r, fig.width=7, fig.height=4}
+# By donor age
+plt_dage <- ggplot(df, aes(x = time, y = mean(prob), group = subject_id, color = dage)) +
+  facet_wrap(. ~ state) +
+  geom_line(alpha = 0.25) +
+  scale_color_viridis_c()
+plt_dage
+```
