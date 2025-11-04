@@ -1,19 +1,20 @@
 ---
-title: "Common multistate models"
+title: "Mathematical description of models in the bmstate package"
 author: Juho Timonen
-date: 1st Oct 2025
+date: 4th Nov 2025
 output: 
   rmarkdown::html_vignette:
     toc: true 
     toc_depth: 3
     number_sections: true
+    
+bibliography: references.bib
+editor: source
 vignette: >
-  %\VignetteIndexEntry{Common multistate models}
+  %\VignetteIndexEntry{Mathematical description of models in the bmstate package}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-
-In this vignette, we illustrate some common multistate models.
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -26,6 +27,139 @@ knitr::opts_chunk$set(
 library(bmstate)
 library(ggplot2)
 theme_set(theme_bw())
+```
+
+# Multistate modeling
+
+## States and transitions
+
+In a multistate model, we can represent
+the possible *transitions* between *states* as directed edges of a graph whose
+$S$ nodes correspond to states $s \in {1, \ldots, S}$. The transitions that 
+start from the same node are 
+all at risk simultaneously when the system is in this state. The transitions
+that are at risk simultaneously are
+competing, meaning that occurrence of one transition censors the other ones.
+
+```{r tmat, fig.width=3.5, fig.height=3}
+tmat <- transmat_full(LETTERS[1:3])
+tmat$plot()
+```
+
+```{r stprint}
+tmat$states_df()
+```
+
+```{r tmatprint}
+tmat$trans_df()
+```
+
+## Hazard model
+
+For each transition $h = 1, \ldots, H$ and observation
+unit $n = 1, \ldots, N$, the hazard rates $\lambda^{(h)}_n(t)$, $h = 1, \ldots, H$,
+are modeled as
+$$
+\lambda^{(h)}_n(t) = b^{(h)}(t)\exp\left(\beta_{T_h}^{\top} \mathbf{x}_n \right)
+$$
+
+where
+
+- $b^{(h)}(t)$ represents the baseline hazard for transition $h$
+- $T_h$ is an integer indexing the type (`trans_type`) of transition $h$
+- $\beta_{T_h}$ is the regression coefficient for transition
+type $T_h$
+- $\mathbf{x}_n$ includes time-independent covariates for unit $n$
+
+We group transitions that end in the same state together to have 
+the same transition type.
+
+```{r tmat2, fig.width=3.5, fig.height=3}
+tmat <- transmat_full(LETTERS[1:3])
+el <- parse(text = paste0("lambda[n]^(", c(1, 3, 2, 4), ")"))
+tmat$plot(edge_labs = el, edge.label.cex = 1.5)
+```
+
+## Baseline hazards
+
+Each log baseline hazard $\log b^{(h)}(t)$ is modeled nonparametrically
+so that
+$$
+\log \left(b^{(h)}(t)\right) = b_0^{(h)} + B^{(h)}(t)
+$$
+where $b_0^{(h)}$ is a constant and $B^{(h)}(t)$ is time-dependent variation
+modeled using B-splines. The knot locations for the splines are same for all
+transitions, and are set based on the quantiles of all transition times.
+
+## Priors
+
+Currently the package uses a standard normal prior for the coefficients 
+$\beta$. The prior for the weights of the spline basis functions is
+set hierarchically so that transitions
+of same type have a shared mean. Also the average log hazard rates
+$b_0^{(h)}$ have a hierarchical prior so that transitions of the same type
+have a shared mean. This prior mean is estimated from the data using a standard
+Cox proportional hazards model fit.
+
+
+# State visit risk prediction
+
+We often ultimately want the model to be able to predict, for a given 
+subject, the probability that a particular state is visited at least once
+before time $t$, given
+an initial state $s_0$ at time $t_0$. We denote this probability
+by $P(s \mid t, s_0, t_0)$.
+
+## Path generation
+
+For any subject, which does not
+need to be part of the training data, we can generate a number of state paths 
+starting from $s_0$ at time $t_0$. This can be done via the
+`generate_paths()` function. For drawing the arrival times for 
+a non-homogeneous Poisson process in path 
+generation, we use the thinning algorithm [@lewis1979].
+
+The probability $P(s \mid t, s_0, t_0)$ can then be estimated as the proportion of paths in which $s$ was visited before time $t$. This can be done via the function `p_state_visit_per_subject()`.
+
+## Kolmogorov forward equations
+
+### Generator matrix
+
+If the transition matrix of the multistate model has no self-loops, it is
+a continuous-time Markov process [@norris1997]. In this special case, we can
+define a generator matrix $\mathbf{Q}(t) = [q_{jk}(t)]$, where $q_{kj}(t)$ is called
+the transition rate from state $k$ to state $j$. The
+transition rate for $k \neq j$ is $0$ if the corresponding transition is not 
+possible, and
+otherwise it is given by the corresponding hazard function. Additionally,
+\begin{equation}
+q_{kk}(t) = -\sum_{j \neq k} q_{kj}(t)
+\end{equation}
+for all diagonal values $k \in {1, \ldots, S}$.
+
+### Transition probability matrix
+
+We also define a transition probability matrix $\mathbf{P}_{t_0}(t)$, where the
+element on the $i$th row and $j$th column is the probability that the process is in state $j$ at time $t$, given that it started in state $i$ at time $t_0$. The Kolmogorov forward equations  are
+\begin{equation}
+\frac{\text{d}}{\text{d}t} \mathbf{P}_{t_0}(t) = \mathbf{P}_{t_0}(t) \mathbf{Q}(t),
+\end{equation}
+and we can solve $\mathbf{P}_{t_0}(t)$ using the initial condition 
+$\mathbf{P}_{t_0}(t_0) = I$. 
+
+### State occupancy probability
+
+The function `p_state_occupancy()` can be used to compute, for a set of
+output times $t_{\mathrm{end}}$, the probability that
+a subject occupies the a certain state $s$ given their state $s_0$
+at the initial time. For terminal states, the state occupancy probability at
+time $t$ is the state visit probability $P(s \mid t, s_0, t_0)$.
+
+# Examples of multistate models
+
+In this section, we illustrate some common multistate models.
+
+```{r}
 N_sub <- 1000
 
 # Plot event time distribution
@@ -42,7 +176,7 @@ plot_time_dist <- function(t) {
 }
 ```
 
-# Basic survival model
+## Basic survival model
 
 ```{r}
 tm <- transmat_survival()
@@ -110,7 +244,7 @@ names(r) <- c("Paths", "Analytic")
 print(r)
 ```
 
-# Competing risks model
+## Competing risks model
 
 The transition matrix is for a competing risks model can be created like so.
 
@@ -169,7 +303,7 @@ print(r)
 ```
 
 
-# Illness-death model
+## Illness-death model
 
 The illness-death model is another common multistate model.
 
@@ -208,7 +342,7 @@ print(r)
 ```
 
 
-# Diamond model
+## Diamond model
 
 This model is a more complex multistate model.
 
@@ -249,7 +383,7 @@ names(r) <- c("Paths", "Analytic", "Analytic2")
 print(r)
 ```
 
-# General multistate models
+## General multistate models
 
 General multistate models can have multiple terminal states and various
 transitions.
@@ -270,4 +404,9 @@ before `t_max`, meaning they get censored (no event)
 ```{r, fig.width=5}
 pd$paths$prop_matrix()
 ```
+
+# References
+
+
+
 
