@@ -196,6 +196,22 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
         dplyr::ungroup()
     },
 
+    #' Extract covariate effects
+    #'
+    #' @description Currently not implemented for models that have a PK submodel.
+    #' @return A data frame which has columns
+    #' \itemize{
+    #'  \item \code{covariate} Name of the covariate
+    #'  \item \code{beta} The covariate effect parameter estimate (\code{rvar}).
+    #'  NOTE: this is the regression coefficient for \emph{normalized} covariates.
+    #'  \item \code{target_state} Name of the target state. The corresponding
+    #'  beta is the covariate effect on all transitions that end in this
+    #'  target state.
+    #' }
+    covariate_effects = function() {
+      msmfit_covariate_effects(self)
+    },
+
     #' @description
     #' Full names of parameters that start with \code{log_z_}.
     log_z_pars = function() {
@@ -210,6 +226,28 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
     }
   )
 )
+
+# Extract beta_oth as an rvar column of a data frame
+msmfit_covariate_effects <- function(fit) {
+  if (fit$model$has_pk()) {
+    stop("not implemented for a model that has PK, need to extract manually")
+  }
+  sd <- fit$get_data()
+  covs <- fit$model$covs()
+  df <- NULL
+  for (j in seq_len(sd$nc_haz)) {
+    rv <- as.vector(fit$get_draws("beta_oth")[1, j, ])
+    df_j <- data.frame(
+      covariate = covs[j], beta = rv,
+      target_state_idx = fit$model$target_states()
+    )
+    df <- rbind(df, df_j)
+  }
+  s_df <- fit$model$system$tm()$states_df() |> dplyr::select("state_idx", "state")
+  colnames(s_df) <- c("target_state_idx", "target_state")
+  df$covariate <- as.factor(df$covariate)
+  df |> dplyr::left_join(s_df, by = "target_state_idx")
+}
 
 # Helper
 msmfit_stan_data <- function(fit, data = NULL) {

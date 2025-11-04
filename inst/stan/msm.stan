@@ -484,7 +484,7 @@ transformed parameters {
 
 model {
 
-  // Prior
+  // HAZARD PARAM PRIOR
   if(do_haz == 1){
     if(nc_haz > 0){
       for(k in 1:nc_haz){
@@ -492,17 +492,21 @@ model {
       }
     }
     if(I_auc==1){
-      beta_auc[1, 1] ~ normal(0, 1);
+      beta_auc[1, 1] ~ normal(0, 1); // only if has pk submodel
     }
 
-    sig_w0[1] ~ normal(0, 5);
+    // Baseline hazard base level
+    sig_w0[1] ~ normal(0, 3);
     to_vector(z_w0[1]) ~ std_normal();
+
+    // Baseline hazard spline weights
     to_vector(mu_weights[1]) ~ normal(0, 1);
     to_vector(sig_weights[1]) ~ normal(0, 0.3);
     to_vector(z_weights[1]) ~ std_normal();
   }
+  // END HAZARD PARAM PRIOR
 
-  // Prior
+  // PK PARAM PRIOR
   if(do_pk == 1){
     for(n in 1:size(log_z_pk[1])){
       log_z_pk[1, n] ~ normal(0, 1);
@@ -514,6 +518,7 @@ model {
     beta_V2[1] ~ normal(0, 1);
     sigma_pk[1] ~ normal(0, 0.5);
   }
+  // END PK PARAM PRIOR
 
   // Hazard model likelihood
   if (omit_lik_haz == 0 && do_haz == 1) {

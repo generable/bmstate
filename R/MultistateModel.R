@@ -4,7 +4,11 @@
 #' @param tm A \code{\link{TransitionMatrix}}. See \code{\link{transmat}}
 #' for how to create common transition matrices.
 #' @param hazard_covs Covariates that affect the hazard. A character vector.
-#' @param categ_covs Names of covariates that are categorical or binary.
+#' The name \code{"dose_amt"} is special if simulating data using the model.
+#' @param categ_covs Names of covariates that are binary.
+#' This only has an effect when simulating data. When fitting a model, all
+#' covariates are treated as continuous, so you should use a binary encoding
+#' for categories if there is more than two.
 #' @param pk_covs \emph{Experimental}. Covariates that affect the PK parameters. A list with
 #' elements \code{ka} \code{CL}, and \code{V2}. If \code{NULL}, a PK model
 #' will not be created.
@@ -132,7 +136,10 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' @param pk_model A \code{\link{PKModel}} or NULL.
     #' @param t_max Max time.
     #' @param num_knots Total number of spline knots.
-    #' @param categorical Names of categorical covariates.
+    #' @param categorical Names of covariates that are binary.
+    #' This only has an effect when simulating data. When fitting a model, all
+    #' covariates are treated as continuous, so you should use a binary encoding
+    #' for categories if there is more than two.
     #' @param n_grid Number of time discretization points for integrating
     #' hazards.
     initialize = function(system, covariates = NULL, pk_model = NULL,
@@ -140,6 +147,9 @@ MultistateModel <- R6::R6Class("MultistateModel",
                           n_grid = 1000) {
       checkmate::assert_character(covariates, null.ok = TRUE)
       checkmate::assert_character(categorical, null.ok = TRUE)
+      if (!all(categorical %in% covariates)) {
+        stop("all categorical covariates should be also in covariates")
+      }
       checkmate::assert_true(!("ss_auc" %in% covariates)) # special name
       checkmate::assert_true(!("dose" %in% covariates)) # special name
       checkmate::assert_class(system, "MultistateSystem")
@@ -344,8 +354,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' @description Simulate subject data
     #'
     #' @param N_subject Number of subjects.
-    #' @param doses Possible doses. Only has effect if a PK submodel exists.
-    #' @return A \code{tibble}
+    #' @param doses Possible doses.
     simulate_subjects = function(N_subject = 100, doses = c(15, 30, 60)) {
       checkmate::assert_numeric(doses, min.len = 1, lower = 0)
 

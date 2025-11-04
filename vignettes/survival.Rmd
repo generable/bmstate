@@ -42,6 +42,7 @@ mod <- create_msm(transmat_survival(),
   hazard_covs = "age",
   t_max = tmax
 )
+set.seed(123)
 simdat <- mod$simulate_data(w0 = h0_true, beta_haz = matrix(beta_age_true))
 simdat$paths$plot_graph()
 ```
@@ -78,15 +79,15 @@ print(max(fit$info$summary$rhat))
 
 ## Inferred baseline hazard
 
-```{r}
+```{r, fig.width=6}
 fit$plot_h0() + geom_hline(yintercept = h0_true, lty = 2)
 ```
 
 ## Inferred covariate effect
 
 ```{r}
-beta_age <- fit$get_draws(name = "beta_oth")
-print(beta_age) # compare to beta_age_true
+df_beta <- fit$covariate_effects()
+df_beta
 ```
 
 ## State occupancy probabilities
