@@ -73,8 +73,6 @@ ensure_exposed_stan_functions <- function(...) {
 #' @export
 #' @param model A \code{\link{MultistateModel}} object.
 #' @param data A \code{\link{JointData}} or \code{\link{PathData}} object.
-#' @param prior_only Sample from prior only?
-#' @param pk_only Do not fit hazard model parameters?
 #' @param return_stanfit Return also the raw 'Stan' fit object?
 #' @param set_auc_normalizers Set AUC normalization based on SS doses.
 #' @param filepath Passed to \code{\link{create_stan_model}}.
@@ -84,8 +82,7 @@ ensure_exposed_stan_functions <- function(...) {
 #' \code{pathfinder} or \code{optimize}
 #' method of the 'CmdStanR' model.
 #' @return A \code{\link{MultistateModelFit}} object.
-fit_stan <- function(model, data, prior_only = FALSE,
-                     pk_only = FALSE,
+fit_stan <- function(model, data,
                      set_auc_normalizers = TRUE,
                      filepath = NULL,
                      return_stanfit = FALSE,
@@ -96,8 +93,6 @@ fit_stan <- function(model, data, prior_only = FALSE,
   checkmate::assert_choice(method, c("sample", "pathfinder", "optimize"))
 
   checkmate::assert_logical(return_stanfit, len = 1)
-  checkmate::assert_logical(prior_only, len = 1)
-  checkmate::assert_logical(pk_only, len = 1)
   checkmate::assert_logical(set_auc_normalizers, len = 1)
   prefit_checks(model, data)
 
@@ -113,6 +108,8 @@ fit_stan <- function(model, data, prior_only = FALSE,
     sca <- stats::sd(aaa)
     model$set_auc_normalizers(loc, sca)
   }
+
+  # Todo: set prior mean h0 here
 
   # Create Stan input list
   sd <- create_stan_data(model, data)
