@@ -28,7 +28,7 @@ library(bmstate)
 library(ggplot2)
 library(dplyr)
 library(tidyr)
-theme_set(theme_minimal())
+library(ggdist)
 theme_set(theme_bw())
 ```
 
@@ -288,6 +288,7 @@ We simulate state paths for a single subject using the fit.
 dat_test <- pd$filter(pd$subject_df$subject_id[1])
 pg <- generate_paths(fit, oos = TRUE, data = dat_test, n_rep = 1000)
 ```
+
 We compute the 20-year state visit probabilities.
 
 ```{r}

@@ -61,7 +61,7 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
       self$num_draws() == 1
     },
 
-    #' @description Extract data list
+    #' @description Extract Stan data list
     #'
     get_data = function() {
       private$stan_data
