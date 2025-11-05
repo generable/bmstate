@@ -36,7 +36,11 @@ theme_set(theme_bw())
 
 ## Data preprocessing
 
-Here we analyse the `cav` data from the `msm` package. First we modify the original data like [here](https://rviews.rstudio.com/2023/04/19/multistate-models-for-medical-applications/).
+Here we analyse the `cav` data from the `msm` package. It is a Cardiac Allograft Vasculopathy (CAV) data set of 622 heart transplant recipients. They are observed
+either in state 1 (No CAV), state 2 (Mild CAV), state 3 (Severe CAV),
+or state 4 (Dead).
+
+First we modify the original data like [here](https://rviews.rstudio.com/2023/04/19/multistate-models-for-medical-applications/).
 
 ```{r}
 df_full <- as_tibble(msm::cav) |>
@@ -53,7 +57,13 @@ transition times. Only the death times are exact. We make an assumption that
 all state transitions happen exactly at the first time the new state is seen
 in the data.
 
-We select only needed columns and rename them.
+We select only needed columns and rename them. In our resulting data frame,
+we will have columns 
+
+* `time`: time since transplant (in years) 
+* `age`: age of the patient at transplant time 
+* `dage`: age of the donor
+* `sex`: 0 or 1
 
 ```{r}
 df_full$PTNUM <- as.character(df_full$PTNUM)
@@ -153,8 +163,17 @@ For each subject, we compute the probability that they are in a given state
 at time $t$.
 
 ```{r}
-df <- p_state_occupancy(fit)
-df <- df |> left_join(fit$data$paths$subject_df, by = "subject_id")
+p_state_df <- function(fit, oos, data = NULL) {
+  df <- p_state_occupancy(fit, data = data, oos = oos)
+  if (is.null(data)) {
+    data <- fit$data
+  }
+  df <- df |> left_join(data$paths$subject_df, by = "subject_id")
+  df$State <- paste0(df$state_idx, ": ", df$state)
+  df$sex <- as.factor(df$sex)
+  df
+}
+df <- p_state_df(fit, oos = FALSE)
 ```
 
 We plot the state occupancy probabilities, coloring by different covariate
@@ -163,19 +182,23 @@ values.
 ```{r, fig.width=7, fig.height=4}
 # Plot by age
 plt_age <- ggplot(df, aes(x = time, y = mean(prob), group = subject_id, color = age)) +
-  facet_wrap(. ~ state) +
+  facet_wrap(. ~ State) +
   geom_line(alpha = 0.25) +
-  scale_color_viridis_c()
+  scale_color_viridis_c() +
+  ylab("State probability")
 plt_age
 ```
 
 
 ```{r, fig.width=7, fig.height=4}
 # By sex
-df$sex <- as.factor(df$sex)
-plt_sex <- ggplot(df, aes(x = time, y = mean(prob), group = subject_id, color = sex)) +
-  facet_wrap(. ~ state) +
-  geom_line(alpha = 0.25)
+df_bysex <- df |>
+  group_by(State, time, sex) |>
+  summarise(p_mean = mean(mean(prob)), .groups = "drop")
+plt_sex <- ggplot(df_bysex, aes(x = time, y = p_mean, group = sex, color = sex)) +
+  facet_wrap(. ~ State) +
+  geom_line() +
+  ylab("Mean state probability")
 plt_sex
 ```
 
@@ -183,8 +206,76 @@ plt_sex
 ```{r, fig.width=7, fig.height=4}
 # By donor age
 plt_dage <- ggplot(df, aes(x = time, y = mean(prob), group = subject_id, color = dage)) +
-  facet_wrap(. ~ state) +
+  facet_wrap(. ~ State) +
   geom_line(alpha = 0.25) +
-  scale_color_viridis_c()
+  scale_color_viridis_c() +
+  ylab("State probability")
 plt_dage
 ```
+
+## Predicting for a new subject
+
+Here is a function for creating test data for a new subject with given
+covariates and given state at time 0.
+
+```{r}
+create_test_subject <- function(state, ages = c(20, 30, 40, 50, 60, 70, 80), dage = 20, sex = 0) {
+  pdf <- NULL
+  sdf <- NULL
+  ldf <- NULL
+  j <- 0
+  for (age in ages) {
+    j <- j + 1
+    sid <- paste0("test-", age)
+    pdf_j <- data.frame(path_id = j, state = state, time = c(0, 20), trans_idx = c(0, 1))
+    sdf_j <- data.frame(subject_id = sid, age = age, dage = dage, sex = sex)
+    ldf_j <- data.frame(path_id = j, draw_idx = 1, rep_idx = 1, subject_id = sid)
+    pdf <- rbind(pdf, pdf_j)
+    ldf <- rbind(ldf, ldf_j)
+    sdf <- rbind(sdf, sdf_j)
+  }
+
+  pd <- PathData$new(sdf, pdf, ldf, fit$model$system$tm(), c("age", "dage", "sex"))
+  JointData$new(paths = pd, dosing = NULL)
+}
+```
+
+We can use it like this to predict the state occupancy probabilities for the same subject considering what if they were different age.
+
+### Starting healthy
+
+```{r, fig.width=7, fig.height=4}
+dat_test <- create_test_subject(state = 1)
+df_test <- p_state_df(fit, data = dat_test, oos = TRUE)
+ggplot(df_test, aes(x = time, y = mean(prob), group = subject_id, color = age)) +
+  facet_wrap(. ~ State) +
+  geom_line() +
+  scale_color_viridis_c() +
+  ylab("State probability")
+```
+
+
+### Starting from Mild CAV
+
+```{r, fig.width=7, fig.height=4}
+dat_test <- create_test_subject(state = 2)
+df_test <- p_state_df(fit, data = dat_test, oos = TRUE)
+ggplot(df_test, aes(x = time, y = mean(prob), group = subject_id, color = age)) +
+  facet_wrap(. ~ State) +
+  geom_line() +
+  scale_color_viridis_c() +
+  ylab("State probability")
+```
+
+### Starting from Severe CAV
+
+```{r, fig.width=7, fig.height=4}
+dat_test <- create_test_subject(state = 3)
+df_test <- p_state_df(fit, data = dat_test, oos = TRUE)
+ggplot(df_test, aes(x = time, y = mean(prob), group = subject_id, color = age)) +
+  facet_wrap(. ~ State) +
+  geom_line() +
+  scale_color_viridis_c() +
+  ylab("State probability")
+```
+
