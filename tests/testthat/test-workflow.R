@@ -232,7 +232,7 @@ test_that("PK-only works", {
   h0_base <- 1e-3
 
   # Simulate data
-  sim <- simulate_example_data(N = options$N_subject)
+  sim <- simulate_example_data(N = options$N_subject, pk_only = TRUE)
   mod <- sim$model
   jd <- sim$data
 
@@ -246,8 +246,7 @@ test_that("PK-only works", {
     chains = options$chains,
     refresh = 5,
     adapt_delta = 0.95,
-    init = 0.1,
-    pk_only = TRUE
+    init = 0.1
   )
   fit <- fit$mean_fit()
   expect_true(inherits(fit, "MultistateModelFit"))

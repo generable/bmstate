@@ -61,7 +61,7 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
       self$num_draws() == 1
     },
 
-    #' @description Extract data list
+    #' @description Extract Stan data list
     #'
     get_data = function() {
       private$stan_data
@@ -280,6 +280,7 @@ mat2list <- function(mat) {
 
 
 #' Evaluate PK parameters
+#'
 #' @export
 #' @param fit A \code{\link{MultistateModelFit}} object
 #' @param data A \code{\link{JointData}} object. If \code{NULL}, the
@@ -532,6 +533,7 @@ msmfit_inst_hazard_param_draws <- function(fit, oos = FALSE, data = NULL) {
 generate_paths <- function(fit, oos = FALSE, t_start = 0, t_max = NULL, n_rep = 10,
                            data = NULL) {
   fit$assert_hazard_fit()
+  data <- pd_to_jointdata(data)
   check_oos(oos, data)
   checkmate::assert_class(fit, "MultistateModelFit")
   checkmate::assert_integerish(n_rep, lower = 1, len = 1)
@@ -611,6 +613,7 @@ generate_paths <- function(fit, oos = FALSE, t_start = 0, t_max = NULL, n_rep = 
 #'  Note that \code{prob} is an \code{rvar} over all parameter draws.
 p_state_occupancy <- function(fit, oos = FALSE, t_start = 0, t_out = NULL,
                               data = NULL, ...) {
+  data <- pd_to_jointdata(data)
   check_oos(oos, data)
   checkmate::assert_class(fit, "MultistateModelFit")
   checkmate::assert_number(t_start, lower = 0)

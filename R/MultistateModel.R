@@ -33,12 +33,16 @@ create_msm <- function(tm, hazard_covs = NULL, pk_covs = NULL,
 #' @export
 #' @field system A \code{\link{MultistateSystem}}
 #' @field pk_model \emph{Experimental}. A \code{\link{PKModel}} or NULL.
+#' @field prior_only Should the model ignore likelihood?
+#' @field pk_only \emph{Experimental}. Should the model ignore the entire
+#' hazard model part?
 #' @field n_grid Number of time discretization grid points for numerically
 #' integrating hazards.
 MultistateModel <- R6::R6Class("MultistateModel",
 
   # PRIVATE
   private = list(
+    prior_mean_h0 = NULL,
     hazard_covariates = NULL,
     categorical = NULL,
     normalizer_locations = NULL,
@@ -83,6 +87,8 @@ MultistateModel <- R6::R6Class("MultistateModel",
     system = NULL,
     pk_model = NULL,
     n_grid = NULL,
+    prior_only = FALSE,
+    pk_only = FALSE,
 
     #' @description Get normalization constants for each variable
     #' @return list
@@ -90,15 +96,6 @@ MultistateModel <- R6::R6Class("MultistateModel",
       list(
         locations = private$normalizer_locations,
         scales = private$normalizer_scales
-      )
-    },
-
-    #' @description Get normalization constants for AUC (PK)
-    #' @return list
-    get_auc_normalizers = function() {
-      list(
-        loc = private$auc_normalizer_loc,
-        scale = private$auc_normalizer_scale
       )
     },
 
@@ -114,6 +111,15 @@ MultistateModel <- R6::R6Class("MultistateModel",
       NULL
     },
 
+    #' @description Get normalization constants for AUC (PK)
+    #' @return list
+    get_auc_normalizers = function() {
+      list(
+        loc = private$auc_normalizer_loc,
+        scale = private$auc_normalizer_scale
+      )
+    },
+
     #' Set normalization constants for AUC (side effect)
     #'
     #' @param loc Location
@@ -125,6 +131,26 @@ MultistateModel <- R6::R6Class("MultistateModel",
       private$auc_normalizer_scale <- scale
       NULL
     },
+
+    #' @description Get assumed prior mean baseline hazard rates.
+    #' @return Numeric vector with length equal to number of transitions
+    get_prior_mean_h0 = function() {
+      v <- private$prior_mean_h0
+      if (is.null(v)) {
+        stop("prior mean h0 has not been set")
+      }
+      v
+    },
+
+    #' @description Set assumed prior mean baseline hazard rates (side
+    #' effect).
+    #' @param mean_h0 Numeric vector with length equal to number of transitions
+    set_prior_mean_h0 = function(mean_h0) {
+      N_trans <- self$system$tm()$num_trans()
+      checkmate::assert_numeric(mean_h0, len = N_trans, lower = 0)
+      private$prior_mean_h0 <- mean_h0
+    },
+
 
     #' @description
     #' Create model
@@ -141,10 +167,13 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' covariates are treated as continuous, so you should use a binary encoding
     #' for categories if there is more than two.
     #' @param n_grid Number of time discretization points for integrating
+    #' @param prior_only Should the model ignore likelihood?
+    #' @param pk_only \emph{Experimental}. Should the model ignore the entire
+    #' hazard model part?
     #' hazards.
     initialize = function(system, covariates = NULL, pk_model = NULL,
                           t_max = 1000, num_knots = 5, categorical = NULL,
-                          n_grid = 1000) {
+                          n_grid = 1000, prior_only = FALSE, pk_only = FALSE) {
       checkmate::assert_character(covariates, null.ok = TRUE)
       checkmate::assert_character(categorical, null.ok = TRUE)
       if (!all(categorical %in% covariates)) {
@@ -154,6 +183,8 @@ MultistateModel <- R6::R6Class("MultistateModel",
       checkmate::assert_true(!("dose" %in% covariates)) # special name
       checkmate::assert_class(system, "MultistateSystem")
       checkmate::assert_integerish(n_grid, lower = 10, len = 1)
+      checkmate::assert_logical(prior_only, len = 1)
+      checkmate::assert_logical(pk_only, len = 1)
       if (!is.null(pk_model)) {
         checkmate::assert_class(pk_model, "PKModel")
       }
@@ -165,6 +196,8 @@ MultistateModel <- R6::R6Class("MultistateModel",
       checkmate::assert_integerish(num_knots, lower = 3, upper = 20)
       self$set_knots(t_max, default_event_distribution(t_max), num_knots)
       self$n_grid <- n_grid
+      self$prior_only <- prior_only
+      self$pk_only <- pk_only
     },
 
     #' @description Set knot locations based on event times

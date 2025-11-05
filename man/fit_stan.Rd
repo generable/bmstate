@@ -7,8 +7,6 @@
 fit_stan(
   model,
   data,
-  prior_only = FALSE,
-  pk_only = FALSE,
   set_auc_normalizers = TRUE,
   filepath = NULL,
   return_stanfit = FALSE,
@@ -20,10 +18,6 @@ fit_stan(
 \item{model}{A \code{\link{MultistateModel}} object.}
 
 \item{data}{A \code{\link{JointData}} or \code{\link{PathData}} object.}
-
-\item{prior_only}{Sample from prior only?}
-
-\item{pk_only}{Do not fit hazard model parameters?}
 
 \item{set_auc_normalizers}{Set AUC normalization based on SS doses.}
 
@@ -42,5 +36,6 @@ method of the 'CmdStanR' model.}
 A \code{\link{MultistateModelFit}} object.
 }
 \description{
-\emph{NOTE:} This function has a side effect of setting normalizers.
+\emph{NOTE:} This function has a side effect of setting covariate
+normalizers and prior assumed mean baseline hazard based on data.
 }

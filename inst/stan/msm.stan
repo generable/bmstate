@@ -299,85 +299,68 @@ functions {
 
 data {
 
-  int<lower=1> N_sub;       // number of subjects
-  int<lower=1> N_int;       // total number of intervals
-  array[N_int] int<lower=1,upper=N_sub> idx_sub; // which subject is interval for
+  // ------ Model properties (should not be modified after fitting) ----------
+
+  int<lower=1> N_trans; // number of possible transitions
+  int<lower=1, upper=N_trans> N_trans_types; // number of transition types
+  int<lower=1> N_sbf; // number of spline basis functions
+  int<lower=0, upper=1> do_pk; // flag
+  int<lower=0, upper=1> do_haz; //flag
+  int<lower=0, upper=1> omit_lik_haz; // flag
+  int<lower=0, upper=1> omit_lik_pk; //flag
+  int<lower=0> nc_haz; // number of hazard covariates
+  vector[N_trans] mu_w0; // Assumed mean h0
   int<lower=1> N_grid;      // number of integration grid points
   real<lower=0> delta_grid; // grid step size
-
-  // which value in t_grid does each t_start and t_end time correspond to
-  array[N_int] int<lower=1,upper=N_grid> t_start_idx_m1;
-  array[N_int] int<lower=2,upper=N_grid+1> t_end_idx;
-
-  // how much we need to "correct" the integral for each interval
-  vector<lower=0>[N_int] correction_multiplier;
-
-  // Transitions / intervals data
-  int<lower=1> N_trans; // number of possible transitions
-  int<lower=1> N_trans_types;
-  int<lower=1> D_trans; // max num of occurrences for a transition
-  int<lower=1> D_risk; // max num of at-risk intervals for a transition
-
-  // Total number of occurred transitions / at-risk intervals
-  array[N_trans] int<lower=0> sum_trans;
-  array[N_trans] int<lower=1> sum_risk;
-
-  // Indices of intervals where a transition occurred / was at risk to occur
-  array[N_trans, D_trans] int<lower=0,upper=N_int> which_trans;
-  array[N_trans, D_risk] int<lower=0,upper=N_int> which_risk;
+  matrix[N_grid, N_sbf] SBF_grid; // basis functions evaluated at t_grid
 
   // Transition type (for example can be same as the target state)
   array[N_trans] int<lower=1,upper=N_trans_types> ttype;
 
-  // Mean h0
-  vector[N_trans] mu_w0;
-
-  // Covariates that affect hazard multiplier (excluding exposure)
-  int<lower=0> nc_haz; // number of hazard covariates
-  array[nc_haz] vector[N_sub] x_haz;
-
-  // Which covariates to include in model
+  // PK options
   int<lower=0,upper=1> I_auc;
+  real<lower=0> auc_loc;
+  real<lower=0> auc_scale;
+  int<lower=0> nc_ka; // num of predictors for ka
+  int<lower=0> nc_CL; // num of predictors for CL
+  int<lower=0> nc_V2; // num of predictors for V2
 
-  // Flags
-  int<lower=0,upper=1> do_pk;
-  int<lower=0,upper=1> do_haz;
+  // --- Actual data (can be modified or re-created when predicting) ----------
 
-  // Number of basis functions
-  int<lower=1> N_sbf;
+  // Intervals data
+  int<lower=1> N_int; // total number of intervals
+  int<lower=1> D_trans; // max num of occurrences for a transition
+  int<lower=1> D_risk; // max num of at-risk intervals for a transition
+  array[N_trans] int<lower=0> sum_trans; // total number of occurred
+  array[N_trans] int<lower=1> sum_risk; // total number at risk
+  array[N_trans, D_trans] int<lower=0,upper=N_int> which_trans;
+  array[N_trans, D_risk] int<lower=0,upper=N_int> which_risk;
 
-  // Basis functions evaluated at interval cut points (end points)
-  matrix[N_int, N_sbf] SBF;
+  // Which value in t_grid does each t_start and t_end time correspond to and
+  // how much we need to "correct" the integral for each interval
+  array[N_int] int<lower=1,upper=N_grid> t_start_idx_m1;
+  array[N_int] int<lower=2,upper=N_grid+1> t_end_idx;
+  vector<lower=0>[N_int] correction_multiplier;
 
-  // Basis functions evaluated at t_grid
-  matrix[N_grid, N_sbf] SBF_grid;
+  // Basis functions
+  matrix[N_int, N_sbf] SBF; // evaluated at interval end points
 
-  // Which likelihoods to include
-  int<lower=0, upper=1> omit_lik_haz;
-  int<lower=0, upper=1> omit_lik_pk;
+  // Subject data
+  int<lower=1> N_sub; // number of subjects
+  array[N_int] int<lower=1,upper=N_sub> idx_sub; // which subject is interval for
+   array[nc_haz] vector[N_sub] x_haz;
 
-  // PK model data
+  // Subject data: PK
   vector<lower=0>[N_sub] pk_lloq; // lower limit of quantification
   array[N_sub] vector<lower=0>[2] conc_pk;
   array[N_sub] vector<lower=0>[2] t_obs_pk;
   vector<lower=0>[N_sub] dose_ss;
-  real<lower=0> tau_ss;
-
-  // Used while fitting
   array[N_sub] vector<lower=0>[2] last_two_times; // 1st = last SS trough time
   array[N_sub] vector<lower=0>[2] last_two_doses;
-
-  // PK model covariates
-  int<lower=0> nc_ka; // num of predictors for ka
-  int<lower=0> nc_CL; // num of predictors for CL
-  int<lower=0> nc_V2; // num of predictors for V2
   array[N_sub] vector[nc_ka] x_ka; // covs that affect ka
   array[N_sub] vector[nc_CL] x_CL; // covs that affect CL
   array[N_sub] vector[nc_V2] x_V2; // covs that affect V2
-
-  // AUC normalization
-  real<lower=0> auc_loc;
-  real<lower=0> auc_scale;
+  real<lower=0> tau_ss; // same for all subjects
 
 }
 

@@ -64,9 +64,11 @@
 #' @param beta_haz see the documentation of \code{\link{MultistateModel}}
 #' @param beta_pk see the documentation of \code{\link{MultistateModel}}
 #' @param w0 see the documentation of \code{\link{MultistateModel}}
+#' @param ... arguments passed to \code{\link{create_msm}}
 #' @param tm A \code{\link{TransitionMatrix}}
 simulate_example_data <- function(N = 10, beta_haz = NULL,
-                                  beta_pk = NULL, w0 = 1e-3, tm = NULL) {
+                                  beta_pk = NULL, w0 = 1e-3, tm = NULL,
+                                  ...) {
   covs <- c("sex", "age")
   pk_covs <- list(
     ka = "age",
@@ -77,7 +79,7 @@ simulate_example_data <- function(N = 10, beta_haz = NULL,
     tm <- transmat_survival()
   }
   tmax <- 3 * 365.25
-  mod <- create_msm(tm, covs, pk_covs, t_max = tmax)
+  mod <- create_msm(tm, covs, pk_covs, t_max = tmax, ...)
   dat <- mod$simulate_data(N, beta_haz, beta_pk, w0)
   list(model = mod, data = dat)
 }
