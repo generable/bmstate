@@ -156,6 +156,24 @@ fit_stan <- function(model, data, prior_only = FALSE,
   )
 }
 
+#' Creating Stan data list (model properties)
+#'
+#' @inheritParams fit_stan
+#' @return A list of data for Stan.
+create_stan_data_model <- function(model) {
+  checkmate::assert_class(model, "MultistateModel")
+  tm <- model$system$tm()
+  delta_grid <- model$system$get_tmax() / model$n_grid
+
+  # Likelihood flags
+  flags <- list(
+    omit_lik_haz = as.integer(model$prior_only),
+    omit_lik_pk = as.integer(model$prior_only),
+    do_pk = as.integer(model$has_pk()),
+    do_haz = as.integer(!model$pk_only)
+  )
+  flags
+}
 
 #' Creating Stan data list
 #'
@@ -181,13 +199,7 @@ create_stan_data <- function(model, data, prior_only = FALSE, pk_only = FALSE) {
     create_stan_data_pk(data, model)
   )
 
-  # Likelihood flags
-  flags <- list(
-    omit_lik_haz = as.integer(prior_only),
-    omit_lik_pk = as.integer(prior_only),
-    do_pk = as.integer(model$has_pk()),
-    do_haz = as.integer(!pk_only)
-  )
+
 
   # Return
   c(stan_dat, flags)
