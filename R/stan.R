@@ -88,7 +88,8 @@ fit_stan <- function(model, data,
                      return_stanfit = FALSE,
                      method = "sample", ...) {
   checkmate::assert_class(model, "MultistateModel")
-  data <- ensure_jointdata(data)
+  data <- pd_to_jointdata(data)
+  checkmate::assert_class(data, "JointData")
   checkmate::assert_character(method, len = 1, min.chars = 1)
   checkmate::assert_choice(method, c("sample", "pathfinder", "optimize"))
 

@@ -280,3 +280,30 @@ ggplot(df_test, aes(x = time, y = mean(prob), group = subject_id, color = dage))
   ylab("State probability")
 ```
 
+## Generating paths
+
+We simulate state paths for a single subject using the fit.
+
+```{r}
+dat_test <- pd$filter(pd$subject_df$subject_id[1])
+pg <- generate_paths(fit, oos = TRUE, data = dat_test, n_rep = 1000)
+```
+We compute the 20-year state visit probabilities.
+
+```{r}
+p1 <- p_state_visit_per_subject(pg, "Mild")
+p2 <- p_state_visit_per_subject(pg, "Severe")
+p3 <- p_state_visit_per_subject(pg, "Dead")
+psv <- rbind(p1, p2, p3) |> left_join(pg$subject_df, by = "subject_id")
+psv
+```
+
+We can study the death event time distribution for this subject.
+
+```{r, fig.width=6}
+td <- pg$as_transitions() |> filter(trans_idx > 0 & to == 4)
+ggplot(td, aes(x = time)) +
+  stat_halfeye() +
+  xlab("Death time") +
+  ylab("Density")
+```

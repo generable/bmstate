@@ -27,8 +27,7 @@ that the subject is in the state they are in \code{data} at \code{t_start}.}
 
 \item{t_out}{End times (vector)}
 
-\item{data}{A \code{\link{JointData}} object. If \code{NULL}, the
-data used to fit the model is used.}
+\item{data}{An object of class \code{\link{PathData}} or \code{\link{JointData}}.}
 
 \item{...}{Arguments passed to \code{deSolve::ode()}.}
 }

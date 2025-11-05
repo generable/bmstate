@@ -523,6 +523,7 @@ msmfit_inst_hazard_param_draws <- function(fit, oos = FALSE, data = NULL) {
 #' that the subject is at the given start time.
 #'
 #' @inheritParams msmfit_pk_params
+#' @param data An object of class \code{\link{PathData}} or \code{\link{JointData}}.
 #' @param t_start Start time. A single value or a vector
 #' with length equal to number of subjects.
 #' @param t_max Max time. If \code{NULL}, the max
@@ -532,6 +533,7 @@ msmfit_inst_hazard_param_draws <- function(fit, oos = FALSE, data = NULL) {
 generate_paths <- function(fit, oos = FALSE, t_start = 0, t_max = NULL, n_rep = 10,
                            data = NULL) {
   fit$assert_hazard_fit()
+  data <- pd_to_jointdata(data)
   check_oos(oos, data)
   checkmate::assert_class(fit, "MultistateModelFit")
   checkmate::assert_integerish(n_rep, lower = 1, len = 1)
@@ -597,6 +599,7 @@ generate_paths <- function(fit, oos = FALSE, t_start = 0, t_max = NULL, n_rep = 
 #' @param fit A \code{\link{MultistateModelFit}} object
 #' @inheritParams solve_trans_prob_matrix
 #' @inheritParams msmfit_pk_params
+#' @param data An object of class \code{\link{PathData}} or \code{\link{JointData}}.
 #' @param t_start Start time. The results are transition probabilities to each
 #' state, evaluated at each time point of \code{t_out}, given that the
 #' that the subject is in the state they are in \code{data} at \code{t_start}.
@@ -611,6 +614,7 @@ generate_paths <- function(fit, oos = FALSE, t_start = 0, t_max = NULL, n_rep = 
 #'  Note that \code{prob} is an \code{rvar} over all parameter draws.
 p_state_occupancy <- function(fit, oos = FALSE, t_start = 0, t_out = NULL,
                               data = NULL, ...) {
+  data <- pd_to_jointdata(data)
   check_oos(oos, data)
   checkmate::assert_class(fit, "MultistateModelFit")
   checkmate::assert_number(t_start, lower = 0)

@@ -171,8 +171,8 @@ create_stan_data_pk <- function(data, model) {
     dose_ss <- rep(0, N_sub)
     tau_ss <- 0
   }
-  t_obs_pk <- pk_obs[, 1:2]
-  conc_pk <- pk_obs[, 3:4]
+  t_obs_pk <- pk_obs[, 1:2, drop = FALSE]
+  conc_pk <- pk_obs[, 3:4, drop = FALSE]
   pk_lloq <- as.numeric(pk_obs[, 5])
 
   # Return
