@@ -302,23 +302,23 @@ data {
   // ------ Model properties (should not be modified after fitting) ----------
 
   int<lower=1> N_trans; // number of possible transitions
-  int<lower=1> N_trans_types;
-  int<lower=1> N_grid;      // number of integration grid points
-  real<lower=0> delta_grid; // grid step size
-  int<lower=0> nc_haz; // number of hazard covariates
+  int<lower=1, upper=N_trans> N_trans_types; // number of transition types
   int<lower=1> N_sbf; // number of spline basis functions
   int<lower=0, upper=1> do_pk; // flag
   int<lower=0, upper=1> do_haz; //flag
   int<lower=0, upper=1> omit_lik_haz; // flag
   int<lower=0, upper=1> omit_lik_pk; //flag
+  int<lower=0> nc_haz; // number of hazard covariates
   vector[N_trans] mu_w0; // Assumed mean h0
+  int<lower=1> N_grid;      // number of integration grid points
+  real<lower=0> delta_grid; // grid step size
+  matrix[N_grid, N_sbf] SBF_grid; // basis functions evaluated at t_grid
 
   // Transition type (for example can be same as the target state)
   array[N_trans] int<lower=1,upper=N_trans_types> ttype;
 
   // PK options
   int<lower=0,upper=1> I_auc;
-  real<lower=0> tau_ss;
   real<lower=0> auc_loc;
   real<lower=0> auc_scale;
   int<lower=0> nc_ka; // num of predictors for ka
@@ -344,7 +344,6 @@ data {
 
   // Basis functions
   matrix[N_int, N_sbf] SBF; // evaluated at interval end points
-  matrix[N_grid, N_sbf] SBF_grid; // evaluated at t_grid
 
   // Subject data
   int<lower=1> N_sub; // number of subjects
@@ -361,6 +360,7 @@ data {
   array[N_sub] vector[nc_ka] x_ka; // covs that affect ka
   array[N_sub] vector[nc_CL] x_CL; // covs that affect CL
   array[N_sub] vector[nc_V2] x_V2; // covs that affect V2
+  real<lower=0> tau_ss; // same for all subjects
 
 }
 

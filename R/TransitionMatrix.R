@@ -42,6 +42,11 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
       sum(as.vector(self$matrix))
     },
 
+    #' @description Get number of different transition types.
+    num_trans_types = function() {
+      length(unique(self$trans_df()$trans_type))
+    },
+
     #' @description As a matrix
     #'
     #' @return An \code{N} x \code{N} matrix with named columns and rows

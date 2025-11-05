@@ -32,7 +32,6 @@ integrating hazards.}
 \item \href{#method-MultistateModel-set_normalizers}{\code{MultistateModel$set_normalizers()}}
 \item \href{#method-MultistateModel-get_auc_normalizers}{\code{MultistateModel$get_auc_normalizers()}}
 \item \href{#method-MultistateModel-set_auc_normalizers}{\code{MultistateModel$set_auc_normalizers()}}
-\item \href{#method-MultistateModel-num_trans_types}{\code{MultistateModel$num_trans_types()}}
 \item \href{#method-MultistateModel-get_prior_mean_h0}{\code{MultistateModel$get_prior_mean_h0()}}
 \item \href{#method-MultistateModel-set_prior_mean_h0}{\code{MultistateModel$set_prior_mean_h0()}}
 \item \href{#method-MultistateModel-new}{\code{MultistateModel$new()}}
@@ -116,16 +115,6 @@ Set normalization constants for AUC (side effect)
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModel-num_trans_types"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModel-num_trans_types}{}}}
-\subsection{Method \code{num_trans_types()}}{
-Get number of different transition types.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$num_trans_types()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateModel-get_prior_mean_h0"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateModel-get_prior_mean_h0}{}}}
 \subsection{Method \code{get_prior_mean_h0()}}{
@@ -135,7 +124,7 @@ Get assumed prior mean baseline hazard rates.
 }
 
 \subsection{Returns}{
-Numeric vector with length equal to number of transition types
+Numeric vector with length equal to number of transitions
 }
 }
 \if{html}{\out{<hr>}}
@@ -151,7 +140,7 @@ effect).
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{mean_h0}}{Numeric vector with length equal to transition types}
+\item{\code{mean_h0}}{Numeric vector with length equal to number of transitions}
 }
 \if{html}{\out{</div>}}
 }

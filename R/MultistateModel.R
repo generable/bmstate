@@ -132,17 +132,9 @@ MultistateModel <- R6::R6Class("MultistateModel",
       NULL
     },
 
-
-    #' @description Get number of different transition types.
-    num_trans_types = function() {
-      tm <- self$system$tm()
-      length(unique(tm$trans_df()$trans_type))
-    },
-
     #' @description Get assumed prior mean baseline hazard rates.
-    #' @return Numeric vector with length equal to number of transition types
+    #' @return Numeric vector with length equal to number of transitions
     get_prior_mean_h0 = function() {
-      length(unique(tm$trans_df()$trans_type))
       v <- private$prior_mean_h0
       if (is.null(v)) {
         stop("prior mean h0 has not been set")
@@ -152,10 +144,10 @@ MultistateModel <- R6::R6Class("MultistateModel",
 
     #' @description Set assumed prior mean baseline hazard rates (side
     #' effect).
-    #' @param mean_h0 Numeric vector with length equal to transition types
+    #' @param mean_h0 Numeric vector with length equal to number of transitions
     set_prior_mean_h0 = function(mean_h0) {
-      N_tt <- self$num_trans_types()
-      checkmate::assert_numeric(mean_h0, len = N_tt, lower = 0)
+      N_trans <- self$system$tm()$num_trans()
+      checkmate::assert_numeric(mean_h0, len = N_trans, lower = 0)
       private$prior_mean_h0 <- mean_h0
     },
 
