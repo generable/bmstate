@@ -7,11 +7,11 @@ create_stan_data <- function(model, data) {
   checkmate::assert_class(data, "JointData")
 
   # Create stan data
-  sd_model <- create_stan_data_model(model)
-  sd_data <- create_stan_data_data(model, sd_model, data)
+  sd_mod <- create_stan_data_model(model)
+  sd_dat <- create_stan_data_data(model, data, sd_mod$t_grid, sd_mod$delta_grid)
 
   # Return
-  c(sd_model, sd_data)
+  c(sd_mod, sd_dat)
 }
 
 # Creating Stan data fields that depend on model only, not data
@@ -52,16 +52,19 @@ create_stan_data_model <- function(model) {
 }
 
 # Creating Stan data fields that depend on actual data
-create_stan_data_data <- function(model, data, sd_model) {
+create_stan_data_data <- function(model, data, t_grid, delta_grid) {
   pd <- data$paths
   tm <- pd$transmat
+  dat <- pd$as_transitions()
   check_equal_transmats(tm, model$system$tm())
-
   c(
     create_stan_data_idx_sub(pd),
     create_stan_data_transitions(pd),
-    create_stan_data_spline(pd, model, sd_model),
-    create_stan_data_covariates(pd, model, sd_model),
+    create_stan_data_intervalidx(
+      dat$time_prev, dat$time, t_grid, delta_grid
+    ),
+    create_stan_data_spline(pd, model),
+    create_stan_data_covariates(pd, model),
     create_stan_data_pk(data, model)
   )
 }
@@ -137,22 +140,16 @@ create_stan_data_idx_sub <- function(pd) {
 }
 
 # Evaluate spline basis functions for each interval
-create_stan_data_spline <- function(pd, model, sd_model) {
+create_stan_data_spline <- function(pd, model) {
   # Interval end time spline evaluations
   dat <- pd$as_transitions()
   t <- dat$time
   SBF <- model$system$basisfun_matrix(t)
 
-  # Grid interval indices
-  sd_int <- create_stan_data_intervalidx(
-    dat$time_prev, dat$time, sd_model$t_grid, sd_model$delta_grid
-  )
-
   # Return
-  sd <- list(
+  list(
     SBF = SBF
   )
-  c(sd, sd_int)
 }
 
 # PK data
