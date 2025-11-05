@@ -28,7 +28,8 @@ time of the model is used.}
 
 \item{n_rep}{Number of repeats per draw.}
 
-\item{data}{An object of class \code{\link{PathData}} or \code{\link{JointData}}.}
+\item{data}{A \code{\link{JointData}} object. If \code{NULL}, the
+data used to fit the model is used.}
 }
 \value{
 A \code{\link{PathData}} object.
