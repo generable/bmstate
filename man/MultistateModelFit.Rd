@@ -121,7 +121,7 @@ a logical value
 \if{html}{\out{<a id="method-MultistateModelFit-get_data"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateModelFit-get_data}{}}}
 \subsection{Method \code{get_data()}}{
-Extract data list
+Extract Stan data list
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModelFit$get_data()}\if{html}{\out{</div>}}
 }

@@ -1,9 +1,11 @@
 #' Creating Stan data list
 #'
+#' @export
 #' @inheritParams fit_stan
 #' @return A list of data for Stan.
 create_stan_data <- function(model, data) {
   checkmate::assert_class(model, "MultistateModel")
+  data <- pd_to_jointdata(data)
   checkmate::assert_class(data, "JointData")
 
   # Create stan data
