@@ -219,14 +219,14 @@ Here is a function for creating test data for a new subject with given
 covariates and given state at time 0.
 
 ```{r}
-create_test_subject <- function(state, ages = c(20, 30, 40, 50, 60, 70, 80), dage = 20, sex = 0) {
+create_test_subject <- function(state, dages = c(20, 30, 40, 50, 60, 70, 80), age = 60, sex = 0) {
   pdf <- NULL
   sdf <- NULL
   ldf <- NULL
   j <- 0
-  for (age in ages) {
+  for (dage in dages) {
     j <- j + 1
-    sid <- paste0("test-", age)
+    sid <- paste0("test-", dage)
     pdf_j <- data.frame(path_id = j, state = state, time = c(0, 20), trans_idx = c(0, 1))
     sdf_j <- data.frame(subject_id = sid, age = age, dage = dage, sex = sex)
     ldf_j <- data.frame(path_id = j, draw_idx = 1, rep_idx = 1, subject_id = sid)
@@ -240,14 +240,15 @@ create_test_subject <- function(state, ages = c(20, 30, 40, 50, 60, 70, 80), dag
 }
 ```
 
-We can use it like this to predict the state occupancy probabilities for the same subject considering what if they were different age.
+We can use it like this to predict the state occupancy probabilities for the same 60 years old subject with sex 0, considering what if they got the transplant
+from a donor of given age.
 
 ### Starting healthy
 
 ```{r, fig.width=7, fig.height=4}
 dat_test <- create_test_subject(state = 1)
 df_test <- p_state_df(fit, data = dat_test, oos = TRUE)
-ggplot(df_test, aes(x = time, y = mean(prob), group = subject_id, color = age)) +
+ggplot(df_test, aes(x = time, y = mean(prob), group = subject_id, color = dage)) +
   facet_wrap(. ~ State) +
   geom_line() +
   scale_color_viridis_c() +
@@ -260,7 +261,7 @@ ggplot(df_test, aes(x = time, y = mean(prob), group = subject_id, color = age)) 
 ```{r, fig.width=7, fig.height=4}
 dat_test <- create_test_subject(state = 2)
 df_test <- p_state_df(fit, data = dat_test, oos = TRUE)
-ggplot(df_test, aes(x = time, y = mean(prob), group = subject_id, color = age)) +
+ggplot(df_test, aes(x = time, y = mean(prob), group = subject_id, color = dage)) +
   facet_wrap(. ~ State) +
   geom_line() +
   scale_color_viridis_c() +
@@ -272,7 +273,7 @@ ggplot(df_test, aes(x = time, y = mean(prob), group = subject_id, color = age)) 
 ```{r, fig.width=7, fig.height=4}
 dat_test <- create_test_subject(state = 3)
 df_test <- p_state_df(fit, data = dat_test, oos = TRUE)
-ggplot(df_test, aes(x = time, y = mean(prob), group = subject_id, color = age)) +
+ggplot(df_test, aes(x = time, y = mean(prob), group = subject_id, color = dage)) +
   facet_wrap(. ~ State) +
   geom_line() +
   scale_color_viridis_c() +
