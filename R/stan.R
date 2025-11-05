@@ -67,7 +67,8 @@ ensure_exposed_stan_functions <- function(...) {
 #' Fit a model using 'Stan'
 #'
 #' @description
-#' \emph{NOTE:} This function has a side effect of setting normalizers.
+#' \emph{NOTE:} This function has a side effect of setting covariate
+#' normalizers and prior assumed mean baseline hazard based on data.
 #'
 #' @export
 #' @param model A \code{\link{MultistateModel}} object.
@@ -89,14 +90,11 @@ fit_stan <- function(model, data, prior_only = FALSE,
                      filepath = NULL,
                      return_stanfit = FALSE,
                      method = "sample", ...) {
+  checkmate::assert_class(model, "MultistateModel")
+  data <- ensure_jointdata(data)
   checkmate::assert_character(method, len = 1, min.chars = 1)
   checkmate::assert_choice(method, c("sample", "pathfinder", "optimize"))
-  if (inherits(data, "PathData")) {
-    # no dosing data, just use path data
-    data <- JointData$new(data, NULL)
-  }
-  checkmate::assert_class(model, "MultistateModel")
-  checkmate::assert_class(data, "JointData")
+
   checkmate::assert_logical(return_stanfit, len = 1)
   checkmate::assert_logical(prior_only, len = 1)
   checkmate::assert_logical(pk_only, len = 1)
@@ -117,7 +115,7 @@ fit_stan <- function(model, data, prior_only = FALSE,
   }
 
   # Create Stan input list
-  sd <- create_stan_data(model, data, prior_only, pk_only)
+  sd <- create_stan_data(model, data)
 
   # Call 'Stan'
   if (method == "pathfinder") {
@@ -177,16 +175,14 @@ create_stan_data_model <- function(model) {
 
 #' Creating Stan data list
 #'
-#' @export
 #' @inheritParams fit_stan
 #' @return A list of data for Stan.
-create_stan_data <- function(model, data, prior_only = FALSE, pk_only = FALSE) {
+create_stan_data <- function(model, data) {
   checkmate::assert_class(model, "MultistateModel")
   checkmate::assert_class(data, "JointData")
   pd <- data$paths
   tm <- pd$transmat
   check_equal_transmats(tm, model$system$tm())
-  checkmate::assert_logical(prior_only, len = 1)
   delta_grid <- model$system$get_tmax() / model$n_grid
 
   # Initial Stan data
@@ -199,7 +195,7 @@ create_stan_data <- function(model, data, prior_only = FALSE, pk_only = FALSE) {
     create_stan_data_pk(data, model)
   )
 
-
+  flags <- create_stan_data_model(model)
 
   # Return
   c(stan_dat, flags)

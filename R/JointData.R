@@ -1,3 +1,13 @@
+# PathData or JointData to JointData
+ensure_jointdata <- function(data) {
+  if (inherits(data, "PathData")) {
+    # no dosing data, just use path data
+    data <- JointData$new(data, NULL)
+  }
+  checkmate::assert_class(data, "JointData")
+  data
+}
+
 #' Joint data class (R6 class)
 #'
 #' @export

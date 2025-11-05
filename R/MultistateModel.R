@@ -99,6 +99,18 @@ MultistateModel <- R6::R6Class("MultistateModel",
       )
     },
 
+    #' Set normalization constant for each variable (side effect)
+    #'
+    #' @param data A \code{\link{JointData}} object
+    set_normalizers = function(data) {
+      checkmate::assert_class(data, "JointData")
+      df_sub <- data$paths$subject_df
+      num_cols <- which(sapply(df_sub, is.numeric))
+      private$normalizer_locations <- lapply(df_sub[, num_cols], mean)
+      private$normalizer_scales <- lapply(df_sub[, num_cols], stats::sd)
+      NULL
+    },
+
     #' @description Get normalization constants for AUC (PK)
     #' @return list
     get_auc_normalizers = function() {
@@ -107,6 +119,19 @@ MultistateModel <- R6::R6Class("MultistateModel",
         scale = private$auc_normalizer_scale
       )
     },
+
+    #' Set normalization constants for AUC (side effect)
+    #'
+    #' @param loc Location
+    #' @param scale Scale
+    set_auc_normalizers = function(loc = 0, scale = 1) {
+      checkmate::assert_numeric(loc, lower = 0, len = 1)
+      checkmate::assert_numeric(scale, lower = 0, len = 1)
+      private$auc_normalizer_loc <- loc
+      private$auc_normalizer_scale <- scale
+      NULL
+    },
+
 
     #' @description Get number of different transition types.
     num_trans_types = function() {
@@ -134,29 +159,6 @@ MultistateModel <- R6::R6Class("MultistateModel",
       private$prior_mean_h0 <- mean_h0
     },
 
-    #' Set normalization constant for each variable (side effect)
-    #'
-    #' @param data A \code{\link{JointData}} object
-    set_normalizers = function(data) {
-      checkmate::assert_class(data, "JointData")
-      df_sub <- data$paths$subject_df
-      num_cols <- which(sapply(df_sub, is.numeric))
-      private$normalizer_locations <- lapply(df_sub[, num_cols], mean)
-      private$normalizer_scales <- lapply(df_sub[, num_cols], stats::sd)
-      NULL
-    },
-
-    #' Set normalization constants for AUC (side effect)
-    #'
-    #' @param loc Location
-    #' @param scale Scale
-    set_auc_normalizers = function(loc = 0, scale = 1) {
-      checkmate::assert_numeric(loc, lower = 0, len = 1)
-      checkmate::assert_numeric(scale, lower = 0, len = 1)
-      private$auc_normalizer_loc <- loc
-      private$auc_normalizer_scale <- scale
-      NULL
-    },
 
     #' @description
     #' Create model

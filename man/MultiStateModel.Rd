@@ -29,12 +29,12 @@ integrating hazards.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-MultistateModel-get_normalizers}{\code{MultistateModel$get_normalizers()}}
+\item \href{#method-MultistateModel-set_normalizers}{\code{MultistateModel$set_normalizers()}}
 \item \href{#method-MultistateModel-get_auc_normalizers}{\code{MultistateModel$get_auc_normalizers()}}
+\item \href{#method-MultistateModel-set_auc_normalizers}{\code{MultistateModel$set_auc_normalizers()}}
 \item \href{#method-MultistateModel-num_trans_types}{\code{MultistateModel$num_trans_types()}}
 \item \href{#method-MultistateModel-get_prior_mean_h0}{\code{MultistateModel$get_prior_mean_h0()}}
 \item \href{#method-MultistateModel-set_prior_mean_h0}{\code{MultistateModel$set_prior_mean_h0()}}
-\item \href{#method-MultistateModel-set_normalizers}{\code{MultistateModel$set_normalizers()}}
-\item \href{#method-MultistateModel-set_auc_normalizers}{\code{MultistateModel$set_auc_normalizers()}}
 \item \href{#method-MultistateModel-new}{\code{MultistateModel$new()}}
 \item \href{#method-MultistateModel-set_knots}{\code{MultistateModel$set_knots()}}
 \item \href{#method-MultistateModel-get_knots}{\code{MultistateModel$get_knots()}}
@@ -64,6 +64,23 @@ Get normalization constants for each variable
 
 \subsection{Returns}{
 list
+Set normalization constant for each variable (side effect)
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-set_normalizers"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-set_normalizers}{}}}
+\subsection{Method \code{set_normalizers()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$set_normalizers(data)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{data}}{A \code{\link{JointData}} object}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -77,6 +94,25 @@ Get normalization constants for AUC (PK)
 
 \subsection{Returns}{
 list
+Set normalization constants for AUC (side effect)
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-set_auc_normalizers"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-set_auc_normalizers}{}}}
+\subsection{Method \code{set_auc_normalizers()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$set_auc_normalizers(loc = 0, scale = 1)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{loc}}{Location}
+
+\item{\code{scale}}{Scale}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -115,43 +151,7 @@ effect).
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{mean_h0}}{Numeric vector with length equal to transition types
-Set normalization constant for each variable (side effect)}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModel-set_normalizers"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModel-set_normalizers}{}}}
-\subsection{Method \code{set_normalizers()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$set_normalizers(data)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{data}}{A \code{\link{JointData}} object
-Set normalization constants for AUC (side effect)}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModel-set_auc_normalizers"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModel-set_auc_normalizers}{}}}
-\subsection{Method \code{set_auc_normalizers()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$set_auc_normalizers(loc = 0, scale = 1)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{loc}}{Location}
-
-\item{\code{scale}}{Scale}
+\item{\code{mean_h0}}{Numeric vector with length equal to transition types}
 }
 \if{html}{\out{</div>}}
 }

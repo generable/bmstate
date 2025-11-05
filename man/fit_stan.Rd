@@ -42,5 +42,6 @@ method of the 'CmdStanR' model.}
 A \code{\link{MultistateModelFit}} object.
 }
 \description{
-\emph{NOTE:} This function has a side effect of setting normalizers.
+\emph{NOTE:} This function has a side effect of setting covariate
+normalizers and prior assumed mean baseline hazard based on data.
 }
