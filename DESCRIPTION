@@ -20,7 +20,7 @@ Depends:
 SystemRequirements: CmdStan >= 2.33.0
 Remotes:
   stan-dev/cmdstanr,
-Imports: 
+Imports:
     abind,
     checkmate,
     cmdstanr,

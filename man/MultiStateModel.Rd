@@ -15,6 +15,11 @@ Main model class
 
 \item{\code{pk_model}}{\emph{Experimental}. A \code{\link{PKModel}} or NULL.}
 
+\item{\code{prior_only}}{Should the model ignore likelihood?}
+
+\item{\code{pk_only}}{\emph{Experimental}. Should the model ignore the entire
+hazard model part?}
+
 \item{\code{n_grid}}{Number of time discretization grid points for numerically
 integrating hazards.}
 }
@@ -24,9 +29,11 @@ integrating hazards.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-MultistateModel-get_normalizers}{\code{MultistateModel$get_normalizers()}}
-\item \href{#method-MultistateModel-get_auc_normalizers}{\code{MultistateModel$get_auc_normalizers()}}
 \item \href{#method-MultistateModel-set_normalizers}{\code{MultistateModel$set_normalizers()}}
+\item \href{#method-MultistateModel-get_auc_normalizers}{\code{MultistateModel$get_auc_normalizers()}}
 \item \href{#method-MultistateModel-set_auc_normalizers}{\code{MultistateModel$set_auc_normalizers()}}
+\item \href{#method-MultistateModel-get_prior_mean_h0}{\code{MultistateModel$get_prior_mean_h0()}}
+\item \href{#method-MultistateModel-set_prior_mean_h0}{\code{MultistateModel$set_prior_mean_h0()}}
 \item \href{#method-MultistateModel-new}{\code{MultistateModel$new()}}
 \item \href{#method-MultistateModel-set_knots}{\code{MultistateModel$set_knots()}}
 \item \href{#method-MultistateModel-get_knots}{\code{MultistateModel$get_knots()}}
@@ -56,19 +63,6 @@ Get normalization constants for each variable
 
 \subsection{Returns}{
 list
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModel-get_auc_normalizers"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModel-get_auc_normalizers}{}}}
-\subsection{Method \code{get_auc_normalizers()}}{
-Get normalization constants for AUC (PK)
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$get_auc_normalizers()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-list
 Set normalization constant for each variable (side effect)
 }
 }
@@ -83,10 +77,23 @@ Set normalization constant for each variable (side effect)
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{data}}{A \code{\link{JointData}} object
-Set normalization constants for AUC (side effect)}
+\item{\code{data}}{A \code{\link{JointData}} object}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-get_auc_normalizers"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-get_auc_normalizers}{}}}
+\subsection{Method \code{get_auc_normalizers()}}{
+Get normalization constants for AUC (PK)
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$get_auc_normalizers()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+list
+Set normalization constants for AUC (side effect)
 }
 }
 \if{html}{\out{<hr>}}
@@ -108,6 +115,37 @@ Set normalization constants for AUC (side effect)}
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-get_prior_mean_h0"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-get_prior_mean_h0}{}}}
+\subsection{Method \code{get_prior_mean_h0()}}{
+Get assumed prior mean baseline hazard rates.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$get_prior_mean_h0()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Numeric vector with length equal to number of transitions
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-set_prior_mean_h0"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-set_prior_mean_h0}{}}}
+\subsection{Method \code{set_prior_mean_h0()}}{
+Set assumed prior mean baseline hazard rates (side
+effect).
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$set_prior_mean_h0(mean_h0)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{mean_h0}}{Numeric vector with length equal to number of transitions}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateModel-new"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateModel-new}{}}}
 \subsection{Method \code{new()}}{
@@ -120,7 +158,9 @@ Create model
   t_max = 1000,
   num_knots = 5,
   categorical = NULL,
-  n_grid = 1000
+  n_grid = 1000,
+  prior_only = FALSE,
+  pk_only = FALSE
 )}\if{html}{\out{</div>}}
 }
 
@@ -144,7 +184,12 @@ This only has an effect when simulating data. When fitting a model, all
 covariates are treated as continuous, so you should use a binary encoding
 for categories if there is more than two.}
 
-\item{\code{n_grid}}{Number of time discretization points for integrating
+\item{\code{n_grid}}{Number of time discretization points for integrating}
+
+\item{\code{prior_only}}{Should the model ignore likelihood?}
+
+\item{\code{pk_only}}{\emph{Experimental}. Should the model ignore the entire
+hazard model part?
 hazards.}
 }
 \if{html}{\out{</div>}}

@@ -1,3 +1,12 @@
+# PathData or JointData to JointData
+pd_to_jointdata <- function(data) {
+  if (inherits(data, "PathData")) {
+    # no dosing data, just use path data
+    data <- JointData$new(data, NULL)
+  }
+  data
+}
+
 #' Joint data class (R6 class)
 #'
 #' @export

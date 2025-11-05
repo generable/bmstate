@@ -9,7 +9,8 @@ simulate_example_data(
   beta_haz = NULL,
   beta_pk = NULL,
   w0 = 0.001,
-  tm = NULL
+  tm = NULL,
+  ...
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ simulate_example_data(
 \item{w0}{see the documentation of \code{\link{MultistateModel}}}
 
 \item{tm}{A \code{\link{TransitionMatrix}}}
+
+\item{...}{arguments passed to \code{\link{create_msm}}}
 }
 \description{
 Simulate example data

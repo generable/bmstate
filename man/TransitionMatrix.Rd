@@ -25,6 +25,7 @@ from state \code{i} to \code{j} is possible}
 \item \href{#method-TransitionMatrix-new}{\code{TransitionMatrix$new()}}
 \item \href{#method-TransitionMatrix-num_states}{\code{TransitionMatrix$num_states()}}
 \item \href{#method-TransitionMatrix-num_trans}{\code{TransitionMatrix$num_trans()}}
+\item \href{#method-TransitionMatrix-num_trans_types}{\code{TransitionMatrix$num_trans_types()}}
 \item \href{#method-TransitionMatrix-as_matrix}{\code{TransitionMatrix$as_matrix()}}
 \item \href{#method-TransitionMatrix-as_transition_index_matrix}{\code{TransitionMatrix$as_transition_index_matrix()}}
 \item \href{#method-TransitionMatrix-as_mstate_transmat}{\code{TransitionMatrix$as_mstate_transmat()}}
@@ -86,6 +87,16 @@ Number of transitions
 \subsection{Returns}{
 integer
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-TransitionMatrix-num_trans_types"></a>}}
+\if{latex}{\out{\hypertarget{method-TransitionMatrix-num_trans_types}{}}}
+\subsection{Method \code{num_trans_types()}}{
+Get number of different transition types.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{TransitionMatrix$num_trans_types()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TransitionMatrix-as_matrix"></a>}}
