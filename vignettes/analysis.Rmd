@@ -119,6 +119,7 @@ pd <- df_to_pathdata(df_state_changes, tm, covs)
 pd
 ```
 
+
 # Analysis
 
 ## Fitting a model
