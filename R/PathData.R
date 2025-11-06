@@ -784,17 +784,17 @@ validate_transitions <- function(df) {
 
   tmp <- df |>
     dplyr::mutate(.row = dplyr::row_number()) |>
-    dplyr::group_by(subject_id) |>
+    dplyr::group_by(.data$subject_id) |>
     dplyr::mutate(
-      .is_first   = dplyr::row_number() == 1,
-      .prev_state = dplyr::lag(state),
-      .same_state = (state == .prev_state) | (is.na(state) & is.na(.prev_state))
+      is_first   = dplyr::row_number() == 1,
+      prev_state = dplyr::lag(state),
+      same_state = (.data$state == .prev_state) | (is.na(.data$state) & is.na(.data$prev_state))
     ) |>
     dplyr::ungroup()
 
   # Rule 1: first row per subject must not be a transition
   bad_first <- tmp |>
-    dplyr::filter(.is_first & is_transition)
+    dplyr::filter(.data$is_first & .data$is_transition)
 
   if (nrow(bad_first) > 0) {
     stop(
@@ -809,7 +809,7 @@ validate_transitions <- function(df) {
 
   # Rule 2: non-transition rows (not first) must keep the same state
   mism <- tmp |>
-    dplyr::filter(!.is_first & !is_transition & !.same_state)
+    dplyr::filter(!.data$is_first & !.data$is_transition & !.data$same_state)
 
   if (nrow(mism) > 0) {
     stop(
