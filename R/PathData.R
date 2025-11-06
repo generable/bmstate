@@ -788,7 +788,7 @@ validate_transitions <- function(df) {
     dplyr::mutate(
       is_first   = dplyr::row_number() == 1,
       prev_state = dplyr::lag(state),
-      same_state = (.data$state == .prev_state) | (is.na(.data$state) & is.na(.data$prev_state))
+      same_state = (.data$state == .data$prev_state) | (is.na(.data$state) & is.na(.data$prev_state))
     ) |>
     dplyr::ungroup()
 
