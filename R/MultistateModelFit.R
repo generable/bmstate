@@ -367,7 +367,7 @@ check_oos <- function(oos, data) {
     checkmate::assert_class(data, "JointData")
     if (isFALSE(oos)) {
       message(
-        "data is NULL but oos is FALSE. This should be done only if",
+        "data is not NULL but oos is FALSE. This should be done only if",
         " testing new covariates for the same subjects but still using ",
         " their subject-specific (PK) parameters"
       )
