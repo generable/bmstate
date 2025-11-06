@@ -235,7 +235,11 @@ msmfit_covariate_effects <- function(fit) {
   sd <- fit$get_data()
   covs <- fit$model$covs()
   df <- NULL
-  for (j in seq_len(sd$nc_haz)) {
+  n_covs <- sd$nc_haz
+  if (n_covs == 0) {
+    stop("Model has no covariates")
+  }
+  for (j in seq_len(n_covs)) {
     rv <- as.vector(fit$get_draws("beta_oth")[1, j, ])
     df_j <- data.frame(
       covariate = covs[j], beta = rv,
