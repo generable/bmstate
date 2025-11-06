@@ -561,6 +561,7 @@ as_single_event <- function(pd, event) {
 #' @param event Name of the event of interest (character)
 #' @return A \code{\link{PathData}} object
 as_survival <- function(pd, event) {
+  checkmate::assert_class(pd, "PathData")
   N_sub <- length(pd$unique_subjects())
   a <- as_single_event(pd, event)
   ppd <- a$as_transitions()
