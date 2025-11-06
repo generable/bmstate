@@ -561,6 +561,7 @@ as_single_event <- function(pd, event) {
 #' @param event Name of the event of interest (character)
 #' @return A \code{\link{PathData}} object
 as_survival <- function(pd, event) {
+  checkmate::assert_class(pd, "PathData")
   N_sub <- length(pd$unique_subjects())
   a <- as_single_event(pd, event)
   ppd <- a$as_transitions()
@@ -739,12 +740,18 @@ df_to_paths_df_part2 <- function(pdf, tm) {
 #'    \item For each row that is a transition, the transition from the state
 #'    of the previous row to the current state should be a valid transition
 #'    in \code{tm}.
+#'    \item For each row that is not a transition, the state should not change
+#'    from the previous row of that subject.
 #' }
 #' @param tm A \code{\link{TransitionMatrix}}
 #' @param covs covariates (character vector)
+#' @param validate Do stricter data validation? Recommended to use \code{TRUE}.
 #' @return A \code{\link{PathData}} object
-df_to_pathdata <- function(df, tm, covs = NULL) {
+df_to_pathdata <- function(df, tm, covs = NULL, validate = TRUE) {
   df <- df |> dplyr::arrange(.data$subject_id, .data$time)
+  if (validate) {
+    validate_transitions(df)
+  }
   checkmate::assert_data_frame(df)
   checkmate::assert_true("state" %in% colnames(df))
   checkmate::assert_integerish(df$state)
@@ -764,4 +771,56 @@ df_to_pathdata <- function(df, tm, covs = NULL) {
   pdf <- df_to_paths_df_part1(df, ldf)
   pdf <- df_to_paths_df_part2(pdf, tm) |> dplyr::select(-"prev_state")
   PathData$new(sdf, pdf, ldf, tm, covs)
+}
+
+validate_transitions <- function(df) {
+  # check required columns
+  if (!all(c("subject_id", "state", "is_transition") %in% names(df))) {
+    stop('df must contain columns: "subject_id", "state", "is_transition"', call. = FALSE)
+  }
+  if (!is.logical(df$is_transition)) {
+    stop('"is_transition" must be logical TRUE/FALSE.', call. = FALSE)
+  }
+
+  tmp <- df |>
+    dplyr::mutate(.row = dplyr::row_number()) |>
+    dplyr::group_by(.data$subject_id) |>
+    dplyr::mutate(
+      is_first   = dplyr::row_number() == 1,
+      prev_state = dplyr::lag(.data$state),
+      same_state = (.data$state == .data$prev_state) | (is.na(.data$state) & is.na(.data$prev_state))
+    ) |>
+    dplyr::ungroup()
+
+  # Rule 1: first row per subject must not be a transition
+  bad_first <- tmp |>
+    dplyr::filter(.data$is_first & .data$is_transition)
+
+  if (nrow(bad_first) > 0) {
+    stop(
+      sprintf(
+        "First row per subject must have is_transition == FALSE (subject %s at row %d).",
+        as.character(bad_first$subject_id[[1]]),
+        bad_first$.row[[1]]
+      ),
+      call. = FALSE
+    )
+  }
+
+  # Rule 2: non-transition rows (not first) must keep the same state
+  mism <- tmp |>
+    dplyr::filter(!.data$is_first & !.data$is_transition & !.data$same_state)
+
+  if (nrow(mism) > 0) {
+    stop(
+      sprintf(
+        "Non-transition row changed state (subject %s at row %d).",
+        as.character(mism$subject_id[[1]]),
+        mism$.row[[1]]
+      ),
+      call. = FALSE
+    )
+  }
+
+  invisible(TRUE)
 }

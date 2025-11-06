@@ -235,7 +235,11 @@ msmfit_covariate_effects <- function(fit) {
   sd <- fit$get_data()
   covs <- fit$model$covs()
   df <- NULL
-  for (j in seq_len(sd$nc_haz)) {
+  n_covs <- sd$nc_haz
+  if (n_covs == 0) {
+    stop("Model has no covariates")
+  }
+  for (j in seq_len(n_covs)) {
     rv <- as.vector(fit$get_draws("beta_oth")[1, j, ])
     df_j <- data.frame(
       covariate = covs[j], beta = rv,
@@ -367,7 +371,7 @@ check_oos <- function(oos, data) {
     checkmate::assert_class(data, "JointData")
     if (isFALSE(oos)) {
       message(
-        "data is NULL but oos is FALSE. This should be done only if",
+        "data is not NULL but oos is FALSE. This should be done only if",
         " testing new covariates for the same subjects but still using ",
         " their subject-specific (PK) parameters"
       )

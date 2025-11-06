@@ -4,7 +4,7 @@
 \alias{df_to_pathdata}
 \title{Create 'PathData' from a data frame of one observed path per subject}
 \usage{
-df_to_pathdata(df, tm, covs = NULL)
+df_to_pathdata(df, tm, covs = NULL, validate = TRUE)
 }
 \arguments{
 \item{df}{Data frame. Should have columns
@@ -25,11 +25,15 @@ Rules:
    \item For each row that is a transition, the transition from the state
    of the previous row to the current state should be a valid transition
    in \code{tm}.
+   \item For each row that is not a transition, the state should not change
+   from the previous row of that subject.
 }}
 
 \item{tm}{A \code{\link{TransitionMatrix}}}
 
 \item{covs}{covariates (character vector)}
+
+\item{validate}{Do stricter data validation? Recommended to use \code{TRUE}.}
 }
 \value{
 A \code{\link{PathData}} object
