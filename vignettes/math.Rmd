@@ -1,7 +1,7 @@
 ---
 title: "Mathematical description of models in the bmstate package"
 author: Juho Timonen
-date: 4th Nov 2025
+date: 8th Nov 2025
 output: 
   rmarkdown::html_vignette:
     toc: true 
@@ -426,7 +426,7 @@ pd$paths$plot_graph()
 ```
 
 Some of the paths may not reach a terminal state
-before `t_max`, meaning they get censored (no event)
+before `t_max`, meaning they get censored.
 
 ```{r, fig.width=5}
 pd$paths$prop_matrix()
