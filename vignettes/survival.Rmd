@@ -33,16 +33,46 @@ the usual steps of a data analysis with the package.
 
 ## Simulating data
 
+This is the setup and the definition of the true baseline hazard.
+
 ```{r}
 tmax <- 10
-h0_true <- 0.1 # true baseline hazard
+h0_true <- 0.1 # true baseline hazard intercept
+num_knots <- 4
+w <- matrix(c(-1, -1, 2, 1, 1), 1, num_knots + 1) # true spline weights
 beta_age_true <- 0.5 # true effect size of age
 mod <- create_msm(transmat_survival(),
   hazard_covs = "age",
-  t_max = tmax
+  t_max = tmax,
+  num_knots = num_knots
 )
+```
+
+We create the model and plot the true baseline hazard. The red lines are the
+knot locations used in data simulation.
+
+```{r, fig.width=6}
+tt <- seq(0, tmax, length.out = 100)
+log_h <- mod$system$log_baseline_hazard(tt, log(h0_true), w[1, ])
+df_h <- data.frame(time = tt, h0_true = exp(log_h))
+ggplot(df_h, aes(x = time, y = h0_true)) +
+  geom_line() +
+  labs(x = "Time", y = "Baseline hazard") +
+  geom_vline(
+    xintercept = mod$get_knots(),
+    lty = 2, color = "firebrick"
+  ) +
+  ggtitle("True baseline hazard")
+```
+
+We simulate subjects and events data.
+
+```{r, fig.width=6, fig.height=4}
 set.seed(123)
-simdat <- mod$simulate_data(w0 = h0_true, beta_haz = matrix(beta_age_true))
+simdat <- mod$simulate_data(
+  w0 = h0_true, beta_haz = matrix(beta_age_true),
+  w = w
+)
 simdat$paths$plot_graph()
 ```
 
@@ -71,6 +101,7 @@ fit <- fit_stan(mod, simdat,
 ```{r}
 print(fit$info$diag)
 ```
+
 ```{r}
 print(max(fit$info$summary$rhat))
 ```
@@ -78,8 +109,13 @@ print(max(fit$info$summary$rhat))
 
 ## Inferred baseline hazard
 
-```{r, fig.width=6}
-fit$plot_h0() + geom_hline(yintercept = h0_true, lty = 2)
+We plot the inferred baseline hazard distribution and the true baseline hazard (dashed line).
+
+```{r, fig.width=6, fig.height=4}
+fit$plot_h0() + geom_line(df_h,
+  mapping = aes(x = time, y = h0_true), inherit.aes = FALSE,
+  lty = 2
+)
 ```
 
 ## Inferred covariate effect
@@ -91,7 +127,7 @@ df_beta
 
 ## State occupancy probabilities
 
-```{r, fig.width=6}
+```{r, fig.width=7}
 mfit <- fit$mean_fit() # use point estimate for speed here
 p <- p_state_occupancy(mfit)
 p <- p |> dplyr::left_join(fit$data$paths$subject_df, by = "subject_id")
