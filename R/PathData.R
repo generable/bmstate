@@ -802,7 +802,7 @@ validate_transitions <- function(df) {
       "First row for each subject must have is_transition == FALSE (subject %s at row %d).",
       as.character(bad_first$subject_id[[1]]), bad_first$.row[[1]]
     )
-    stop(msg, call. = FALSE)
+    stop(msg1, call. = FALSE)
   }
 
   # Rule 2: non-transition rows (not first) must keep the same state
