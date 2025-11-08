@@ -15,3 +15,10 @@ logical telling whether they were already exposed
 \description{
 Expose 'Stan' functions if they are not yet exposed
 }
+\seealso{
+Other Stan-related functions: 
+\code{\link{create_stan_model}()},
+\code{\link{default_stan_filepath}()},
+\code{\link{fit_stan}()}
+}
+\concept{Stan-related functions}

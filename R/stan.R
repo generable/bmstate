@@ -1,58 +1,32 @@
-# Checks to be made that make sure that the model settings
-# make sense for given data
-prefit_checks <- function(model, data) {
-  pd <- data$paths
-  lens <- pd$as_transitions() |>
-    dplyr::mutate(time_len = .data$time - .data$time_prev) |>
-    dplyr::pull(.data$time_len)
-
-  # Numbers that can lead to message, warning, or error if bad
-  tmax <- model$get_tmax()
-  min_len <- min(lens)
-  delta_grid <- tmax / model$n_grid
-  max_time <- max(pd$get_path_df()$time)
-
-  # Define possible messages
-  msg <- paste0(
-    "Shortest time interval (", min_len,
-    ") is smaller than delta_grid (", delta_grid,
-    "). Consider increasing n_grid or decreasing t_max of the model."
-  )
-  msg_warning <- paste0(
-    "Set model t_max is more than twice as large as ",
-    "largest observed time in the data. Are you sure you want to do this? ",
-    "If not, set smaller t_max."
-  )
-  msg_error <- paste0(
-    "Model t_max (", tmax,
-    ") is smaller than max observed time in data (",
-    max_time, "). Increase t_max."
-  )
-
-  # Check
-  if (min_len < delta_grid) {
-    message(msg)
-  }
-  if (tmax > 2 * max_time) {
-    warning(msg_warning)
-  }
-  if (tmax < max_time) {
-    stop(msg_error)
-  }
-  TRUE
-}
-
 #' Create the main 'Stan' model
 #'
 #' @export
 #' @param ... Arguments passed to 'CmdStanR'
-#' @param filepath File path to the \code{msm.stan} file.
+#' @param filepath Deprecated.
+#' @description Uses the Stan code at
+#' at \code{\link{default_stan_filepath}} or a custom file if it has been
+#' set using \code{options(bmstate_stan_file = ...)}.
+#' @family Stan-related functions
 create_stan_model <- function(filepath = NULL, ...) {
-  fn <- "msm.stan"
-  if (is.null(filepath)) {
-    filepath <- system.file(file.path("stan", fn), package = "bmstate")
+  msg <- paste0(
+    "filepath argument is deprecated, set is using ",
+    "options(bmstate_stan_file = FILEPATH) instead"
+  )
+  if (!is.null(filepath)) {
+    stop(msg)
   }
+  filepath <- getOption("bmstate_stan_file", default = default_stan_filepath())
+  message("using stan file at ", filepath)
   cmdstanr::cmdstan_model(filepath, ...)
+}
+
+#' Get path to default Stan file
+#'
+#' @export
+#' @family Stan-related functions
+default_stan_filepath <- function() {
+  fn <- "msm.stan"
+  system.file(file.path("stan", fn), package = "bmstate")
 }
 
 #' Expose 'Stan' functions if they are not yet exposed
@@ -60,6 +34,7 @@ create_stan_model <- function(filepath = NULL, ...) {
 #' @export
 #' @param ... Passed to \code{\link{create_stan_model}}
 #' @return logical telling whether they were already exposed
+#' @family Stan-related functions
 ensure_exposed_stan_functions <- function(...) {
   if (exists("STAN_dummy_function")) {
     return(TRUE)
@@ -82,13 +57,14 @@ ensure_exposed_stan_functions <- function(...) {
 #' @param data A \code{\link{JointData}} or \code{\link{PathData}} object.
 #' @param return_stanfit Return also the raw 'Stan' fit object?
 #' @param set_auc_normalizers Set AUC normalization based on SS doses.
-#' @param filepath Passed to \code{\link{create_stan_model}}.
+#' @inheritParams create_stan_model
 #' @param method Must be one of \code{"sample"} (default),
 #' \code{"pathfinder"} or \code{"optimize"}.
 #' @param ... Arguments passed to the \code{sample},
 #' \code{pathfinder} or \code{optimize}
 #' method of the 'CmdStanR' model.
 #' @return A \code{\link{MultistateModelFit}} object.
+#' @family Stan-related functions
 fit_stan <- function(model, data,
                      set_auc_normalizers = TRUE,
                      filepath = NULL,

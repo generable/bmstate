@@ -7,10 +7,19 @@
 create_stan_model(filepath = NULL, ...)
 }
 \arguments{
-\item{filepath}{File path to the \code{msm.stan} file.}
+\item{filepath}{Deprecated.}
 
 \item{...}{Arguments passed to 'CmdStanR'}
 }
 \description{
-Create the main 'Stan' model
+Uses the Stan code at
+at \code{\link{default_stan_filepath}} or a custom file if it has been
+set using \code{options(bmstate_stan_file = ...)}.
 }
+\seealso{
+Other Stan-related functions: 
+\code{\link{default_stan_filepath}()},
+\code{\link{ensure_exposed_stan_functions}()},
+\code{\link{fit_stan}()}
+}
+\concept{Stan-related functions}
