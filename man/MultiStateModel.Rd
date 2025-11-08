@@ -200,6 +200,10 @@ hazards.}
 \if{latex}{\out{\hypertarget{method-MultistateModel-set_knots}{}}}
 \subsection{Method \code{set_knots()}}{
 Set knot locations based on event times
+
+
+The knots define how the spline basis functions are
+set.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModel$set_knots(t_max, t_event, num_knots)}\if{html}{\out{</div>}}
 }
@@ -211,7 +215,8 @@ Set knot locations based on event times
 
 \item{\code{t_event}}{Occurred event times}
 
-\item{\code{num_knots}}{Total number of knots}
+\item{\code{num_knots}}{Total number of knots. Includes the boundary knots.
+Number of spline basis functions will be \code{num_knots + 1}.}
 }
 \if{html}{\out{</div>}}
 }

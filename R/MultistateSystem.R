@@ -399,12 +399,10 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
   )
 )
 
-
 # Evaluate B-spline basis at t
 bspline_basis <- function(t, k, knots, BK) {
   splines2::bSpline(t,
-    degree = k - 1, knots = knots, intercept = TRUE,
-    Boundary.knots = BK
+    degree = k - 1, knots = knots, intercept = TRUE, Boundary.knots = BK
   )
 }
 
