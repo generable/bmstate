@@ -57,7 +57,7 @@ tmat$trans_df()
 ## Hazard model
 
 For each transition $h = 1, \ldots, H$ and observation
-unit $n = 1, \ldots, N$, the hazard rates $\lambda^{(h)}_n(t)$, $h = 1, \ldots, H$,
+unit (subject) $n = 1, \ldots, N$, the hazard rates $\lambda^{(h)}_n(t)$, $h = 1, \ldots, H$,
 are modeled as
 $$
 \lambda^{(h)}_n(t) = b^{(h)}(t)\exp\left(\beta_{T_h}^{\top} \mathbf{x}_n \right)
@@ -89,7 +89,7 @@ $$
 $$
 where $b_0^{(h)}$ is a constant and $B^{(h)}(t)$ is time-dependent variation
 modeled using B-splines. The knot locations for the splines are same for all
-transitions, and are set based on the quantiles of all transition times.
+transitions.
 
 ## Priors
 
@@ -245,25 +245,31 @@ plot_time_dist(times) + geom_vline(xintercept = 1 / lambda, color = "firebrick")
 
 Here generate paths with a lower hazard so that they can get censored
 before the follow-up ends. We compute the risk of death based on paths and 
-ensure that it is correct.
+ensure that it is correct, by comparing to two different more analytic
+implementations of solving a transition probability matrix.
 
 ```{r, fig.width=5}
+# 1) This is the general way using the package
 solve_p <- function(mod, lambda) {
   tt <- c(0, mod$system$get_tmax())
   P <- solve_trans_prob_matrix(mod$system, t_out = tt, log_w0 = log(lambda))
   P[2, 1, ]
 }
+
+# 2) This is a special case which can be used if the baseline hazards are constant,
+# currently not in the package but we use it to validate that we get the
+# Same result
 solve_P_consthaz <- function(mod, h0) {
   Q_true <- mod$system$intensity_matrix(mod$system$get_tmax(), log(h0))
   Matrix::expm(Q_true * mod$system$get_tmax())
 }
+
 lambda <- 1e-3
 pd <- mod$simulate_data(N_sub, w0 = lambda)
 p <- solve_p(mod, lambda)
-p_death1 <- p_state_visit(pd$paths)$prob
-p_death2 <- p[2]
-r <- c(p_death1, p_death2)
-names(r) <- c("Paths", "Analytic")
+P <- solve_P_consthaz(mod, lambda)
+r <- c(p_state_visit(pd$paths)$prob, p[2], P[1, 2])
+names(r) <- c("Paths", "Analytic1", "Analytic2")
 print(r)
 ```
 
@@ -318,10 +324,10 @@ ensure that they are correct.
 ```{r, fig.width=5}
 pd <- mod$simulate_data(N_sub, w0 = 0.01 * w0)
 p <- solve_p(mod, 0.01 * w0)
-p_death1 <- p_state_visit(pd$paths)$prob
-p_death2 <- p[2:4]
-r <- rbind(p_death1, p_death2)
-rownames(r) <- c("Paths", "Analytic")
+P <- solve_P_consthaz(mod, 0.01 * w0)
+r <- rbind(p_state_visit(pd$paths)$prob, p[2:4], P[1, 2:4])
+rownames(r) <- c("Paths", "Analytic1", "Analytic2")
+colnames(r) <- paste0("P(state = ", colnames(r), ")")
 print(r)
 ```
 

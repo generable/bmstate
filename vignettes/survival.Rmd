@@ -1,7 +1,7 @@
 ---
 title: "Survival data analysis with the bmstate package"
 author: Juho Timonen
-date: 3rd Nov 2025
+date: 8th Nov 2025
 output: 
   rmarkdown::html_vignette:
     toc: true 
