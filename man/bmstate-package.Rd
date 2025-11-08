@@ -56,7 +56,7 @@ See the vignettes for more information.
 }
 
 \author{
-Juho Timonen (first.last at iki.fi) and Jacqueline Buros
+Juho Timonen and Jacqueline Buros
 }
 \keyword{Bayesian}
 \keyword{Stan}

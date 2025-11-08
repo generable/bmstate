@@ -4,9 +4,8 @@ Title: Bayesian multistate modeling
 Version: 0.1.4.9000
 Author: Juho Timonen and Jacqueline Buros
 Maintainer: Juho Timonen <juho.timonen@iki.fi>
-Description: Bayesian multistate modeling of time-to-event data,
-    using 'Stan' to fit models. 
-    Transition hazards between the states are modeled with spline baseline
+Description: Bayesian multistate modeling of time-to-event data.
+    Transition hazards between the states are modeled with B-spline baseline
     hazards and time-indepedent covariate effects.
 Encoding: UTF-8
 LazyData: true
@@ -16,7 +15,7 @@ Suggests:
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Depends: 
-    R (>= 3.5.0)
+    R (>= 4.1.0)
 SystemRequirements: CmdStan >= 2.33.0
 Remotes:
   stan-dev/cmdstanr,
