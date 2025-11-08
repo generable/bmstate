@@ -797,24 +797,22 @@ validate_transitions <- function(df) {
   # Rule 1: first row per subject must not be a transition
   bad_first <- tmp |>
     dplyr::filter(.data$is_first & .data$is_transition)
-  msg1 <- sprintf(
-    "First row per subject must have is_transition == FALSE (subject %s at row %d).",
-    as.character(bad_first$subject_id[[1]]),
-    bad_first$.row[[1]]
-  )
   if (nrow(bad_first) > 0) {
+    msg1 <- sprintf(
+      "First row for each subject must have is_transition == FALSE (subject %s at row %d).",
+      as.character(bad_first$subject_id[[1]]), bad_first$.row[[1]]
+    )
     stop(msg, call. = FALSE)
   }
 
   # Rule 2: non-transition rows (not first) must keep the same state
   mism <- tmp |>
     dplyr::filter(!.data$is_first & !.data$is_transition & !.data$same_state)
-  msg2 <- sprintf(
-    "Non-transition row changed state (subject %s at row %d).",
-    as.character(mism$subject_id[[1]]),
-    mism$.row[[1]]
-  )
   if (nrow(mism) > 0) {
+    msg2 <- sprintf(
+      "Non-transition row changed state (subject %s at row %d).",
+      as.character(mism$subject_id[[1]]), mism$.row[[1]]
+    )
     stop(msg2, call. = FALSE)
   }
 
