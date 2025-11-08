@@ -101,6 +101,29 @@ $b_0^{(h)}$ have a hierarchical prior so that transitions of the same type
 have a shared mean. This prior mean is estimated from the data using a standard
 Cox proportional hazards model fit.
 
+You can view the prior in the Stan code for example like this.
+
+```{r}
+stan_lines <- readLines(default_stan_filepath())
+line_idx <- which(grepl(stan_lines, pattern = "HAZARD PARAM PRIOR"))
+stan_lines_prior <- stan_lines[line_idx[1]:line_idx[2]]
+prior_stan_code <- paste(stan_lines_prior, collapse = "\n")
+cat(prior_stan_code)
+```
+
+## Using custom Stan code
+
+```{r}
+stan_lines <- readLines(default_stan_filepath())
+full_stan_code <- paste(stan_lines, collapse = "\n")
+```
+
+You should be able to write `full_stan_code` to some file, edit that file,
+and set `options(bmstate_stan_file = path_to_your_file)`. If a path to custom
+Stan model code has been set, the correctness of package functionality
+cannot be guaranteed. However, it should be safe to change for example just
+the prior of some parameter from, say, `normal(0, 1)` to
+`student_t(4, 0, 1)` for example.
 
 # State visit risk prediction
 
@@ -368,8 +391,6 @@ h0_true_vec <- rep(h0_true, 7)
 h0_true_vec[3] <- 0.1 * h0_true
 h0_true_vec[5] <- 5 * h0_true
 h0_true_vec[7] <- 20 * h0_true
-# h0_true_vec <- rep(1e-8, 7)
-# h0_true_vec[3] <- 1e-3
 
 P_true <- solve_P_consthaz(mod, h0_true_vec)
 p_death3 <- P_true[1, 4]

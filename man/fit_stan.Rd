@@ -21,7 +21,7 @@ fit_stan(
 
 \item{set_auc_normalizers}{Set AUC normalization based on SS doses.}
 
-\item{filepath}{Passed to \code{\link{create_stan_model}}.}
+\item{filepath}{Deprecated.}
 
 \item{return_stanfit}{Return also the raw 'Stan' fit object?}
 
@@ -39,3 +39,10 @@ A \code{\link{MultistateModelFit}} object.
 \emph{NOTE:} This function has a side effect of setting covariate
 normalizers and prior assumed mean baseline hazard based on data.
 }
+\seealso{
+Other Stan-related functions: 
+\code{\link{create_stan_model}()},
+\code{\link{default_stan_filepath}()},
+\code{\link{ensure_exposed_stan_functions}()}
+}
+\concept{Stan-related functions}

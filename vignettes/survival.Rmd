@@ -8,7 +8,6 @@ output:
     toc_depth: 3
     number_sections: true
     
-bibliography: references.bib
 editor: source
 vignette: >
   %\VignetteIndexEntry{Survival data analysis with the bmstate package}

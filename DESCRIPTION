@@ -1,7 +1,7 @@
 Package: bmstate
 Type: Package
 Title: Bayesian multistate modeling
-Version: 0.1.5
+Version: 0.1.6
 Author: Juho Timonen and Jacqueline Buros
 Maintainer: Juho Timonen <juho.timonen@iki.fi>
 Description: Bayesian multistate modeling of time-to-event data.
