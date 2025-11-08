@@ -694,24 +694,26 @@ df_to_paths_df_part2 <- function(pdf, tm) {
     dplyr::mutate(prev_state = dplyr::lag(.data$state, default = 0)) |>
     dplyr::ungroup()
   tim <- tm$as_transition_index_matrix()
+  msg1 <- paste0(
+    "Previous state should not be 0. The first row for any subject",
+    " should never be marked as a transition."
+  )
+
   for (r in seq_len(nrow(pdf))) {
     if (pdf$is_transition[r]) {
       s1 <- pdf$prev_state[r]
       if (s1 == 0) {
-        stop(
-          "Previous state should not be 0. The first row for any subject",
-          " should never be marked as a transition."
-        )
+        stop(msg1)
       }
       s2 <- pdf$state[r]
+      msg2 <- paste0(
+        "row ", r, " has is_transition = TRUE but the given",
+        " transition matrix has no transition from state ",
+        s1, " to ", s2
+      )
       t_idx <- tim[s1, s2]
       if (t_idx == 0) {
-        msg <- paste0(
-          "row ", r, " has is_transition = TRUE but the given",
-          " transition matrix has no transition from state ",
-          s1, " to ", s2
-        )
-        stop(msg)
+        stop(msg2)
       }
       pdf$trans_idx[r] <- t_idx
     }
@@ -795,31 +797,23 @@ validate_transitions <- function(df) {
   # Rule 1: first row per subject must not be a transition
   bad_first <- tmp |>
     dplyr::filter(.data$is_first & .data$is_transition)
-
   if (nrow(bad_first) > 0) {
-    stop(
-      sprintf(
-        "First row per subject must have is_transition == FALSE (subject %s at row %d).",
-        as.character(bad_first$subject_id[[1]]),
-        bad_first$.row[[1]]
-      ),
-      call. = FALSE
+    msg1 <- sprintf(
+      "First row for each subject must have is_transition == FALSE (subject %s at row %d).",
+      as.character(bad_first$subject_id[[1]]), bad_first$.row[[1]]
     )
+    stop(msg, call. = FALSE)
   }
 
   # Rule 2: non-transition rows (not first) must keep the same state
   mism <- tmp |>
     dplyr::filter(!.data$is_first & !.data$is_transition & !.data$same_state)
-
   if (nrow(mism) > 0) {
-    stop(
-      sprintf(
-        "Non-transition row changed state (subject %s at row %d).",
-        as.character(mism$subject_id[[1]]),
-        mism$.row[[1]]
-      ),
-      call. = FALSE
+    msg2 <- sprintf(
+      "Non-transition row changed state (subject %s at row %d).",
+      as.character(mism$subject_id[[1]]), mism$.row[[1]]
     )
+    stop(msg2, call. = FALSE)
   }
 
   invisible(TRUE)

@@ -1,36 +1,43 @@
 # Checks to be made that make sure that the model settings
 # make sense for given data
 prefit_checks <- function(model, data) {
-  tmax <- model$get_tmax()
   pd <- data$paths
   lens <- pd$as_transitions() |>
     dplyr::mutate(time_len = .data$time - .data$time_prev) |>
     dplyr::pull(.data$time_len)
+
+  # Numbers that can lead to message, warning, or error if bad
+  tmax <- model$get_tmax()
   min_len <- min(lens)
   delta_grid <- tmax / model$n_grid
+  max_time <- max(pd$get_path_df()$time)
+
+  # Define possible messages
+  msg <- paste0(
+    "Shortest time interval (", min_len,
+    ") is smaller than delta_grid (", delta_grid,
+    "). Consider increasing n_grid or decreasing t_max of the model."
+  )
+  msg_warning <- paste0(
+    "Set model t_max is more than twice as large as ",
+    "largest observed time in the data. Are you sure you want to do this? ",
+    "If not, set smaller t_max."
+  )
+  msg_error <- paste0(
+    "Model t_max (", tmax,
+    ") is smaller than max observed time in data (",
+    max_time, "). Increase t_max."
+  )
+
+  # Check
   if (min_len < delta_grid) {
-    msg <- paste0(
-      "Shortest time interval (", min_len,
-      ") is smaller than delta_grid (", delta_grid,
-      "). Consider increasing n_grid or decreasing t_max of the model."
-    )
     message(msg)
   }
-  max_time <- max(pd$get_path_df()$time)
-  if (tmax < max_time) {
-    msg <- paste0(
-      "Model t_max (", tmax,
-      ") is smaller than max observed time in data (",
-      max_time, "). Increase t_max."
-    )
-    stop(msg)
-  }
   if (tmax > 2 * max_time) {
-    warning(
-      "Set model t_max is more than twice as large as largest observed time",
-      " in the data. Are you sure you want to do this? If not, set smaller",
-      " t_max."
-    )
+    warning(msg_warning)
+  }
+  if (tmax < max_time) {
+    stop(msg_error)
   }
   TRUE
 }

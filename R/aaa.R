@@ -1,7 +1,7 @@
 #' The 'bmstate' package.
 #'
 #' @description Bayesian multistate modeling of right-censored time-to-event data.
-#' @author Juho Timonen (first.last at iki.fi) and Jacqueline Buros
+#' @author Juho Timonen and Jacqueline Buros
 #' @keywords multistate Stan Bayesian
 #'
 #' @section Transition matrix:

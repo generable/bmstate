@@ -204,7 +204,10 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #'
     #' @param t_max Max time
     #' @param t_event Occurred event times
-    #' @param num_knots Total number of knots
+    #' @param num_knots Total number of knots. Includes the boundary knots.
+    #' Number of spline basis functions will be \code{num_knots + 1}.
+    #' @description The knots define how the spline basis functions are
+    #' set.
     set_knots = function(t_max, t_event, num_knots) {
       checkmate::assert_integerish(num_knots, len = 1, lower = 3)
       checkmate::assert_number(t_max, lower = 0)
