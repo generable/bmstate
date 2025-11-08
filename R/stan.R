@@ -16,7 +16,7 @@ create_stan_model <- function(filepath = NULL, ...) {
     stop(msg)
   }
   filepath <- getOption("bmstate_stan_file", default = default_stan_filepath())
-  message("using stan file at ", filepath)
+  message("Using stan file at ", filepath)
   cmdstanr::cmdstan_model(filepath, ...)
 }
 
