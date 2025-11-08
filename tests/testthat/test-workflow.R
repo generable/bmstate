@@ -40,6 +40,13 @@ test_that("entire workflow works", {
   fit <- a$fit
   expect_true(inherits(fit, "MultistateModelFit"))
 
+  # Print
+  expect_output(print(fit), "A MultistateModelFit with 30 draws")
+
+  # Covariate effects
+  beta <- fit$covariate_effects()
+  expect_equal(nrow(beta), 6)
+
   # Computing hazard multipliers
   log_m <- msmfit_log_hazard_multipliers(fit)
   log_m_test <- msmfit_log_hazard_multipliers(fit, oos = TRUE, data = jd$test)

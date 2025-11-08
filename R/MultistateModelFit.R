@@ -367,14 +367,15 @@ msmfit_exposure <- function(fit, oos = FALSE, data = NULL) {
 # Helper
 check_oos <- function(oos, data) {
   checkmate::assert_logical(oos, len = 1)
+  msg <- paste0(
+    "Given 'data' is not NULL but 'oos' is FALSE. This should be",
+    " done only if testing new covariates for the same subjects but still using",
+    " their subject-specific (PK) parameters."
+  )
   if (!is.null(data)) {
     checkmate::assert_class(data, "JointData")
     if (isFALSE(oos)) {
-      message(
-        "data is not NULL but oos is FALSE. This should be done only if",
-        " testing new covariates for the same subjects but still using ",
-        " their subject-specific (PK) parameters"
-      )
+      message(msg)
     }
   }
   TRUE
