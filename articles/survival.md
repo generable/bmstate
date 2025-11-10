@@ -93,7 +93,7 @@ fit <- fit_stan(mod, simdat,
 #> Chain 1 Iteration: 601 / 800 [ 75%]  (Sampling) 
 #> Chain 1 Iteration: 700 / 800 [ 87%]  (Sampling) 
 #> Chain 1 Iteration: 800 / 800 [100%]  (Sampling) 
-#> Chain 1 finished in 9.1 seconds.
+#> Chain 1 finished in 10.9 seconds.
 ```
 
 ## Sampling diagnostics
@@ -107,12 +107,12 @@ print(fit$info$diag)
 #> [1] 0
 #> 
 #> $ebfmi
-#> [1] 0.877751
+#> [1] 0.9291845
 ```
 
 ``` r
 print(max(fit$info$summary$rhat))
-#> [1] 1.016961
+#> [1] 1.018949
 ```
 
 ## Inferred baseline hazard
@@ -134,8 +134,8 @@ fit$plot_h0() + geom_line(df_h,
 ``` r
 df_beta <- fit$covariate_effects()
 df_beta
-#>   covariate        beta target_state_idx target_state
-#> 1       age 0.42 ± 0.11                2         Dead
+#>   covariate         beta target_state_idx target_state
+#> 1       age 0.41 ± 0.094                2         Dead
 ```
 
 ## State occupancy probabilities

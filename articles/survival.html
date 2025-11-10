@@ -149,7 +149,7 @@ times.</p>
 <span><span class="co">#&gt; Chain 1 Iteration: 601 / 800 [ 75%]  (Sampling) </span></span>
 <span><span class="co">#&gt; Chain 1 Iteration: 700 / 800 [ 87%]  (Sampling) </span></span>
 <span><span class="co">#&gt; Chain 1 Iteration: 800 / 800 [100%]  (Sampling) </span></span>
-<span><span class="co">#&gt; Chain 1 finished in 9.1 seconds.</span></span></code></pre></div>
+<span><span class="co">#&gt; Chain 1 finished in 10.9 seconds.</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="sampling-diagnostics">Sampling diagnostics<a class="anchor" aria-label="anchor" href="#sampling-diagnostics"></a>
@@ -163,10 +163,10 @@ times.</p>
 <span><span class="co">#&gt; [1] 0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $ebfmi</span></span>
-<span><span class="co">#&gt; [1] 0.877751</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 0.9291845</span></span></code></pre></div>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">info</span><span class="op">$</span><span class="va">summary</span><span class="op">$</span><span class="va">rhat</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1.016961</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 1.018949</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="inferred-baseline-hazard">Inferred baseline hazard<a class="anchor" aria-label="anchor" href="#inferred-baseline-hazard"></a>
@@ -186,8 +186,8 @@ baseline hazard (dashed line).</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df_beta</span> <span class="op">&lt;-</span> <span class="va">fit</span><span class="op">$</span><span class="fu">covariate_effects</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">df_beta</span></span>
-<span><span class="co">#&gt;   covariate        beta target_state_idx target_state</span></span>
-<span><span class="co">#&gt; 1       age 0.42 ± 0.11                2         Dead</span></span></code></pre></div>
+<span><span class="co">#&gt;   covariate         beta target_state_idx target_state</span></span>
+<span><span class="co">#&gt; 1       age 0.41 ± 0.094                2         Dead</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="state-occupancy-probabilities">State occupancy probabilities<a class="anchor" aria-label="anchor" href="#state-occupancy-probabilities"></a>
