@@ -43,6 +43,13 @@ test_that("entire workflow works", {
   # Print
   expect_output(print(fit), "A MultistateModelFit with 30 draws")
 
+  # Debug functions
+  a <- plot_stan_data_integral(mod, fit$get_data(), 1)
+  expect_true(is_ggplot(a))
+  a <- plot_stan_data_matrix(mod, fit$get_data(), "transition", 1)
+  expect_true(is_ggplot(a))
+  expect_error(plot_stan_data_matrix(mod, fit$get_data(), "asfd", 4))
+
   # Covariate effects
   beta <- fit$covariate_effects()
   expect_equal(nrow(beta), 6)
