@@ -36,8 +36,6 @@ create_msm <- function(tm, hazard_covs = NULL, pk_covs = NULL,
 #' @field prior_only Should the model ignore likelihood?
 #' @field pk_only \emph{Experimental}. Should the model ignore the entire
 #' hazard model part?
-#' @field n_grid Number of time discretization grid points for numerically
-#' integrating hazards.
 MultistateModel <- R6::R6Class("MultistateModel",
 
   # PRIVATE
@@ -49,6 +47,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
     normalizer_scales = NULL,
     auc_normalizer_loc = 300,
     auc_normalizer_scale = 100,
+    n_grid = NULL,
     simulate_log_hazard_multipliers = function(df_subjects, beta) {
       ts <- self$target_states()
       x <- self$covs()
@@ -86,7 +85,6 @@ MultistateModel <- R6::R6Class("MultistateModel",
   public = list(
     system = NULL,
     pk_model = NULL,
-    n_grid = NULL,
     prior_only = FALSE,
     pk_only = FALSE,
 
@@ -97,6 +95,12 @@ MultistateModel <- R6::R6Class("MultistateModel",
         locations = private$normalizer_locations,
         scales = private$normalizer_scales
       )
+    },
+
+    #' @description Get number of grid points used for integration.
+    #' @return An integer
+    get_n_grid = function() {
+      private$n_grid
     },
 
     #' Set normalization constant for each variable (side effect)
@@ -195,7 +199,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       checkmate::assert_number(t_max, lower = 0)
       checkmate::assert_integerish(num_knots, lower = 3, upper = 20)
       self$set_knots(t_max, default_event_distribution(t_max), num_knots)
-      self$n_grid <- n_grid
+      private$n_grid <- n_grid
       self$prior_only <- prior_only
       self$pk_only <- pk_only
     },

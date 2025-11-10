@@ -310,7 +310,7 @@ data {
   int<lower=0, upper=1> omit_lik_pk; //flag
   int<lower=0> nc_haz; // number of hazard covariates
   vector[N_trans] mu_w0; // Assumed mean h0
-  int<lower=1> N_grid;      // number of integration grid points
+  int<lower=1> N_grid; // number of integration grid points
   real<lower=0> delta_grid; // grid step size
   matrix[N_grid, N_sbf] SBF_grid; // basis functions evaluated at t_grid
 
@@ -341,9 +341,12 @@ data {
   array[N_int] int<lower=1,upper=N_grid> t_start_idx_m1;
   array[N_int] int<lower=2,upper=N_grid+1> t_end_idx;
   vector<lower=0>[N_int] correction_multiplier;
+  vector<lower=0>[N_grid] t_grid;
 
   // Basis functions
-  matrix[N_int, N_sbf] SBF; // evaluated at interval end points
+  matrix[N_int, N_sbf] SBF_end; // evaluated at interval end points
+  vector<lower=0>[N_int] t_int_end; // interval end time points
+  vector<lower=0>[N_int] t_int_start; // interval start time points
 
   // Subject data
   int<lower=1> N_sub; // number of subjects
@@ -519,7 +522,7 @@ model {
 
       // Occurred transitions (log hazard at interval end time)
       target += log_hazard(
-        log_C_haz[idx_occ, h], SBF[idx_occ,:], weights[1,h], log_w0[1,h]
+        log_C_haz[idx_occ, h], SBF_end[idx_occ,:], weights[1,h], log_w0[1,h]
       );
 
       // Evaluate baseline hazard at grid, prepad with zero

@@ -19,9 +19,6 @@ Main model class
 
 \item{\code{pk_only}}{\emph{Experimental}. Should the model ignore the entire
 hazard model part?}
-
-\item{\code{n_grid}}{Number of time discretization grid points for numerically
-integrating hazards.}
 }
 \if{html}{\out{</div>}}
 }
@@ -29,6 +26,7 @@ integrating hazards.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-MultistateModel-get_normalizers}{\code{MultistateModel$get_normalizers()}}
+\item \href{#method-MultistateModel-get_n_grid}{\code{MultistateModel$get_n_grid()}}
 \item \href{#method-MultistateModel-set_normalizers}{\code{MultistateModel$set_normalizers()}}
 \item \href{#method-MultistateModel-get_auc_normalizers}{\code{MultistateModel$get_auc_normalizers()}}
 \item \href{#method-MultistateModel-set_auc_normalizers}{\code{MultistateModel$set_auc_normalizers()}}
@@ -63,6 +61,19 @@ Get normalization constants for each variable
 
 \subsection{Returns}{
 list
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-get_n_grid"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-get_n_grid}{}}}
+\subsection{Method \code{get_n_grid()}}{
+Get number of grid points used for integration.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$get_n_grid()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+An integer
 Set normalization constant for each variable (side effect)
 }
 }

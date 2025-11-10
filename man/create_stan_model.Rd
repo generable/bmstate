@@ -20,6 +20,8 @@ set using \code{options(bmstate_stan_file = ...)}.
 Other Stan-related functions: 
 \code{\link{default_stan_filepath}()},
 \code{\link{ensure_exposed_stan_functions}()},
-\code{\link{fit_stan}()}
+\code{\link{fit_stan}()},
+\code{\link{plot_stan_data_integral}()},
+\code{\link{plot_stan_data_matrix}()}
 }
 \concept{Stan-related functions}

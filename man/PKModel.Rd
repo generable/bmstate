@@ -160,9 +160,9 @@ Simulate data with many subjects
 
 \item{\code{beta_pk}}{Covariate effects}
 
-\item{\code{tau}}{Dosing interval}
+\item{\code{tau}}{Dosing interval (PK)}
 
-\item{\code{sigma}}{Noise magnitude}
+\item{\code{sigma}}{Noise magnitude of concentration measurements (PK)}
 }
 \if{html}{\out{</div>}}
 }

@@ -73,7 +73,8 @@ create_stan_data_data <- function(model, data, t_grid, delta_grid) {
 
 # integration time grid
 create_stan_data_timegrid <- function(model) {
-  delta_grid <- model$system$get_tmax() / model$n_grid
+  G <- model$get_n_grid()
+  delta_grid <- model$system$get_tmax() / G
   t_max <- model$system$get_tmax()
   if (delta_grid > 0.25 * t_max) {
     stop("delta_grid is very large compared to t_max")
@@ -82,7 +83,7 @@ create_stan_data_timegrid <- function(model) {
 
   # Return
   list(
-    N_grid = model$n_grid,
+    N_grid = G,
     delta_grid = delta_grid,
     t_grid = t_grid,
     SBF_grid = model$system$basisfun_matrix(t_grid)
@@ -145,12 +146,14 @@ create_stan_data_idx_sub <- function(pd) {
 create_stan_data_spline <- function(pd, model) {
   # Interval end time spline evaluations
   dat <- pd$as_transitions()
-  t <- dat$time
-  SBF <- model$system$basisfun_matrix(t)
+  t_end <- dat$time
+  t_start <- dat$time_prev
 
   # Return
   list(
-    SBF = SBF
+    SBF_end = model$system$basisfun_matrix(t_end),
+    t_int_end = t_end,
+    t_int_start = t_start
   )
 }
 

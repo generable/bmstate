@@ -99,7 +99,7 @@ prefit_checks <- function(model, data) {
   # Numbers that can lead to message, warning, or error if bad
   tmax <- model$get_tmax()
   min_len <- min(lens)
-  delta_grid <- tmax / model$n_grid
+  delta_grid <- tmax / model$get_n_grid()
   max_time <- max(pd$get_path_df()$time)
 
   # Define possible messages

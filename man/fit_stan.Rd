@@ -43,6 +43,8 @@ normalizers and prior assumed mean baseline hazard based on data.
 Other Stan-related functions: 
 \code{\link{create_stan_model}()},
 \code{\link{default_stan_filepath}()},
-\code{\link{ensure_exposed_stan_functions}()}
+\code{\link{ensure_exposed_stan_functions}()},
+\code{\link{plot_stan_data_integral}()},
+\code{\link{plot_stan_data_matrix}()}
 }
 \concept{Stan-related functions}
