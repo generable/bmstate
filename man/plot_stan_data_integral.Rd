@@ -17,8 +17,6 @@ plot_stan_data_integral(model, stan_data, iidx, h0 = 0.001, w = NULL)
 \item{h0}{Hazard function average value}
 
 \item{w}{Hazard function spline weights. Randomly generated if not given.}
-
-\item{subject_idx}{Index of subject whose data rows to plot.}
 }
 \description{
 Visualize numerical integration of hazard

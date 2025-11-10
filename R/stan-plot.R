@@ -2,7 +2,6 @@
 #'
 #' @export
 #' @inheritParams plot_stan_data_matrix
-#' @param subject_idx Index of subject whose data rows to plot.
 #' @param iidx Interval index
 #' @param h0 Hazard function average value
 #' @param w Hazard function spline weights. Randomly generated if not given.
@@ -41,7 +40,7 @@ plot_stan_data_integral <- function(model, stan_data, iidx, h0 = 0.001, w = NULL
     ) +
     geom_col(
       data = data.frame(time = t_eval, hazard = l_eval),
-      fill = NA, col = "gray40", width = delta_grid
+      fill = NA, col = "gray40", width = sd$delta_grid
     ) +
     geom_col(
       data = data.frame(time = t_eval[i1:i2], hazard = l_eval[i1:i2]),
