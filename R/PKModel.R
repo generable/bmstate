@@ -100,8 +100,8 @@ PKModel <- R6::R6Class("PKModel",
     #'
     #' @param df_subjects Data frame with one row for each subject
     #' @param beta_pk Covariate effects
-    #' @param tau Dosing interval
-    #' @param sigma Noise magnitude
+    #' @param tau Dosing interval (PK)
+    #' @param sigma Noise magnitude of concentration measurements (PK)
     #' @return Data frame with one row for each subject, and a
     #' \code{\link{DosingData}} object
     simulate_data = function(df_subjects, beta_pk = NULL, tau = 24,

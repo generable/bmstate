@@ -147,9 +147,10 @@ We generate example data for a single subject here and plot the realized path.
 
 ```{r, fig.width=6}
 set.seed(383)
-mod <- create_msm(tmat, n_grid = 100)
-mod$set_prior_mean_h0(c(0.1, 0.01, 0.05))
-dat <- mod$simulate_data(N_subject = 1)
+mod <- create_msm(tmat, n_grid = 10) # set very low n_grid for demo
+h0_true <- rep(1e-3, 3)
+mod$set_prior_mean_h0(h0_true) # has no effect for simulation
+dat <- mod$simulate_data(N_subject = 1, w0 = h0_true)
 dat$paths$plot_paths(truncate = TRUE, alpha = 1) + ggtitle("")
 ```
 
@@ -179,14 +180,40 @@ where $\theta = \{\theta_0, \beta\}$ contains the baseline hazard parameters $\t
 ## Numerical integration
 
 The package relies on numerical integration of the hazard functions to evaluate
-the likelihood. The integration step size is `mod$get_tmax() / mod$n_grid`,
-which we can check here.
+the likelihood. The integration step size is the max time divided by number
+of grid points, which we can check here.
 
 ```{r}
-delta_grid <- mod$get_tmax() / mod$n_grid
+delta_grid <- mod$get_tmax() / mod$get_n_grid()
 a <- c(delta_grid, sd$delta_grid)
 names(a) <- c("expected delta_grid", "found delta_grid")
 print(a)
+```
+
+We create an example hazard function to demonstrate numerical integration.
+
+```{r, fig.width=6}
+hfun <- function(t) {
+  w <- c(0.2, 0.3, 0.5, -0.5, 0, 0.1)
+  log_h <- mod$system$log_baseline_hazard(t, log(h0_true[1]), w = w)
+  exp(log_h)
+}
+```
+
+We demonstrate the integration grid.
+
+```{r, fig.width=6}
+tt <- seq(0, mod$get_tmax())
+ll <- hfun(tt)
+t_eval <- sd$t_grid
+l_eval <- hfun(t_eval)
+plt_bh <- ggplot(data.frame(time = tt, hazard = ll), aes(x = time, y = hazard)) +
+  geom_col(
+    data = data.frame(time = t_eval, hazard = l_eval),
+    fill = NA, col = "firebrick", width = delta_grid
+  ) +
+  geom_line(lwd = 1)
+plt_bh
 ```
 
 

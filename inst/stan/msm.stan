@@ -310,7 +310,7 @@ data {
   int<lower=0, upper=1> omit_lik_pk; //flag
   int<lower=0> nc_haz; // number of hazard covariates
   vector[N_trans] mu_w0; // Assumed mean h0
-  int<lower=1> N_grid;      // number of integration grid points
+  int<lower=1> N_grid; // number of integration grid points
   real<lower=0> delta_grid; // grid step size
   matrix[N_grid, N_sbf] SBF_grid; // basis functions evaluated at t_grid
 
