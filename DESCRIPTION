@@ -10,6 +10,7 @@ Description: Bayesian multistate modeling of time-to-event data.
 Encoding: UTF-8
 LazyData: true
 Suggests: 
+    ggpubr,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
@@ -43,7 +44,8 @@ Imports:
     tibble,
     tidyr,
     utils,
-    msm
+    msm,
+    reshape2
 RoxygenNote: 7.3.2
 Config/testthat/edition: 3
 License: file LICENSE

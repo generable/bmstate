@@ -29,7 +29,7 @@ library(ggplot2)
 theme_set(theme_bw())
 ```
 
-# Multistate modeling
+# Multistate hazard model
 
 ## States and transitions
 
@@ -41,8 +41,10 @@ all at risk simultaneously when the system is in this state. The transitions
 that are at risk simultaneously are
 competing, meaning that occurrence of one transition censors the other ones.
 
+Below is an example multistate system.
+
 ```{r tmat, fig.width=3.5, fig.height=3}
-tmat <- transmat_full(LETTERS[1:3])
+tmat <- transmat_illnessdeath()
 tmat$plot()
 ```
 
@@ -75,8 +77,7 @@ We group transitions that end in the same state together to have
 the same transition type.
 
 ```{r tmat2, fig.width=3.5, fig.height=3}
-tmat <- transmat_full(LETTERS[1:3])
-el <- parse(text = paste0("lambda[n]^(", c(1, 3, 2, 4), ")"))
+el <- parse(text = paste0("lambda[n]^(", c(1, 2, 3), ")"))
 tmat$plot(edge_labs = el, edge.label.cex = 1.5)
 ```
 
@@ -124,6 +125,61 @@ Stan model code has been set, the correctness of package functionality
 cannot be guaranteed. However, it should be safe to change for example just
 the prior of some parameter from, say, `normal(0, 1)` to
 `student_t(4, 0, 1)` for example.
+
+# Likelihood evaluation
+
+## Binary matrix representation of observed data
+
+For each subject $i = 1, \ldots, N$, the state transition times
+divide the follow-up time period into $K_i \geq 1$ intervals. We assume 
+$t^{(i)}_0 = 0$ as the start time of the first interval and for $k \geq 1$ use
+$t^{(i)}_k$ to denote the end time of the
+$k$th interval. Furthermore, let $s^{(i)}_0$ be the initial state and $s^{(i)}_k \in \{1, \ldots, S\}$ to denote the state
+that subject $i$ was in at the end of the time interval. 
+
+We use the binary variable $\delta_{k,i}^{(h)}$ 
+to indicate whether transition $h \in \{1, \ldots, H\}$ occurred at the end of
+the $k$th time interval for unit $i$. Another binary variable $I_{k,i}^{(h)}$ 
+indicates whether unit $i$ was at risk for transition $h$ during the 
+$k$th time interval. We collect the entire observed multistate path (event sequence) data into $\mathbf{D}_{\textrm{MS}} = \left \{\Delta_i, \mathbf{I}_i, \mathbf{t}_i \right\}_{i=1}^N$ where $\Delta_i$, $\mathbf{I}_i$ and $\mathbf{t}_i$ contain the transition indicator, risk indicator, and interval time data for unit $i$, respectively.
+
+We generate example data for a single subject here and plot the realized path.
+
+```{r, fig.width=6}
+set.seed(383)
+mod <- create_msm(tmat, n_grid = 100)
+mod$set_prior_mean_h0(c(0.1, 0.01, 0.05))
+dat <- mod$simulate_data(N_subject = 1)
+dat$paths$plot_paths(truncate = TRUE, alpha = 1) + ggtitle("")
+```
+
+
+Here we plot the corresponding binary values $\delta_{k,1}^{(h)}$ and
+$I_{k,1}^{(h)}$ in $H \times K$ matrices `transition` and
+`at_risk`, respectively.
+
+```{r, fig.width=6}
+sd <- create_stan_data(mod, dat)
+a <- plot_stan_data(mod, sd, "transition", 1)
+b <- plot_stan_data(mod, sd, "at_risk", 1)
+ggpubr::ggarrange(a, b, nrow = 1, ncol = 2)
+```
+
+
+## Likelihood formula
+
+The log likelihood of the path data is [@kneib2008]
+
+\begin{equation}
+\label{eq: mslik}
+\log p(\mathbf{D}_{\textrm{MS}} \mid \theta) = \sum_{i=1}^{N} \sum_{k=1}^{K_i}\sum_{h=1}^H\left[\delta_{k,i}^{(h)}\log\left(\lambda_i^{(h)}(t^{(i)}_k \mid \theta) \right) - \text{I}_{k,i}^{(h)} \int_{t^{(i)}_{k-1}}^{t^{(i)}_{k}} \lambda_i^{(h)}(t \mid \theta) \text{d}t \right]
+\end{equation}
+where $\theta = \{\theta_0, \beta}$ contains the baseline hazard parameters $\theta_0$ and regression coefficients $\beta$.
+
+The package relies on numerical integration of the hazard functions. This is
+required to evaluate the likelihood, which involves integrating over the
+intervals that were at risk.
+
 
 # State visit risk prediction
 
@@ -431,6 +487,8 @@ before `t_max`, meaning they get censored.
 ```{r, fig.width=5}
 pd$paths$prop_matrix()
 ```
+
+
 
 # References
 
