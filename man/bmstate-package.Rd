@@ -55,6 +55,13 @@ You can fit a model with 'Stan' using \code{\link{fit_stan}}.
 See the vignettes for more information.
 }
 
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://generable.github.io/bmstate/}
+}
+
+}
 \author{
 Juho Timonen and Jacqueline Buros
 }
