@@ -13,7 +13,7 @@ Authors@R:
            family = "Buros",
            role = c("ctb")
            ),
-      person(given = "Generable Inc.",
+      person(given = "Generable",
            role = c("cph", "fnd")
            )
     )
