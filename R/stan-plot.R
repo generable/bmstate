@@ -41,3 +41,40 @@ plot_mat <- function(x) {
     theme_bw() +
     theme(panel.grid.major = element_blank())
 }
+
+plot_integral <- function(mod, sd, iidx, h0, w) {
+  checkmate::assert_number(h0, lower = 0)
+  if (is.null(w)) {
+    w <- stats::rnorm(mod$system$num_weights(), sd = 0.3)
+  }
+  checkmate::assert_vector(w)
+  hfun <- function(t) {
+    log_h <- mod$system$log_baseline_hazard(t, log(h0), w = w)
+    exp(log_h)
+  }
+  tt <- seq(0, mod$get_tmax())
+  ll <- hfun(tt)
+  t_eval <- sd$t_grid
+  l_eval <- hfun(t_eval)
+  i1 <- sd$t_start_idx_m1[iidx]
+  i2 <- sd$t_end_idx[iidx] - 1
+  xint <- c(sd$t_int_start[iidx], sd$t_int_end[iidx])
+  ts <- paste0("interval_idx = ", iidx, ", correction_multiplier = ", round(sd$correction_multiplier[iidx], 5))
+  ggplot(data.frame(time = tt, hazard = ll), aes(x = time, y = hazard)) +
+    stat_function(
+      fun = hfun,
+      xlim = xint,
+      geom = "area",
+      fill = "steelblue"
+    ) +
+    geom_col(
+      data = data.frame(time = t_eval, hazard = l_eval),
+      fill = NA, col = "gray40", width = delta_grid
+    ) +
+    geom_col(
+      data = data.frame(time = t_eval[i1:i2], hazard = l_eval[i1:i2]),
+      fill = "firebrick3", col = "firebrick3", width = delta_grid, alpha = 0.3
+    ) +
+    geom_line(lwd = 1) +
+    ggtitle(ts, subtitle = "Blue area ~ Area of red bars x Correction multiplier")
+}

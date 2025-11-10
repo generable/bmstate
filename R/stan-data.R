@@ -146,12 +146,14 @@ create_stan_data_idx_sub <- function(pd) {
 create_stan_data_spline <- function(pd, model) {
   # Interval end time spline evaluations
   dat <- pd$as_transitions()
-  t <- dat$time
-  SBF <- model$system$basisfun_matrix(t)
+  t_end <- dat$time
+  t_start <- dat$time_prev
 
   # Return
   list(
-    SBF = SBF
+    SBF_end = model$system$basisfun_matrix(t_end),
+    t_int_end = t_end,
+    t_int_start = t_start
   )
 }
 

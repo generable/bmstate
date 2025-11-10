@@ -190,30 +190,12 @@ names(a) <- c("expected delta_grid", "found delta_grid")
 print(a)
 ```
 
-We create an example hazard function to demonstrate numerical integration.
+We demonstrate the integration grid with an example hazard function.
 
 ```{r, fig.width=6}
-hfun <- function(t) {
-  w <- c(0.2, 0.3, 0.5, -0.5, 0, 0.1)
-  log_h <- mod$system$log_baseline_hazard(t, log(h0_true[1]), w = w)
-  exp(log_h)
-}
-```
-
-We demonstrate the integration grid.
-
-```{r, fig.width=6}
-tt <- seq(0, mod$get_tmax())
-ll <- hfun(tt)
-t_eval <- sd$t_grid
-l_eval <- hfun(t_eval)
-plt_bh <- ggplot(data.frame(time = tt, hazard = ll), aes(x = time, y = hazard)) +
-  geom_col(
-    data = data.frame(time = t_eval, hazard = l_eval),
-    fill = NA, col = "firebrick", width = delta_grid
-  ) +
-  geom_line(lwd = 1)
-plt_bh
+w <- c(0.2, 0.3, 0.5, -0.5, 0, 0.1)
+h0 <- 0.001
+bmstate:::plot_integral(mod, sd, 2, h0, w)
 ```
 
 
