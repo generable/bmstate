@@ -14,3 +14,4 @@ docs/
 .Rproj.user
 inst/doc
 *.pdf
+docs

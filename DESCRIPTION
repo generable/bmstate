@@ -49,3 +49,4 @@ Imports:
 RoxygenNote: 7.3.2
 Config/testthat/edition: 3
 License: file LICENSE
+URL: https://generable.github.io/bmstate/
