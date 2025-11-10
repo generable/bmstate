@@ -14,6 +14,7 @@ permissions: read-all
 
 jobs:
   pkgdown:
+    runs-on: ubuntu-latest
     # Only restrict concurrency for non-PR jobs
     concurrency:
       group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
@@ -26,8 +27,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config:
-          - {os: ubuntu-latest,   r: 'release', rtools: ''}
     steps:
       - name: cmdstan env vars
         run: |
