@@ -146,8 +146,8 @@ $k$th time interval. We collect the entire observed multistate path (event seque
 We generate example data for a single subject here and plot the realized path.
 
 ```{r, fig.width=6}
-set.seed(383)
-mod <- create_msm(tmat, n_grid = 10) # set very low n_grid for demo
+set.seed(2344)
+mod <- create_msm(tmat, n_grid = 12) # set very low n_grid for demo
 h0_true <- rep(1e-3, 3)
 mod$set_prior_mean_h0(h0_true) # has no effect for simulation
 dat <- mod$simulate_data(N_subject = 1, w0 = h0_true)
@@ -161,8 +161,8 @@ $I_{k,1}^{(h)}$ in $H \times K$ matrices `transition` and
 
 ```{r, fig.width=6}
 sd <- create_stan_data(mod, dat)
-a <- plot_stan_data(mod, sd, "transition", 1)
-b <- plot_stan_data(mod, sd, "at_risk", 1)
+a <- plot_stan_data_matrix(mod, sd, "transition", 1)
+b <- plot_stan_data_matrix(mod, sd, "at_risk", 1)
 gridExtra::grid.arrange(a, b, nrow = 1, ncol = 2)
 ```
 
@@ -192,10 +192,11 @@ print(a)
 
 We demonstrate the integration grid with an example hazard function.
 
-```{r, fig.width=6}
+```{r, fig.width=7, fig.height=4}
 w <- c(0.2, 0.3, 0.5, -0.5, 0, 0.1)
 h0 <- 0.001
-bmstate:::plot_integral(mod, sd, 2, h0, w)
+plot_stan_data_integral(mod, sd, 1, h0, w) # first interval
+plot_stan_data_integral(mod, sd, 2, h0, w) # second interval
 ```
 
 

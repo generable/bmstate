@@ -19,6 +19,8 @@ Expose 'Stan' functions if they are not yet exposed
 Other Stan-related functions: 
 \code{\link{create_stan_model}()},
 \code{\link{default_stan_filepath}()},
-\code{\link{fit_stan}()}
+\code{\link{fit_stan}()},
+\code{\link{plot_stan_data_integral}()},
+\code{\link{plot_stan_data_matrix}()}
 }
 \concept{Stan-related functions}
