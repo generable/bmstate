@@ -1,35 +1,68 @@
 #' Dosing data class (R6 class)
 #'
 #' @export
-#' @field doses Dose amounts (list with length equal to number of subjects).
-#' @field times Dose times (list with length equal to number of subjects).
-#' @field dose_ss Steady-state dose.
-#' @field tau_ss Steady-state dosing interval.
 #' @field subject_ids Subject ids.
 DosingData <- R6::R6Class(
   classname = "DosingData",
   public = list(
-    doses = NULL,
-    times = NULL,
-    dose_ss = NULL,
-    tau_ss = NULL,
     subject_ids = NULL,
 
     #' Initialize
     #'
     #' @param subject_ids A character vector
+    set_sub_ids = function(subject_ids) {
+      checkmate::assert_character(subject_ids)
+      self$subject_ids <- subject_ids
+    },
+
+    #' @description Print info
+    print = function() {
+      msg <- paste("A DosingData object with", self$num_subjects(), "subjects\n")
+      cat(msg)
+    },
+
+    #' @description Get number of subjects
+    num_subjects = function() {
+      length(self$subject_ids)
+    }
+  )
+)
+
+#' Partially steady-state dosing data class (R6 class)
+#'
+#' @export
+#' @field doses Dose amounts (list with length equal to number of subjects).
+#' Corresponds to doses after the steady state.
+#' @field times Dose times (list with length equal to number of subjects).
+#' Corresponds to doses after the steady state. First time here is the end
+#' of steady-state assumption time range.
+#' @field dose_ss Steady-state dose.
+#' @field tau_ss Steady-state dosing interval.
+PSSDosingData <- R6::R6Class(
+  classname = "PSSDosingData",
+  inherit = DosingData,
+  public = list(
+    doses = NULL,
+    times = NULL,
+    dose_ss = NULL,
+    tau_ss = NULL,
+
+    #' Initialize
+    #'
+    #' @param subject_ids A character vector
     #' @param doses Dose amounts (list with length equal to number of subjects).
+    #' Corresponds to doses after the steady state.
     #' @param times Dose times (list with length equal to number of subjects).
+    #' Corresponds to doses after the steady state. First time here is the end
+    #' of steady-state assumption time range.
     #' @param dose_ss Steady-state dose.
     #' @param tau_ss Steady-state dosing interval.
     initialize = function(subject_ids, doses, times, dose_ss = NULL, tau_ss = 24) {
-      checkmate::assert_character(subject_ids)
-      N_sub <- length(subject_ids)
+      self$set_sub_ids(subject_ids)
+      N_sub <- self$num_subjects()
       checkmate::assert_number(tau_ss, lower = 0)
       checkmate::assert_list(doses, len = N_sub)
-      N_sub <- length(doses)
       checkmate::assert_list(times, len = N_sub)
-      self$subject_ids <- subject_ids
       self$doses <- doses
       self$times <- times
       if (is.null(dose_ss)) {
@@ -58,17 +91,6 @@ DosingData <- R6::R6Class(
       out
     },
 
-    #' @description Print info
-    print = function() {
-      msg <- paste("A DosingData object with", self$num_subjects(), "subjects\n")
-      cat(msg)
-    },
-
-    #' @description Get number of subjects
-    num_subjects = function() {
-      length(self$subject_ids)
-    },
-
     #' Simulate PK dynamics
     #'
     #' @param t A vector of output times for each subject (a list).
@@ -76,11 +98,12 @@ DosingData <- R6::R6Class(
     #' @return a \code{data.frame}
     simulate_pk = function(t, theta) {
       checkmate::assert_list(t, len = self$num_subjects())
-      out <- pop_2cpt_partly_ss(
+      out <- pk_2cpt_pss(
         t, self$dose_ss, self$times, self$doses, theta, self$tau_ss
       )
       time <- as.numeric(unlist(t))
       val <- unlist(out)
+      val[val < 0] <- 1e-12
       sid <- rep(self$subject_ids, sapply(t, length))
       data.frame(
         time = time,
@@ -154,7 +177,7 @@ DosingData <- R6::R6Class(
       }
       checkmate::assert_character(subject_ids_keep)
       idx_keep <- which(self$subject_ids %in% subject_ids_keep)
-      DosingData$new(
+      PSSDosingData$new(
         self$subject_ids[idx_keep],
         self$doses[idx_keep],
         self$times[idx_keep],
@@ -168,27 +191,64 @@ DosingData <- R6::R6Class(
 #' Simulate dosing data
 #'
 #' @export
-#' @param df_subjects Data frame with one row for each subject
-#' @param tau Dosing interval.
+#' @param df_subjects Data frame with one row for each subject. Must have
+#' columns \code{subject_id, num_ss_doses, num_doses, dose}.
+#' @param tau Supposed dosing interval (same for each subject).
+#' @param t_jitter Randomness added to dose times.
 #' @param p_miss Probability of missing a dose.
 #' @return A \code{\link{DosingData}} object
-simulate_dosing <- function(df_subjects, tau = 24, p_miss = 0.2) {
+simulate_dosing <- function(df_subjects, tau = 24, p_miss = 0.2, t_jitter = 4) {
+  checkmate::assert_data_frame(df_subjects)
   N <- nrow(df_subjects)
-  dose_ss <- df_subjects$dose
-  t1 <- 100 + 100 * stats::runif(N)
-  t2 <- t1 + (1 - 0.5 * stats::runif(N)) * tau
-  d1 <- dose_ss
-  d2 <- dose_ss
+  needed_cols <- c("subject_id", "num_ss_doses", "num_doses", "dose")
+  stopifnot(all(needed_cols %in% colnames(df_subjects)))
+  doses <- list()
+  times <- list()
   for (j in seq_len(N)) {
-    if (stats::runif(1) < p_miss) {
-      d1[j] <- 0
+    D <- df_subjects$num_doses[j]
+    Dss <- df_subjects$num_ss_doses[j]
+    stopifnot(Dss < D)
+    ttt <- seq(0, (D - 1) * tau, by = tau)
+    ttt <- ttt + rnorm(D, sd = t_jitter)
+    ttt <- sort(ttt)
+    ttt[1] <- 0
+    ttt[which(ttt < 0)] <- 0
+    if (length(unique(ttt)) != D) {
+      stop("too high t_jitter?")
     }
-    if (stats::runif(1) < p_miss) {
-      d2[j] <- 0
-    }
+    ddd <- rep(df_subjects$dose[j], D)
+    ddd[which(stats::runif(D) < p_miss)] <- 0
+    ttt <- ttt[(Dss + 1):D]
+    ddd <- ddd[(Dss + 1):D]
+    times[[j]] <- ttt
+    doses[[j]] <- ddd
   }
-  times <- as.list(data.frame(t(matrix(c(t1, t2), ncol = 2))))
-  doses <- as.list(data.frame(t(matrix(c(d1, d2), ncol = 2))))
   sid <- df_subjects$subject_id
-  DosingData$new(sid, doses, times, dose_ss, tau)
+  dss <- df_subjects$dose
+  PSSDosingData$new(sid, doses, times, dss, tau)
+}
+
+#' Partially steady-state PK model
+#'
+#' @export
+#' @description For each subject
+#' @param t vector of output time points
+#' @param dose_ss dose amount in SS (for each subject)
+#' @param times time points, first of which is the end of stedy-state assumption
+#' @param doses doses taken after \code{t_last_ss}
+#' @param theta PK params for each subject
+#' @param tau Dosing interval (same for all subjects).
+#' @return For each subject, the concentration in the central compartment at
+#' times \code{t}
+pk_2cpt_pss <- function(t, dose_ss, times, doses, theta, tau) {
+  ensure_exposed_stan_functions()
+  checkmate::assert_number(tau, lower = 0)
+  checkmate::assert_numeric(dose_ss, lower = 0)
+  N_sub <- length(dose_ss)
+  checkmate::assert_list(times, len = N_sub)
+  checkmate::assert_list(doses, len = N_sub)
+  checkmate::assert_list(t, len = N_sub)
+  checkmate::assert_matrix(theta, nrows = N_sub, ncols = 3)
+  a <- pop_2cpt_partly_ss(t, dose_ss, times, doses, theta, tau)
+  a
 }

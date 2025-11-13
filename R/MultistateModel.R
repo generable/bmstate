@@ -393,7 +393,8 @@ MultistateModel <- R6::R6Class("MultistateModel",
         K <- length(self$covs())
         beta_haz <- matrix(0, L, K)
       }
-      pksim <- private$simulate_pk_data(sub_df, beta_pk)
+      sub_df_pk <- add_dosing_sim_opts(sub_df)
+      pksim <- private$simulate_pk_data(sub_df_pk, beta_pk)
       pk_dat <- pksim$pk
       if (self$has_pk()) {
         sub_df <- sub_df |> dplyr::left_join(pk_dat, by = "subject_id")
@@ -419,6 +420,13 @@ MultistateModel <- R6::R6Class("MultistateModel",
     }
   )
 )
+
+add_dosing_sim_opts <- function(df) {
+  df$num_doses <- 22
+  df$num_ss_doses <- 20
+  df
+}
+
 
 # Create internal knots based on event time quantiles
 place_internal_knots <- function(t_max, num_knots, t_event) {

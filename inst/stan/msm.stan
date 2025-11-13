@@ -50,7 +50,8 @@ functions {
   }
 
   // PK functions
-#include pk/pk.stan
+#include pk/pk-2cpt.stan
+#include pk/pk-2cpt_partly_ss.stan
 
 }
 

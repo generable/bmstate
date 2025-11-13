@@ -1,26 +1,25 @@
-test_that("DosingData init and methods work", {
-  N <- 3
-  dose_ss <- c(30, 30, 20)
-  times <- list(c(4, 5.9), c(6.2, 8.1), c(8.5, 10))
-  doses <- list(c(30, 30), c(0, 30), c(0, 0))
+test_that("PSSDosingData init and methods work", {
+  dose <- c(30, 30, 20)
   sid <- c("A", "B", "C")
-  dd1 <- DosingData$new(sid, doses, times, dose_ss, 2)
+  df <- data.frame(subject_id = sid, dose = dose, num_doses = 10, num_ss_doses = 6)
+  dd <- simulate_dosing(df, tau = 5, t_jitter = 0.7, p_miss = 0.2)
 
   theta <- rep(exp(-2), 3)
+  N <- length(dose)
   theta <- matrix(rep(theta, N), N, 3, byrow = TRUE)
-  t <- seq(0, 11, by = 0.01)
+  t <- seq(0, 60, by = 0.05)
   ts <- list()
   for (j in 1:N) {
     ts[[j]] <- t
   }
-  a <- dd1$simulate_pk(ts, theta)
-  b <- dd1$plot(a)
+  a <- dd$simulate_pk(ts, theta)
+  b <- dd$plot(a)
   expect_true(is_ggplot(b))
-  r <- dd1$filter()
+  r <- dd$filter()
   expect_equal(r$num_subjects(), N)
 })
 
-test_that("DosingData works with zero steady-state doses", {
+test_that("PSSDosingData works with zero steady-state doses", {
   N <- 1
   dose_ss <- c(0)
   tau <- 12
@@ -30,7 +29,7 @@ test_that("DosingData works with zero steady-state doses", {
   d1[4] <- 0
   doses <- list(d1)
   sid <- c("A")
-  dd1 <- DosingData$new(sid, doses, times, tau = tau)
+  dd1 <- PSSDosingData$new(sid, doses, times, tau = tau)
 
   theta <- rep(exp(-2), 3)
   theta <- matrix(rep(theta, N), N, 3, byrow = TRUE)
