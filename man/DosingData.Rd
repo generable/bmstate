@@ -11,14 +11,6 @@ Dosing data class (R6 class)
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{doses}}{Dose amounts (list with length equal to number of subjects).}
-
-\item{\code{times}}{Dose times (list with length equal to number of subjects).}
-
-\item{\code{dose_ss}}{Steady-state dose.}
-
-\item{\code{tau_ss}}{Steady-state dosing interval.}
-
 \item{\code{subject_ids}}{Subject ids.
 Initialize}
 }
@@ -27,49 +19,27 @@ Initialize}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-DosingData-new}{\code{DosingData$new()}}
-\item \href{#method-DosingData-as_data_frame}{\code{DosingData$as_data_frame()}}
+\item \href{#method-DosingData-set_sub_ids}{\code{DosingData$set_sub_ids()}}
 \item \href{#method-DosingData-print}{\code{DosingData$print()}}
 \item \href{#method-DosingData-num_subjects}{\code{DosingData$num_subjects()}}
-\item \href{#method-DosingData-simulate_pk}{\code{DosingData$simulate_pk()}}
-\item \href{#method-DosingData-plot}{\code{DosingData$plot()}}
-\item \href{#method-DosingData-filter}{\code{DosingData$filter()}}
 \item \href{#method-DosingData-clone}{\code{DosingData$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DosingData-new"></a>}}
-\if{latex}{\out{\hypertarget{method-DosingData-new}{}}}
-\subsection{Method \code{new()}}{
+\if{html}{\out{<a id="method-DosingData-set_sub_ids"></a>}}
+\if{latex}{\out{\hypertarget{method-DosingData-set_sub_ids}{}}}
+\subsection{Method \code{set_sub_ids()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DosingData$new(subject_ids, doses, times, dose_ss = NULL, tau_ss = 24)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DosingData$set_sub_ids(subject_ids)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{subject_ids}}{A character vector}
-
-\item{\code{doses}}{Dose amounts (list with length equal to number of subjects).}
-
-\item{\code{times}}{Dose times (list with length equal to number of subjects).}
-
-\item{\code{dose_ss}}{Steady-state dose.}
-
-\item{\code{tau_ss}}{Steady-state dosing interval.}
 }
 \if{html}{\out{</div>}}
 }
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DosingData-as_data_frame"></a>}}
-\if{latex}{\out{\hypertarget{method-DosingData-as_data_frame}{}}}
-\subsection{Method \code{as_data_frame()}}{
-As data frame
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DosingData$as_data_frame()}\if{html}{\out{</div>}}
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DosingData-print"></a>}}
@@ -86,70 +56,10 @@ Print info
 \if{latex}{\out{\hypertarget{method-DosingData-num_subjects}{}}}
 \subsection{Method \code{num_subjects()}}{
 Get number of subjects
-Simulate PK dynamics
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DosingData$num_subjects()}\if{html}{\out{</div>}}
 }
 
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DosingData-simulate_pk"></a>}}
-\if{latex}{\out{\hypertarget{method-DosingData-simulate_pk}{}}}
-\subsection{Method \code{simulate_pk()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DosingData$simulate_pk(t, theta)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{t}}{A vector of output times for each subject (a list).}
-
-\item{\code{theta}}{A matrix of parameters.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-a \code{data.frame}
-Plot dosing (and PK) data
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DosingData-plot"></a>}}
-\if{latex}{\out{\hypertarget{method-DosingData-plot}{}}}
-\subsection{Method \code{plot()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DosingData$plot(df_fit = NULL, subject_df = NULL, max_num_subjects = 12)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{df_fit}}{Fit data frame.}
-
-\item{\code{subject_df}}{Subject data frame.}
-
-\item{\code{max_num_subjects}}{Max number of subjects to plot.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DosingData-filter"></a>}}
-\if{latex}{\out{\hypertarget{method-DosingData-filter}{}}}
-\subsection{Method \code{filter()}}{
-Filter based on subject id, creates new object
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DosingData$filter(subject_ids_keep = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{subject_ids_keep}}{Subject ids to keep}
-}
-\if{html}{\out{</div>}}
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DosingData-clone"></a>}}

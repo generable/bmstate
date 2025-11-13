@@ -28,11 +28,6 @@ functions {
     return(log_C_haz);
   }
 
-  // Sigmoidal curve
-  vector sigmoid(vector x, real steepness, real midpoint){
-    return 1.0 ./ (1.0 + exp(-steepness*(x - midpoint)));
-  }
-
   // Transform mu, sig, z to actual parameter
   vector raw_params_to_actual(array[] real mu, array[] real sigma,
       vector z, data array[] int tt){
@@ -49,6 +44,11 @@ functions {
     return(log_C_haz + log_basehaz(SBF, w, log_w0));
   }
 
+  // Dummy function
+  real STAN_dummy_function(real x){
+    return(x + 1.0);
+  }
+
   // Transform params
   matrix compute_theta_pk(
       array[] vector log_z, vector log_mu, vector log_sig,
@@ -58,21 +58,18 @@ functions {
     int N_id = size(log_z);
     matrix[N_id, 3] log_theta;
     for(n in 1:N_id) {
-      real v1 = -2 + log_mu[1] + log_z[n][1] * log_sig[1] +
-        sum(beta_ka .* x_ka[n]);
-      real v2 = -2 + log_mu[2] + log_z[n][2] * log_sig[2] +
-        sum(beta_CL .* x_CL[n]);
-      real v3 = -2 + log_mu[3] + log_z[n][3] * log_sig[3] +
-        sum(beta_V2 .* x_V2[n]);
 
       // ka
-      log_theta[n, 1] = v1;
+      log_theta[n, 1] = -2 + log_mu[1] + log_z[n][1] * log_sig[1] +
+        sum(beta_ka .* x_ka[n]);
 
       // CL
-      log_theta[n, 2] = v2;
+      log_theta[n, 2] = -2 + log_mu[2] + log_z[n][2] * log_sig[2] +
+        sum(beta_CL .* x_CL[n]);
 
       // V2
-      log_theta[n, 3] = v3;
+      log_theta[n, 3] = -2 + log_mu[3] + log_z[n][3] * log_sig[3] +
+        sum(beta_V2 .* x_V2[n]);
 
     }
     return(exp(log_theta));
@@ -105,29 +102,6 @@ functions {
     return(conc);
   }
 
-  // Two-cpt population PK model (steady state peak time after dose)
-  array[] vector pop_2cpt_ss_peak_time(matrix theta, data real tau){
-
-    int N_id = rows(theta);
-    vector[N_id] tau_ss = rep_vector(tau, N_id);
-
-    vector[N_id] ka = theta[:,1];
-    vector[N_id] CL = theta[:,2];
-    vector[N_id] V2 = theta[:,3];
-
-    vector[N_id] ke = CL ./ V2;
-
-    array[N_id] vector[1] t_peak;
-    vector[N_id] ma = inv(-expm1(-ka.*tau_ss)); // 1/(1-exp(-ka*tau))
-    vector[N_id] me = inv(-expm1(-ke.*tau_ss));
-    real r;
-    for(n in 1:N_id){
-      r = me[n]*ke[n]/(ma[n]*ka[n]);
-      t_peak[n] = rep_vector(log(r)/(ke[n]-ka[n]), 1);
-    }
-    return(t_peak);
-  }
-
   // Analytic solution with general initial condition (A0, C0)
   real two_cpt_central(real t, real ka, real CL, real V2, real A0, real C0){
     if(t < 0){
@@ -143,6 +117,42 @@ functions {
       reject("t = ", t,", should be non-negative");
     }
     return(A0*exp(-t*ka));
+  }
+
+
+  // Two-cpt PK model (steady state at given time t)
+  real two_cpt_central_ss(real t, real tau, real dose, real ka, real CL, real V2)
+  {
+    real ke = CL / V2;
+    real A = dose * (ka / (ka-ke));
+    real tt = fmod(t, tau);
+    real ma = A * inv(-expm1(-ka*tau)); // 1/(1-exp(-ka*tau))
+    real me = A * inv(-expm1(-ke*tau));
+    return(me * exp(-ke*tt) - ma * exp(-ka * tt));
+  }
+
+  // Two-cpt PK model (steady state at trough)
+  real two_cpt_central_ss0(real tau, real dose, real ka, real CL, real V2) {
+    real ke = CL / V2;
+    real A = dose * (ka / (ka-ke));
+    return(A * (inv(-expm1(-ke*tau)) - inv(-expm1(-ka*tau))));
+  }
+
+  // Two-cpt PK model (steady state at trough)
+  real two_cpt_depot_ss0(real tau, real dose, real ka) {
+    return(dose * inv(-expm1(-ka*tau)));
+  }
+
+  // How many elements in increasing vector x are <= y
+  int rank_of(vector x, real y){
+    int N = num_elements(x);
+    int count = 0;
+    for(n in 1:N){
+      if(x[n] <= y){
+        count = count + 1;
+      }
+    }
+    return(count);
   }
 
   // Two-cpt population PK model with multiple doses (partly steady-state)
@@ -191,18 +201,6 @@ functions {
       }
     }
     return(amt);
-  }
-
-  // How many elements in increasing vector x are <= y
-  int rank_of(vector x, real y){
-    int N = num_elements(x);
-    int count = 0;
-    for(n in 1:N){
-      if(x[n] <= y){
-        count = count + 1;
-      }
-    }
-    return(count);
   }
 
   // Two-cpt population PK model with multiple doses (partly steady-state)
@@ -267,32 +265,36 @@ functions {
     return(C);
   }
 
-  // Two-cpt PK model (steady state at given time t)
-  real two_cpt_central_ss(real t, real tau, real dose, real ka, real CL, real V2)
-  {
-    real ke = CL / V2;
-    real A = dose * (ka / (ka-ke));
-    real tt = fmod(t, tau);
-    real ma = A * inv(-expm1(-ka*tau)); // 1/(1-exp(-ka*tau))
-    real me = A * inv(-expm1(-ke*tau));
-    return(me * exp(-ke*tt) - ma * exp(-ka * tt));
-  }
+  // Two-cpt PK model (partly steady-state)
+  // For each subject,
+  // * t = vector of output time points
+  // * dose_ss = dose amount
+  // * dose_times = the time points after SS
+  // * doses = the doses taken after SS
+  // * tau = dosing interval
+  array[] vector pop_2cpt_partly_ss(
+    data array[] vector t,
+    data vector dose_ss,
+    data array[] vector dose_times,
+    data array[] vector doses,
+    matrix theta,
+    data real tau
+  ){
 
-  // Two-cpt PK model (steady state at trough)
-  real two_cpt_central_ss0(real tau, real dose, real ka, real CL, real V2) {
-    real ke = CL / V2;
-    real A = dose * (ka / (ka-ke));
-    return(A * (inv(-expm1(-ke*tau)) - inv(-expm1(-ka*tau))));
-  }
+    // Find drug amounts in both compartments at dose_times
+    int N_t = num_elements(t[1]);
+    int N_sub = num_elements(dose_ss);
+    int D = num_elements(dose_times[1]);
+    array[2, N_sub] vector[D] amounts = pop_2cpt_partly_ss_stage1(
+      dose_ss, dose_times, doses, theta, tau
+    );
 
-  // Two-cpt PK model (steady state at trough)
-  real two_cpt_depot_ss0(real tau, real dose, real ka) {
-    return(dose * inv(-expm1(-ka*tau)));
-  }
+    array[N_sub] vector[N_t] conc = pop_2cpt_partly_ss_stage2(
+      t, dose_ss, dose_times, doses, amounts, theta, tau
+    );
 
-  // Dummy function
-  real STAN_dummy_function(real x){
-    return(x + 1.0);
+    // Drug concentration at t
+    return(conc);
   }
 
 }
@@ -426,13 +428,9 @@ transformed parameters {
     }
   }
 
-  // PK quantities (in-sample)
+  // PK quantities
   array[do_pk] matrix[N_sub, 3] theta_pk;
-  array[do_pk, 2, N_sub] vector[2] last_two_amounts_pk;
   array[do_pk, N_sub] vector[2] conc_mu_pk;
-  array[do_pk, N_sub] vector[1] t1_ss;
-  array[do_pk, N_sub] vector[1] ss_trough;
-  array[do_pk, N_sub] vector[1] ss_peak;
   array[do_pk] vector[N_sub] ss_auc; // auc for each subject
   array[do_pk] vector[N_int] x_auc_long; // auc for each interval
 
@@ -444,21 +442,12 @@ transformed parameters {
       beta_ka[1], beta_CL[1], beta_V2[1], x_ka, x_CL, x_V2
     );
 
-    // Find drug amounts in both compartments at last two dose times
-    last_two_amounts_pk[1] = pop_2cpt_partly_ss_stage1(
-      dose_ss, last_two_times, last_two_doses, theta_pk[1], tau_ss
-    );
-
     // Drug concentration estimated at t_obs
-    conc_mu_pk[1] = pop_2cpt_partly_ss_stage2(
-      t_obs_pk, dose_ss, last_two_times, last_two_doses, last_two_amounts_pk[1],
-      theta_pk[1], tau_ss
+    conc_mu_pk[1] = pop_2cpt_partly_ss(
+      t_obs_pk, dose_ss, last_two_times, last_two_doses, theta_pk[1], tau_ss
     );
 
-    // Trough, peak, and auc at steady state
-    t1_ss[1] = pop_2cpt_ss_peak_time(theta_pk[1], tau_ss);
-    ss_trough[1] = pop_2cpt_ss(t0_ss, dose_ss, theta_pk[1], tau_ss);
-    ss_peak[1] = pop_2cpt_ss(t1_ss[1], dose_ss, theta_pk[1], tau_ss);
+    // Auc at steady state
     ss_auc[1] = dose_ss ./ theta_pk[1][:,2]; // D/CL
 
     // Set AUC corresponding to each interval

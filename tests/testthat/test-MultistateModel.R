@@ -64,11 +64,6 @@ test_that("MultistateModel with PK submodel works", {
   tmax <- 3 * 365.25
   mod$set_knots(tmax, seq(0, tmax - 1, length.out = 1000), 3)
   N <- 99
-  a <- mod$simulate_subjects(N)
-  r <- mod$simulate_pk_data(a)
-  expect_equal(ncol(a), 6)
-  expect_equal(nrow(r$pk), N)
-  expect_true("dose" %in% colnames(a))
   ss <- mod$simulate_data(N)
   expect_equal(ss$paths$n_paths(), N)
 })

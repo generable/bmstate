@@ -4,14 +4,17 @@
 \alias{simulate_dosing}
 \title{Simulate dosing data}
 \usage{
-simulate_dosing(df_subjects, tau = 24, p_miss = 0.2)
+simulate_dosing(df_subjects, tau = 24, p_miss = 0.2, t_jitter = 4)
 }
 \arguments{
-\item{df_subjects}{Data frame with one row for each subject}
+\item{df_subjects}{Data frame with one row for each subject. Must have
+columns \code{subject_id, num_ss_doses, num_doses, dose}.}
 
-\item{tau}{Dosing interval.}
+\item{tau}{Supposed dosing interval (same for each subject).}
 
 \item{p_miss}{Probability of missing a dose.}
+
+\item{t_jitter}{Randomness added to dose times.}
 }
 \value{
 A \code{\link{DosingData}} object

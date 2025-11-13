@@ -114,6 +114,44 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
         ggtitle("Basis functions")
     },
 
+
+    #' @description Simulate PK dynamics using fitted params.
+    #'
+    #' @param data Data for which to predict the concentration. If \code{NULL},
+    #' training data is used.
+    #' @param L number of grid points for each subject
+    #' @param timescale scale of time
+    #' @param n_prev number of previous doses to show fit for
+    #' @param oos Out-of-sample subjects?
+    simulate_pk = function(oos = FALSE, data = NULL, L = 100,
+                           timescale = 24, n_prev = 3) {
+      check_oos(oos, data)
+      checkmate::assert_integerish(L, len = 1)
+      pkpar <- msmfit_pk_params(self, oos, data = data)
+      if (is.null(data)) {
+        data <- self$data
+      }
+      trange <- sapply(data$dosing$times, range)
+      S <- length(pkpar)
+      N <- nrow(pkpar[[1]])
+      ts <- list()
+      for (j in 1:N) {
+        ts[[j]] <- seq(
+          trange[1, j] - timescale * n_prev,
+          trange[2, j],
+          length.out = L
+        ) + timescale
+      }
+
+      df <- NULL
+      for (s in seq_len(S)) {
+        df_s <- data$dosing$simulate_pk(ts, pkpar[[s]])
+        df_s$.draw_idx <- s
+        df <- rbind(df, df_s)
+      }
+      df
+    },
+
     #' @description Plot PK fit.
     #'
     #' @param max_num_subjects Max number of subjects to show.
@@ -123,28 +161,29 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
     #' @param timescale scale of time
     #' @param n_prev number of previous doses to show fit for
     #' @param oos Out-of-sample subjects?
+    #' @param ci_alpha Width of central credible interval.
     plot_pk = function(max_num_subjects = 12, oos = FALSE, data = NULL, L = 100,
-                       timescale = 24, n_prev = 3) {
-      check_oos(oos, data)
-      checkmate::assert_integerish(L, len = 1)
-      pkpar <- msmfit_pk_params(self, oos, data = data)
-      theta <- pkpar[[1]]
+                       timescale = 24, n_prev = 3, ci_alpha = 0.9) {
+      pksim <- self$simulate_pk(oos, data, L, timescale, n_prev)
       if (is.null(data)) {
         data <- self$data
       }
-      trange <- sapply(data$dosing$times, range)
-      N <- nrow(theta)
-      ts <- list()
-      for (j in 1:N) {
-        ts[[j]] <- seq(
-          trange[1, j] - timescale * n_prev,
-          trange[2, j],
-          length.out = L
-        ) + timescale
+      if (!self$is_point_estimate()) {
+        capt <- paste0("Median and ", 100 * ci_alpha, "% CrI")
+      } else {
+        capt <- paste0("Point-estimate fit")
       }
-      pksim <- data$dosing$simulate_pk(ts, theta)
-      pltd <- data$plot_dosing(df_fit = pksim, max_num_subjects = max_num_subjects)
-      pltd
+      checkmate::assert_number(ci_alpha, lower = 0, upper = 1)
+      alpha <- (1 - ci_alpha) / 2
+      pksim <- pksim |>
+        dplyr::group_by(.data$subject_id, .data$time) |>
+        dplyr::summarize(
+          val = stats::median(.data$val),
+          lower = quantile(.data$val, alpha / 2),
+          upper = quantile(.data$val, 1 - alpha / 2), .groups = "drop"
+        )
+      data$plot_dosing(df_fit = pksim, max_num_subjects = max_num_subjects) +
+        labs(caption = capt)
     },
 
     #' Plot baseline hazard distribution

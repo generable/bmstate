@@ -2,7 +2,7 @@
 #'
 #' @description Bayesian multistate modeling of right-censored time-to-event data.
 #' @author Juho Timonen and Jacqueline Buros
-#' @keywords multistate Stan Bayesian
+#' @keywords multistate Bayesian
 #'
 #' @section Transition matrix:
 #' For any analysis with this package, you will need a \code{\link{TransitionMatrix}}
