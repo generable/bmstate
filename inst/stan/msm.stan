@@ -183,13 +183,9 @@ transformed parameters {
     }
   }
 
-  // PK quantities (in-sample)
+  // PK quantities
   array[do_pk] matrix[N_sub, 3] theta_pk;
-  array[do_pk, 2, N_sub] vector[2] last_two_amounts_pk;
   array[do_pk, N_sub] vector[2] conc_mu_pk;
-  array[do_pk, N_sub] vector[1] t1_ss;
-  array[do_pk, N_sub] vector[1] ss_trough;
-  array[do_pk, N_sub] vector[1] ss_peak;
   array[do_pk] vector[N_sub] ss_auc; // auc for each subject
   array[do_pk] vector[N_int] x_auc_long; // auc for each interval
 
@@ -201,21 +197,12 @@ transformed parameters {
       beta_ka[1], beta_CL[1], beta_V2[1], x_ka, x_CL, x_V2
     );
 
-    // Find drug amounts in both compartments at last two dose times
-    last_two_amounts_pk[1] = pop_2cpt_partly_ss_stage1(
-      dose_ss, last_two_times, last_two_doses, theta_pk[1], tau_ss
-    );
-
     // Drug concentration estimated at t_obs
-    conc_mu_pk[1] = pop_2cpt_partly_ss_stage2(
-      t_obs_pk, dose_ss, last_two_times, last_two_doses, last_two_amounts_pk[1],
-      theta_pk[1], tau_ss
+    conc_mu_pk[1] = pop_2cpt_partly_ss(
+      t_obs_pk, dose_ss, last_two_times, last_two_doses, theta_pk[1], tau_ss
     );
 
-    // Trough, peak, and auc at steady state
-    t1_ss[1] = pop_2cpt_ss_peak_time(theta_pk[1], tau_ss);
-    ss_trough[1] = pop_2cpt_ss(t0_ss, dose_ss, theta_pk[1], tau_ss);
-    ss_peak[1] = pop_2cpt_ss(t1_ss[1], dose_ss, theta_pk[1], tau_ss);
+    // Auc at steady state
     ss_auc[1] = dose_ss ./ theta_pk[1][:,2]; // D/CL
 
     // Set AUC corresponding to each interval

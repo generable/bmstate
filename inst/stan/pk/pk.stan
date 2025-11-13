@@ -213,6 +213,34 @@
     return(C);
   }
 
+  // Two-cpt PK model (partly steady-state)
+  // For each subject,
+  // * t = vector of output time points
+  // * dose_ss = dose amount in SS
+  // * times = the time points after SS
+  // * doses = the doses taken after SS
+  // * tau = dosing interval
+  array[] vector pop_2cpt_partly_ss(
+    data array[] vector t,
+    data vector dose_ss,
+    data array[] vector times,
+    data array[] vector doses,
+    matrix theta,
+    data real tau
+  ){
+
+    // Find drug amounts in both compartments at last two dose times
+    int N_sub = num_elements(dose_ss);
+    array[2, N_sub] vector[2] amounts = pop_2cpt_partly_ss_stage1(
+      dose_ss, times, doses, theta, tau
+    );
+
+    // Drug concentration estimated at t
+    return(pop_2cpt_partly_ss_stage2(
+      t, dose_ss, times, doses, amounts, theta, tau
+    ));
+  }
+
   // Two-cpt PK model (steady state at given time t)
   real two_cpt_central_ss(real t, real tau, real dose, real ka, real CL, real V2)
   {
