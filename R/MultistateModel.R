@@ -78,6 +78,67 @@ MultistateModel <- R6::R6Class("MultistateModel",
         }
       }
       out
+    },
+
+    # Simulate PK data
+    simulate_pk_data = function(df_subjects, beta_pk = NULL) {
+      pk_dat <- NULL
+      if (self$has_pk()) {
+        beta_pk <- self$pk_model$format_params(beta_pk)
+        pk_dat <- self$pk_model$simulate_data(df_subjects, beta_pk)
+      }
+      pk_dat
+    },
+
+    # Simulate events data
+    simulate_events = function(df_subjects, beta_haz, log_w0, w) {
+      dt <- 1
+      N <- nrow(df_subjects)
+      S <- self$system$num_trans()
+      L <- self$system$num_weights()
+      checkmate::assert_numeric(log_w0, len = S)
+      w_all <- array(0, dim = c(N, S, L))
+      if (!is.null(w)) {
+        for (n in seq_len(N)) {
+          w_all[n, , ] <- w
+        }
+      }
+
+      log_w0 <- matrix(rep(log_w0, N), N, S, byrow = TRUE)
+      log_m <- private$simulate_log_hazard_multipliers(df_subjects, beta_haz)
+      paths <- self$system$simulate(w_all, log_w0, log_m)
+      as_tibble(paths)
+    },
+
+    # Simulate subject data
+    simulate_subjects = function(N_subject = 100, doses = c(15, 30, 60)) {
+      checkmate::assert_numeric(doses, min.len = 1, lower = 0)
+
+      # Generate covariates
+      covs <- self$data_covs()
+      categ <- self$categ_covs()
+      idx_cat <- which(covs %in% categ)
+      N_covs <- length(covs)
+      A <- 60 + 10 * matrix(rnorm(N_subject * N_covs), N_subject, N_covs)
+
+      # Discretize covariates
+      for (idx in idx_cat) {
+        A[, idx] <- as.numeric(A[, idx] > mean(A[, idx]))
+      }
+
+      # Create data frame
+      df <- data.frame(A)
+      colnames(df) <- covs
+      df$subject_id <- sim_subject_ids(N_subject)
+      n_groups <- length(doses)
+      doses_vec <- doses[sample.int(n_groups, N_subject, replace = TRUE)]
+      if (self$has_pk()) {
+        df$dose <- doses_vec
+      }
+      if ("dose_amt" %in% covs) {
+        df$dose_amt <- doses_vec
+      }
+      as_tibble(df)
     }
   ),
 
@@ -312,14 +373,14 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' @param beta_pk Covariate effects on PK parameters. A named list with
     #' three elements, each being a vector. If any element is \code{NULL},
     #' a vector of zeros is used.
-    #' @param w0 Baseline hazard rate for all transitions
+    #' @param w0 Baseline hazard rate for all transitions.
     #' @param w Spline weights. Matrix of shape \code{num_trans} x
     #' \code{num_weights}. If \code{NULL}, a matrix of zeros is used.
     #' @return A \code{\link{JointData}} object.
     simulate_data = function(N_subject = 100, beta_haz = NULL,
                              beta_pk = NULL, w0 = 1e-3, w = NULL) {
       H <- self$system$num_trans()
-      sub_df <- self$simulate_subjects(N_subject)
+      sub_df <- private$simulate_subjects(N_subject)
       checkmate::assert_numeric(w0, lower = 0)
       if (length(w0) > 1) {
         checkmate::assert_numeric(w0, len = H)
@@ -332,12 +393,12 @@ MultistateModel <- R6::R6Class("MultistateModel",
         K <- length(self$covs())
         beta_haz <- matrix(0, L, K)
       }
-      pksim <- self$simulate_pk_data(sub_df, beta_pk)
+      pksim <- private$simulate_pk_data(sub_df, beta_pk)
       pk_dat <- pksim$pk
       if (self$has_pk()) {
         sub_df <- sub_df |> dplyr::left_join(pk_dat, by = "subject_id")
       }
-      path_df <- self$simulate_events(sub_df, beta_haz, log_w0, w)
+      path_df <- private$simulate_events(sub_df, beta_haz, log_w0, w)
       N <- nrow(sub_df)
       link_df <- data.frame(
         path_id = seq_len(N),
@@ -347,82 +408,6 @@ MultistateModel <- R6::R6Class("MultistateModel",
       link_df$draw_idx <- rep(1, N)
       pd <- PathData$new(sub_df, path_df, link_df, self$system$tm(), colnames(sub_df))
       JointData$new(pd, pksim$dosing)
-    },
-
-    #' @description Simulate PK data
-    #'
-    #' @param df_subjects The subjects data frame
-    #' @param beta_pk TODO
-    #' @return a \code{data.frame} object
-    simulate_pk_data = function(df_subjects, beta_pk = NULL) {
-      pk_dat <- NULL
-      if (self$has_pk()) {
-        beta_pk <- self$pk_model$format_params(beta_pk)
-        pk_dat <- self$pk_model$simulate_data(df_subjects, beta_pk)
-      }
-      pk_dat
-    },
-
-    #' @description Simulate events data
-    #'
-    #' @param df_subjects The subjects data frame
-    #' @param beta_haz Matrix of shape \code{num_target_states} x \code{num_covs}
-    #' @param log_w0 Baseline log hazard rate, vector with length
-    #' \code{num_trans}
-    #' @param w Spline weights. Matrix of shape \code{num_trans} x
-    #' \code{num_weights}. If \code{NULL}, a matrix of zeros is used.
-    #' @return a \code{tibble}
-    simulate_events = function(df_subjects, beta_haz, log_w0, w) {
-      dt <- 1
-      N <- nrow(df_subjects)
-      S <- self$system$num_trans()
-      L <- self$system$num_weights()
-      checkmate::assert_numeric(log_w0, len = S)
-      w_all <- array(0, dim = c(N, S, L))
-      if (!is.null(w)) {
-        for (n in seq_len(N)) {
-          w_all[n, , ] <- w
-        }
-      }
-
-      log_w0 <- matrix(rep(log_w0, N), N, S, byrow = TRUE)
-      log_m <- private$simulate_log_hazard_multipliers(df_subjects, beta_haz)
-      paths <- self$system$simulate(w_all, log_w0, log_m)
-      as_tibble(paths)
-    },
-
-    #' @description Simulate subject data
-    #'
-    #' @param N_subject Number of subjects.
-    #' @param doses Possible doses.
-    simulate_subjects = function(N_subject = 100, doses = c(15, 30, 60)) {
-      checkmate::assert_numeric(doses, min.len = 1, lower = 0)
-
-      # Generate covariates
-      covs <- self$data_covs()
-      categ <- self$categ_covs()
-      idx_cat <- which(covs %in% categ)
-      N_covs <- length(covs)
-      A <- 60 + 10 * matrix(rnorm(N_subject * N_covs), N_subject, N_covs)
-
-      # Discretize covariates
-      for (idx in idx_cat) {
-        A[, idx] <- as.numeric(A[, idx] > mean(A[, idx]))
-      }
-
-      # Create data frame
-      df <- data.frame(A)
-      colnames(df) <- covs
-      df$subject_id <- sim_subject_ids(N_subject)
-      n_groups <- length(doses)
-      doses_vec <- doses[sample.int(n_groups, N_subject, replace = TRUE)]
-      if (self$has_pk()) {
-        df$dose <- doses_vec
-      }
-      if ("dose_amt" %in% covs) {
-        df$dose_amt <- doses_vec
-      }
-      as_tibble(df)
     },
 
     #' Get indices of states that are not source states
