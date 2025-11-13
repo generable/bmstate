@@ -424,7 +424,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
 )
 
 add_dosing_sim_opts <- function(df, num_doses) {
-  checkmate::assert_integerish(num_doses, len = 1, min = 4)
+  checkmate::assert_integerish(num_doses, len = 1, lower = 4)
   df$num_doses <- num_doses - 3 + sample(5, size = nrow(df), replace = TRUE)
   df$num_ss_doses <- df$num_doses - 2
   df
