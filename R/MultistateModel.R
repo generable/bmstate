@@ -376,9 +376,11 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' @param w0 Baseline hazard rate for all transitions.
     #' @param w Spline weights. Matrix of shape \code{num_trans} x
     #' \code{num_weights}. If \code{NULL}, a matrix of zeros is used.
+    #' @param num_doses Average number of doses taken by each subject. Only
+    #' has effect if model as a PK submodel.
     #' @return A \code{\link{JointData}} object.
     simulate_data = function(N_subject = 100, beta_haz = NULL,
-                             beta_pk = NULL, w0 = 1e-3, w = NULL) {
+                             beta_pk = NULL, w0 = 1e-3, w = NULL, num_doses = 10) {
       H <- self$system$num_trans()
       sub_df <- private$simulate_subjects(N_subject)
       checkmate::assert_numeric(w0, lower = 0)
@@ -393,7 +395,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
         K <- length(self$covs())
         beta_haz <- matrix(0, L, K)
       }
-      sub_df_pk <- add_dosing_sim_opts(sub_df)
+      sub_df_pk <- add_dosing_sim_opts(sub_df, num_doses)
       pksim <- private$simulate_pk_data(sub_df_pk, beta_pk)
       pk_dat <- pksim$pk
       if (self$has_pk()) {
@@ -421,9 +423,10 @@ MultistateModel <- R6::R6Class("MultistateModel",
   )
 )
 
-add_dosing_sim_opts <- function(df) {
-  df$num_doses <- 22
-  df$num_ss_doses <- 20
+add_dosing_sim_opts <- function(df, num_doses) {
+  checkmate::assert_integerish(num_doses, len = 1, min = 4)
+  df$num_doses <- num_doses - 3 + sample(5, size = nrow(df), replace = TRUE)
+  df$num_ss_doses <- df$num_doses - 2
   df
 }
 

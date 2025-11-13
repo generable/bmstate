@@ -33,6 +33,7 @@ Minimal fit class
 \item \href{#method-MultistateModelFit-get_draws_of}{\code{MultistateModelFit$get_draws_of()}}
 \item \href{#method-MultistateModelFit-print}{\code{MultistateModelFit$print()}}
 \item \href{#method-MultistateModelFit-plot_basisfun}{\code{MultistateModelFit$plot_basisfun()}}
+\item \href{#method-MultistateModelFit-simulate_pk}{\code{MultistateModelFit$simulate_pk()}}
 \item \href{#method-MultistateModelFit-plot_pk}{\code{MultistateModelFit$plot_pk()}}
 \item \href{#method-MultistateModelFit-plot_h0}{\code{MultistateModelFit$plot_h0()}}
 \item \href{#method-MultistateModelFit-h0_dist}{\code{MultistateModelFit$h0_dist()}}
@@ -198,13 +199,12 @@ Plot used basis functions (grid)
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModelFit-plot_pk"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModelFit-plot_pk}{}}}
-\subsection{Method \code{plot_pk()}}{
-Plot PK fit.
+\if{html}{\out{<a id="method-MultistateModelFit-simulate_pk"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModelFit-simulate_pk}{}}}
+\subsection{Method \code{simulate_pk()}}{
+Simulate PK dynamics using fitted params.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModelFit$plot_pk(
-  max_num_subjects = 12,
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModelFit$simulate_pk(
   oos = FALSE,
   data = NULL,
   L = 100,
@@ -216,10 +216,7 @@ Plot PK fit.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{max_num_subjects}}{Max number of subjects to show.}
-
-\item{\code{oos}}{Out-of-sample subjects?
-Plot baseline hazard distribution}
+\item{\code{oos}}{Out-of-sample subjects?}
 
 \item{\code{data}}{Data for which to predict the concentration. If \code{NULL},
 training data is used.}
@@ -229,6 +226,45 @@ training data is used.}
 \item{\code{timescale}}{scale of time}
 
 \item{\code{n_prev}}{number of previous doses to show fit for}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModelFit-plot_pk"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModelFit-plot_pk}{}}}
+\subsection{Method \code{plot_pk()}}{
+Plot PK fit.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModelFit$plot_pk(
+  max_num_subjects = 12,
+  oos = FALSE,
+  data = NULL,
+  L = 100,
+  timescale = 24,
+  n_prev = 3,
+  ci_alpha = 0.9
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{max_num_subjects}}{Max number of subjects to show.}
+
+\item{\code{oos}}{Out-of-sample subjects?}
+
+\item{\code{data}}{Data for which to predict the concentration. If \code{NULL},
+training data is used.}
+
+\item{\code{L}}{number of grid points for each subject}
+
+\item{\code{timescale}}{scale of time}
+
+\item{\code{n_prev}}{number of previous doses to show fit for}
+
+\item{\code{ci_alpha}}{Width of central credible interval.
+Plot baseline hazard distribution}
 }
 \if{html}{\out{</div>}}
 }

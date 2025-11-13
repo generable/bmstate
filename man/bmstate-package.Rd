@@ -66,5 +66,4 @@ Useful links:
 Juho Timonen and Jacqueline Buros
 }
 \keyword{Bayesian}
-\keyword{Stan}
 \keyword{multistate}

@@ -114,7 +114,8 @@ PSSDosingData <- R6::R6Class(
 
     #' Plot dosing (and PK) data
     #'
-    #' @param df_fit Fit data frame.
+    #' @param df_fit Fit data frame. Uses columns \code{val}, \code{lower}
+    #' and \code{upper}.
     #' @param subject_df Subject data frame.
     #' @param max_num_subjects Max number of subjects to plot.
     plot = function(df_fit = NULL, subject_df = NULL, max_num_subjects = 12) {
@@ -209,7 +210,7 @@ simulate_dosing <- function(df_subjects, tau = 24, p_miss = 0.2, t_jitter = 4) {
     Dss <- df_subjects$num_ss_doses[j]
     stopifnot(Dss < D)
     ttt <- seq(0, (D - 1) * tau, by = tau)
-    ttt <- ttt + rnorm(D, sd = t_jitter)
+    ttt <- ttt + stats::rnorm(D, sd = t_jitter)
     ttt <- sort(ttt)
     ttt[1] <- 0
     ttt[which(ttt < 0)] <- 0

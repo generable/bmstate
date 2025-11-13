@@ -120,7 +120,8 @@ Plot dosing (and PK) data
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{df_fit}}{Fit data frame.}
+\item{\code{df_fit}}{Fit data frame. Uses columns \code{val}, \code{lower}
+and \code{upper}.}
 
 \item{\code{subject_df}}{Subject data frame.}
 

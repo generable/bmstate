@@ -331,7 +331,8 @@ Simulate data using the multistate model
   beta_haz = NULL,
   beta_pk = NULL,
   w0 = 0.001,
-  w = NULL
+  w = NULL,
+  num_doses = 10
 )}\if{html}{\out{</div>}}
 }
 
@@ -352,6 +353,9 @@ a vector of zeros is used.}
 
 \item{\code{w}}{Spline weights. Matrix of shape \code{num_trans} x
 \code{num_weights}. If \code{NULL}, a matrix of zeros is used.}
+
+\item{\code{num_doses}}{Average number of doses taken by each subject. Only
+has effect if model as a PK submodel.}
 }
 \if{html}{\out{</div>}}
 }
