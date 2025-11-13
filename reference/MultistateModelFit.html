@@ -9,7 +9,7 @@ Minimal fit class"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">bmstate</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,6 +78,7 @@ Minimal fit class"></head><body>
 <li><p><a href="#method-MultistateModelFit-get_draws_of"><code>MultistateModelFit$get_draws_of()</code></a></p></li>
 <li><p><a href="#method-MultistateModelFit-print"><code>MultistateModelFit$print()</code></a></p></li>
 <li><p><a href="#method-MultistateModelFit-plot_basisfun"><code>MultistateModelFit$plot_basisfun()</code></a></p></li>
+<li><p><a href="#method-MultistateModelFit-simulate_pk"><code>MultistateModelFit$simulate_pk()</code></a></p></li>
 <li><p><a href="#method-MultistateModelFit-plot_pk"><code>MultistateModelFit$plot_pk()</code></a></p></li>
 <li><p><a href="#method-MultistateModelFit-plot_h0"><code>MultistateModelFit$plot_h0()</code></a></p></li>
 <li><p><a href="#method-MultistateModelFit-h0_dist"><code>MultistateModelFit$h0_dist()</code></a></p></li>
@@ -238,12 +239,11 @@ Print the object</p>
 </div>
 
 
-</div><p></p><hr><a id="method-MultistateModelFit-plot_pk"></a><div class="section">
-<h3 id="method-plot-pk-">Method <code>plot_pk()</code><a class="anchor" aria-label="anchor" href="#method-plot-pk-"></a></h3>
-<p>Plot PK fit.</p><div class="section">
+</div><p></p><hr><a id="method-MultistateModelFit-simulate_pk"></a><div class="section">
+<h3 id="method-simulate-pk-">Method <code>simulate_pk()</code><a class="anchor" aria-label="anchor" href="#method-simulate-pk-"></a></h3>
+<p>Simulate PK dynamics using fitted params.</p><div class="section">
 <h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModelFit</span><span class="op">$</span><span class="fu">plot_pk</span><span class="op">(</span></span>
-<span>  max_num_subjects <span class="op">=</span> <span class="fl">12</span>,</span>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModelFit</span><span class="op">$</span><span class="fu">simulate_pk</span><span class="op">(</span></span>
 <span>  oos <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  L <span class="op">=</span> <span class="fl">100</span>,</span>
@@ -254,13 +254,8 @@ Print the object</p>
 
 <div class="section">
 <h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>max_num_subjects</code></dt>
-<dd><p>Max number of subjects to show.</p></dd>
-
-
-<dt><code>oos</code></dt>
-<dd><p>Out-of-sample subjects?
-Plot baseline hazard distribution</p></dd>
+<p></p><div class="arguments"><dl><dt><code>oos</code></dt>
+<dd><p>Out-of-sample subjects?</p></dd>
 
 
 <dt><code>data</code></dt>
@@ -283,16 +278,66 @@ training data is used.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-MultistateModelFit-plot_h0"></a><div class="section">
-<h3 id="method-plot-h-">Method <code>plot_h0()</code><a class="anchor" aria-label="anchor" href="#method-plot-h-"></a></h3>
-
-<div class="section">
+</div><p></p><hr><a id="method-MultistateModelFit-plot_pk"></a><div class="section">
+<h3 id="method-plot-pk-">Method <code>plot_pk()</code><a class="anchor" aria-label="anchor" href="#method-plot-pk-"></a></h3>
+<p>Plot PK fit.</p><div class="section">
 <h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModelFit</span><span class="op">$</span><span class="fu">plot_h0</span><span class="op">(</span>t <span class="op">=</span> <span class="cn">NULL</span>, ci_alpha <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModelFit</span><span class="op">$</span><span class="fu">plot_pk</span><span class="op">(</span></span>
+<span>  max_num_subjects <span class="op">=</span> <span class="fl">12</span>,</span>
+<span>  oos <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  L <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  timescale <span class="op">=</span> <span class="fl">24</span>,</span>
+<span>  n_prev <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  ci_alpha <span class="op">=</span> <span class="fl">0.9</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>max_num_subjects</code></dt>
+<dd><p>Max number of subjects to show.</p></dd>
+
+
+<dt><code>oos</code></dt>
+<dd><p>Out-of-sample subjects?</p></dd>
+
+
+<dt><code>data</code></dt>
+<dd><p>Data for which to predict the concentration. If <code>NULL</code>,
+training data is used.</p></dd>
+
+
+<dt><code>L</code></dt>
+<dd><p>number of grid points for each subject</p></dd>
+
+
+<dt><code>timescale</code></dt>
+<dd><p>scale of time</p></dd>
+
+
+<dt><code>n_prev</code></dt>
+<dd><p>number of previous doses to show fit for</p></dd>
+
+
+<dt><code>ci_alpha</code></dt>
+<dd><p>Width of central credible interval.
+Plot baseline hazard distribution</p></dd>
+
+
+</dl><p></p></div>
+</div>
+
+</div><p></p><hr><a id="method-MultistateModelFit-plot_h0"></a><div class="section">
+<h3 id="method-plot-h-">Method <code>plot_h0()</code><a class="anchor" aria-label="anchor" href="#method-plot-h-"></a></h3>
+
+<div class="section">
+<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModelFit</span><span class="op">$</span><span class="fu">plot_h0</span><span class="op">(</span>t <span class="op">=</span> <span class="cn">NULL</span>, ci_alpha <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>t</code></dt>
 <dd><p>times where to evaluate the baseline hazards</p></dd>
 
@@ -309,12 +354,12 @@ Baseline hazard distribution</p></dd>
 <h3 id="method-h-dist-">Method <code>h0_dist()</code><a class="anchor" aria-label="anchor" href="#method-h-dist-"></a></h3>
 
 <div class="section">
-<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
+<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModelFit</span><span class="op">$</span><span class="fu">h0_dist</span><span class="op">(</span>t <span class="op">=</span> <span class="cn">NULL</span>, ci_alpha <span class="op">=</span> <span class="fl">0.95</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
+<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>t</code></dt>
 <dd><p>times where to evaluate the baseline hazards</p></dd>
 
@@ -330,7 +375,7 @@ Extract covariate effects</p></dd>
 </div><p></p><hr><a id="method-MultistateModelFit-covariate_effects"></a><div class="section">
 <h3 id="method-covariate-effects-">Method <code>covariate_effects()</code><a class="anchor" aria-label="anchor" href="#method-covariate-effects-"></a></h3>
 <p>Currently not implemented for models that have a PK submodel.</p><div class="section">
-<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
+<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModelFit</span><span class="op">$</span><span class="fu">covariate_effects</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -347,7 +392,7 @@ Extract covariate effects</p></dd>
 </div><p></p><hr><a id="method-MultistateModelFit-log_z_pars"></a><div class="section">
 <h3 id="method-log-z-pars-">Method <code>log_z_pars()</code><a class="anchor" aria-label="anchor" href="#method-log-z-pars-"></a></h3>
 <p>Full names of parameters that start with <code>log_z_</code>.</p><div class="section">
-<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
+<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModelFit</span><span class="op">$</span><span class="fu">log_z_pars</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -355,7 +400,7 @@ Extract covariate effects</p></dd>
 </div><p></p><hr><a id="method-MultistateModelFit-num_draws"></a><div class="section">
 <h3 id="method-num-draws-">Method <code>num_draws()</code><a class="anchor" aria-label="anchor" href="#method-num-draws-"></a></h3>
 <p>Get number of draws</p><div class="section">
-<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
+<h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModelFit</span><span class="op">$</span><span class="fu">num_draws</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -363,12 +408,12 @@ Extract covariate effects</p></dd>
 </div><p></p><hr><a id="method-MultistateModelFit-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
+<h4 id="usage-18">Usage<a class="anchor" aria-label="anchor" href="#usage-18"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModelFit</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
+<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 

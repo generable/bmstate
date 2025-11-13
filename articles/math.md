@@ -2,7 +2,7 @@
 
 ``` r
 library(bmstate)
-#> Attached bmstate 0.2.0. Type ?bmstate to get started.
+#> Attached bmstate 0.2.1. Type ?bmstate to get started.
 library(ggplot2)
 theme_set(theme_bw())
 ```
@@ -166,10 +166,6 @@ mod$set_prior_mean_h0(h0_true) # has no effect for simulation
 dat <- mod$simulate_data(N_subject = 1, w0 = h0_true)
 #> Generating 1 paths
 dat$paths$plot_paths(truncate = TRUE, alpha = 1) + ggtitle("")
-#> Warning: There was 1 warning in `summarise()`.
-#> ℹ In argument: `term_time = min(.data$time, na.rm = T)`.
-#> Caused by warning in `min()`:
-#> ! no non-missing arguments to min; returning Inf
 ```
 
 ![](math_files/figure-html/unnamed-chunk-4-1.png)
@@ -401,7 +397,7 @@ r <- c(p_state_visit(pd$paths)$prob, p[2], P[1, 2])
 names(r) <- c("Paths", "Analytic1", "Analytic2")
 print(r)
 #>     Paths Analytic1 Analytic2 
-#> 0.6830000 0.6657109 0.6657112
+#> 0.6500000 0.6657109 0.6657112
 ```
 
 ### Competing risks model
@@ -482,7 +478,7 @@ rownames(r) <- c("Paths", "Analytic1", "Analytic2")
 colnames(r) <- paste0("P(state = ", colnames(r), ")")
 print(r)
 #>           P(state = B) P(state = C) P(state = D)
-#> Paths       0.06900000    0.1750000    0.2530000
+#> Paths       0.08100000    0.1440000    0.2380000
 #> Analytic1   0.08030481    0.1606096    0.2409144
 #> Analytic2   0.08030484    0.1606097    0.2409145
 ```
@@ -541,7 +537,7 @@ r <- c(p_death1, p_death2, p_death3)
 names(r) <- c("Paths", "Analytic", "Analytic2")
 print(r)
 #>     Paths  Analytic Analytic2 
-#> 0.3080000 0.2961619 0.2961618
+#> 0.3110000 0.2961619 0.2961618
 ```
 
 ### Diamond model
@@ -601,7 +597,7 @@ r <- c(p_death1, p_death2, p_death3)
 names(r) <- c("Paths", "Analytic", "Analytic2")
 print(r)
 #>     Paths  Analytic Analytic2 
-#> 0.5530000 0.5459059 0.5459058
+#> 0.5270000 0.5459059 0.5459058
 ```
 
 ### General multistate models
@@ -645,9 +641,9 @@ they get censored.
 pd$paths$prop_matrix()
 #>     to
 #> from         A         B         C         D         E  no event
-#>    A 0.0000000 0.2670000 0.2470000 0.2250000 0.2440000 0.0170000
-#>    B 0.0000000 0.2054176 0.2325056 0.2279910 0.1918736 0.1422122
-#>    C 0.0000000 0.1918736 0.2099323 0.2234763 0.2212190 0.1534989
+#>    A 0.0000000 0.2600000 0.2550000 0.2380000 0.2330000 0.0140000
+#>    B 0.0000000 0.2339545 0.2091097 0.2070393 0.2111801 0.1387164
+#>    C 0.0000000 0.2412281 0.2192982 0.1973684 0.2302632 0.1118421
 #>    D 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 1.0000000
 #>    E 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 1.0000000
 ```

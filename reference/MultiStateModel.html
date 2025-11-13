@@ -9,7 +9,7 @@ Main model class"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">bmstate</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -90,9 +90,6 @@ hazard model part?</p></dd>
 <li><p><a href="#method-MultistateModel-data_covs"><code>MultistateModel$data_covs()</code></a></p></li>
 <li><p><a href="#method-MultistateModel-categ_covs"><code>MultistateModel$categ_covs()</code></a></p></li>
 <li><p><a href="#method-MultistateModel-simulate_data"><code>MultistateModel$simulate_data()</code></a></p></li>
-<li><p><a href="#method-MultistateModel-simulate_pk_data"><code>MultistateModel$simulate_pk_data()</code></a></p></li>
-<li><p><a href="#method-MultistateModel-simulate_events"><code>MultistateModel$simulate_events()</code></a></p></li>
-<li><p><a href="#method-MultistateModel-simulate_subjects"><code>MultistateModel$simulate_subjects()</code></a></p></li>
 <li><p><a href="#method-MultistateModel-target_states"><code>MultistateModel$target_states()</code></a></p></li>
 <li><p><a href="#method-MultistateModel-clone"><code>MultistateModel$clone()</code></a></p></li>
 </ul></div><p></p><hr><a id="method-MultistateModel-get_normalizers"></a><div class="section">
@@ -381,7 +378,8 @@ if PK model is included)</p><div class="section">
 <span>  beta_haz <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  beta_pk <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  w0 <span class="op">=</span> <span class="fl">0.001</span>,</span>
-<span>  w <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  w <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  num_doses <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -404,122 +402,49 @@ a vector of zeros is used.</p></dd>
 
 
 <dt><code>w0</code></dt>
-<dd><p>Baseline hazard rate for all transitions</p></dd>
+<dd><p>Baseline hazard rate for all transitions.</p></dd>
 
 
 <dt><code>w</code></dt>
 <dd><p>Spline weights. Matrix of shape <code>num_trans</code> x
 <code>num_weights</code>. If <code>NULL</code>, a matrix of zeros is used.</p></dd>
+
+
+<dt><code>num_doses</code></dt>
+<dd><p>Average number of doses taken by each subject. Only
+has effect if model as a PK submodel.</p></dd>
 
 
 </dl><p></p></div>
 </div>
 <div class="section">
 <h4 id="returns-5">Returns<a class="anchor" aria-label="anchor" href="#returns-5"></a></h4>
-<p>A <code><a href="JointData.html">JointData</a></code> object.</p>
-</div>
-
-</div><p></p><hr><a id="method-MultistateModel-simulate_pk_data"></a><div class="section">
-<h3 id="method-simulate-pk-data-">Method <code>simulate_pk_data()</code><a class="anchor" aria-label="anchor" href="#method-simulate-pk-data-"></a></h3>
-<p>Simulate PK data</p><div class="section">
-<h4 id="usage-18">Usage<a class="anchor" aria-label="anchor" href="#usage-18"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModel</span><span class="op">$</span><span class="fu">simulate_pk_data</span><span class="op">(</span><span class="va">df_subjects</span>, beta_pk <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
-<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>df_subjects</code></dt>
-<dd><p>The subjects data frame</p></dd>
-
-
-<dt><code>beta_pk</code></dt>
-<dd><p>TODO</p></dd>
-
-
-</dl><p></p></div>
-</div>
-<div class="section">
-<h4 id="returns-6">Returns<a class="anchor" aria-label="anchor" href="#returns-6"></a></h4>
-<p>a <code>data.frame</code> object</p>
-</div>
-
-</div><p></p><hr><a id="method-MultistateModel-simulate_events"></a><div class="section">
-<h3 id="method-simulate-events-">Method <code>simulate_events()</code><a class="anchor" aria-label="anchor" href="#method-simulate-events-"></a></h3>
-<p>Simulate events data</p><div class="section">
-<h4 id="usage-19">Usage<a class="anchor" aria-label="anchor" href="#usage-19"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModel</span><span class="op">$</span><span class="fu">simulate_events</span><span class="op">(</span><span class="va">df_subjects</span>, <span class="va">beta_haz</span>, <span class="va">log_w0</span>, <span class="va">w</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
-<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>df_subjects</code></dt>
-<dd><p>The subjects data frame</p></dd>
-
-
-<dt><code>beta_haz</code></dt>
-<dd><p>Matrix of shape <code>num_target_states</code> x <code>num_covs</code></p></dd>
-
-
-<dt><code>log_w0</code></dt>
-<dd><p>Baseline log hazard rate, vector with length
-<code>num_trans</code></p></dd>
-
-
-<dt><code>w</code></dt>
-<dd><p>Spline weights. Matrix of shape <code>num_trans</code> x
-<code>num_weights</code>. If <code>NULL</code>, a matrix of zeros is used.</p></dd>
-
-
-</dl><p></p></div>
-</div>
-<div class="section">
-<h4 id="returns-7">Returns<a class="anchor" aria-label="anchor" href="#returns-7"></a></h4>
-<p>a <code>tibble</code></p>
-</div>
-
-</div><p></p><hr><a id="method-MultistateModel-simulate_subjects"></a><div class="section">
-<h3 id="method-simulate-subjects-">Method <code>simulate_subjects()</code><a class="anchor" aria-label="anchor" href="#method-simulate-subjects-"></a></h3>
-<p>Simulate subject data</p><div class="section">
-<h4 id="usage-20">Usage<a class="anchor" aria-label="anchor" href="#usage-20"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModel</span><span class="op">$</span><span class="fu">simulate_subjects</span><span class="op">(</span>N_subject <span class="op">=</span> <span class="fl">100</span>, doses <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">15</span>, <span class="fl">30</span>, <span class="fl">60</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
-<h4 id="arguments-9">Arguments<a class="anchor" aria-label="anchor" href="#arguments-9"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>N_subject</code></dt>
-<dd><p>Number of subjects.</p></dd>
-
-
-<dt><code>doses</code></dt>
-<dd><p>Possible doses.
-Get indices of states that are not source states</p></dd>
-
-
-</dl><p></p></div>
+<p>A <code><a href="JointData.html">JointData</a></code> object.
+Get indices of states that are not source states</p>
 </div>
 
 </div><p></p><hr><a id="method-MultistateModel-target_states"></a><div class="section">
 <h3 id="method-target-states-">Method <code>target_states()</code><a class="anchor" aria-label="anchor" href="#method-target-states-"></a></h3>
 
 <div class="section">
-<h4 id="usage-21">Usage<a class="anchor" aria-label="anchor" href="#usage-21"></a></h4>
+<h4 id="usage-18">Usage<a class="anchor" aria-label="anchor" href="#usage-18"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModel</span><span class="op">$</span><span class="fu">target_states</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="returns-8">Returns<a class="anchor" aria-label="anchor" href="#returns-8"></a></h4>
+<h4 id="returns-6">Returns<a class="anchor" aria-label="anchor" href="#returns-6"></a></h4>
 <p>integer</p>
 </div>
 
 </div><p></p><hr><a id="method-MultistateModel-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-22">Usage<a class="anchor" aria-label="anchor" href="#usage-22"></a></h4>
+<h4 id="usage-19">Usage<a class="anchor" aria-label="anchor" href="#usage-19"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModel</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-10">Arguments<a class="anchor" aria-label="anchor" href="#arguments-10"></a></h4>
+<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 

@@ -13,6 +13,7 @@
 <url><loc>https://generable.github.io/bmstate/reference/MultistateModelFit.html</loc></url>
 <url><loc>https://generable.github.io/bmstate/reference/MultistateSystem.html</loc></url>
 <url><loc>https://generable.github.io/bmstate/reference/PKModel.html</loc></url>
+<url><loc>https://generable.github.io/bmstate/reference/PSSDosingData.html</loc></url>
 <url><loc>https://generable.github.io/bmstate/reference/PathData.html</loc></url>
 <url><loc>https://generable.github.io/bmstate/reference/TransitionMatrix.html</loc></url>
 <url><loc>https://generable.github.io/bmstate/reference/as_single_event.html</loc></url>
@@ -40,10 +41,10 @@
 <url><loc>https://generable.github.io/bmstate/reference/p_state_occupancy.html</loc></url>
 <url><loc>https://generable.github.io/bmstate/reference/p_state_visit.html</loc></url>
 <url><loc>https://generable.github.io/bmstate/reference/p_state_visit_per_subject.html</loc></url>
+<url><loc>https://generable.github.io/bmstate/reference/pk_2cpt_pss.html</loc></url>
 <url><loc>https://generable.github.io/bmstate/reference/plot_stan_data_integral.html</loc></url>
 <url><loc>https://generable.github.io/bmstate/reference/plot_stan_data_matrix.html</loc></url>
 <url><loc>https://generable.github.io/bmstate/reference/plot_state_occupancy.html</loc></url>
-<url><loc>https://generable.github.io/bmstate/reference/pop_2cpt_partly_ss.html</loc></url>
 <url><loc>https://generable.github.io/bmstate/reference/potential_covariates.html</loc></url>
 <url><loc>https://generable.github.io/bmstate/reference/simulate_dosing.html</loc></url>
 <url><loc>https://generable.github.io/bmstate/reference/simulate_example_data.html</loc></url>

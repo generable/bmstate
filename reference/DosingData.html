@@ -9,7 +9,7 @@ Dosing data class (R6 class)"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">bmstate</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,23 +47,7 @@ Dosing data class (R6 class)"></head><body>
 
     <div class="section level2">
     <h2 id="public-fields">Public fields<a class="anchor" aria-label="anchor" href="#public-fields"></a></h2>
-    <p></p><div class="r6-fields"><dl><dt><code>doses</code></dt>
-<dd><p>Dose amounts (list with length equal to number of subjects).</p></dd>
-
-
-<dt><code>times</code></dt>
-<dd><p>Dose times (list with length equal to number of subjects).</p></dd>
-
-
-<dt><code>dose_ss</code></dt>
-<dd><p>Steady-state dose.</p></dd>
-
-
-<dt><code>tau_ss</code></dt>
-<dd><p>Steady-state dosing interval.</p></dd>
-
-
-<dt><code>subject_ids</code></dt>
+    <p></p><div class="r6-fields"><dl><dt><code>subject_ids</code></dt>
 <dd><p>Subject ids.
 Initialize</p></dd>
 
@@ -76,20 +60,16 @@ Initialize</p></dd>
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
 
-<ul><li><p><a href="#method-DosingData-new"><code>DosingData$new()</code></a></p></li>
-<li><p><a href="#method-DosingData-as_data_frame"><code>DosingData$as_data_frame()</code></a></p></li>
+<ul><li><p><a href="#method-DosingData-set_sub_ids"><code>DosingData$set_sub_ids()</code></a></p></li>
 <li><p><a href="#method-DosingData-print"><code>DosingData$print()</code></a></p></li>
 <li><p><a href="#method-DosingData-num_subjects"><code>DosingData$num_subjects()</code></a></p></li>
-<li><p><a href="#method-DosingData-simulate_pk"><code>DosingData$simulate_pk()</code></a></p></li>
-<li><p><a href="#method-DosingData-plot"><code>DosingData$plot()</code></a></p></li>
-<li><p><a href="#method-DosingData-filter"><code>DosingData$filter()</code></a></p></li>
 <li><p><a href="#method-DosingData-clone"><code>DosingData$clone()</code></a></p></li>
-</ul></div><p></p><hr><a id="method-DosingData-new"></a><div class="section">
-<h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
+</ul></div><p></p><hr><a id="method-DosingData-set_sub_ids"></a><div class="section">
+<h3 id="method-set-sub-ids-">Method <code>set_sub_ids()</code><a class="anchor" aria-label="anchor" href="#method-set-sub-ids-"></a></h3>
 
 <div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/DosingData.html">DosingData</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">subject_ids</span>, <span class="va">doses</span>, <span class="va">times</span>, dose_ss <span class="op">=</span> <span class="cn">NULL</span>, tau_ss <span class="op">=</span> <span class="fl">24</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DosingData</span><span class="op">$</span><span class="fu">set_sub_ids</span><span class="op">(</span><span class="va">subject_ids</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -98,126 +78,34 @@ Initialize</p></dd>
 <dd><p>A character vector</p></dd>
 
 
-<dt><code>doses</code></dt>
-<dd><p>Dose amounts (list with length equal to number of subjects).</p></dd>
-
-
-<dt><code>times</code></dt>
-<dd><p>Dose times (list with length equal to number of subjects).</p></dd>
-
-
-<dt><code>dose_ss</code></dt>
-<dd><p>Steady-state dose.</p></dd>
-
-
-<dt><code>tau_ss</code></dt>
-<dd><p>Steady-state dosing interval.</p></dd>
-
-
 </dl><p></p></div>
 </div>
-
-</div><p></p><hr><a id="method-DosingData-as_data_frame"></a><div class="section">
-<h3 id="method-as-data-frame-">Method <code>as_data_frame()</code><a class="anchor" aria-label="anchor" href="#method-as-data-frame-"></a></h3>
-<p>As data frame</p><div class="section">
-<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DosingData</span><span class="op">$</span><span class="fu">as_data_frame</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
 
 </div><p></p><hr><a id="method-DosingData-print"></a><div class="section">
 <h3 id="method-print-">Method <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code><a class="anchor" aria-label="anchor" href="#method-print-"></a></h3>
 <p>Print info</p><div class="section">
-<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DosingData</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 
 </div><p></p><hr><a id="method-DosingData-num_subjects"></a><div class="section">
 <h3 id="method-num-subjects-">Method <code>num_subjects()</code><a class="anchor" aria-label="anchor" href="#method-num-subjects-"></a></h3>
-<p>Get number of subjects
-Simulate PK dynamics</p><div class="section">
-<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<p>Get number of subjects</p><div class="section">
+<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DosingData</span><span class="op">$</span><span class="fu">num_subjects</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 
-</div><p></p><hr><a id="method-DosingData-simulate_pk"></a><div class="section">
-<h3 id="method-simulate-pk-">Method <code>simulate_pk()</code><a class="anchor" aria-label="anchor" href="#method-simulate-pk-"></a></h3>
-
-<div class="section">
-<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DosingData</span><span class="op">$</span><span class="fu">simulate_pk</span><span class="op">(</span><span class="va">t</span>, <span class="va">theta</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
-<h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>t</code></dt>
-<dd><p>A vector of output times for each subject (a list).</p></dd>
-
-
-<dt><code>theta</code></dt>
-<dd><p>A matrix of parameters.</p></dd>
-
-
-</dl><p></p></div>
-</div>
-<div class="section">
-<h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
-<p>a <code>data.frame</code>
-Plot dosing (and PK) data</p>
-</div>
-
-</div><p></p><hr><a id="method-DosingData-plot"></a><div class="section">
-<h3 id="method-plot-">Method <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code><a class="anchor" aria-label="anchor" href="#method-plot-"></a></h3>
-
-<div class="section">
-<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DosingData</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span>df_fit <span class="op">=</span> <span class="cn">NULL</span>, subject_df <span class="op">=</span> <span class="cn">NULL</span>, max_num_subjects <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
-<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>df_fit</code></dt>
-<dd><p>Fit data frame.</p></dd>
-
-
-<dt><code>subject_df</code></dt>
-<dd><p>Subject data frame.</p></dd>
-
-
-<dt><code>max_num_subjects</code></dt>
-<dd><p>Max number of subjects to plot.</p></dd>
-
-
-</dl><p></p></div>
-</div>
-
-</div><p></p><hr><a id="method-DosingData-filter"></a><div class="section">
-<h3 id="method-filter-">Method <code><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter()</a></code><a class="anchor" aria-label="anchor" href="#method-filter-"></a></h3>
-<p>Filter based on subject id, creates new object</p><div class="section">
-<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DosingData</span><span class="op">$</span><span class="fu">filter</span><span class="op">(</span>subject_ids_keep <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
-<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>subject_ids_keep</code></dt>
-<dd><p>Subject ids to keep</p></dd>
-
-
-</dl><p></p></div>
-</div>
-
 </div><p></p><hr><a id="method-DosingData-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">DosingData</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
+<h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 

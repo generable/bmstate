@@ -14,6 +14,8 @@
   : A multistate system with proportional spline hazards
 - [`PKModel`](https://generable.github.io/bmstate/reference/PKModel.md)
   : One-compartment PK Model
+- [`PSSDosingData`](https://generable.github.io/bmstate/reference/PSSDosingData.md)
+  : Partially steady-state dosing data class (R6 class)
 - [`PathData`](https://generable.github.io/bmstate/reference/PathData.md)
   : Path data class (R6 class)
 - [`TransitionMatrix`](https://generable.github.io/bmstate/reference/TransitionMatrix.md)
@@ -70,14 +72,14 @@
 - [`p_state_visit_per_subject()`](https://generable.github.io/bmstate/reference/p_state_visit_per_subject.md)
   : For each subject, compute probability of visiting a given state at
   least once before given time
+- [`pk_2cpt_pss()`](https://generable.github.io/bmstate/reference/pk_2cpt_pss.md)
+  : Partially steady-state PK model
 - [`plot_stan_data_integral()`](https://generable.github.io/bmstate/reference/plot_stan_data_integral.md)
   : Visualize numerical integration of hazard
 - [`plot_stan_data_matrix()`](https://generable.github.io/bmstate/reference/plot_stan_data_matrix.md)
   : Visualize parts of the 'Stan' data
 - [`plot_state_occupancy()`](https://generable.github.io/bmstate/reference/plot_state_occupancy.md)
   : Plot mean state occupancy probabilities over time for each subject
-- [`pop_2cpt_partly_ss()`](https://generable.github.io/bmstate/reference/pop_2cpt_partly_ss.md)
-  : Partially steady-state PK model
 - [`potential_covariates()`](https://generable.github.io/bmstate/reference/potential_covariates.md)
   : Look for potential covariates that affect transitions
 - [`simulate_dosing()`](https://generable.github.io/bmstate/reference/simulate_dosing.md)

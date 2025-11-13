@@ -47,6 +47,8 @@ Minimal fit class
 
 - [`MultistateModelFit$plot_basisfun()`](#method-MultistateModelFit-plot_basisfun)
 
+- [`MultistateModelFit$simulate_pk()`](#method-MultistateModelFit-simulate_pk)
+
 - [`MultistateModelFit$plot_pk()`](#method-MultistateModelFit-plot_pk)
 
 - [`MultistateModelFit$plot_h0()`](#method-MultistateModelFit-plot_h0)
@@ -226,14 +228,13 @@ Plot used basis functions (grid)
 
 ------------------------------------------------------------------------
 
-### Method `plot_pk()`
+### Method `simulate_pk()`
 
-Plot PK fit.
+Simulate PK dynamics using fitted params.
 
 #### Usage
 
-    MultistateModelFit$plot_pk(
-      max_num_subjects = 12,
+    MultistateModelFit$simulate_pk(
       oos = FALSE,
       data = NULL,
       L = 100,
@@ -243,13 +244,9 @@ Plot PK fit.
 
 #### Arguments
 
-- `max_num_subjects`:
-
-  Max number of subjects to show.
-
 - `oos`:
 
-  Out-of-sample subjects? Plot baseline hazard distribution
+  Out-of-sample subjects?
 
 - `data`:
 
@@ -267,6 +264,55 @@ Plot PK fit.
 - `n_prev`:
 
   number of previous doses to show fit for
+
+------------------------------------------------------------------------
+
+### Method `plot_pk()`
+
+Plot PK fit.
+
+#### Usage
+
+    MultistateModelFit$plot_pk(
+      max_num_subjects = 12,
+      oos = FALSE,
+      data = NULL,
+      L = 100,
+      timescale = 24,
+      n_prev = 3,
+      ci_alpha = 0.9
+    )
+
+#### Arguments
+
+- `max_num_subjects`:
+
+  Max number of subjects to show.
+
+- `oos`:
+
+  Out-of-sample subjects?
+
+- `data`:
+
+  Data for which to predict the concentration. If `NULL`, training data
+  is used.
+
+- `L`:
+
+  number of grid points for each subject
+
+- `timescale`:
+
+  scale of time
+
+- `n_prev`:
+
+  number of previous doses to show fit for
+
+- `ci_alpha`:
+
+  Width of central credible interval. Plot baseline hazard distribution
 
 ------------------------------------------------------------------------
 

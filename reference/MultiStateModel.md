@@ -65,12 +65,6 @@ Main model class
 
 - [`MultistateModel$simulate_data()`](#method-MultistateModel-simulate_data)
 
-- [`MultistateModel$simulate_pk_data()`](#method-MultistateModel-simulate_pk_data)
-
-- [`MultistateModel$simulate_events()`](#method-MultistateModel-simulate_events)
-
-- [`MultistateModel$simulate_subjects()`](#method-MultistateModel-simulate_subjects)
-
 - [`MultistateModel$target_states()`](#method-MultistateModel-target_states)
 
 - [`MultistateModel$clone()`](#method-MultistateModel-clone)
@@ -377,7 +371,8 @@ Simulate data using the multistate model
       beta_haz = NULL,
       beta_pk = NULL,
       w0 = 0.001,
-      w = NULL
+      w = NULL,
+      num_doses = 10
     )
 
 #### Arguments
@@ -400,95 +395,23 @@ Simulate data using the multistate model
 
 - `w0`:
 
-  Baseline hazard rate for all transitions
+  Baseline hazard rate for all transitions.
 
 - `w`:
 
   Spline weights. Matrix of shape `num_trans` x `num_weights`. If
   `NULL`, a matrix of zeros is used.
+
+- `num_doses`:
+
+  Average number of doses taken by each subject. Only has effect if
+  model as a PK submodel.
 
 #### Returns
 
 A
 [`JointData`](https://generable.github.io/bmstate/reference/JointData.md)
-object.
-
-------------------------------------------------------------------------
-
-### Method `simulate_pk_data()`
-
-Simulate PK data
-
-#### Usage
-
-    MultistateModel$simulate_pk_data(df_subjects, beta_pk = NULL)
-
-#### Arguments
-
-- `df_subjects`:
-
-  The subjects data frame
-
-- `beta_pk`:
-
-  TODO
-
-#### Returns
-
-a `data.frame` object
-
-------------------------------------------------------------------------
-
-### Method `simulate_events()`
-
-Simulate events data
-
-#### Usage
-
-    MultistateModel$simulate_events(df_subjects, beta_haz, log_w0, w)
-
-#### Arguments
-
-- `df_subjects`:
-
-  The subjects data frame
-
-- `beta_haz`:
-
-  Matrix of shape `num_target_states` x `num_covs`
-
-- `log_w0`:
-
-  Baseline log hazard rate, vector with length `num_trans`
-
-- `w`:
-
-  Spline weights. Matrix of shape `num_trans` x `num_weights`. If
-  `NULL`, a matrix of zeros is used.
-
-#### Returns
-
-a `tibble`
-
-------------------------------------------------------------------------
-
-### Method `simulate_subjects()`
-
-Simulate subject data
-
-#### Usage
-
-    MultistateModel$simulate_subjects(N_subject = 100, doses = c(15, 30, 60))
-
-#### Arguments
-
-- `N_subject`:
-
-  Number of subjects.
-
-- `doses`:
-
-  Possible doses. Get indices of states that are not source states
+object. Get indices of states that are not source states
 
 ------------------------------------------------------------------------
 

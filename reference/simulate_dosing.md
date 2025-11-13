@@ -5,22 +5,27 @@ Simulate dosing data
 ## Usage
 
 ``` r
-simulate_dosing(df_subjects, tau = 24, p_miss = 0.2)
+simulate_dosing(df_subjects, tau = 24, p_miss = 0.2, t_jitter = 4)
 ```
 
 ## Arguments
 
 - df_subjects:
 
-  Data frame with one row for each subject
+  Data frame with one row for each subject. Must have columns
+  `subject_id, num_ss_doses, num_doses, dose`.
 
 - tau:
 
-  Dosing interval.
+  Supposed dosing interval (same for each subject).
 
 - p_miss:
 
   Probability of missing a dose.
+
+- t_jitter:
+
+  Randomness added to dose times.
 
 ## Value
 

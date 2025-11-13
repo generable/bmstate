@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bmstate</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,7 +70,7 @@ Timonen</h4>
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://generable.github.io/bmstate/">bmstate</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Attached bmstate 0.2.0. Type ?bmstate to get started.</span></span>
+<span><span class="co">#&gt; Attached bmstate 0.2.1. Type ?bmstate to get started.</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/get_theme.html" class="external-link">theme_set</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
@@ -286,11 +286,7 @@ realized path.</p>
 <span><span class="va">mod</span><span class="op">$</span><span class="fu">set_prior_mean_h0</span><span class="op">(</span><span class="va">h0_true</span><span class="op">)</span> <span class="co"># has no effect for simulation</span></span>
 <span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="va">mod</span><span class="op">$</span><span class="fu">simulate_data</span><span class="op">(</span>N_subject <span class="op">=</span> <span class="fl">1</span>, w0 <span class="op">=</span> <span class="va">h0_true</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Generating 1 paths</span></span>
-<span><span class="va">dat</span><span class="op">$</span><span class="va">paths</span><span class="op">$</span><span class="fu">plot_paths</span><span class="op">(</span>truncate <span class="op">=</span> <span class="cn">TRUE</span>, alpha <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">""</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: There was 1 warning in `summarise()`.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> In argument: `term_time = min(.data$time, na.rm = T)`.</span></span>
-<span><span class="co">#&gt; Caused by warning in `min()`:</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> no non-missing arguments to min; returning Inf</span></span></code></pre></div>
+<span><span class="va">dat</span><span class="op">$</span><span class="va">paths</span><span class="op">$</span><span class="fu">plot_paths</span><span class="op">(</span>truncate <span class="op">=</span> <span class="cn">TRUE</span>, alpha <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">""</span><span class="op">)</span></span></code></pre></div>
 <p><img src="math_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" width="576"></p>
 <p>Here we plot the corresponding binary values
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>δ</mi><mrow><mi>k</mi><mo>,</mo><mn>1</mn></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mi>h</mi><mo stretchy="true" form="postfix">)</mo></mrow></msubsup><annotation encoding="application/x-tex">\delta_{k,1}^{(h)}</annotation></semantics></math>
@@ -550,7 +546,7 @@ analytic implementations of solving a transition probability matrix.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Paths"</span>, <span class="st">"Analytic1"</span>, <span class="st">"Analytic2"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     Paths Analytic1 Analytic2 </span></span>
-<span><span class="co">#&gt; 0.6830000 0.6657109 0.6657112</span></span></code></pre></div>
+<span><span class="co">#&gt; 0.6500000 0.6657109 0.6657112</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="competing-risks-model">Competing risks model<a class="anchor" aria-label="anchor" href="#competing-risks-model"></a>
@@ -617,7 +613,7 @@ ensure that they are correct.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"P(state = "</span>, <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span>, <span class="st">")"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           P(state = B) P(state = C) P(state = D)</span></span>
-<span><span class="co">#&gt; Paths       0.06900000    0.1750000    0.2530000</span></span>
+<span><span class="co">#&gt; Paths       0.08100000    0.1440000    0.2380000</span></span>
 <span><span class="co">#&gt; Analytic1   0.08030481    0.1606096    0.2409144</span></span>
 <span><span class="co">#&gt; Analytic2   0.08030484    0.1606097    0.2409145</span></span></code></pre></div>
 </div>
@@ -665,7 +661,7 @@ correct.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Paths"</span>, <span class="st">"Analytic"</span>, <span class="st">"Analytic2"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     Paths  Analytic Analytic2 </span></span>
-<span><span class="co">#&gt; 0.3080000 0.2961619 0.2961618</span></span></code></pre></div>
+<span><span class="co">#&gt; 0.3110000 0.2961619 0.2961618</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="diamond-model">Diamond model<a class="anchor" aria-label="anchor" href="#diamond-model"></a>
@@ -714,7 +710,7 @@ correct.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Paths"</span>, <span class="st">"Analytic"</span>, <span class="st">"Analytic2"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     Paths  Analytic Analytic2 </span></span>
-<span><span class="co">#&gt; 0.5530000 0.5459059 0.5459058</span></span></code></pre></div>
+<span><span class="co">#&gt; 0.5270000 0.5459059 0.5459058</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="general-multistate-models">General multistate models<a class="anchor" aria-label="anchor" href="#general-multistate-models"></a>
@@ -747,9 +743,9 @@ various transitions.</p>
 <code class="sourceCode R"><span><span class="va">pd</span><span class="op">$</span><span class="va">paths</span><span class="op">$</span><span class="fu">prop_matrix</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     to</span></span>
 <span><span class="co">#&gt; from         A         B         C         D         E  no event</span></span>
-<span><span class="co">#&gt;    A 0.0000000 0.2670000 0.2470000 0.2250000 0.2440000 0.0170000</span></span>
-<span><span class="co">#&gt;    B 0.0000000 0.2054176 0.2325056 0.2279910 0.1918736 0.1422122</span></span>
-<span><span class="co">#&gt;    C 0.0000000 0.1918736 0.2099323 0.2234763 0.2212190 0.1534989</span></span>
+<span><span class="co">#&gt;    A 0.0000000 0.2600000 0.2550000 0.2380000 0.2330000 0.0140000</span></span>
+<span><span class="co">#&gt;    B 0.0000000 0.2339545 0.2091097 0.2070393 0.2111801 0.1387164</span></span>
+<span><span class="co">#&gt;    C 0.0000000 0.2412281 0.2192982 0.1973684 0.2302632 0.1118421</span></span>
 <span><span class="co">#&gt;    D 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 1.0000000</span></span>
 <span><span class="co">#&gt;    E 0.0000000 0.0000000 0.0000000 0.0000000 0.0000000 1.0000000</span></span></code></pre></div>
 </div>
