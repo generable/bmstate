@@ -11,6 +11,7 @@ Get path to default Stan file
 }
 \seealso{
 Other Stan-related functions: 
+\code{\link{create_stan_data}()},
 \code{\link{create_stan_model}()},
 \code{\link{ensure_exposed_stan_functions}()},
 \code{\link{fit_stan}()},

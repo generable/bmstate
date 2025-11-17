@@ -17,3 +17,13 @@ A list of data for Stan.
 \description{
 Creating Stan data list
 }
+\seealso{
+Other Stan-related functions: 
+\code{\link{create_stan_model}()},
+\code{\link{default_stan_filepath}()},
+\code{\link{ensure_exposed_stan_functions}()},
+\code{\link{fit_stan}()},
+\code{\link{plot_stan_data_integral}()},
+\code{\link{plot_stan_data_matrix}()}
+}
+\concept{Stan-related functions}

@@ -22,8 +22,8 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
     initialize = function(matrix, states) {
       checkmate::assert_matrix(matrix, min.rows = 1, min.cols = 1)
       checkmate::assert_integerish(matrix, lower = 0, upper = 1)
-      checkmate::assert_true(length(states) == nrow(matrix))
       checkmate::assert_true(nrow(matrix) == ncol(matrix))
+      checkmate::assert_character(states, len = nrow(matrix), unique = TRUE)
       self$matrix <- matrix
       self$states <- states
     },

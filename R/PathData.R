@@ -514,10 +514,12 @@ potential_covariates <- function(pd, possible = NULL, ...) {
 #' @export
 #' @param pd A \code{\link{PathData}} object
 #' @param event Name of the state corresponding to the event of interest (character)
+#' @param null_state Name of the base state
 #' @return A \code{\link{PathData}} object
-as_single_event <- function(pd, event) {
+as_single_event <- function(pd, event, null_state = "Randomization") {
   checkmate::assert_class(pd, "PathData")
   checkmate::assert_character(event, len = 1)
+  checkmate::assert_character(null_state, len = 1, min.chars = 1)
   stopifnot(event %in% pd$state_names())
   state <- which(pd$state_names() == event)
   if (length(state) != 1) {
@@ -548,7 +550,7 @@ as_single_event <- function(pd, event) {
     pd$subject_df |> dplyr::select("subject_id"),
     by = "subject_id"
   )
-  tm <- transmat_survival(state_names = c("Randomization", event))
+  tm <- transmat_survival(state_names = c(null_state, event))
   PathData$new(
     pd$subject_df, path_df_new, link_df, tm, pd$covs
   )

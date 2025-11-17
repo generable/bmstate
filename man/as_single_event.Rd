@@ -4,12 +4,14 @@
 \alias{as_single_event}
 \title{PathData to time-to-event data format with a single event}
 \usage{
-as_single_event(pd, event)
+as_single_event(pd, event, null_state = "Randomization")
 }
 \arguments{
 \item{pd}{A \code{\link{PathData}} object}
 
 \item{event}{Name of the state corresponding to the event of interest (character)}
+
+\item{null_state}{Name of the base state}
 }
 \value{
 A \code{\link{PathData}} object
