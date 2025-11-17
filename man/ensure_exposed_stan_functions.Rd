@@ -17,6 +17,7 @@ Expose 'Stan' functions if they are not yet exposed
 }
 \seealso{
 Other Stan-related functions: 
+\code{\link{create_stan_data}()},
 \code{\link{create_stan_model}()},
 \code{\link{default_stan_filepath}()},
 \code{\link{fit_stan}()},

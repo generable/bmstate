@@ -3,6 +3,7 @@
 #' @export
 #' @inheritParams fit_stan
 #' @return A list of data for Stan.
+#' @family Stan-related functions
 create_stan_data <- function(model, data) {
   checkmate::assert_class(model, "MultistateModel")
   data <- pd_to_jointdata(data)

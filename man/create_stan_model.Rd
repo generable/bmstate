@@ -18,6 +18,7 @@ set using \code{options(bmstate_stan_file = ...)}.
 }
 \seealso{
 Other Stan-related functions: 
+\code{\link{create_stan_data}()},
 \code{\link{default_stan_filepath}()},
 \code{\link{ensure_exposed_stan_functions}()},
 \code{\link{fit_stan}()},
