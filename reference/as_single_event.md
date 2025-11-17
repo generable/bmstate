@@ -5,7 +5,7 @@ PathData to time-to-event data format with a single event
 ## Usage
 
 ``` r
-as_single_event(pd, event)
+as_single_event(pd, event, null_state = "Randomization")
 ```
 
 ## Arguments
@@ -19,6 +19,10 @@ as_single_event(pd, event)
 - event:
 
   Name of the state corresponding to the event of interest (character)
+
+- null_state:
+
+  Name of the base state
 
 ## Value
 

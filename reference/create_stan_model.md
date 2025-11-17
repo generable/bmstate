@@ -24,6 +24,7 @@ create_stan_model(filepath = NULL, ...)
 ## See also
 
 Other Stan-related functions:
+[`create_stan_data()`](https://generable.github.io/bmstate/reference/create_stan_data.md),
 [`default_stan_filepath()`](https://generable.github.io/bmstate/reference/default_stan_filepath.md),
 [`ensure_exposed_stan_functions()`](https://generable.github.io/bmstate/reference/ensure_exposed_stan_functions.md),
 [`fit_stan()`](https://generable.github.io/bmstate/reference/fit_stan.md),

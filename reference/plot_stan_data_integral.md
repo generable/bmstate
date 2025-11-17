@@ -35,6 +35,7 @@ plot_stan_data_integral(model, stan_data, iidx, h0 = 0.001, w = NULL)
 ## See also
 
 Other Stan-related functions:
+[`create_stan_data()`](https://generable.github.io/bmstate/reference/create_stan_data.md),
 [`create_stan_model()`](https://generable.github.io/bmstate/reference/create_stan_model.md),
 [`default_stan_filepath()`](https://generable.github.io/bmstate/reference/default_stan_filepath.md),
 [`ensure_exposed_stan_functions()`](https://generable.github.io/bmstate/reference/ensure_exposed_stan_functions.md),
