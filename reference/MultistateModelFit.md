@@ -183,12 +183,13 @@ Extract draws as `rvar`s
 
 - `name`:
 
-  Param/quantity name Draws in a raw array with same shape as Stan
-  variable
+  Param/quantity name
 
 ------------------------------------------------------------------------
 
 ### Method `get_draws_of()`
+
+Draws in a raw array with same shape as Stan variable
 
 #### Usage
 
@@ -202,11 +203,13 @@ Extract draws as `rvar`s
 
 #### Returns
 
-Array with dimension `c(ndraws(x), dim(x))` Print the object
+Array with dimension `c(ndraws(x), dim(x))`
 
 ------------------------------------------------------------------------
 
 ### Method [`print()`](https://rdrr.io/r/base/print.html)
+
+Print the object
 
 #### Usage
 
@@ -312,11 +315,13 @@ Plot PK fit.
 
 - `ci_alpha`:
 
-  Width of central credible interval. Plot baseline hazard distribution
+  Width of central credible interval.
 
 ------------------------------------------------------------------------
 
 ### Method `plot_h0()`
+
+Plot baseline hazard distribution
 
 #### Usage
 
@@ -330,11 +335,13 @@ Plot PK fit.
 
 - `ci_alpha`:
 
-  width of credible interval Baseline hazard distribution
+  width of credible interval
 
 ------------------------------------------------------------------------
 
 ### Method `h0_dist()`
+
+Baseline hazard distribution
 
 #### Usage
 
@@ -348,11 +355,13 @@ Plot PK fit.
 
 - `ci_alpha`:
 
-  width of credible interval Extract covariate effects
+  width of credible interval
 
 ------------------------------------------------------------------------
 
 ### Method `covariate_effects()`
+
+Extract covariate effects
 
 Currently not implemented for models that have a PK submodel.
 

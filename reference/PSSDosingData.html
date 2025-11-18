@@ -9,7 +9,7 @@ Partially steady-state dosing data class (R6 class)"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">bmstate</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,8 +67,7 @@ of steady-state assumption time range.</p></dd>
 
 
 <dt><code>tau_ss</code></dt>
-<dd><p>Steady-state dosing interval.
-Initialize</p></dd>
+<dd><p>Steady-state dosing interval.</p></dd>
 
 
 </dl><p></p></div>
@@ -90,8 +89,7 @@ Initialize</p></dd>
 <li><span class="pkg-link" data-pkg="bmstate" data-topic="DosingData" data-id="set_sub_ids"><a href="DosingData.html#method-set_sub_ids"><code>bmstate::DosingData$set_sub_ids()</code></a></span></li>
 </ul></details></p><hr><a id="method-PSSDosingData-new"></a><div class="section">
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
-
-<div class="section">
+<p>Initialize</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/PSSDosingData.html">PSSDosingData</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">subject_ids</span>, <span class="va">doses</span>, <span class="va">times</span>, dose_ss <span class="op">=</span> <span class="cn">NULL</span>, tau_ss <span class="op">=</span> <span class="fl">24</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
@@ -126,8 +124,7 @@ of steady-state assumption time range.</p></dd>
 
 </div><p></p><hr><a id="method-PSSDosingData-as_data_frame"></a><div class="section">
 <h3 id="method-as-data-frame-">Method <code>as_data_frame()</code><a class="anchor" aria-label="anchor" href="#method-as-data-frame-"></a></h3>
-<p>As data frame</p>
-<p>Simulate PK dynamics</p><div class="section">
+<p>As data frame</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PSSDosingData</span><span class="op">$</span><span class="fu">as_data_frame</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
@@ -135,8 +132,7 @@ of steady-state assumption time range.</p></dd>
 
 </div><p></p><hr><a id="method-PSSDosingData-simulate_pk"></a><div class="section">
 <h3 id="method-simulate-pk-">Method <code>simulate_pk()</code><a class="anchor" aria-label="anchor" href="#method-simulate-pk-"></a></h3>
-
-<div class="section">
+<p>Simulate PK dynamics</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PSSDosingData</span><span class="op">$</span><span class="fu">simulate_pk</span><span class="op">(</span><span class="va">t</span>, <span class="va">theta</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
@@ -155,14 +151,12 @@ of steady-state assumption time range.</p></dd>
 </div>
 <div class="section">
 <h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
-<p>a <code>data.frame</code>
-Plot dosing (and PK) data</p>
+<p>a <code>data.frame</code></p>
 </div>
 
 </div><p></p><hr><a id="method-PSSDosingData-plot"></a><div class="section">
 <h3 id="method-plot-">Method <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code><a class="anchor" aria-label="anchor" href="#method-plot-"></a></h3>
-
-<div class="section">
+<p>Plot dosing (and PK) data</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PSSDosingData</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span>df_fit <span class="op">=</span> <span class="cn">NULL</span>, subject_df <span class="op">=</span> <span class="cn">NULL</span>, max_num_subjects <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>

@@ -15,7 +15,6 @@ Joint data class (R6 class)
 
   The dosing data, an object of class
   [`DosingData`](https://generable.github.io/bmstate/reference/DosingData.md).
-  Initialize
 
 ## Methods
 
@@ -35,6 +34,8 @@ Joint data class (R6 class)
 
 ### Method `new()`
 
+Initialize
+
 #### Usage
 
     JointData$new(paths, dosing)
@@ -50,11 +51,13 @@ Joint data class (R6 class)
 
   The dosing data, an object of class
   [`DosingData`](https://generable.github.io/bmstate/reference/DosingData.md).
-  Can be also `NULL`. Filter subjects, creates new object
+  Can be also `NULL`.
 
 ------------------------------------------------------------------------
 
 ### Method [`filter()`](https://rdrr.io/r/stats/filter.html)
+
+Filter subjects, creates new object
 
 #### Usage
 

@@ -63,6 +63,8 @@ Main model class
 
 - [`MultistateModel$categ_covs()`](#method-MultistateModel-categ_covs)
 
+- [`MultistateModel$simulate_subjects()`](#method-MultistateModel-simulate_subjects)
+
 - [`MultistateModel$simulate_data()`](#method-MultistateModel-simulate_data)
 
 - [`MultistateModel$target_states()`](#method-MultistateModel-target_states)
@@ -95,11 +97,13 @@ Get number of grid points used for integration.
 
 #### Returns
 
-An integer Set normalization constant for each variable (side effect)
+An integer
 
 ------------------------------------------------------------------------
 
 ### Method `set_normalizers()`
+
+Set normalization constant for each variable (side effect)
 
 #### Usage
 
@@ -125,11 +129,13 @@ Get normalization constants for AUC (PK)
 
 #### Returns
 
-list Set normalization constants for AUC (side effect)
+list
 
 ------------------------------------------------------------------------
 
 ### Method `set_auc_normalizers()`
+
+Set normalization constants for AUC (side effect)
 
 #### Usage
 
@@ -303,7 +309,7 @@ Get names of the states
 
 ### Method `has_pk()`
 
-Is there a PK submodel? Print the object
+Is there a PK submodel?
 
 #### Usage
 
@@ -312,6 +318,8 @@ Is there a PK submodel? Print the object
 ------------------------------------------------------------------------
 
 ### Method [`print()`](https://rdrr.io/r/base/print.html)
+
+Print the object
 
 #### Usage
 
@@ -360,6 +368,26 @@ Get names of categorical covariates
 
 ------------------------------------------------------------------------
 
+### Method `simulate_subjects()`
+
+Simulate subject data, all covariates independently.
+
+#### Usage
+
+    MultistateModel$simulate_subjects(N_subject = 100, doses = c(15, 30, 60))
+
+#### Arguments
+
+- `N_subject`:
+
+  Number of subjects.
+
+- `doses`:
+
+  Possible doses.
+
+------------------------------------------------------------------------
+
 ### Method `simulate_data()`
 
 Simulate data using the multistate model
@@ -372,7 +400,8 @@ Simulate data using the multistate model
       beta_pk = NULL,
       w0 = 0.001,
       w = NULL,
-      num_doses = 10
+      num_doses = 10,
+      subjects_df = NULL
     )
 
 #### Arguments
@@ -407,15 +436,22 @@ Simulate data using the multistate model
   Average number of doses taken by each subject. Only has effect if
   model as a PK submodel.
 
+- `subjects_df`:
+
+  Subject data frame. If `NULL`, simulated using the `simulate_subjects`
+  method.
+
 #### Returns
 
 A
 [`JointData`](https://generable.github.io/bmstate/reference/JointData.md)
-object. Get indices of states that are not source states
+object.
 
 ------------------------------------------------------------------------
 
 ### Method `target_states()`
+
+Get indices of states that are not source states
 
 #### Usage
 

@@ -28,7 +28,7 @@ Partially steady-state dosing data class (R6 class)
 
 - `tau_ss`:
 
-  Steady-state dosing interval. Initialize
+  Steady-state dosing interval.
 
 ## Methods
 
@@ -55,6 +55,8 @@ Inherited methods
 ------------------------------------------------------------------------
 
 ### Method `new()`
+
+Initialize
 
 #### Usage
 
@@ -91,8 +93,6 @@ Inherited methods
 
 As data frame
 
-Simulate PK dynamics
-
 #### Usage
 
     PSSDosingData$as_data_frame()
@@ -100,6 +100,8 @@ Simulate PK dynamics
 ------------------------------------------------------------------------
 
 ### Method `simulate_pk()`
+
+Simulate PK dynamics
 
 #### Usage
 
@@ -117,11 +119,13 @@ Simulate PK dynamics
 
 #### Returns
 
-a `data.frame` Plot dosing (and PK) data
+a `data.frame`
 
 ------------------------------------------------------------------------
 
 ### Method [`plot()`](https://rdrr.io/r/graphics/plot.default.html)
+
+Plot dosing (and PK) data
 
 #### Usage
 

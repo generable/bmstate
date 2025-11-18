@@ -72,11 +72,13 @@ Create graph
 
 - `states`:
 
-  a character vector of state names (length `N`) Number of states
+  a character vector of state names (length `N`)
 
 ------------------------------------------------------------------------
 
 ### Method `num_states()`
+
+Get number of states
 
 #### Usage
 
@@ -84,11 +86,13 @@ Create graph
 
 #### Returns
 
-integer `N` Number of transitions
+integer `N`
 
 ------------------------------------------------------------------------
 
 ### Method `num_trans()`
+
+Get number of transitions
 
 #### Usage
 
@@ -164,11 +168,13 @@ Get indices of possible transitions from given state
 
 - `state`:
 
-  Index of state Get target state of a transition
+  Index of state
 
 ------------------------------------------------------------------------
 
 ### Method `target_state()`
+
+Get target state of a transition
 
 #### Usage
 
@@ -178,12 +184,13 @@ Get indices of possible transitions from given state
 
 - `trans_idx`:
 
-  Index of the transition Get states that are at risk when at given
-  state
+  Index of the transition
 
 ------------------------------------------------------------------------
 
 ### Method `at_risk()`
+
+Get states that are at risk when at given state
 
 #### Usage
 
@@ -250,11 +257,13 @@ Visualize the matrix as a graph
 
 #### Returns
 
-`qgraph` plot Print output
+`qgraph` plot
 
 ------------------------------------------------------------------------
 
 ### Method [`print()`](https://rdrr.io/r/base/print.html)
+
+Print output
 
 #### Usage
 
@@ -262,11 +271,13 @@ Visualize the matrix as a graph
 
 #### Returns
 
-nothing Get states that cannot be transitioned from
+nothing
 
 ------------------------------------------------------------------------
 
 ### Method `absorbing_states()`
+
+Get states that cannot be transitioned from
 
 #### Usage
 
@@ -276,12 +287,13 @@ nothing Get states that cannot be transitioned from
 
 - `names`:
 
-  Return names of the states? Otherwise returns indices. Get states that
-  cannot be transitioned to
+  Return names of the states? Otherwise returns indices.
 
 ------------------------------------------------------------------------
 
 ### Method `source_states()`
+
+Get states that cannot be transitioned to
 
 #### Usage
 

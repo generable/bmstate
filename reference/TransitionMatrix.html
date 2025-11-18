@@ -9,7 +9,7 @@ Defines states and possible transitions"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">bmstate</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -98,8 +98,7 @@ from state <code>i</code> to <code>j</code> is possible</p></dd>
 
 
 <dt><code>states</code></dt>
-<dd><p>a character vector of state names (length <code>N</code>)
-Number of states</p></dd>
+<dd><p>a character vector of state names (length <code>N</code>)</p></dd>
 
 
 </dl><p></p></div>
@@ -107,22 +106,19 @@ Number of states</p></dd>
 
 </div><p></p><hr><a id="method-TransitionMatrix-num_states"></a><div class="section">
 <h3 id="method-num-states-">Method <code>num_states()</code><a class="anchor" aria-label="anchor" href="#method-num-states-"></a></h3>
-
-<div class="section">
+<p>Get number of states</p><div class="section">
 <h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TransitionMatrix</span><span class="op">$</span><span class="fu">num_states</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
-<p>integer <code>N</code>
-Number of transitions</p>
+<p>integer <code>N</code></p>
 </div>
 
 </div><p></p><hr><a id="method-TransitionMatrix-num_trans"></a><div class="section">
 <h3 id="method-num-trans-">Method <code>num_trans()</code><a class="anchor" aria-label="anchor" href="#method-num-trans-"></a></h3>
-
-<div class="section">
+<p>Get number of transitions</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TransitionMatrix</span><span class="op">$</span><span class="fu">num_trans</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
@@ -186,8 +182,7 @@ Number of transitions</p>
 <div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>state</code></dt>
-<dd><p>Index of state
-Get target state of a transition</p></dd>
+<dd><p>Index of state</p></dd>
 
 
 </dl><p></p></div>
@@ -195,8 +190,7 @@ Get target state of a transition</p></dd>
 
 </div><p></p><hr><a id="method-TransitionMatrix-target_state"></a><div class="section">
 <h3 id="method-target-state-">Method <code>target_state()</code><a class="anchor" aria-label="anchor" href="#method-target-state-"></a></h3>
-
-<div class="section">
+<p>Get target state of a transition</p><div class="section">
 <h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TransitionMatrix</span><span class="op">$</span><span class="fu">target_state</span><span class="op">(</span><span class="va">trans_idx</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
@@ -204,8 +198,7 @@ Get target state of a transition</p></dd>
 <div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>trans_idx</code></dt>
-<dd><p>Index of the transition
-Get states that are at risk when at given state</p></dd>
+<dd><p>Index of the transition</p></dd>
 
 
 </dl><p></p></div>
@@ -213,8 +206,7 @@ Get states that are at risk when at given state</p></dd>
 
 </div><p></p><hr><a id="method-TransitionMatrix-at_risk"></a><div class="section">
 <h3 id="method-at-risk-">Method <code>at_risk()</code><a class="anchor" aria-label="anchor" href="#method-at-risk-"></a></h3>
-
-<div class="section">
+<p>Get states that are at risk when at given state</p><div class="section">
 <h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TransitionMatrix</span><span class="op">$</span><span class="fu">at_risk</span><span class="op">(</span><span class="va">state</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
@@ -277,28 +269,24 @@ Get states that are at risk when at given state</p></dd>
 </div>
 <div class="section">
 <h4 id="returns-8">Returns<a class="anchor" aria-label="anchor" href="#returns-8"></a></h4>
-<p><code>qgraph</code> plot
-Print output</p>
+<p><code>qgraph</code> plot</p>
 </div>
 
 </div><p></p><hr><a id="method-TransitionMatrix-print"></a><div class="section">
 <h3 id="method-print-">Method <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code><a class="anchor" aria-label="anchor" href="#method-print-"></a></h3>
-
-<div class="section">
+<p>Print output</p><div class="section">
 <h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TransitionMatrix</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="returns-9">Returns<a class="anchor" aria-label="anchor" href="#returns-9"></a></h4>
-<p>nothing
-Get states that cannot be transitioned from</p>
+<p>nothing</p>
 </div>
 
 </div><p></p><hr><a id="method-TransitionMatrix-absorbing_states"></a><div class="section">
 <h3 id="method-absorbing-states-">Method <code>absorbing_states()</code><a class="anchor" aria-label="anchor" href="#method-absorbing-states-"></a></h3>
-
-<div class="section">
+<p>Get states that cannot be transitioned from</p><div class="section">
 <h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TransitionMatrix</span><span class="op">$</span><span class="fu">absorbing_states</span><span class="op">(</span>names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
@@ -306,8 +294,7 @@ Get states that cannot be transitioned from</p>
 <div class="section">
 <h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>names</code></dt>
-<dd><p>Return names of the states? Otherwise returns indices.
-Get states that cannot be transitioned to</p></dd>
+<dd><p>Return names of the states? Otherwise returns indices.</p></dd>
 
 
 </dl><p></p></div>
@@ -315,8 +302,7 @@ Get states that cannot be transitioned to</p></dd>
 
 </div><p></p><hr><a id="method-TransitionMatrix-source_states"></a><div class="section">
 <h3 id="method-source-states-">Method <code>source_states()</code><a class="anchor" aria-label="anchor" href="#method-source-states-"></a></h3>
-
-<div class="section">
+<p>Get states that cannot be transitioned to</p><div class="section">
 <h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">TransitionMatrix</span><span class="op">$</span><span class="fu">source_states</span><span class="op">(</span>names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>

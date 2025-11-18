@@ -8,7 +8,7 @@ Dosing data class (R6 class)
 
 - `subject_ids`:
 
-  Subject ids. Initialize
+  Subject ids.
 
 ## Methods
 
@@ -25,6 +25,8 @@ Dosing data class (R6 class)
 ------------------------------------------------------------------------
 
 ### Method `set_sub_ids()`
+
+Initialize
 
 #### Usage
 

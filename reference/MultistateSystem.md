@@ -89,11 +89,13 @@ Get number of transitions
 
 #### Returns
 
-integer Get number of spline weight parameters
+integer
 
 ------------------------------------------------------------------------
 
 ### Method `num_weights()`
+
+Get number of spline weight parameters
 
 #### Usage
 
@@ -183,11 +185,13 @@ Get max time set for the model
 
 #### Returns
 
-a number Print the object
+a number
 
 ------------------------------------------------------------------------
 
 ### Method [`print()`](https://rdrr.io/r/base/print.html)
+
+Print the object
 
 #### Usage
 
@@ -358,11 +362,13 @@ Max instant hazard on interval (t1, t2)
 
 - `log_m`:
 
-  Hazard multiplier (log) Generate paths
+  Hazard multiplier (log)
 
 ------------------------------------------------------------------------
 
 ### Method [`simulate()`](https://rdrr.io/r/stats/simulate.html)
+
+Generate paths
 
 #### Usage
 
