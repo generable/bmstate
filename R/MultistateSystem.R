@@ -174,7 +174,7 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
       self$tm()$num_trans()
     },
 
-    #' Get number of spline weight parameters
+    #' @description Get number of spline weight parameters
     #' @return an integer (\code{num_knots} - 2) + \code{self$spline_k}
     num_weights = function() {
       if (self$knots_not_set()) {
@@ -231,7 +231,7 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
       max(self$get_knots())
     },
 
-    #' Print the object
+    #' @description Print the object
     #'
     #' @return nothing
     print = function() {
@@ -339,7 +339,7 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
       return(exp(max(log_haz)))
     },
 
-    #' Generate paths
+    #' @description Generate paths
     #'
     #' @param w An array of shape \code{n_draws} x \code{n_trans} x
     #' \code{n_weights}

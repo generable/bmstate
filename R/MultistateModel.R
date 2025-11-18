@@ -133,7 +133,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       private$n_grid
     },
 
-    #' Set normalization constant for each variable (side effect)
+    #' @description Set normalization constant for each variable (side effect)
     #'
     #' @param data A \code{\link{JointData}} object
     set_normalizers = function(data) {
@@ -154,7 +154,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       )
     },
 
-    #' Set normalization constants for AUC (side effect)
+    #' @description Set normalization constants for AUC (side effect)
     #'
     #' @param loc Location
     #' @param scale Scale
@@ -186,8 +186,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
     },
 
 
-    #' @description
-    #' Create model
+    #' @description Create model
     #'
     #' @param system A \code{\link{MultistateSystem}}
     #' @param covariates The names of the hazard covariates (excluding possible
@@ -271,7 +270,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       !is.null(self$pk_model)
     },
 
-    #' Print the object
+    #' @description Print the object
     #'
     #' @return nothing
     print = function() {
@@ -417,8 +416,8 @@ MultistateModel <- R6::R6Class("MultistateModel",
         path_id = seq_len(N_subject),
         subject_id = subjects_df$subject_id
       )
-      link_df$rep_idx <- rep(1, N)
-      link_df$draw_idx <- rep(1, N)
+      link_df$rep_idx <- rep(1, N_subject)
+      link_df$draw_idx <- rep(1, N_subject)
       pd <- PathData$new(
         subjects_df, path_df, link_df, self$system$tm(),
         colnames(subjects_df)
@@ -426,7 +425,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       JointData$new(pd, pksim$dosing)
     },
 
-    #' Get indices of states that are not source states
+    #' @description Get indices of states that are not source states
     #'
     #' @return integer
     target_states = function() {

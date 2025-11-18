@@ -13,8 +13,7 @@ Joint data class (R6 class)
 \describe{
 \item{\code{paths}}{The events data, an object of class \code{\link{PathData}}.}
 
-\item{\code{dosing}}{The dosing data, an object of class \code{\link{DosingData}}.
-Initialize}
+\item{\code{dosing}}{The dosing data, an object of class \code{\link{DosingData}}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -32,6 +31,7 @@ Initialize}
 \if{html}{\out{<a id="method-JointData-new"></a>}}
 \if{latex}{\out{\hypertarget{method-JointData-new}{}}}
 \subsection{Method \code{new()}}{
+Initialize
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{JointData$new(paths, dosing)}\if{html}{\out{</div>}}
 }
@@ -42,8 +42,7 @@ Initialize}
 \item{\code{paths}}{The events data, an object of class \code{\link{PathData}}.}
 
 \item{\code{dosing}}{The dosing data, an object of class \code{\link{DosingData}}.
-Can be also \code{NULL}.
-Filter subjects, creates new object}
+Can be also \code{NULL}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -52,6 +51,7 @@ Filter subjects, creates new object}
 \if{html}{\out{<a id="method-JointData-filter"></a>}}
 \if{latex}{\out{\hypertarget{method-JointData-filter}{}}}
 \subsection{Method \code{filter()}}{
+Filter subjects, creates new object
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{JointData$filter(subject_ids_keep)}\if{html}{\out{</div>}}
 }

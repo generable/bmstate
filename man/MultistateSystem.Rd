@@ -73,13 +73,13 @@ Get number of transitions
 
 \subsection{Returns}{
 integer
-Get number of spline weight parameters
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateSystem-num_weights"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateSystem-num_weights}{}}}
 \subsection{Method \code{num_weights()}}{
+Get number of spline weight parameters
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$num_weights()}\if{html}{\out{</div>}}
 }
@@ -165,13 +165,13 @@ Get max time set for the model
 
 \subsection{Returns}{
 a number
-Print the object
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateSystem-print"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateSystem-print}{}}}
 \subsection{Method \code{print()}}{
+Print the object
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$print()}\if{html}{\out{</div>}}
 }
@@ -313,8 +313,7 @@ Max instant hazard on interval (t1, t2)
 
 \item{\code{log_w0}}{Intercept (log)}
 
-\item{\code{log_m}}{Hazard multiplier (log)
-Generate paths}
+\item{\code{log_m}}{Hazard multiplier (log)}
 }
 \if{html}{\out{</div>}}
 }
@@ -323,6 +322,7 @@ Generate paths}
 \if{html}{\out{<a id="method-MultistateSystem-simulate"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateSystem-simulate}{}}}
 \subsection{Method \code{simulate()}}{
+Generate paths
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateSystem$simulate(
   w,

@@ -7,7 +7,7 @@ DosingData <- R6::R6Class(
   public = list(
     subject_ids = NULL,
 
-    #' Initialize
+    #' @description Initialize
     #'
     #' @param subject_ids A character vector
     set_sub_ids = function(subject_ids) {
@@ -47,7 +47,7 @@ PSSDosingData <- R6::R6Class(
     dose_ss = NULL,
     tau_ss = NULL,
 
-    #' Initialize
+    #' @description Initialize
     #'
     #' @param subject_ids A character vector
     #' @param doses Dose amounts (list with length equal to number of subjects).
@@ -91,7 +91,7 @@ PSSDosingData <- R6::R6Class(
       out
     },
 
-    #' Simulate PK dynamics
+    #' @description Simulate PK dynamics
     #'
     #' @param t A vector of output times for each subject (a list).
     #' @param theta A matrix of parameters.
@@ -112,7 +112,7 @@ PSSDosingData <- R6::R6Class(
       )
     },
 
-    #' Plot dosing (and PK) data
+    #' @description Plot dosing (and PK) data
     #'
     #' @param df_fit Fit data frame. Uses columns \code{val}, \code{lower}
     #' and \code{upper}.

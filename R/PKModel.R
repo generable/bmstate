@@ -11,8 +11,7 @@ PKModel <- R6::R6Class("PKModel",
   # PUBLIC
   public = list(
 
-    #' @description
-    #' Create model
+    #' @description Create model
     #'
     #' @param covariates A list with elements \code{ka},
     #' \code{CL}, and \code{V2}

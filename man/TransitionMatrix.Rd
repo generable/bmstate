@@ -57,8 +57,7 @@ Create graph
 \code{matrix[i,j]} is 1 if transition
 from state \code{i} to \code{j} is possible}
 
-\item{\code{states}}{a character vector of state names (length \code{N})
-Number of states}
+\item{\code{states}}{a character vector of state names (length \code{N})}
 }
 \if{html}{\out{</div>}}
 }
@@ -67,19 +66,20 @@ Number of states}
 \if{html}{\out{<a id="method-TransitionMatrix-num_states"></a>}}
 \if{latex}{\out{\hypertarget{method-TransitionMatrix-num_states}{}}}
 \subsection{Method \code{num_states()}}{
+Get number of states
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TransitionMatrix$num_states()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 integer \code{N}
-Number of transitions
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TransitionMatrix-num_trans"></a>}}
 \if{latex}{\out{\hypertarget{method-TransitionMatrix-num_trans}{}}}
 \subsection{Method \code{num_trans()}}{
+Get number of transitions
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TransitionMatrix$num_trans()}\if{html}{\out{</div>}}
 }
@@ -149,8 +149,7 @@ Get indices of possible transitions from given state
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{state}}{Index of state
-Get target state of a transition}
+\item{\code{state}}{Index of state}
 }
 \if{html}{\out{</div>}}
 }
@@ -159,6 +158,7 @@ Get target state of a transition}
 \if{html}{\out{<a id="method-TransitionMatrix-target_state"></a>}}
 \if{latex}{\out{\hypertarget{method-TransitionMatrix-target_state}{}}}
 \subsection{Method \code{target_state()}}{
+Get target state of a transition
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TransitionMatrix$target_state(trans_idx)}\if{html}{\out{</div>}}
 }
@@ -166,8 +166,7 @@ Get target state of a transition}
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{trans_idx}}{Index of the transition
-Get states that are at risk when at given state}
+\item{\code{trans_idx}}{Index of the transition}
 }
 \if{html}{\out{</div>}}
 }
@@ -176,6 +175,7 @@ Get states that are at risk when at given state}
 \if{html}{\out{<a id="method-TransitionMatrix-at_risk"></a>}}
 \if{latex}{\out{\hypertarget{method-TransitionMatrix-at_risk}{}}}
 \subsection{Method \code{at_risk()}}{
+Get states that are at risk when at given state
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TransitionMatrix$at_risk(state)}\if{html}{\out{</div>}}
 }
@@ -237,26 +237,26 @@ Visualize the matrix as a graph
 }
 \subsection{Returns}{
 \code{qgraph} plot
-Print output
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TransitionMatrix-print"></a>}}
 \if{latex}{\out{\hypertarget{method-TransitionMatrix-print}{}}}
 \subsection{Method \code{print()}}{
+Print output
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TransitionMatrix$print()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 nothing
-Get states that cannot be transitioned from
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-TransitionMatrix-absorbing_states"></a>}}
 \if{latex}{\out{\hypertarget{method-TransitionMatrix-absorbing_states}{}}}
 \subsection{Method \code{absorbing_states()}}{
+Get states that cannot be transitioned from
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TransitionMatrix$absorbing_states(names = TRUE)}\if{html}{\out{</div>}}
 }
@@ -264,8 +264,7 @@ Get states that cannot be transitioned from
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{names}}{Return names of the states? Otherwise returns indices.
-Get states that cannot be transitioned to}
+\item{\code{names}}{Return names of the states? Otherwise returns indices.}
 }
 \if{html}{\out{</div>}}
 }
@@ -274,6 +273,7 @@ Get states that cannot be transitioned to}
 \if{html}{\out{<a id="method-TransitionMatrix-source_states"></a>}}
 \if{latex}{\out{\hypertarget{method-TransitionMatrix-source_states}{}}}
 \subsection{Method \code{source_states()}}{
+Get states that cannot be transitioned to
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{TransitionMatrix$source_states(names = TRUE)}\if{html}{\out{</div>}}
 }

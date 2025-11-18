@@ -72,13 +72,13 @@ Get number of grid points used for integration.
 
 \subsection{Returns}{
 An integer
-Set normalization constant for each variable (side effect)
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateModel-set_normalizers"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateModel-set_normalizers}{}}}
 \subsection{Method \code{set_normalizers()}}{
+Set normalization constant for each variable (side effect)
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModel$set_normalizers(data)}\if{html}{\out{</div>}}
 }
@@ -102,13 +102,13 @@ Get normalization constants for AUC (PK)
 
 \subsection{Returns}{
 list
-Set normalization constants for AUC (side effect)
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateModel-set_auc_normalizers"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateModel-set_auc_normalizers}{}}}
 \subsection{Method \code{set_auc_normalizers()}}{
+Set normalization constants for AUC (side effect)
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModel$set_auc_normalizers(loc = 0, scale = 1)}\if{html}{\out{</div>}}
 }
@@ -265,7 +265,6 @@ Get names of the states
 \if{latex}{\out{\hypertarget{method-MultistateModel-has_pk}{}}}
 \subsection{Method \code{has_pk()}}{
 Is there a PK submodel?
-Print the object
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModel$has_pk()}\if{html}{\out{</div>}}
 }
@@ -275,6 +274,7 @@ Print the object
 \if{html}{\out{<a id="method-MultistateModel-print"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateModel-print}{}}}
 \subsection{Method \code{print()}}{
+Print the object
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModel$print()}\if{html}{\out{</div>}}
 }
@@ -385,13 +385,13 @@ the \code{simulate_subjects} method.}
 }
 \subsection{Returns}{
 A \code{\link{JointData}} object.
-Get indices of states that are not source states
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateModel-target_states"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateModel-target_states}{}}}
 \subsection{Method \code{target_states()}}{
+Get indices of states that are not source states
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModel$target_states()}\if{html}{\out{</div>}}
 }
