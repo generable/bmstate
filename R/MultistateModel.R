@@ -412,10 +412,10 @@ MultistateModel <- R6::R6Class("MultistateModel",
       if (self$has_pk()) {
         subjects_df <- subjects_df |> dplyr::left_join(pk_dat, by = "subject_id")
       }
-      path_df <- private$simulate_events(sub_df, beta_haz, log_w0, w)
+      path_df <- private$simulate_events(subjects_df, beta_haz, log_w0, w)
       link_df <- data.frame(
         path_id = seq_len(N_subject),
-        subject_id = sub_df$subject_id
+        subject_id = subjects_df$subject_id
       )
       link_df$rep_idx <- rep(1, N)
       link_df$draw_idx <- rep(1, N)
