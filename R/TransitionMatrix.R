@@ -12,8 +12,7 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
     matrix = NULL,
     states = NULL,
 
-    #' @description
-    #' Create graph
+    #' @description Create graph
     #'
     #' @param matrix a binary \code{N} x \code{N} matrix where
     #' \code{matrix[i,j]} is 1 if transition
@@ -28,14 +27,14 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
       self$states <- states
     },
 
-    #' Number of states
+    #' @description Get number of states
     #'
     #' @return integer \code{N}
     num_states = function() {
       nrow(self$matrix)
     },
 
-    #' Number of transitions
+    #' @description Get number of transitions
     #'
     #' @return integer
     num_trans = function() {
@@ -95,7 +94,7 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
       as.numeric(row[row > 0])
     },
 
-    #' Get target state of a transition
+    #' @description Get target state of a transition
     #'
     #' @param trans_idx Index of the transition
     target_state = function(trans_idx) {
@@ -104,7 +103,7 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
       self$trans_df()$state[trans_idx]
     },
 
-    #' Get states that are at risk when at given state
+    #' @description Get states that are at risk when at given state
     #'
     #' @param state index of current state
     #' @return indices of states at risk
@@ -176,14 +175,14 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
       )
     },
 
-    #' Print output
+    #' @description Print output
     #'
     #' @return nothing
     print = function() {
       print(self$as_matrix())
     },
 
-    #' Get states that cannot be transitioned from
+    #' @description Get states that cannot be transitioned from
     #'
     #' @param names Return names of the states? Otherwise returns indices.
     absorbing_states = function(names = TRUE) {
@@ -194,7 +193,7 @@ TransitionMatrix <- R6::R6Class("TransitionMatrix",
       out
     },
 
-    #' Get states that cannot be transitioned to
+    #' @description Get states that cannot be transitioned to
     #'
     #' @param names Return names of the states? Otherwise returns indices.
     source_states = function(names = TRUE) {

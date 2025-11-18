@@ -11,8 +11,7 @@ Dosing data class (R6 class)
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{subject_ids}}{Subject ids.
-Initialize}
+\item{\code{subject_ids}}{Subject ids.}
 }
 \if{html}{\out{</div>}}
 }
@@ -29,6 +28,7 @@ Initialize}
 \if{html}{\out{<a id="method-DosingData-set_sub_ids"></a>}}
 \if{latex}{\out{\hypertarget{method-DosingData-set_sub_ids}{}}}
 \subsection{Method \code{set_sub_ids()}}{
+Initialize
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DosingData$set_sub_ids(subject_ids)}\if{html}{\out{</div>}}
 }

@@ -23,8 +23,7 @@ of steady-state assumption time range.}
 
 \item{\code{dose_ss}}{Steady-state dose.}
 
-\item{\code{tau_ss}}{Steady-state dosing interval.
-Initialize}
+\item{\code{tau_ss}}{Steady-state dosing interval.}
 }
 \if{html}{\out{</div>}}
 }
@@ -52,6 +51,7 @@ Initialize}
 \if{html}{\out{<a id="method-PSSDosingData-new"></a>}}
 \if{latex}{\out{\hypertarget{method-PSSDosingData-new}{}}}
 \subsection{Method \code{new()}}{
+Initialize
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PSSDosingData$new(subject_ids, doses, times, dose_ss = NULL, tau_ss = 24)}\if{html}{\out{</div>}}
 }
@@ -80,8 +80,6 @@ of steady-state assumption time range.}
 \if{latex}{\out{\hypertarget{method-PSSDosingData-as_data_frame}{}}}
 \subsection{Method \code{as_data_frame()}}{
 As data frame
-
-Simulate PK dynamics
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PSSDosingData$as_data_frame()}\if{html}{\out{</div>}}
 }
@@ -91,6 +89,7 @@ Simulate PK dynamics
 \if{html}{\out{<a id="method-PSSDosingData-simulate_pk"></a>}}
 \if{latex}{\out{\hypertarget{method-PSSDosingData-simulate_pk}{}}}
 \subsection{Method \code{simulate_pk()}}{
+Simulate PK dynamics
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PSSDosingData$simulate_pk(t, theta)}\if{html}{\out{</div>}}
 }
@@ -106,13 +105,13 @@ Simulate PK dynamics
 }
 \subsection{Returns}{
 a \code{data.frame}
-Plot dosing (and PK) data
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PSSDosingData-plot"></a>}}
 \if{latex}{\out{\hypertarget{method-PSSDosingData-plot}{}}}
 \subsection{Method \code{plot()}}{
+Plot dosing (and PK) data
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PSSDosingData$plot(df_fit = NULL, subject_df = NULL, max_num_subjects = 12)}\if{html}{\out{</div>}}
 }

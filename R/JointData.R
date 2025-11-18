@@ -18,7 +18,7 @@ JointData <- R6::R6Class(
     paths = NULL,
     dosing = NULL,
 
-    #' Initialize
+    #' @description Initialize
     #' @param paths The events data, an object of class \code{\link{PathData}}.
     #' @param dosing The dosing data, an object of class \code{\link{DosingData}}.
     #' Can be also \code{NULL}.
@@ -34,7 +34,7 @@ JointData <- R6::R6Class(
       self$dosing <- dosing
     },
 
-    #' Filter subjects, creates new object
+    #' @description Filter subjects, creates new object
     #'
     #' @param subject_ids_keep Subjects to keep
     filter = function(subject_ids_keep) {

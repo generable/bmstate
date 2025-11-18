@@ -150,8 +150,7 @@ Extract draws as \code{rvar}s
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{name}}{Param/quantity name
-Draws in a raw array with same shape as Stan variable}
+\item{\code{name}}{Param/quantity name}
 }
 \if{html}{\out{</div>}}
 }
@@ -160,6 +159,7 @@ Draws in a raw array with same shape as Stan variable}
 \if{html}{\out{<a id="method-MultistateModelFit-get_draws_of"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateModelFit-get_draws_of}{}}}
 \subsection{Method \code{get_draws_of()}}{
+Draws in a raw array with same shape as Stan variable
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModelFit$get_draws_of(name)}\if{html}{\out{</div>}}
 }
@@ -173,13 +173,13 @@ Draws in a raw array with same shape as Stan variable}
 }
 \subsection{Returns}{
 Array with dimension \code{c(ndraws(x), dim(x))}
-Print the object
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-MultistateModelFit-print"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateModelFit-print}{}}}
 \subsection{Method \code{print()}}{
+Print the object
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModelFit$print()}\if{html}{\out{</div>}}
 }
@@ -263,8 +263,7 @@ training data is used.}
 
 \item{\code{n_prev}}{number of previous doses to show fit for}
 
-\item{\code{ci_alpha}}{Width of central credible interval.
-Plot baseline hazard distribution}
+\item{\code{ci_alpha}}{Width of central credible interval.}
 }
 \if{html}{\out{</div>}}
 }
@@ -273,6 +272,7 @@ Plot baseline hazard distribution}
 \if{html}{\out{<a id="method-MultistateModelFit-plot_h0"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateModelFit-plot_h0}{}}}
 \subsection{Method \code{plot_h0()}}{
+Plot baseline hazard distribution
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModelFit$plot_h0(t = NULL, ci_alpha = 0.95)}\if{html}{\out{</div>}}
 }
@@ -282,8 +282,7 @@ Plot baseline hazard distribution}
 \describe{
 \item{\code{t}}{times where to evaluate the baseline hazards}
 
-\item{\code{ci_alpha}}{width of credible interval
-Baseline hazard distribution}
+\item{\code{ci_alpha}}{width of credible interval}
 }
 \if{html}{\out{</div>}}
 }
@@ -292,6 +291,7 @@ Baseline hazard distribution}
 \if{html}{\out{<a id="method-MultistateModelFit-h0_dist"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateModelFit-h0_dist}{}}}
 \subsection{Method \code{h0_dist()}}{
+Baseline hazard distribution
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModelFit$h0_dist(t = NULL, ci_alpha = 0.95)}\if{html}{\out{</div>}}
 }
@@ -301,8 +301,7 @@ Baseline hazard distribution}
 \describe{
 \item{\code{t}}{times where to evaluate the baseline hazards}
 
-\item{\code{ci_alpha}}{width of credible interval
-Extract covariate effects}
+\item{\code{ci_alpha}}{width of credible interval}
 }
 \if{html}{\out{</div>}}
 }
@@ -311,6 +310,9 @@ Extract covariate effects}
 \if{html}{\out{<a id="method-MultistateModelFit-covariate_effects"></a>}}
 \if{latex}{\out{\hypertarget{method-MultistateModelFit-covariate_effects}{}}}
 \subsection{Method \code{covariate_effects()}}{
+Extract covariate effects
+
+
 Currently not implemented for models that have a PK submodel.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{MultistateModelFit$covariate_effects()}\if{html}{\out{</div>}}

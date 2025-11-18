@@ -14,8 +14,7 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
     data = NULL,
     info = NULL,
 
-    #' @description
-    #' Create model fit object
+    #' @description Create model fit object
     #'
     #' @param data Data used to create the fit.
     #' @param draws A named list of rvars.
@@ -80,7 +79,7 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
       private$draws[[name]]
     },
 
-    #' Draws in a raw array with same shape as Stan variable
+    #' @description Draws in a raw array with same shape as Stan variable
     #'
     #' @param name Param/quantity name of \code{x}
     #' @return Array with dimension \code{c(ndraws(x), dim(x))}
@@ -88,7 +87,7 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
       posterior::draws_of(self$get_draws(name), with_chains = FALSE)
     },
 
-    #' Print the object
+    #' @description Print the object
     #'
     #' @return nothing
     print = function() {
@@ -186,7 +185,7 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
         labs(caption = capt)
     },
 
-    #' Plot baseline hazard distribution
+    #' @description Plot baseline hazard distribution
     #'
     #' @param t times where to evaluate the baseline hazards
     #' @param ci_alpha width of credible interval
@@ -215,7 +214,7 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
         scale_y_log10()
     },
 
-    #' Baseline hazard distribution
+    #' @description Baseline hazard distribution
     #'
     #' @param t times where to evaluate the baseline hazards
     #' @param ci_alpha width of credible interval
@@ -235,7 +234,7 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
         dplyr::ungroup()
     },
 
-    #' Extract covariate effects
+    #' @description Extract covariate effects
     #'
     #' @description Currently not implemented for models that have a PK submodel.
     #' @return A data frame which has columns
