@@ -120,7 +120,7 @@ PKModel <- R6::R6Class("PKModel",
     #' @return Data frame with one row for each subject, and a
     #' \code{\link{DosingData}} object
     simulate_data = function(df_subjects, beta_pk = NULL, tau = 24,
-                             sigma = 0.2) {
+                             sigma = 0.3) {
       checkmate::assert_class(df_subjects, "data.frame")
       checkmate::assert_true("dose" %in% colnames(df_subjects))
       checkmate::assert_number(tau, lower = 0)
@@ -137,9 +137,9 @@ PKModel <- R6::R6Class("PKModel",
       SUB_ID <- rep("s", N)
       for (n in seq_len(N)) {
         theta_n <- list(
-          ka = exp(-2 + sum(x[n, self$ka_covs()] * beta_pk$ka)),
-          CL = exp(-2 + sum(x[n, self$CL_covs()] * beta_pk$CL)),
-          V2 = exp(-2 + sum(x[n, self$V2_covs()] * beta_pk$V2))
+          ka = exp(-2 + sum(x[n, self$ka_covs()] * beta_pk$ka) + 0.1 * stats::rnorm(1)),
+          CL = exp(-2 + sum(x[n, self$CL_covs()] * beta_pk$CL) + 0.1 * stats::rnorm(1)),
+          V2 = exp(-2 + sum(x[n, self$V2_covs()] * beta_pk$V2) + 0.1 * stats::rnorm(1))
         )
         t_last <- max(dd$times[[n]])
         t_pre <- t_last - (0.02 + 0.05) * runif(1) * tau

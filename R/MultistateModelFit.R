@@ -272,14 +272,15 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
 
 # Extract beta_oth as an rvar column of a data frame
 msmfit_covariate_effects <- function(fit) {
-  sd <- fit$get_data()
   covs <- fit$model$covs()
+  sd <- fit$get_data()
   df <- NULL
   n_covs <- length(fit$model$covs())
   if (n_covs == 0) {
     stop("Model has no covariates")
   }
-  for (j in seq_len(n_covs)) {
+  n_haz_covs <- sd$nc_haz
+  for (j in seq_len(n_haz_covs)) {
     rv <- as.vector(fit$get_draws("beta_oth")[1, j, ])
     df_j <- data.frame(
       covariate = covs[j], beta = rv,

@@ -60,7 +60,7 @@ functions {
     for(n in 1:N_id) {
 
       // ka
-      log_theta[n, 1] = -2 + log_mu[1] + log_z[n][1] * log_sig[1] +
+      log_theta[n, 1] = -3 + log_mu[1] + log_z[n][1] * log_sig[1] +
         sum(beta_ka .* x_ka[n]);
 
       // CL

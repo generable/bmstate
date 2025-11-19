@@ -179,7 +179,7 @@ A numeric value
 \subsection{Method \code{simulate_data()}}{
 Simulate data with many subjects
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PKModel$simulate_data(df_subjects, beta_pk = NULL, tau = 24, sigma = 0.2)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PKModel$simulate_data(df_subjects, beta_pk = NULL, tau = 24, sigma = 0.3)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

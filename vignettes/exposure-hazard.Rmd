@@ -61,7 +61,8 @@ create_true_covariate_effects <- function(mod) {
   df <- data.frame(bh_true) |>
     rownames_to_column("event") |>
     pivot_longer(cols = -event, names_to = "covariate", values_to = "beta")
-  list(df = df, matrix = bh_true)
+  beta_pk <- list(CL = c(0.5, -0.5), V2 = c(0.5))
+  list(df = df, matrix = bh_true, pk = beta_pk)
 }
 
 # True baseline hazard parameters
@@ -110,32 +111,59 @@ create_true_model <- function() {
   )
 }
 
-# Create rvars
-create_true_draws <- function(sim) {
-  w <- array(0, dim = c(1, 1, 7, 9))
-  w[1, 1, , ] <- sim$w_true
-  w <- posterior::rvar(w)
-  log_w0 <- array(0, dim = c(1, 1, 7))
-  log_w0[1, , ] <- log(sim$df_true_h0$h0_true)
-  log_w0 <- posterior::rvar(log_w0)
+# Create oracle fit draws
+create_oracle_fit <- function(similar_fit, beta_true, h0_true) {
+  checkmate::assert_true(similar_fit$is_point_estimate())
+  weights <- similar_fit$get_draws("weights")
+  weights[1, , ] <- h0_true$w
+  log_w0 <- similar_fit$get_draws("log_w0")
+  log_w0[1, ] <- log(h0_true$w0)
 
-  beta_oth <- array(0, dim = c(1, 1, 2, 3))
-  bb <- cbind(
-    sim$df_true_beta |>
-      filter(covariate == "age") |> pull(beta),
-    sim$df_true_beta |>
-      filter(covariate == "dose_amt") |> pull(beta)
-  )
-  beta_oth[1, 1, , ] <- t(bb)
+  beta_oth <- similar_fit$get_draws("beta_oth")
+  beta_oth[1, , ] <- t(beta_true$matrix[, 1])
   beta_oth <- posterior::rvar(beta_oth)
-  S <- posterior::ndraws(beta_oth)
 
-  # Create rvar list
-  list(
+  beta_auc <- similar_fit$get_draws("beta_auc")
+  beta_auc[1, , ] <- t(beta_true$matrix[, 2])
+
+  beta_ka <- fit_true$get_draws("beta_ka")
+  beta_CL <- fit_true$get_draws("beta_CL")
+  beta_V2 <- fit_true$get_draws("beta_V2")
+
+  lp <- similar_fit$get_draws("lp__")
+  lp[] <- NA
+  log_z_pk <- similar_fit$get_draws("log_z_pk")
+  log_z_pk[, , ] <- 0
+  log_sig_pk <- similar_fit$get_draws("log_sig_pk")
+  log_sig_pk[, ] <- 0
+  log_mu_pk <- similar_fit$get_draws("log_mu_pk")
+  log_mu_pk[, ] <- 0
+  sigma_pk <- similar_fit$get_draws("sigma_pk")
+  sigma_pk[] <- 0.3
+  beta_CL <- similar_fit$get_draws("beta_CL")
+  beta_CL[1, ] <- beta_true$pk$CL
+  beta_V2 <- similar_fit$get_draws("beta_V2")
+  beta_V2[1, ] <- beta_true$pk$V2
+
+  # Create fit
+  draws <- list(
     beta_oth = beta_oth,
-    weights = w,
+    beta_auc = beta_auc,
+    beta_ka = beta_ka,
+    beta_CL = beta_CL,
+    beta_V2 = beta_V2,
+    weights = weights,
+    log_z_pk = log_z_pk,
+    log_sig_pk = log_sig_pk,
+    log_mu_pk = log_mu_pk,
+    sigma_pk = sigma_pk,
     log_w0 = log_w0,
-    lp__ = posterior::rvar(array(0, dim = c(S, 1)))
+    lp__ = lp
+  )
+  sd <- similar_fit$get_data()
+  mod <- similar_fit$model
+  MultistateModelFit$new(similar_fit$data, sd, mod, draws,
+    info = "Oracle fit"
   )
 }
 ```
@@ -149,6 +177,7 @@ h0_true <- create_true_baseline_hazard(mod_true)
 simdat <- mod_true$simulate_data(
   params$N_subject,
   beta_haz = beta_true$matrix,
+  beta_pk = beta_true$pk,
   w0 = h0_true$w0,
   w = h0_true$w
 )
@@ -200,9 +229,8 @@ mod_ms_dh$set_knots(t3yr, tt, NK)
 mod_death$set_knots(t3yr, tt, NK)
 
 # Oracle fit
-fit_true <- fit_stan(mod_true, simdat, chains = 1, iter_warmup = 60, iter_sampling = 60)
-td <- create_true_draws(sim)
-fit_true <- MultistateModelFit$new(fit_true$data, fit_true$get_data(), mod_true, td)
+fit_prelim <- fit_stan(mod_true, simdat, method = "optimize", init = 0, iter = 100)
+fit_true <- create_oracle_fit(fit_prelim, beta_true, h0_true)
 ```
 
 ```{r}
