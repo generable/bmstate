@@ -126,10 +126,6 @@ create_oracle_fit <- function(similar_fit, beta_true, h0_true) {
   beta_auc <- similar_fit$get_draws("beta_auc")
   beta_auc[1, , ] <- t(beta_true$matrix[, 2])
 
-  beta_ka <- fit_true$get_draws("beta_ka")
-  beta_CL <- fit_true$get_draws("beta_CL")
-  beta_V2 <- fit_true$get_draws("beta_V2")
-
   lp <- similar_fit$get_draws("lp__")
   lp[] <- NA
   log_z_pk <- similar_fit$get_draws("log_z_pk")
@@ -149,7 +145,6 @@ create_oracle_fit <- function(similar_fit, beta_true, h0_true) {
   draws <- list(
     beta_oth = beta_oth,
     beta_auc = beta_auc,
-    beta_ka = beta_ka,
     beta_CL = beta_CL,
     beta_V2 = beta_V2,
     weights = weights,
@@ -174,6 +169,15 @@ create_oracle_fit <- function(similar_fit, beta_true, h0_true) {
 mod_true <- create_true_model()
 beta_true <- create_true_covariate_effects(mod_true)
 h0_true <- create_true_baseline_hazard(mod_true)
+simdat <- mod_true$simulate_data(
+  params$N_subject,
+  beta_haz = beta_true$matrix,
+  beta_pk = beta_true$pk,
+  w0 = h0_true$w0,
+  w = h0_true$w
+)
+sa <- simdat$paths$subject_df$ss_auc
+mod_true$set_auc_normalizers(loc = mean(sa), scale = stats::sd(sa))
 simdat <- mod_true$simulate_data(
   params$N_subject,
   beta_haz = beta_true$matrix,

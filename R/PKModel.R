@@ -23,6 +23,7 @@ PKModel <- R6::R6Class("PKModel",
       checkmate::assert_number(value, lower = 0)
       message("setting max conc = ", round(value, 5))
       private$MAX_CONC <- value
+      invisible(NULL)
     },
 
     #' @description Create model
@@ -68,7 +69,7 @@ PKModel <- R6::R6Class("PKModel",
       x3 <- paste0(" - CL covariates: {", paste0(self$CL_covs(), collapse = ", "), "}")
       x4 <- paste0(" - V2 covariates: {", paste0(self$V2_covs(), collapse = ", "), "}")
       MC <- self$get_max_conc()
-      x5 <- paste0(" - Concentration upper bound:", round(MC, 5))
+      x5 <- paste0(" - Concentration upper bound: ", round(MC, 5))
       msg <- paste(x1, x2, x3, x4, x5, "\n", sep = "\n")
       cat(msg)
     },

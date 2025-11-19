@@ -1,8 +1,8 @@
 # Check for unusual normalized covariate values (will cause issues for hazard)
-check_normalized_covariate <- function(x_norm) {
+check_normalized_covariate <- function(x_norm, name) {
   mabs <- max(abs(x_norm))
   msg <- paste0(
-    "a normalized covariate has maximum absolute value ",
+    "Normalized ", name, " has maximum absolute value ",
     round(mabs, 5), ", are you sure normalization of covariates is correct?"
   )
   if (mabs > 10) {

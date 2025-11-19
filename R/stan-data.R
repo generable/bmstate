@@ -239,7 +239,7 @@ standata_scaled_covariates <- function(pd, model, name) {
       stop("no normalizers set for ", cn)
     }
     x_norm <- (xx - xj_loc) / xj_scale
-    check_normalized_covariate(x_norm)
+    check_normalized_covariate(x_norm, cn)
     x[[j]] <- x_norm
   }
   x <- sapply(x, function(x) x)

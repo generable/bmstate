@@ -215,6 +215,7 @@ MultistateSystem <- R6::R6Class("MultistateSystem",
       checkmate::assert_numeric(locations, min.len = 2)
       names(locations) <- NULL
       private$knots <- locations
+      invisible(NULL)
     },
 
     #' @description Get knot locations
