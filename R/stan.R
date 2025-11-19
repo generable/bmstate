@@ -50,7 +50,8 @@ ensure_exposed_stan_functions <- function(...) {
 #'
 #' @description
 #' \emph{NOTE:} This function has a side effect of setting covariate
-#' normalizers and prior assumed mean baseline hazard based on data.
+#' normalizers, prior assumed mean baseline hazard, and concentration upper
+#' bound (PK) based on data.
 #'
 #' @export
 #' @param model A \code{\link{MultistateModel}} object.
@@ -58,6 +59,8 @@ ensure_exposed_stan_functions <- function(...) {
 #' @param return_stanfit Return also the raw 'Stan' fit object?
 #' @param set_auc_normalizers Set AUC normalization based on SS doses.
 #' @inheritParams create_stan_model
+#' @param max_conc_factor Factor to multiply observed max concentration by
+#' to get concentration upper bound.
 #' @param method Must be one of \code{"sample"} (default),
 #' \code{"pathfinder"} or \code{"optimize"}.
 #' @param ... Arguments passed to the \code{sample},
@@ -69,10 +72,12 @@ fit_stan <- function(model, data,
                      set_auc_normalizers = TRUE,
                      filepath = NULL,
                      return_stanfit = FALSE,
+                     max_conc_factor = 100,
                      method = "sample", ...) {
   checkmate::assert_class(model, "MultistateModel")
   data <- pd_to_jointdata(data)
   checkmate::assert_class(data, "JointData")
+  checkmate::assert_number(max_conc_factor, lower = 2)
   checkmate::assert_character(method, len = 1, min.chars = 1)
   checkmate::assert_choice(method, c("sample", "pathfinder", "optimize"))
 
@@ -91,6 +96,14 @@ fit_stan <- function(model, data,
     loc <- mean(aaa)
     sca <- stats::sd(aaa)
     model$set_auc_normalizers(loc, sca)
+  }
+
+  # Set max PK concentration
+  if (model$has_pk()) {
+    c1 <- data$paths$subject_df$conc_pre
+    c2 <- data$paths$subject_df$conc_post
+    MC <- max_conc_factor * max(c(c1, c2))
+    model$pk_model$set_max_conc(MC)
   }
 
   # Set prior mean baseline hazard rates (side effect)

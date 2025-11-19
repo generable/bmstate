@@ -41,13 +41,18 @@ create_stan_data_model <- function(model) {
 
   # PK options
   an <- model$get_auc_normalizers()
+  MC <- 1e-7
+  if (model$has_pk()) {
+    MC <- model$pk_model$get_max_conc()
+  }
   sd_pk <- list(
     nc_ka = length(model$data_covs("ka")),
     nc_CL = length(model$data_covs("CL")),
     nc_V2 = length(model$data_covs("V2")),
     I_auc = as.numeric(model$has_pk()),
     auc_loc = an$loc,
-    auc_scale = an$scale
+    auc_scale = an$scale,
+    MAX_CONC = MC
   )
 
   # Return

@@ -143,12 +143,18 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
       }
 
       df <- NULL
+      message("PK simulation")
+      pb <- progress::progress_bar$new(total = S)
+      ensure_exposed_stan_functions()
+      MC <- self$model$pk_model$get_max_conc()
+      DF <- list()
       for (s in seq_len(S)) {
-        df_s <- data$dosing$simulate_pk(ts, pkpar[[s]])
+        pb$tick()
+        df_s <- data$dosing$simulate_pk(ts, pkpar[[s]], MC, skip_assert = TRUE)
         df_s$.draw_idx <- s
-        df <- rbind(df, df_s)
+        DF[[s]] <- df_s
       }
-      df
+      dplyr::bind_rows(DF)
     },
 
     #' @description Plot PK fit.
@@ -173,14 +179,13 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
         capt <- paste0("Point-estimate fit")
       }
       checkmate::assert_number(ci_alpha, lower = 0, upper = 1)
-      alpha <- (1 - ci_alpha) / 2
+      av <- (1 - ci_alpha) / 2
       pksim <- pksim |>
         dplyr::group_by(.data$subject_id, .data$time) |>
-        dplyr::summarize(
-          val = stats::median(.data$val),
-          lower = quantile(.data$val, alpha / 2),
-          upper = quantile(.data$val, 1 - alpha / 2), .groups = "drop"
-        )
+        dplyr::summarise(q = list(quantile(.data$val, probs = c(av / 2, 0.5, 1 - av / 2))), .groups = "drop") |>
+        tidyr::unnest_wider(q, names_sep = "_")
+      colnames(pksim)[3:5] <- c("lower", "val", "upper")
+
       data$plot_dosing(df_fit = pksim, max_num_subjects = max_num_subjects) +
         labs(caption = capt)
     },

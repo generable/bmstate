@@ -4,7 +4,7 @@
 \alias{pk_2cpt_pss}
 \title{Partially steady-state PK model}
 \usage{
-pk_2cpt_pss(t, dose_ss, times, doses, theta, tau)
+pk_2cpt_pss(t, dose_ss, times, doses, theta, tau, MAX_CONC)
 }
 \arguments{
 \item{t}{vector of output time points}
@@ -18,6 +18,8 @@ pk_2cpt_pss(t, dose_ss, times, doses, theta, tau)
 \item{theta}{PK params for each subject}
 
 \item{tau}{Dosing interval (same for all subjects).}
+
+\item{MAX_CONC}{Concentration upper bound.}
 }
 \value{
 For each subject, the concentration in the central compartment at

@@ -163,6 +163,10 @@ MultistateModel <- R6::R6Class("MultistateModel",
     set_auc_normalizers = function(loc = 0, scale = 1) {
       checkmate::assert_numeric(loc, lower = 0, len = 1)
       checkmate::assert_numeric(scale, lower = 0, len = 1)
+      message(
+        "setting auc normalizers to loc = ",
+        round(loc, 5), ", scale = ", round(scale, 5)
+      )
       private$auc_normalizer_loc <- loc
       private$auc_normalizer_scale <- scale
       NULL

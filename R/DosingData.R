@@ -95,12 +95,24 @@ PSSDosingData <- R6::R6Class(
     #'
     #' @param t A vector of output times for each subject (a list).
     #' @param theta A matrix of parameters.
+    #' @param skip_assert Skip most assertions and call exposed Stan directly,
+    #' assuming that it exists?
+    #' @param MAX_CONC concentration upper bound
     #' @return a \code{data.frame}
-    simulate_pk = function(t, theta) {
+    simulate_pk = function(t, theta, MAX_CONC, skip_assert = FALSE) {
       checkmate::assert_list(t, len = self$num_subjects())
-      out <- pk_2cpt_pss(
-        t, self$dose_ss, self$times, self$doses, theta, self$tau_ss
-      )
+      checkmate::assert_logical(skip_assert, len = 1)
+      checkmate::assert_number(MAX_CONC, lower = 0)
+      if (skip_assert) {
+        out <- pop_2cpt_partly_ss(
+          t, self$dose_ss, self$times, self$doses, theta, self$tau_ss, MAX_CONC
+        )
+      } else {
+        out <- pk_2cpt_pss(
+          t, self$dose_ss, self$times, self$doses, theta, self$tau_ss, MAX_CONC
+        )
+      }
+
       time <- as.numeric(unlist(t))
       val <- unlist(out)
       val[val < 0] <- 1e-12
@@ -239,17 +251,18 @@ simulate_dosing <- function(df_subjects, tau = 24, p_miss = 0.2, t_jitter = 4) {
 #' @param doses doses taken after \code{t_last_ss}
 #' @param theta PK params for each subject
 #' @param tau Dosing interval (same for all subjects).
+#' @param MAX_CONC Concentration upper bound.
 #' @return For each subject, the concentration in the central compartment at
 #' times \code{t}
-pk_2cpt_pss <- function(t, dose_ss, times, doses, theta, tau) {
+pk_2cpt_pss <- function(t, dose_ss, times, doses, theta, tau, MAX_CONC) {
   ensure_exposed_stan_functions()
   checkmate::assert_number(tau, lower = 0)
+  checkmate::assert_number(MAX_CONC, lower = 0)
   checkmate::assert_numeric(dose_ss, lower = 0)
   N_sub <- length(dose_ss)
   checkmate::assert_list(times, len = N_sub)
   checkmate::assert_list(doses, len = N_sub)
   checkmate::assert_list(t, len = N_sub)
   checkmate::assert_matrix(theta, nrows = N_sub, ncols = 3)
-  a <- pop_2cpt_partly_ss(t, dose_ss, times, doses, theta, tau)
-  a
+  pop_2cpt_partly_ss(t, dose_ss, times, doses, theta, tau, MAX_CONC)
 }

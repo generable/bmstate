@@ -251,12 +251,13 @@ functions {
     data array[] vector dose_times,
     data array[] vector doses,
     matrix theta,
-    data real tau
+    data real tau,
+    data real MAX_CONC
   ){
 
     // Find drug amounts in both compartments at dose_times
     int N_t = num_elements(t[1]);
-    vector[N_t] MAX_CONC = rep_vector(1e7, N_t);
+    vector[N_t] max_conc = rep_vector(MAX_CONC, N_t);
     int N_sub = num_elements(dose_ss);
     int D = num_elements(dose_times[1]);
     array[2, N_sub] vector[D] amounts = pop_2cpt_partly_ss_stage1(
@@ -303,6 +304,7 @@ data {
   int<lower=0> nc_ka; // num of predictors for ka
   int<lower=0> nc_CL; // num of predictors for CL
   int<lower=0> nc_V2; // num of predictors for V2
+  real<lower=0> MAX_CONC; // maximum estimable concentration
 
   // --- Actual data (can be modified or re-created when predicting) ----------
 
@@ -421,7 +423,8 @@ transformed parameters {
 
     // Drug concentration estimated at t_obs
     conc_mu_pk[1] = pop_2cpt_partly_ss(
-      t_obs_pk, dose_ss, last_two_times, last_two_doses, theta_pk[1], tau_ss
+      t_obs_pk, dose_ss, last_two_times, last_two_doses, theta_pk[1], tau_ss,
+      MAX_CONC
     );
 
     // Auc at steady state
