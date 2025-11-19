@@ -29,7 +29,7 @@ library(ggplot2)
 ```{r}
 # Setup
 params <- list(
-  N_subject = 2000,
+  N_subject = 600,
   iter_warmup = 800,
   iter_sampling = 400,
   chains = 1
@@ -200,7 +200,7 @@ mod_ms_dh$set_knots(t3yr, tt, NK)
 mod_death$set_knots(t3yr, tt, NK)
 
 # Oracle fit
-fit_true <- fit_stan(mod_true, simdat, method = "sample", chains = 1, iter_warmup = 300, iter_sampling = 100)
+fit_true <- fit_stan(mod_true, simdat, chains = 1, iter_warmup = 60, iter_sampling = 60)
 td <- create_true_draws(sim)
 fit_true <- MultistateModelFit$new(fit_true$data, fit_true$get_data(), mod_true, td)
 ```

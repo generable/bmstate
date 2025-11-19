@@ -64,7 +64,7 @@ functions {
         sum(beta_ka .* x_ka[n]);
 
       // CL
-      log_theta[n, 2] = -1 + log_mu[2] + log_z[n][2] * log_sig[2] +
+      log_theta[n, 2] = -2 + log_mu[2] + log_z[n][2] * log_sig[2] +
         sum(beta_CL .* x_CL[n]);
 
       // V2
@@ -381,8 +381,8 @@ parameters {
 
   // PK model
   array[do_pk, N_sub] vector[3] log_z_pk;
-  array[do_pk] vector[3] log_mu_pk;
-  array[do_pk] vector<lower=0>[3] log_sig_pk;
+  array[do_pk] vector<lower=-5,upper=5>[3] log_mu_pk;
+  array[do_pk] vector<lower=0,upper=3>[3] log_sig_pk;
   array[do_pk] vector[nc_ka] beta_ka;
   array[do_pk] vector[nc_CL] beta_CL;
   array[do_pk] vector[nc_V2] beta_V2;
