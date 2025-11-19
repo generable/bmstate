@@ -64,7 +64,7 @@ functions {
         sum(beta_ka .* x_ka[n]);
 
       // CL
-      log_theta[n, 2] = -2 + log_mu[2] + log_z[n][2] * log_sig[2] +
+      log_theta[n, 2] = -1 + log_mu[2] + log_z[n][2] * log_sig[2] +
         sum(beta_CL .* x_CL[n]);
 
       // V2
@@ -73,33 +73,6 @@ functions {
 
     }
     return(exp(log_theta));
-  }
-
-  // Two-cpt population PK model with multiple doses (steady state)
-  array[] vector pop_2cpt_ss(array[] vector t, data vector dose, matrix theta,
-      data real tau) {
-
-    int N_id = size(dose);
-    int N_t = num_elements(t[1]);
-    vector[N_id] tau_ss = rep_vector(tau, N_id);
-
-    vector[N_id] ka = theta[:,1];
-    vector[N_id] CL = theta[:,2];
-    vector[N_id] V2 = theta[:,3];
-
-    vector[N_id] ke = CL ./ V2;
-    vector[N_id] A = (dose ./ V2) .* (ka ./ (ka-ke));
-
-    array[N_id] vector[N_t] conc;
-    vector[N_id] ma = A .* inv(-expm1(-ka.*tau_ss)); // 1/(1-exp(-ka*tau))
-    vector[N_id] me = A .* inv(-expm1(-ke.*tau_ss));
-    vector[N_t] tt;
-
-    for(n in 1:N_id){
-      tt = fmod(t[n], tau_ss[n]);
-      conc[n] = me[n] * exp(-ke[n]*tt) - ma[n] * exp(-ka[n] * tt);
-    }
-    return(conc);
   }
 
   // Analytic solution with general initial condition (A0, C0)
@@ -283,6 +256,7 @@ functions {
 
     // Find drug amounts in both compartments at dose_times
     int N_t = num_elements(t[1]);
+    vector[N_t] MAX_CONC = rep_vector(1e7, N_t);
     int N_sub = num_elements(dose_ss);
     int D = num_elements(dose_times[1]);
     array[2, N_sub] vector[D] amounts = pop_2cpt_partly_ss_stage1(
@@ -292,6 +266,9 @@ functions {
     array[N_sub] vector[N_t] conc = pop_2cpt_partly_ss_stage2(
       t, dose_ss, dose_times, doses, amounts, theta, tau
     );
+    for(n in 1:N_sub){
+      conc[n] = fmin(conc[n], MAX_CONC);
+    }
 
     // Drug concentration at t
     return(conc);

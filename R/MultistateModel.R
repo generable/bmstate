@@ -64,7 +64,9 @@ MultistateModel <- R6::R6Class("MultistateModel",
       X_norm <- normalize_columns(X)
       if ("ss_auc" %in% x) {
         idx <- which(x == "ss_auc")
-        X_norm[, idx] <- (X[, idx] - auc_norm$loc) / auc_norm$scale
+        x_norm <- (X[, idx] - auc_norm$loc) / auc_norm$scale
+        check_normalized_covariate(x_norm)
+        X_norm[, idx] <- x_norm
       }
       for (s in seq_len(S)) {
         target_state <- tf$state[s]
@@ -465,5 +467,7 @@ normalize <- function(a) {
   if (sdd == 0) {
     stop("error in normalization, zero variance")
   }
-  (a - mean(a)) / sdd
+  x_norm <- (a - mean(a)) / sdd
+  check_normalized_covariate(x_norm)
+  x_norm
 }
