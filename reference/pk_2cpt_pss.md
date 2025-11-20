@@ -5,7 +5,7 @@ For each subject
 ## Usage
 
 ``` r
-pk_2cpt_pss(t, dose_ss, times, doses, theta, tau)
+pk_2cpt_pss(t, dose_ss, times, doses, theta, tau, MAX_CONC)
 ```
 
 ## Arguments
@@ -33,6 +33,10 @@ pk_2cpt_pss(t, dose_ss, times, doses, theta, tau)
 - tau:
 
   Dosing interval (same for all subjects).
+
+- MAX_CONC:
+
+  Concentration upper bound.
 
 ## Value
 

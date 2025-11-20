@@ -54,6 +54,8 @@ constructor of this class. Rather use
 
 - [`PathData$covariate_names()`](#method-PathData-covariate_names)
 
+- [`PathData$subset_covariates()`](#method-PathData-subset_covariates)
+
 - [`PathData$state_at()`](#method-PathData-state_at)
 
 - [`PathData$transition_times()`](#method-PathData-transition_times)
@@ -167,6 +169,30 @@ Get names of covariates
 #### Returns
 
 a character vector
+
+------------------------------------------------------------------------
+
+### Method `subset_covariates()`
+
+Create a new PathData with a subset of covariates
+
+#### Usage
+
+    PathData$subset_covariates(covs, renamed_old = NULL, renamed_new = NULL)
+
+#### Arguments
+
+- `covs`:
+
+  Names of all new covariates
+
+- `renamed_old`:
+
+  Name of an old covariate to rename
+
+- `renamed_new`:
+
+  Name of new covariate where old one is copied
 
 ------------------------------------------------------------------------
 

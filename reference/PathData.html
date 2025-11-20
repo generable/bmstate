@@ -9,7 +9,7 @@ the constructor of this class. Rather use df_to_pathdata."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">bmstate</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -21,6 +21,7 @@ the constructor of this class. Rather use df_to_pathdata."></head><body>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/analysis.html">Time-to-event data analysis with the bmstate package</a></li>
+    <li><a class="dropdown-item" href="../articles/exposure-hazard.html">Exposure-hazard multistate modeling with bmstate</a></li>
     <li><a class="dropdown-item" href="../articles/math.html">Mathematical description of models in the bmstate package</a></li>
     <li><a class="dropdown-item" href="../articles/survival.html">Survival data analysis with the bmstate package</a></li>
   </ul></li>
@@ -92,6 +93,7 @@ which the paths belong.</p></dd>
 <ul><li><p><a href="#method-PathData-new"><code>PathData$new()</code></a></p></li>
 <li><p><a href="#method-PathData-unique_subjects"><code>PathData$unique_subjects()</code></a></p></li>
 <li><p><a href="#method-PathData-covariate_names"><code>PathData$covariate_names()</code></a></p></li>
+<li><p><a href="#method-PathData-subset_covariates"><code>PathData$subset_covariates()</code></a></p></li>
 <li><p><a href="#method-PathData-state_at"><code>PathData$state_at()</code></a></p></li>
 <li><p><a href="#method-PathData-transition_times"><code>PathData$transition_times()</code></a></p></li>
 <li><p><a href="#method-PathData-n_paths"><code>PathData$n_paths()</code></a></p></li>
@@ -178,15 +180,39 @@ which the paths belong.</p></dd>
 <p>a character vector</p>
 </div>
 
-</div><p></p><hr><a id="method-PathData-state_at"></a><div class="section">
-<h3 id="method-state-at-">Method <code>state_at()</code><a class="anchor" aria-label="anchor" href="#method-state-at-"></a></h3>
-<p>For each path, get the state it is in at time t</p><div class="section">
+</div><p></p><hr><a id="method-PathData-subset_covariates"></a><div class="section">
+<h3 id="method-subset-covariates-">Method <code>subset_covariates()</code><a class="anchor" aria-label="anchor" href="#method-subset-covariates-"></a></h3>
+<p>Create a new PathData with a subset of covariates</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">state_at</span><span class="op">(</span><span class="va">t</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">subset_covariates</span><span class="op">(</span><span class="va">covs</span>, renamed_old <span class="op">=</span> <span class="cn">NULL</span>, renamed_new <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>covs</code></dt>
+<dd><p>Names of all new covariates</p></dd>
+
+
+<dt><code>renamed_old</code></dt>
+<dd><p>Name of an old covariate to rename</p></dd>
+
+
+<dt><code>renamed_new</code></dt>
+<dd><p>Name of new covariate where old one is copied</p></dd>
+
+
+</dl><p></p></div>
+</div>
+
+</div><p></p><hr><a id="method-PathData-state_at"></a><div class="section">
+<h3 id="method-state-at-">Method <code>state_at()</code><a class="anchor" aria-label="anchor" href="#method-state-at-"></a></h3>
+<p>For each path, get the state it is in at time t</p><div class="section">
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">state_at</span><span class="op">(</span><span class="va">t</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>t</code></dt>
 <dd><p>time</p></dd>
 
@@ -201,12 +227,12 @@ which the paths belong.</p></dd>
 </div><p></p><hr><a id="method-PathData-transition_times"></a><div class="section">
 <h3 id="method-transition-times-">Method <code>transition_times()</code><a class="anchor" aria-label="anchor" href="#method-transition-times-"></a></h3>
 <p>Get all transition times</p><div class="section">
-<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">transition_times</span><span class="op">(</span>trans_inds <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
+<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>trans_inds</code></dt>
 <dd><p>Indices of transition whose occurrence times are
 requested. Default is <code>NULL</code>, in which case all transitions are
@@ -223,7 +249,7 @@ considered.</p></dd>
 </div><p></p><hr><a id="method-PathData-n_paths"></a><div class="section">
 <h3 id="method-n-paths-">Method <code>n_paths()</code><a class="anchor" aria-label="anchor" href="#method-n-paths-"></a></h3>
 <p>Get number of paths</p><div class="section">
-<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">n_paths</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -235,7 +261,7 @@ considered.</p></dd>
 </div><p></p><hr><a id="method-PathData-state_names"></a><div class="section">
 <h3 id="method-state-names-">Method <code>state_names()</code><a class="anchor" aria-label="anchor" href="#method-state-names-"></a></h3>
 <p>Get names of all states</p><div class="section">
-<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
+<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">state_names</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -248,7 +274,7 @@ considered.</p></dd>
 <h3 id="method-get-event-state-names-">Method <code>get_event_state_names()</code><a class="anchor" aria-label="anchor" href="#method-get-event-state-names-"></a></h3>
 <p>Get names of all states to which transitioning
 can be a transition event</p><div class="section">
-<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">get_event_state_names</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -260,7 +286,7 @@ can be a transition event</p><div class="section">
 </div><p></p><hr><a id="method-PathData-terminal_states"></a><div class="section">
 <h3 id="method-terminal-states-">Method <code>terminal_states()</code><a class="anchor" aria-label="anchor" href="#method-terminal-states-"></a></h3>
 <p>Get names of terminal states</p><div class="section">
-<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">terminal_states</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -272,7 +298,7 @@ can be a transition event</p><div class="section">
 </div><p></p><hr><a id="method-PathData-print"></a><div class="section">
 <h3 id="method-print-">Method <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code><a class="anchor" aria-label="anchor" href="#method-print-"></a></h3>
 <p>Print info</p><div class="section">
-<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
+<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -284,12 +310,12 @@ can be a transition event</p><div class="section">
 </div><p></p><hr><a id="method-PathData-get_path_df"></a><div class="section">
 <h3 id="method-get-path-df-">Method <code>get_path_df()</code><a class="anchor" aria-label="anchor" href="#method-get-path-df-"></a></h3>
 <p>Get path data frame</p><div class="section">
-<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
+<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">get_path_df</span><span class="op">(</span>truncate <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
+<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>truncate</code></dt>
 <dd><p>Remove rows after terminal events?</p></dd>
 
@@ -300,12 +326,12 @@ can be a transition event</p><div class="section">
 </div><p></p><hr><a id="method-PathData-as_data_frame"></a><div class="section">
 <h3 id="method-as-data-frame-">Method <code>as_data_frame()</code><a class="anchor" aria-label="anchor" href="#method-as-data-frame-"></a></h3>
 <p>Convert to one long data frame</p><div class="section">
-<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
+<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">as_data_frame</span><span class="op">(</span>covariates <span class="op">=</span> <span class="cn">NULL</span>, truncate <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
+<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>covariates</code></dt>
 <dd><p>Which covariates to include?</p></dd>
 
@@ -320,12 +346,12 @@ can be a transition event</p><div class="section">
 </div><p></p><hr><a id="method-PathData-full_link"></a><div class="section">
 <h3 id="method-full-link-">Method <code>full_link()</code><a class="anchor" aria-label="anchor" href="#method-full-link-"></a></h3>
 <p>Full link data frame</p><div class="section">
-<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
+<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">full_link</span><span class="op">(</span>covariates <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
+<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>covariates</code></dt>
 <dd><p>Which covariates to include</p></dd>
 
@@ -341,12 +367,12 @@ including also the covariate columns and <code>subject_id</code></p>
 </div><p></p><hr><a id="method-PathData-as_transitions"></a><div class="section">
 <h3 id="method-as-transitions-">Method <code>as_transitions()</code><a class="anchor" aria-label="anchor" href="#method-as-transitions-"></a></h3>
 <p>Data frame in transitions format</p><div class="section">
-<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
+<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">as_transitions</span><span class="op">(</span>covariates <span class="op">=</span> <span class="cn">NULL</span>, truncate <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
+<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>covariates</code></dt>
 <dd><p>Which covariates to include?</p></dd>
 
@@ -365,12 +391,12 @@ including also the covariate columns and <code>subject_id</code></p>
 </div><p></p><hr><a id="method-PathData-as_transitions_alt"></a><div class="section">
 <h3 id="method-as-transitions-alt-">Method <code>as_transitions_alt()</code><a class="anchor" aria-label="anchor" href="#method-as-transitions-alt-"></a></h3>
 <p>Data frame in alternative transitions format</p><div class="section">
-<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
+<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">as_transitions_alt</span><span class="op">(</span>covariates <span class="op">=</span> <span class="cn">NULL</span>, truncate <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
+<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>covariates</code></dt>
 <dd><p>Which covariates to include?</p></dd>
 
@@ -389,12 +415,12 @@ including also the covariate columns and <code>subject_id</code></p>
 </div><p></p><hr><a id="method-PathData-as_msdata"></a><div class="section">
 <h3 id="method-as-msdata-">Method <code>as_msdata()</code><a class="anchor" aria-label="anchor" href="#method-as-msdata-"></a></h3>
 <p>Convert to format used by the 'mstate' package</p><div class="section">
-<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
+<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">as_msdata</span><span class="op">(</span>covariates <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
+<h4 id="arguments-9">Arguments<a class="anchor" aria-label="anchor" href="#arguments-9"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>covariates</code></dt>
 <dd><p>Which covariates to include?</p></dd>
 
@@ -409,12 +435,12 @@ including also the covariate columns and <code>subject_id</code></p>
 </div><p></p><hr><a id="method-PathData-plot_paths"></a><div class="section">
 <h3 id="method-plot-paths-">Method <code>plot_paths()</code><a class="anchor" aria-label="anchor" href="#method-plot-paths-"></a></h3>
 <p>Step plot of the paths</p><div class="section">
-<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
+<h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">plot_paths</span><span class="op">(</span>n_paths <span class="op">=</span> <span class="cn">NULL</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>, truncate <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-9">Arguments<a class="anchor" aria-label="anchor" href="#arguments-9"></a></h4>
+<h4 id="arguments-10">Arguments<a class="anchor" aria-label="anchor" href="#arguments-10"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>n_paths</code></dt>
 <dd><p>Number of paths to subsample for plotting.</p></dd>
 
@@ -433,12 +459,12 @@ including also the covariate columns and <code>subject_id</code></p>
 </div><p></p><hr><a id="method-PathData-prop_matrix"></a><div class="section">
 <h3 id="method-prop-matrix-">Method <code>prop_matrix()</code><a class="anchor" aria-label="anchor" href="#method-prop-matrix-"></a></h3>
 <p>Transition proportion matrix</p><div class="section">
-<h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
+<h4 id="usage-18">Usage<a class="anchor" aria-label="anchor" href="#usage-18"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">prop_matrix</span><span class="op">(</span>include_censor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-10">Arguments<a class="anchor" aria-label="anchor" href="#arguments-10"></a></h4>
+<h4 id="arguments-11">Arguments<a class="anchor" aria-label="anchor" href="#arguments-11"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>include_censor</code></dt>
 <dd><p>Include censoring (no event) proportion in the
 matrix</p></dd>
@@ -454,12 +480,12 @@ matrix</p></dd>
 </div><p></p><hr><a id="method-PathData-plot_graph"></a><div class="section">
 <h3 id="method-plot-graph-">Method <code>plot_graph()</code><a class="anchor" aria-label="anchor" href="#method-plot-graph-"></a></h3>
 <p>Visualize the transition proportion matrix as a graph</p><div class="section">
-<h4 id="usage-18">Usage<a class="anchor" aria-label="anchor" href="#usage-18"></a></h4>
+<h4 id="usage-19">Usage<a class="anchor" aria-label="anchor" href="#usage-19"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">plot_graph</span><span class="op">(</span>digits <span class="op">=</span> <span class="fl">3</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-11">Arguments<a class="anchor" aria-label="anchor" href="#arguments-11"></a></h4>
+<h4 id="arguments-12">Arguments<a class="anchor" aria-label="anchor" href="#arguments-12"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>digits</code></dt>
 <dd><p>Max number of digits to show in numbers</p></dd>
 
@@ -478,28 +504,8 @@ matrix</p></dd>
 </div><p></p><hr><a id="method-PathData-fit_coxph"></a><div class="section">
 <h3 id="method-fit-coxph-">Method <code><a href="fit_coxph.html">fit_coxph()</a></code><a class="anchor" aria-label="anchor" href="#method-fit-coxph-"></a></h3>
 <p>Fit Cox proportional hazards model</p><div class="section">
-<h4 id="usage-19">Usage<a class="anchor" aria-label="anchor" href="#usage-19"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">fit_coxph</span><span class="op">(</span>covariates <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
-<h4 id="arguments-12">Arguments<a class="anchor" aria-label="anchor" href="#arguments-12"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>covariates</code></dt>
-<dd><p>Covariates to include.</p></dd>
-
-
-<dt><code>...</code></dt>
-<dd><p>Arguments passed to <code><a href="https://rdrr.io/pkg/survival/man/coxph.html" class="external-link">survival::coxph</a></code>.</p></dd>
-
-
-</dl><p></p></div>
-</div>
-
-</div><p></p><hr><a id="method-PathData-fit_mstate"></a><div class="section">
-<h3 id="method-fit-mstate-">Method <code>fit_mstate()</code><a class="anchor" aria-label="anchor" href="#method-fit-mstate-"></a></h3>
-<p>Fit frequentist 'mstate' model</p><div class="section">
 <h4 id="usage-20">Usage<a class="anchor" aria-label="anchor" href="#usage-20"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">fit_mstate</span><span class="op">(</span>covariates <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">fit_coxph</span><span class="op">(</span>covariates <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -515,15 +521,35 @@ matrix</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-PathData-filter"></a><div class="section">
-<h3 id="method-filter-">Method <code><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter()</a></code><a class="anchor" aria-label="anchor" href="#method-filter-"></a></h3>
-<p>Filter based on subject id, creates new object</p><div class="section">
+</div><p></p><hr><a id="method-PathData-fit_mstate"></a><div class="section">
+<h3 id="method-fit-mstate-">Method <code>fit_mstate()</code><a class="anchor" aria-label="anchor" href="#method-fit-mstate-"></a></h3>
+<p>Fit frequentist 'mstate' model</p><div class="section">
 <h4 id="usage-21">Usage<a class="anchor" aria-label="anchor" href="#usage-21"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">filter</span><span class="op">(</span><span class="va">subject_ids_keep</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">fit_mstate</span><span class="op">(</span>covariates <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-14">Arguments<a class="anchor" aria-label="anchor" href="#arguments-14"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>covariates</code></dt>
+<dd><p>Covariates to include.</p></dd>
+
+
+<dt><code>...</code></dt>
+<dd><p>Arguments passed to <code><a href="https://rdrr.io/pkg/survival/man/coxph.html" class="external-link">survival::coxph</a></code>.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+
+</div><p></p><hr><a id="method-PathData-filter"></a><div class="section">
+<h3 id="method-filter-">Method <code><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter()</a></code><a class="anchor" aria-label="anchor" href="#method-filter-"></a></h3>
+<p>Filter based on subject id, creates new object</p><div class="section">
+<h4 id="usage-22">Usage<a class="anchor" aria-label="anchor" href="#usage-22"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">filter</span><span class="op">(</span><span class="va">subject_ids_keep</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-15">Arguments<a class="anchor" aria-label="anchor" href="#arguments-15"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>subject_ids_keep</code></dt>
 <dd><p>Subject ids to keep</p></dd>
 
@@ -534,12 +560,12 @@ matrix</p></dd>
 </div><p></p><hr><a id="method-PathData-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-22">Usage<a class="anchor" aria-label="anchor" href="#usage-22"></a></h4>
+<h4 id="usage-23">Usage<a class="anchor" aria-label="anchor" href="#usage-23"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PathData</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-15">Arguments<a class="anchor" aria-label="anchor" href="#arguments-15"></a></h4>
+<h4 id="arguments-16">Arguments<a class="anchor" aria-label="anchor" href="#arguments-16"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 

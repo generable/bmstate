@@ -1,7 +1,8 @@
 # Fit a model using 'Stan'
 
-*NOTE:* This function has a side effect of setting covariate normalizers
-and prior assumed mean baseline hazard based on data.
+*NOTE:* This function has a side effect of setting covariate
+normalizers, prior assumed mean baseline hazard, and concentration upper
+bound (PK) based on data.
 
 ## Usage
 
@@ -12,6 +13,7 @@ fit_stan(
   set_auc_normalizers = TRUE,
   filepath = NULL,
   return_stanfit = FALSE,
+  max_conc_factor = 100,
   method = "sample",
   ...
 )
@@ -44,6 +46,11 @@ fit_stan(
 - return_stanfit:
 
   Return also the raw 'Stan' fit object?
+
+- max_conc_factor:
+
+  Factor to multiply observed max concentration by to get concentration
+  upper bound.
 
 - method:
 

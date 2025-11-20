@@ -8,6 +8,10 @@ One-compartment PK Model
 
 ### Public methods
 
+- [`PKModel$get_max_conc()`](#method-PKModel-get_max_conc)
+
+- [`PKModel$set_max_conc()`](#method-PKModel-set_max_conc)
+
 - [`PKModel$new()`](#method-PKModel-new)
 
 - [`PKModel$ka_covs()`](#method-PKModel-ka_covs)
@@ -29,6 +33,32 @@ One-compartment PK Model
 - [`PKModel$format_params()`](#method-PKModel-format_params)
 
 - [`PKModel$clone()`](#method-PKModel-clone)
+
+------------------------------------------------------------------------
+
+### Method `get_max_conc()`
+
+Get concentration upper bound
+
+#### Usage
+
+    PKModel$get_max_conc()
+
+------------------------------------------------------------------------
+
+### Method `set_max_conc()`
+
+Set concentration upper bound
+
+#### Usage
+
+    PKModel$set_max_conc(value)
+
+#### Arguments
+
+- `value`:
+
+  Upper bound for concentration, to avoid numerical issues.
 
 ------------------------------------------------------------------------
 
@@ -165,7 +195,7 @@ Simulate data with many subjects
 
 #### Usage
 
-    PKModel$simulate_data(df_subjects, beta_pk = NULL, tau = 24, sigma = 0.2)
+    PKModel$simulate_data(df_subjects, beta_pk = NULL, tau = 24, sigma = 0.3)
 
 #### Arguments
 

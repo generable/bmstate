@@ -3,9 +3,10 @@ pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   analysis: analysis.html
+  exposure-hazard: exposure-hazard.html
   math: math.html
   survival: survival.html
-last_built: 2025-11-18T22:10Z
+last_built: 2025-11-20T08:32Z
 urls:
   reference: https://generable.github.io/bmstate/reference
   article: https://generable.github.io/bmstate/articles

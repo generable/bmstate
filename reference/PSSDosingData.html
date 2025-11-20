@@ -9,7 +9,7 @@ Partially steady-state dosing data class (R6 class)"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">bmstate</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -21,6 +21,7 @@ Partially steady-state dosing data class (R6 class)"></head><body>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/analysis.html">Time-to-event data analysis with the bmstate package</a></li>
+    <li><a class="dropdown-item" href="../articles/exposure-hazard.html">Exposure-hazard multistate modeling with bmstate</a></li>
     <li><a class="dropdown-item" href="../articles/math.html">Mathematical description of models in the bmstate package</a></li>
     <li><a class="dropdown-item" href="../articles/survival.html">Survival data analysis with the bmstate package</a></li>
   </ul></li>
@@ -134,7 +135,7 @@ of steady-state assumption time range.</p></dd>
 <h3 id="method-simulate-pk-">Method <code>simulate_pk()</code><a class="anchor" aria-label="anchor" href="#method-simulate-pk-"></a></h3>
 <p>Simulate PK dynamics</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PSSDosingData</span><span class="op">$</span><span class="fu">simulate_pk</span><span class="op">(</span><span class="va">t</span>, <span class="va">theta</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PSSDosingData</span><span class="op">$</span><span class="fu">simulate_pk</span><span class="op">(</span><span class="va">t</span>, <span class="va">theta</span>, <span class="va">MAX_CONC</span>, skip_assert <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -145,6 +146,15 @@ of steady-state assumption time range.</p></dd>
 
 <dt><code>theta</code></dt>
 <dd><p>A matrix of parameters.</p></dd>
+
+
+<dt><code>MAX_CONC</code></dt>
+<dd><p>concentration upper bound</p></dd>
+
+
+<dt><code>skip_assert</code></dt>
+<dd><p>Skip most assertions and call exposed Stan directly,
+assuming that it exists?</p></dd>
 
 
 </dl><p></p></div>

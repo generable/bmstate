@@ -9,7 +9,7 @@ One-compartment PK Model"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">bmstate</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -21,6 +21,7 @@ One-compartment PK Model"></head><body>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/analysis.html">Time-to-event data analysis with the bmstate package</a></li>
+    <li><a class="dropdown-item" href="../articles/exposure-hazard.html">Exposure-hazard multistate modeling with bmstate</a></li>
     <li><a class="dropdown-item" href="../articles/math.html">Mathematical description of models in the bmstate package</a></li>
     <li><a class="dropdown-item" href="../articles/survival.html">Survival data analysis with the bmstate package</a></li>
   </ul></li>
@@ -51,7 +52,9 @@ One-compartment PK Model"></head><body>
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
 
-<ul><li><p><a href="#method-PKModel-new"><code>PKModel$new()</code></a></p></li>
+<ul><li><p><a href="#method-PKModel-get_max_conc"><code>PKModel$get_max_conc()</code></a></p></li>
+<li><p><a href="#method-PKModel-set_max_conc"><code>PKModel$set_max_conc()</code></a></p></li>
+<li><p><a href="#method-PKModel-new"><code>PKModel$new()</code></a></p></li>
 <li><p><a href="#method-PKModel-ka_covs"><code>PKModel$ka_covs()</code></a></p></li>
 <li><p><a href="#method-PKModel-CL_covs"><code>PKModel$CL_covs()</code></a></p></li>
 <li><p><a href="#method-PKModel-V2_covs"><code>PKModel$V2_covs()</code></a></p></li>
@@ -62,15 +65,39 @@ One-compartment PK Model"></head><body>
 <li><p><a href="#method-PKModel-simulate_data"><code>PKModel$simulate_data()</code></a></p></li>
 <li><p><a href="#method-PKModel-format_params"><code>PKModel$format_params()</code></a></p></li>
 <li><p><a href="#method-PKModel-clone"><code>PKModel$clone()</code></a></p></li>
-</ul></div><p></p><hr><a id="method-PKModel-new"></a><div class="section">
-<h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
-<p>Create model</p><div class="section">
+</ul></div><p></p><hr><a id="method-PKModel-get_max_conc"></a><div class="section">
+<h3 id="method-get-max-conc-">Method <code>get_max_conc()</code><a class="anchor" aria-label="anchor" href="#method-get-max-conc-"></a></h3>
+<p>Get concentration upper bound</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/PKModel.html">PKModel</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">covariates</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PKModel</span><span class="op">$</span><span class="fu">get_max_conc</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+
+</div><p></p><hr><a id="method-PKModel-set_max_conc"></a><div class="section">
+<h3 id="method-set-max-conc-">Method <code>set_max_conc()</code><a class="anchor" aria-label="anchor" href="#method-set-max-conc-"></a></h3>
+<p>Set concentration upper bound</p><div class="section">
+<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PKModel</span><span class="op">$</span><span class="fu">set_max_conc</span><span class="op">(</span><span class="va">value</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>value</code></dt>
+<dd><p>Upper bound for concentration, to avoid numerical issues.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+
+</div><p></p><hr><a id="method-PKModel-new"></a><div class="section">
+<h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
+<p>Create model</p><div class="section">
+<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/PKModel.html">PKModel</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">covariates</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>covariates</code></dt>
 <dd><p>A list with elements <code>ka</code>,
 <code>CL</code>, and <code>V2</code></p></dd>
@@ -82,7 +109,7 @@ One-compartment PK Model"></head><body>
 </div><p></p><hr><a id="method-PKModel-ka_covs"></a><div class="section">
 <h3 id="method-ka-covs-">Method <code>ka_covs()</code><a class="anchor" aria-label="anchor" href="#method-ka-covs-"></a></h3>
 <p>Get the covariates affecting the k_a parameter.</p><div class="section">
-<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PKModel</span><span class="op">$</span><span class="fu">ka_covs</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -90,7 +117,7 @@ One-compartment PK Model"></head><body>
 </div><p></p><hr><a id="method-PKModel-CL_covs"></a><div class="section">
 <h3 id="method-cl-covs-">Method <code>CL_covs()</code><a class="anchor" aria-label="anchor" href="#method-cl-covs-"></a></h3>
 <p>Get the covariates affecting the CL parameter.</p><div class="section">
-<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PKModel</span><span class="op">$</span><span class="fu">CL_covs</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -98,7 +125,7 @@ One-compartment PK Model"></head><body>
 </div><p></p><hr><a id="method-PKModel-V2_covs"></a><div class="section">
 <h3 id="method-v-covs-">Method <code>V2_covs()</code><a class="anchor" aria-label="anchor" href="#method-v-covs-"></a></h3>
 <p>Get the covariates affecting the V2 parameter.</p><div class="section">
-<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PKModel</span><span class="op">$</span><span class="fu">V2_covs</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -106,7 +133,7 @@ One-compartment PK Model"></head><body>
 </div><p></p><hr><a id="method-PKModel-covs"></a><div class="section">
 <h3 id="method-covs-">Method <code>covs()</code><a class="anchor" aria-label="anchor" href="#method-covs-"></a></h3>
 <p>Get names of all unique covariates</p><div class="section">
-<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PKModel</span><span class="op">$</span><span class="fu">covs</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -114,7 +141,7 @@ One-compartment PK Model"></head><body>
 </div><p></p><hr><a id="method-PKModel-print"></a><div class="section">
 <h3 id="method-print-">Method <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code><a class="anchor" aria-label="anchor" href="#method-print-"></a></h3>
 <p>Print the object info</p><div class="section">
-<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PKModel</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -126,12 +153,12 @@ One-compartment PK Model"></head><body>
 </div><p></p><hr><a id="method-PKModel-simulate_ss"></a><div class="section">
 <h3 id="method-simulate-ss-">Method <code>simulate_ss()</code><a class="anchor" aria-label="anchor" href="#method-simulate-ss-"></a></h3>
 <p>Simulate system in steady state</p><div class="section">
-<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PKModel</span><span class="op">$</span><span class="fu">simulate_ss</span><span class="op">(</span><span class="va">t</span>, <span class="va">theta</span>, <span class="va">dose</span>, <span class="va">tau</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
+<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>t</code></dt>
 <dd><p>output time points</p></dd>
 
@@ -159,12 +186,12 @@ concentration in the central compartment.</p>
 </div><p></p><hr><a id="method-PKModel-compute_ss_auc"></a><div class="section">
 <h3 id="method-compute-ss-auc-">Method <code>compute_ss_auc()</code><a class="anchor" aria-label="anchor" href="#method-compute-ss-auc-"></a></h3>
 <p>Compute steady-state area under curve over one dosing interval</p><div class="section">
-<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
+<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PKModel</span><span class="op">$</span><span class="fu">compute_ss_auc</span><span class="op">(</span><span class="va">theta</span>, <span class="va">dose</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
+<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>theta</code></dt>
 <dd><p>parameter values</p></dd>
 
@@ -183,12 +210,12 @@ concentration in the central compartment.</p>
 </div><p></p><hr><a id="method-PKModel-simulate_data"></a><div class="section">
 <h3 id="method-simulate-data-">Method <code>simulate_data()</code><a class="anchor" aria-label="anchor" href="#method-simulate-data-"></a></h3>
 <p>Simulate data with many subjects</p><div class="section">
-<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PKModel</span><span class="op">$</span><span class="fu">simulate_data</span><span class="op">(</span><span class="va">df_subjects</span>, beta_pk <span class="op">=</span> <span class="cn">NULL</span>, tau <span class="op">=</span> <span class="fl">24</span>, sigma <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PKModel</span><span class="op">$</span><span class="fu">simulate_data</span><span class="op">(</span><span class="va">df_subjects</span>, beta_pk <span class="op">=</span> <span class="cn">NULL</span>, tau <span class="op">=</span> <span class="fl">24</span>, sigma <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
+<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>df_subjects</code></dt>
 <dd><p>Data frame with one row for each subject</p></dd>
 
@@ -216,12 +243,12 @@ concentration in the central compartment.</p>
 </div><p></p><hr><a id="method-PKModel-format_params"></a><div class="section">
 <h3 id="method-format-params-">Method <code>format_params()</code><a class="anchor" aria-label="anchor" href="#method-format-params-"></a></h3>
 <p>Format list of input PK parameters to standardized format.</p><div class="section">
-<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
+<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PKModel</span><span class="op">$</span><span class="fu">format_params</span><span class="op">(</span>beta_pk <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
+<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>beta_pk</code></dt>
 <dd><p>A list of max three elements</p></dd>
 
@@ -236,12 +263,12 @@ concentration in the central compartment.</p>
 </div><p></p><hr><a id="method-PKModel-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
+<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PKModel</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
+<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 

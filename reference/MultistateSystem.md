@@ -379,7 +379,8 @@ Generate paths
       init_state = 1,
       t_start = 0,
       t_max = NULL,
-      n_rep = 1
+      n_rep = 1,
+      min_t_step = 1e-06
     )
 
 #### Arguments
@@ -412,6 +413,10 @@ Generate paths
 - `n_rep`:
 
   Number of repetitions to do for each draw.
+
+- `min_t_step`:
+
+  Minimal time step.
 
 #### Returns
 
