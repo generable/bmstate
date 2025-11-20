@@ -61,7 +61,7 @@ create_true_covariate_effects <- function(mod) {
   df <- data.frame(bh_true) |>
     rownames_to_column("event") |>
     pivot_longer(cols = -event, names_to = "covariate", values_to = "beta")
-  beta_pk <- list(CL = c(0.5, -0.5), V2 = c(0.5))
+  beta_pk <- list(CL = c(0.3, -0.3), V2 = c(0.3))
   list(df = df, matrix = bh_true, pk = beta_pk)
 }
 
@@ -176,6 +176,8 @@ simdat <- mod_true$simulate_data(
   w0 = h0_true$w0,
   w = h0_true$w
 )
+simdat$paths$subject_df$dose_amt <- simdat$paths$subject_df$dose
+simdat_death <- as_single_event(simdat$paths, "Dead", null_state = "Healthy")
 sa <- simdat$paths$subject_df$ss_auc
 mod_true$set_auc_normalizers(loc = mean(sa), scale = stats::sd(sa))
 simdat <- mod_true$simulate_data(
@@ -185,6 +187,10 @@ simdat <- mod_true$simulate_data(
   w0 = h0_true$w0,
   w = h0_true$w
 )
+```
+
+```{r fig.width=7, fig.height=5}
+print(simdat)
 ```
 
 # Modeling
@@ -228,19 +234,32 @@ mod_death <- create_msm(
 # Inference model knots
 t3yr <- mod_true$get_tmax()
 tt <- simdat$paths$transition_times()
+ttd <- simdat_death$transition_times()
 mod_ms_eh$set_knots(t3yr, tt, NK)
 mod_ms_dh$set_knots(t3yr, tt, NK)
 mod_death$set_knots(t3yr, tt, NK)
+```
 
+```{r fig.width=7, fig.height=5}
 # Oracle fit
 fit_prelim <- fit_stan(mod_true, simdat, method = "optimize", init = 0, iter = 100)
 fit_true <- create_oracle_fit(fit_prelim, beta_true, h0_true)
+fit_true$covariate_effects()
+fit_true$plot_pk()
+fit_true$plot_h0()
 ```
 
 ```{r}
-# Fit the models
-fit_ms_eh <- fit_stan(mod_ms_eh, simdat, method = "pathfinder")
-fit_ms_dh <- fit_stan(mod_ms_dh, simdat, method = "pathfinder")
+# Fit different models
+fit_ms_eh <- fit_stan(mod_ms_eh, simdat, method = "optimize", init = 0)
+fit_ms_dh <- fit_stan(mod_ms_dh, simdat, method = "optimize", init = 0)
+fit_death <- fit_stan(mod_death, simdat_death, method = "optimize", init = 0)
+fit_ms_eh$plot_h0()
+fit_ms_eh$covariate_effects()
+fit_ms_dh$covariate_effects()
+fit_death$covariate_effects()
+```
 
-fit_death <- fit_stan(mod_death, sim$train_data_death, method = "pathfinder")
+```{r fig.width=7, fig.height=5}
+fit_ms_eh$plot_pk()
 ```
