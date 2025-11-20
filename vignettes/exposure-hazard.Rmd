@@ -262,8 +262,9 @@ fit_true$plot_pk()
 fit_true$plot_h0()
 ```
 
+## Fitting various models
+
 ```{r, fig.width=7, fig.height=5}
-# Fit different models
 fit_ms_eh <- fit_stan(mod_ms_eh, simdat, method = "optimize", init = 0)
 fit_ms_dh <- fit_stan(mod_ms_dh, simdat_dh, method = "optimize", init = 0)
 fit_death <- fit_stan(mod_death, simdat_death, method = "optimize", init = 0)
