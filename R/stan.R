@@ -138,7 +138,8 @@ fit_stan <- function(model, data,
   info <- list(
     diag = diag,
     runset = stan_fit$runset,
-    summary = smr$result
+    summary = smr$result,
+    time = stan_fit$time()
   )
   fit <- MultistateModelFit$new(data, sd, model, draws, info)
   if (!return_stanfit) {

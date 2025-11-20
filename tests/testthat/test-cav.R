@@ -1,7 +1,7 @@
-library(ggplot2)
-library(dplyr)
-
 test_that("cav data analysis works", {
+  library(ggplot2)
+  library(dplyr)
+
   # Modify original data like in
   # https://rviews.rstudio.com/2023/04/19/multistate-models-for-medical-applications/
   df_full <- as_tibble(msm::cav) |>
