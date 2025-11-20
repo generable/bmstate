@@ -2,7 +2,7 @@
 
 ``` r
 library(bmstate)
-#> Attached bmstate 0.2.4. Type ?bmstate to get started.
+#> Attached bmstate 0.2.5. Type ?bmstate to get started.
 library(ggplot2)
 theme_set(theme_bw())
 ```

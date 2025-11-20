@@ -20,6 +20,9 @@
   : Path data class (R6 class)
 - [`TransitionMatrix`](https://generable.github.io/bmstate/reference/TransitionMatrix.md)
   : Defines states and possible transitions
+- [`as_any_event()`](https://generable.github.io/bmstate/reference/as_any_event.md)
+  : PathData to time-to-event data format for any state other than null
+  state
 - [`as_single_event()`](https://generable.github.io/bmstate/reference/as_single_event.md)
   : PathData to time-to-event data format with a single event
 - [`as_survival()`](https://generable.github.io/bmstate/reference/as_survival.md)
