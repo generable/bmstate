@@ -120,6 +120,24 @@ PathData <- R6::R6Class(
       self$covs
     },
 
+    #' @description Create a new PathData with a subset of covariates
+    #' @param renamed_old Name of an old covariate to rename
+    #' @param renamed_new Name of new covariate where old one is copied
+    #' @param covs Names of all new covariates
+    subset_covariates = function(covs, renamed_old = NULL, renamed_new = NULL) {
+      sdf <- self$subject_df
+      if (!is.null(renamed_old)) {
+        checkmate::assert_character(renamed_old, len = 1)
+        checkmate::assert_character(renamed_new, len = 1)
+        sdf[[renamed_new]] <- sdf[[renamed_old]]
+        covs <- setdiff(covs, renamed_old)
+        covs <- unique(c(covs, renamed_new))
+      }
+      PathData$new(sdf, self$get_path_df(), self$link_df, self$transmat,
+        covs = covs
+      )
+    },
+
     #' @description For each path, get the state it is in at time t
     #' @param t time
     #' @return a data frame with one row for each path

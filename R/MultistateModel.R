@@ -64,7 +64,9 @@ MultistateModel <- R6::R6Class("MultistateModel",
       X_norm <- normalize_columns(X)
       if ("ss_auc" %in% x) {
         idx <- which(x == "ss_auc")
-        X_norm[, idx] <- (X[, idx] - auc_norm$loc) / auc_norm$scale
+        x_norm <- (X[, idx] - auc_norm$loc) / auc_norm$scale
+        check_normalized_covariate(x_norm, "ss_auc")
+        X_norm[, idx] <- x_norm
       }
       for (s in seq_len(S)) {
         target_state <- tf$state[s]
@@ -106,7 +108,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
 
       log_w0 <- matrix(rep(log_w0, N), N, S, byrow = TRUE)
       log_m <- private$simulate_log_hazard_multipliers(df_subjects, beta_haz)
-      paths <- self$system$simulate(w_all, log_w0, log_m)
+      paths <- self$system$simulate(w_all, log_w0, log_m, min_t_step = 0.1)
       as_tibble(paths)
     }
   ),
@@ -142,7 +144,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       num_cols <- which(sapply(df_sub, is.numeric))
       private$normalizer_locations <- lapply(df_sub[, num_cols], mean)
       private$normalizer_scales <- lapply(df_sub[, num_cols], stats::sd)
-      NULL
+      invisible(NULL)
     },
 
     #' @description Get normalization constants for AUC (PK)
@@ -161,9 +163,13 @@ MultistateModel <- R6::R6Class("MultistateModel",
     set_auc_normalizers = function(loc = 0, scale = 1) {
       checkmate::assert_numeric(loc, lower = 0, len = 1)
       checkmate::assert_numeric(scale, lower = 0, len = 1)
+      message(
+        "setting auc normalizers to loc = ",
+        round(loc, 5), ", scale = ", round(scale, 5)
+      )
       private$auc_normalizer_loc <- loc
       private$auc_normalizer_scale <- scale
-      NULL
+      invisible(NULL)
     },
 
     #' @description Get assumed prior mean baseline hazard rates.
@@ -183,6 +189,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       N_trans <- self$system$tm()$num_trans()
       checkmate::assert_numeric(mean_h0, len = N_trans, lower = 0)
       private$prior_mean_h0 <- mean_h0
+      invisible(NULL)
     },
 
 
@@ -453,17 +460,20 @@ place_internal_knots <- function(t_max, num_knots, t_event) {
 # Normalize columns of matrix A
 normalize_columns <- function(A) {
   K <- ncol(A)
+  cn <- colnames(A)
   for (j in seq_len(K)) {
-    A[, j] <- normalize(A[, j])
+    A[, j] <- normalize(A[, j], cn[j])
   }
   A
 }
 
 # Normalize
-normalize <- function(a) {
+normalize <- function(a, name) {
   sdd <- stats::sd(a)
   if (sdd == 0) {
-    stop("error in normalization, zero variance")
+    stop("error in normalization of ", name, ", zero variance")
   }
-  (a - mean(a)) / sdd
+  x_norm <- (a - mean(a)) / sdd
+  check_normalized_covariate(x_norm, name)
+  x_norm
 }

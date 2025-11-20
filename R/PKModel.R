@@ -5,11 +5,26 @@ PKModel <- R6::R6Class("PKModel",
 
   # PRIVATE
   private = list(
-    covariates = NULL
+    covariates = NULL,
+    MAX_CONC = 1e7
   ),
 
   # PUBLIC
   public = list(
+
+    #' @description Get concentration upper bound
+    get_max_conc = function() {
+      private$MAX_CONC
+    },
+
+    #' @description Set concentration upper bound
+    #' @param value Upper bound for concentration, to avoid numerical issues.
+    set_max_conc = function(value) {
+      checkmate::assert_number(value, lower = 0)
+      message("setting max conc = ", round(value, 5))
+      private$MAX_CONC <- value
+      invisible(NULL)
+    },
 
     #' @description Create model
     #'
@@ -53,7 +68,9 @@ PKModel <- R6::R6Class("PKModel",
       x2 <- paste0(" - ka covariates: {", paste0(self$ka_covs(), collapse = ", "), "}")
       x3 <- paste0(" - CL covariates: {", paste0(self$CL_covs(), collapse = ", "), "}")
       x4 <- paste0(" - V2 covariates: {", paste0(self$V2_covs(), collapse = ", "), "}")
-      msg <- paste(x1, x2, x3, x4, "\n", sep = "\n")
+      MC <- self$get_max_conc()
+      x5 <- paste0(" - Concentration upper bound: ", round(MC, 5))
+      msg <- paste(x1, x2, x3, x4, x5, "\n", sep = "\n")
       cat(msg)
     },
 
@@ -104,7 +121,7 @@ PKModel <- R6::R6Class("PKModel",
     #' @return Data frame with one row for each subject, and a
     #' \code{\link{DosingData}} object
     simulate_data = function(df_subjects, beta_pk = NULL, tau = 24,
-                             sigma = 0.2) {
+                             sigma = 0.3) {
       checkmate::assert_class(df_subjects, "data.frame")
       checkmate::assert_true("dose" %in% colnames(df_subjects))
       checkmate::assert_number(tau, lower = 0)
@@ -121,9 +138,9 @@ PKModel <- R6::R6Class("PKModel",
       SUB_ID <- rep("s", N)
       for (n in seq_len(N)) {
         theta_n <- list(
-          ka = exp(-2 + sum(x[n, self$ka_covs()] * beta_pk$ka)),
-          CL = exp(-2 + sum(x[n, self$CL_covs()] * beta_pk$CL)),
-          V2 = exp(-2 + sum(x[n, self$V2_covs()] * beta_pk$V2))
+          ka = exp(-2 + sum(x[n, self$ka_covs()] * beta_pk$ka) + 0.1 * stats::rnorm(1)),
+          CL = exp(-2 + sum(x[n, self$CL_covs()] * beta_pk$CL) + 0.1 * stats::rnorm(1)),
+          V2 = exp(-2 + sum(x[n, self$V2_covs()] * beta_pk$V2) + 0.1 * stats::rnorm(1))
         )
         t_last <- max(dd$times[[n]])
         t_pre <- t_last - (0.02 + 0.05) * runif(1) * tau
@@ -134,7 +151,7 @@ PKModel <- R6::R6Class("PKModel",
       }
 
       # Simulate observed concentration
-      CONC <- dd$simulate_pk(t_obs, THETA)
+      CONC <- dd$simulate_pk(t_obs, THETA, self$get_max_conc())
       df_out <- NULL
       for (n in seq_len(N)) {
         ss_auc <- self$compute_ss_auc(THETA[n, ], dd$dose_ss[n])

@@ -41,13 +41,18 @@ create_stan_data_model <- function(model) {
 
   # PK options
   an <- model$get_auc_normalizers()
+  MC <- 1e-7
+  if (model$has_pk()) {
+    MC <- model$pk_model$get_max_conc()
+  }
   sd_pk <- list(
     nc_ka = length(model$data_covs("ka")),
     nc_CL = length(model$data_covs("CL")),
     nc_V2 = length(model$data_covs("V2")),
     I_auc = as.numeric(model$has_pk()),
     auc_loc = an$loc,
-    auc_scale = an$scale
+    auc_scale = an$scale,
+    MAX_CONC = MC
   )
 
   # Return
@@ -179,6 +184,12 @@ create_stan_data_pk <- function(data, model) {
   }
   t_obs_pk <- pk_obs[, 1:2, drop = FALSE]
   conc_pk <- pk_obs[, 3:4, drop = FALSE]
+  if (max(conc_pk) > 1e5) {
+    stop(
+      "Rescale concentration measurements to larger units so that maximum",
+      "concentration has smaller numeric value"
+    )
+  }
   pk_lloq <- as.numeric(pk_obs[, 5])
 
   # Return
@@ -227,7 +238,9 @@ standata_scaled_covariates <- function(pd, model, name) {
     if (is.null(xj_loc) || is.null(xj_scale)) {
       stop("no normalizers set for ", cn)
     }
-    x[[j]] <- (xx - xj_loc) / xj_scale
+    x_norm <- (xx - xj_loc) / xj_scale
+    check_normalized_covariate(x_norm, cn)
+    x[[j]] <- x_norm
   }
   x <- sapply(x, function(x) x)
   if (length(dim(x)) != 2) {

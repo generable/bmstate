@@ -60,7 +60,7 @@ functions {
     for(n in 1:N_id) {
 
       // ka
-      log_theta[n, 1] = -2 + log_mu[1] + log_z[n][1] * log_sig[1] +
+      log_theta[n, 1] = -3 + log_mu[1] + log_z[n][1] * log_sig[1] +
         sum(beta_ka .* x_ka[n]);
 
       // CL
@@ -73,33 +73,6 @@ functions {
 
     }
     return(exp(log_theta));
-  }
-
-  // Two-cpt population PK model with multiple doses (steady state)
-  array[] vector pop_2cpt_ss(array[] vector t, data vector dose, matrix theta,
-      data real tau) {
-
-    int N_id = size(dose);
-    int N_t = num_elements(t[1]);
-    vector[N_id] tau_ss = rep_vector(tau, N_id);
-
-    vector[N_id] ka = theta[:,1];
-    vector[N_id] CL = theta[:,2];
-    vector[N_id] V2 = theta[:,3];
-
-    vector[N_id] ke = CL ./ V2;
-    vector[N_id] A = (dose ./ V2) .* (ka ./ (ka-ke));
-
-    array[N_id] vector[N_t] conc;
-    vector[N_id] ma = A .* inv(-expm1(-ka.*tau_ss)); // 1/(1-exp(-ka*tau))
-    vector[N_id] me = A .* inv(-expm1(-ke.*tau_ss));
-    vector[N_t] tt;
-
-    for(n in 1:N_id){
-      tt = fmod(t[n], tau_ss[n]);
-      conc[n] = me[n] * exp(-ke[n]*tt) - ma[n] * exp(-ka[n] * tt);
-    }
-    return(conc);
   }
 
   // Analytic solution with general initial condition (A0, C0)
@@ -278,11 +251,13 @@ functions {
     data array[] vector dose_times,
     data array[] vector doses,
     matrix theta,
-    data real tau
+    data real tau,
+    data real MAX_CONC
   ){
 
     // Find drug amounts in both compartments at dose_times
     int N_t = num_elements(t[1]);
+    vector[N_t] max_conc = rep_vector(MAX_CONC, N_t);
     int N_sub = num_elements(dose_ss);
     int D = num_elements(dose_times[1]);
     array[2, N_sub] vector[D] amounts = pop_2cpt_partly_ss_stage1(
@@ -292,6 +267,9 @@ functions {
     array[N_sub] vector[N_t] conc = pop_2cpt_partly_ss_stage2(
       t, dose_ss, dose_times, doses, amounts, theta, tau
     );
+    for(n in 1:N_sub){
+      conc[n] = fmin(conc[n], MAX_CONC);
+    }
 
     // Drug concentration at t
     return(conc);
@@ -326,6 +304,7 @@ data {
   int<lower=0> nc_ka; // num of predictors for ka
   int<lower=0> nc_CL; // num of predictors for CL
   int<lower=0> nc_V2; // num of predictors for V2
+  real<lower=0> MAX_CONC; // maximum estimable concentration
 
   // --- Actual data (can be modified or re-created when predicting) ----------
 
@@ -404,8 +383,8 @@ parameters {
 
   // PK model
   array[do_pk, N_sub] vector[3] log_z_pk;
-  array[do_pk] vector[3] log_mu_pk;
-  array[do_pk] vector<lower=0>[3] log_sig_pk;
+  array[do_pk] vector<lower=-5,upper=5>[3] log_mu_pk;
+  array[do_pk] vector<lower=0,upper=3>[3] log_sig_pk;
   array[do_pk] vector[nc_ka] beta_ka;
   array[do_pk] vector[nc_CL] beta_CL;
   array[do_pk] vector[nc_V2] beta_V2;
@@ -444,7 +423,8 @@ transformed parameters {
 
     // Drug concentration estimated at t_obs
     conc_mu_pk[1] = pop_2cpt_partly_ss(
-      t_obs_pk, dose_ss, last_two_times, last_two_doses, theta_pk[1], tau_ss
+      t_obs_pk, dose_ss, last_two_times, last_two_doses, theta_pk[1], tau_ss,
+      MAX_CONC
     );
 
     // Auc at steady state

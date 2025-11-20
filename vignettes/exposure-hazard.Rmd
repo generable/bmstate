@@ -1,0 +1,279 @@
+---
+title: "Exposure-hazard multistate modeling with bmstate"
+author: Juho Timonen
+date: 20th Nov 2025
+output: 
+  rmarkdown::html_vignette:
+    toc: true 
+    toc_depth: 3
+    number_sections: true
+    
+editor: source
+vignette: >
+  %\VignetteIndexEntry{Exposure-hazard multistate modeling with bmstate}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This vignette is work in progress.
+
+# Data simulation
+
+## Setup
+
+```{r setup}
+library(bmstate)
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(ggplot2)
+```
+
+```{r}
+# Setup
+params <- list(
+  N_subject = 600,
+  iter_warmup = 800,
+  iter_sampling = 400,
+  chains = 1
+)
+
+# Names of event states
+event_state_names <- function(model) {
+  tm <- model$system$tm()
+  tm$states_df() |>
+    filter(!source) |>
+    pull(state)
+}
+```
+
+## True data-generating model
+
+```{r}
+# True beta
+create_true_covariate_effects <- function(mod) {
+  NTT <- mod$system$num_states() - 1
+  C <- length(mod$covs())
+  bh_true <- matrix(0, NTT, C)
+  bh_true[1, 2] <- 1
+  bh_true[2, 2] <- -1
+  bh_true[3, 1] <- 0.3
+  sn <- event_state_names(mod)
+  rownames(bh_true) <- paste0("Effect on ", sn)
+  colnames(bh_true) <- mod$covs()
+  df <- data.frame(bh_true) |>
+    rownames_to_column("event") |>
+    pivot_longer(cols = -event, names_to = "covariate", values_to = "beta")
+  beta_pk <- list(CL = c(0.3, -0.3), V2 = c(0.3))
+  list(df = df, matrix = bh_true, pk = beta_pk)
+}
+
+# True baseline hazard parameters
+create_true_baseline_hazard <- function(mod) {
+  tm <- mod$system$tm()
+
+  # Spline weights
+  w_true <- matrix(0, 7, 9)
+  for (j in 1:7) {
+    ww <- rep(0, 9)
+    if (tm$trans_df()$trans_type[j] == 2) {
+      ww <- rep(-1, 9)
+      ww[3:5] <- 1
+    }
+    if (tm$trans_df()$trans_type[j] == 3) {
+      ww <- rep(-1, 9)
+      ww[4:8] <- 1
+    }
+    w_true[j, ] <- ww
+  }
+
+  # Intercept
+  w0_true <- 0.5 * 1e-3
+  w0_true_vec <- rep(w0_true, 7)
+  w0_true_vec[3] <- 0.1 * w0_true
+  w0_true_vec[5] <- 5 * w0_true
+  w0_true_vec[7] <- 20 * w0_true
+
+  # Return
+  list(w0 = w0_true_vec, w = w_true)
+}
+
+# True data-generating model
+create_true_model <- function() {
+  # Create models
+  sn <- c("Healthy", "Bleed", "Stroke", "Dead")
+  tm <- transmat_diamond(state_names = sn)
+  t3yr <- 3 * 365.25
+  haz_covs <- c("age")
+  pk_covs <- list(
+    CL = c("CrCL", "age"), V2 = "weight"
+  )
+  create_msm(
+    tm,
+    hazard_covs = haz_covs, pk_covs = pk_covs, num_knots = 8, t_max = t3yr
+  )
+}
+
+# Create oracle fit draws
+create_oracle_fit <- function(similar_fit, beta_true, h0_true) {
+  checkmate::assert_true(similar_fit$is_point_estimate())
+  weights <- similar_fit$get_draws("weights")
+  weights[1, , ] <- h0_true$w
+  log_w0 <- similar_fit$get_draws("log_w0")
+  log_w0[1, ] <- log(h0_true$w0)
+
+  beta_oth <- similar_fit$get_draws("beta_oth")
+  beta_oth[1, , ] <- t(beta_true$matrix[, 1])
+  beta_oth <- posterior::rvar(beta_oth)
+
+  beta_auc <- similar_fit$get_draws("beta_auc")
+  beta_auc[1, , ] <- t(beta_true$matrix[, 2])
+
+  lp <- similar_fit$get_draws("lp__")
+  lp[] <- NA
+  log_z_pk <- similar_fit$get_draws("log_z_pk")
+  log_z_pk[, , ] <- 0
+  log_sig_pk <- similar_fit$get_draws("log_sig_pk")
+  log_sig_pk[, ] <- 0
+  log_mu_pk <- similar_fit$get_draws("log_mu_pk")
+  log_mu_pk[, ] <- 0
+  sigma_pk <- similar_fit$get_draws("sigma_pk")
+  sigma_pk[] <- 0.3
+  beta_CL <- similar_fit$get_draws("beta_CL")
+  beta_CL[1, ] <- beta_true$pk$CL
+  beta_V2 <- similar_fit$get_draws("beta_V2")
+  beta_V2[1, ] <- beta_true$pk$V2
+
+  # Create fit
+  draws <- list(
+    beta_oth = beta_oth,
+    beta_auc = beta_auc,
+    beta_CL = beta_CL,
+    beta_V2 = beta_V2,
+    weights = weights,
+    log_z_pk = log_z_pk,
+    log_sig_pk = log_sig_pk,
+    log_mu_pk = log_mu_pk,
+    sigma_pk = sigma_pk,
+    log_w0 = log_w0,
+    lp__ = lp
+  )
+  sd <- similar_fit$get_data()
+  mod <- similar_fit$model
+  MultistateModelFit$new(similar_fit$data, sd, mod, draws,
+    info = "Oracle fit"
+  )
+}
+```
+
+## Data simulation
+
+```{r}
+mod_true <- create_true_model()
+beta_true <- create_true_covariate_effects(mod_true)
+h0_true <- create_true_baseline_hazard(mod_true)
+simdat <- mod_true$simulate_data(
+  params$N_subject,
+  beta_haz = beta_true$matrix,
+  beta_pk = beta_true$pk,
+  w0 = h0_true$w0,
+  w = h0_true$w
+)
+covs_dh <- unique(c(mod_true$data_covs(), "dose_amt"))
+simdat_dh <- simdat$paths$subset_covariates(covs_dh, renamed_old = "dose", renamed_new = "dose_amt")
+simdat_death <- as_single_event(simdat_dh, "Dead", null_state = "Healthy")
+
+sa <- simdat$paths$subject_df$ss_auc
+mod_true$set_auc_normalizers(loc = mean(sa), scale = stats::sd(sa))
+
+simdat <- mod_true$simulate_data(
+  params$N_subject,
+  beta_haz = beta_true$matrix,
+  beta_pk = beta_true$pk,
+  w0 = h0_true$w0,
+  w = h0_true$w
+)
+```
+
+```{r fig.width=7, fig.height=5}
+print(simdat)
+```
+
+# Modeling
+
+## Defining models
+
+
+```{r}
+NK <- 4
+tm <- mod_true$system$tm()
+pk_covs <- list(
+  ka = mod_true$pk_model$ka_covs(),
+  CL = mod_true$pk_model$CL_covs(),
+  V2 = mod_true$pk_model$V2_covs()
+)
+
+# Exposure-hazard multistate model
+mod_ms_eh <- create_msm(
+  tm,
+  hazard_covs = setdiff(mod_true$covs(), "ss_auc"),
+  pk_covs = pk_covs,
+  num_knots = NK, t_max = mod_true$get_tmax()
+)
+
+# Dose-hazard multistate model
+mod_ms_dh <- create_msm(
+  tm,
+  hazard_covs = covs_dh, num_knots = NK, t_max = mod_true$get_tmax()
+)
+
+# Survival model
+tm0 <- transmat_survival(tm$states[c(1, 4)])
+mod_death <- create_msm(
+  tm0,
+  hazard_covs = covs_dh, num_knots = NK, t_max = mod_true$get_tmax()
+)
+```
+
+```{r}
+# Inference model knots
+t3yr <- mod_true$get_tmax()
+tt1 <- simdat$paths$transition_times()
+tt2 <- simdat_dh$transition_times()
+tt3 <- simdat_death$transition_times()
+mod_ms_eh$set_knots(t3yr, tt1, NK)
+mod_ms_dh$set_knots(t3yr, tt2, NK)
+mod_death$set_knots(t3yr, tt3, NK)
+```
+
+```{r fig.width=7, fig.height=5}
+# Oracle fit
+fit_prelim <- fit_stan(mod_true, simdat, method = "optimize", init = 0, iter = 100)
+fit_true <- create_oracle_fit(fit_prelim, beta_true, h0_true)
+fit_true$covariate_effects()
+fit_true$plot_pk()
+fit_true$plot_h0()
+```
+
+## Fitting various models
+
+```{r, fig.width=7, fig.height=5}
+fit_ms_eh <- fit_stan(mod_ms_eh, simdat, method = "optimize", init = 0)
+fit_ms_dh <- fit_stan(mod_ms_dh, simdat_dh, method = "optimize", init = 0)
+fit_death <- fit_stan(mod_death, simdat_death, method = "optimize", init = 0)
+fit_ms_eh$plot_h0()
+fit_ms_eh$covariate_effects()
+fit_ms_dh$covariate_effects()
+fit_death$covariate_effects()
+```
+
+```{r fig.width=7, fig.height=5}
+fit_ms_eh$plot_pk()
+```

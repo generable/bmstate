@@ -1,3 +1,18 @@
+# Check for unusual normalized covariate values (will cause issues for hazard)
+check_normalized_covariate <- function(x_norm, name) {
+  mabs <- max(abs(x_norm))
+  msg <- paste0(
+    "Normalized ", name, " has maximum absolute value ",
+    round(mabs, 5), ", are you sure normalization of covariates is correct?"
+  )
+  if (mabs > 10) {
+    warning(msg)
+    return(FALSE)
+  }
+  TRUE
+}
+
+
 # Access one dimension and drop only that dimension
 access_one_dim <- function(x, dim_index, value) {
   dims <- rep(list(quote(expr = )), length(dim(x)))

@@ -12,7 +12,7 @@ test_that("PSSDosingData init and methods work", {
   for (j in 1:N) {
     ts[[j]] <- t
   }
-  a <- dd$simulate_pk(ts, theta)
+  a <- dd$simulate_pk(ts, theta, 100)
   b <- dd$plot(a)
   expect_true(is_ggplot(b))
   r <- dd$filter()
@@ -38,7 +38,7 @@ test_that("PSSDosingData works with zero steady-state doses", {
   for (j in 1:N) {
     ts[[j]] <- t
   }
-  a <- dd1$simulate_pk(ts, theta)
+  a <- dd1$simulate_pk(ts, theta, 1000)
   b <- dd1$plot(a)
   expect_true(is_ggplot(b))
 })

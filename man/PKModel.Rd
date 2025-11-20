@@ -11,6 +11,8 @@ One-compartment PK Model
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
+\item \href{#method-PKModel-get_max_conc}{\code{PKModel$get_max_conc()}}
+\item \href{#method-PKModel-set_max_conc}{\code{PKModel$set_max_conc()}}
 \item \href{#method-PKModel-new}{\code{PKModel$new()}}
 \item \href{#method-PKModel-ka_covs}{\code{PKModel$ka_covs()}}
 \item \href{#method-PKModel-CL_covs}{\code{PKModel$CL_covs()}}
@@ -22,6 +24,33 @@ One-compartment PK Model
 \item \href{#method-PKModel-simulate_data}{\code{PKModel$simulate_data()}}
 \item \href{#method-PKModel-format_params}{\code{PKModel$format_params()}}
 \item \href{#method-PKModel-clone}{\code{PKModel$clone()}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PKModel-get_max_conc"></a>}}
+\if{latex}{\out{\hypertarget{method-PKModel-get_max_conc}{}}}
+\subsection{Method \code{get_max_conc()}}{
+Get concentration upper bound
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PKModel$get_max_conc()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PKModel-set_max_conc"></a>}}
+\if{latex}{\out{\hypertarget{method-PKModel-set_max_conc}{}}}
+\subsection{Method \code{set_max_conc()}}{
+Set concentration upper bound
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PKModel$set_max_conc(value)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{value}}{Upper bound for concentration, to avoid numerical issues.}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -150,7 +179,7 @@ A numeric value
 \subsection{Method \code{simulate_data()}}{
 Simulate data with many subjects
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PKModel$simulate_data(df_subjects, beta_pk = NULL, tau = 24, sigma = 0.2)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PKModel$simulate_data(df_subjects, beta_pk = NULL, tau = 24, sigma = 0.3)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

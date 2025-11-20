@@ -331,7 +331,8 @@ Generate paths
   init_state = 1,
   t_start = 0,
   t_max = NULL,
-  n_rep = 1
+  n_rep = 1,
+  min_t_step = 1e-06
 )}\if{html}{\out{</div>}}
 }
 
@@ -354,6 +355,8 @@ with length equal to \code{n_draws}.}
 time of the model is used.}
 
 \item{\code{n_rep}}{Number of repetitions to do for each draw.}
+
+\item{\code{min_t_step}}{Minimal time step.}
 }
 \if{html}{\out{</div>}}
 }

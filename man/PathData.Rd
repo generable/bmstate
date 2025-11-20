@@ -44,6 +44,7 @@ which the paths belong.}
 \item \href{#method-PathData-new}{\code{PathData$new()}}
 \item \href{#method-PathData-unique_subjects}{\code{PathData$unique_subjects()}}
 \item \href{#method-PathData-covariate_names}{\code{PathData$covariate_names()}}
+\item \href{#method-PathData-subset_covariates}{\code{PathData$subset_covariates()}}
 \item \href{#method-PathData-state_at}{\code{PathData$state_at()}}
 \item \href{#method-PathData-transition_times}{\code{PathData$transition_times()}}
 \item \href{#method-PathData-n_paths}{\code{PathData$n_paths()}}
@@ -128,6 +129,27 @@ Get names of covariates
 
 \subsection{Returns}{
 a character vector
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-subset_covariates"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-subset_covariates}{}}}
+\subsection{Method \code{subset_covariates()}}{
+Create a new PathData with a subset of covariates
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$subset_covariates(covs, renamed_old = NULL, renamed_new = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{covs}}{Names of all new covariates}
+
+\item{\code{renamed_old}}{Name of an old covariate to rename}
+
+\item{\code{renamed_new}}{Name of new covariate where old one is copied}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
