@@ -40,6 +40,10 @@ test_that("entire workflow works", {
   fit <- a$fit
   expect_true(inherits(fit, "MultistateModelFit"))
 
+  # Test
+  a <- as_any_event(jd$train$paths, "Healthy")
+  checkmate::assert_true(all(a$state_names() == c("Healthy", "Any event")))
+
   # Print
   expect_output(print(fit), "A MultistateModelFit with 30 draws")
 
