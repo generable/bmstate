@@ -1,6 +1,14 @@
 ---
 title: "Exposure-hazard multistate modeling with bmstate"
-output: rmarkdown::html_vignette
+author: Juho Timonen
+date: 20th Nov 2025
+output: 
+  rmarkdown::html_vignette:
+    toc: true 
+    toc_depth: 3
+    number_sections: true
+    
+editor: source
 vignette: >
   %\VignetteIndexEntry{Exposure-hazard multistate modeling with bmstate}
   %\VignetteEngine{knitr::rmarkdown}
@@ -13,6 +21,8 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+
+This vignette is work in progress.
 
 # Data simulation
 
@@ -176,10 +186,13 @@ simdat <- mod_true$simulate_data(
   w0 = h0_true$w0,
   w = h0_true$w
 )
-simdat$paths$subject_df$dose_amt <- simdat$paths$subject_df$dose
-simdat_death <- as_single_event(simdat$paths, "Dead", null_state = "Healthy")
+covs_dh <- unique(c(mod_true$data_covs(), "dose_amt"))
+simdat_dh <- simdat$paths$subset_covariates(covs_dh, renamed_old = "dose", renamed_new = "dose_amt")
+simdat_death <- as_single_event(simdat_dh, "Dead", null_state = "Healthy")
+
 sa <- simdat$paths$subject_df$ss_auc
 mod_true$set_auc_normalizers(loc = mean(sa), scale = stats::sd(sa))
+
 simdat <- mod_true$simulate_data(
   params$N_subject,
   beta_haz = beta_true$matrix,
@@ -199,7 +212,6 @@ print(simdat)
 
 
 ```{r}
-covs_dh <- unique(c(mod_true$data_covs(), "dose_amt"))
 NK <- 4
 tm <- mod_true$system$tm()
 pk_covs <- list(
@@ -233,11 +245,12 @@ mod_death <- create_msm(
 ```{r}
 # Inference model knots
 t3yr <- mod_true$get_tmax()
-tt <- simdat$paths$transition_times()
-ttd <- simdat_death$transition_times()
-mod_ms_eh$set_knots(t3yr, tt, NK)
-mod_ms_dh$set_knots(t3yr, tt, NK)
-mod_death$set_knots(t3yr, tt, NK)
+tt1 <- simdat$paths$transition_times()
+tt2 <- simdat_dh$transition_times()
+tt3 <- simdat_death$transition_times()
+mod_ms_eh$set_knots(t3yr, tt1, NK)
+mod_ms_dh$set_knots(t3yr, tt2, NK)
+mod_death$set_knots(t3yr, tt3, NK)
 ```
 
 ```{r fig.width=7, fig.height=5}
@@ -249,10 +262,10 @@ fit_true$plot_pk()
 fit_true$plot_h0()
 ```
 
-```{r}
+```{r, fig.width=7, fig.height=5}
 # Fit different models
 fit_ms_eh <- fit_stan(mod_ms_eh, simdat, method = "optimize", init = 0)
-fit_ms_dh <- fit_stan(mod_ms_dh, simdat, method = "optimize", init = 0)
+fit_ms_dh <- fit_stan(mod_ms_dh, simdat_dh, method = "optimize", init = 0)
 fit_death <- fit_stan(mod_death, simdat_death, method = "optimize", init = 0)
 fit_ms_eh$plot_h0()
 fit_ms_eh$covariate_effects()
