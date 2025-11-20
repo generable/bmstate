@@ -533,17 +533,18 @@ potential_covariates <- function(pd, possible = NULL, ...) {
 #' @inheritParams as_single_event
 #' @return A \code{\link{PathData}} object
 as_any_event <- function(pd, null_state = "Randomization") {
-  df <- pd$path_df
-  idx <- which(pd$transmat$states == null_state)
+  pd_new <- pd$clone(deep = TRUE)
+  df <- pd_new$path_df
+  idx <- which(pd_new$transmat$states == null_state)
   if (length(idx) != 1) {
     stop("error")
   }
   df$state[which(df$state == idx)] <- 1
   df$state[which(df$state != 1)] <- 2
   tm <- transmat_survival(state_names = c(null_state, "Any event"))
-  pd$path_df <- df
-  pd$transmat <- tm
-  as_single_event(pd, "Any event", null_state)
+  pd_new$path_df <- df
+  pd_new$transmat <- tm
+  as_single_event(pd_new, "Any event", null_state)
 }
 
 #' PathData to time-to-event data format with a single event
