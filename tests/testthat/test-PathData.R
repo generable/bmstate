@@ -13,6 +13,14 @@ test_that("PathData methods work", {
   pd <- simdat$data$paths
   expect_output(print(pd))
 
+  # Covariate subset
+  pd2 <- pd$subset_covariates("weight")
+  expect_equal(pd2$covs, "weight")
+
+  # As any event
+  pd3 <- as_any_event(pd, null_state = "Alive")
+  expect_true("Alive" %in% pd3$state_names())
+
   # As data frame
   df1 <- pd$as_data_frame()
   df2 <- pd$as_data_frame(covariates = pd$covariate_names())

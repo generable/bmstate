@@ -1,12 +1,3 @@
-# util
-check_columns <- function(df, needed_columns) {
-  if (!(all(needed_columns %in% colnames(df)))) {
-    message("found = {", paste(colnames(df), collapse = ", "), "}")
-    message("required = {", paste(needed_columns, collapse = ", "), "}")
-    stop("some needed columns are missing from df")
-  }
-}
-
 #' Path data class (R6 class)
 #'
 #' @export
@@ -537,7 +528,7 @@ as_any_event <- function(pd, null_state = "Randomization") {
   df <- pd_new$path_df
   idx <- which(pd_new$transmat$states == null_state)
   if (length(idx) != 1) {
-    stop("error")
+    stop("given null_state not a state of given pd")
   }
   df$state[which(df$state == idx)] <- 1
   df$state[which(df$state != 1)] <- 2
@@ -790,19 +781,15 @@ df_to_paths_df_part2 <- function(pdf, tm) {
 #' @param validate Do stricter data validation? Recommended to use \code{TRUE}.
 #' @return A \code{\link{PathData}} object
 df_to_pathdata <- function(df, tm, covs = NULL, validate = TRUE) {
+  check_columns(df, c("state", "time", "subject_id", "is_transition"))
+  checkmate::assert_integerish(df$state)
+  checkmate::assert_numeric(df$time)
+  checkmate::assert_character(df$subject_id)
+  checkmate::assert_logical(df$is_transition)
   df <- df |> dplyr::arrange(.data$subject_id, .data$time)
   if (validate) {
     validate_transitions(df)
   }
-  checkmate::assert_data_frame(df)
-  checkmate::assert_true("state" %in% colnames(df))
-  checkmate::assert_integerish(df$state)
-  checkmate::assert_true("time" %in% colnames(df))
-  checkmate::assert_numeric(df$time)
-  checkmate::assert_true("subject_id" %in% colnames(df))
-  checkmate::assert_character(df$subject_id)
-  checkmate::assert_true("is_transition" %in% colnames(df))
-  checkmate::assert_logical(df$is_transition)
   checkmate::assert_class(tm, "TransitionMatrix")
   if (!is.null(covs)) {
     checkmate::assert_character(covs)
