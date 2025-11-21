@@ -23,8 +23,7 @@ potential_covariates(pd, possible = NULL, ...)
 
 - ...:
 
-  Arguments passed to
-  [`fit_coxph()`](https://generable.github.io/bmstate/reference/fit_coxph.md).
+  Arguments passed to `fit_coxph()`.
 
 ## Value
 

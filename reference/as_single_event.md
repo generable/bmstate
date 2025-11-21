@@ -29,3 +29,9 @@ as_single_event(pd, event, null_state = "Randomization")
 A
 [`PathData`](https://generable.github.io/bmstate/reference/PathData.md)
 object
+
+## See also
+
+Other PathData mutation functions:
+[`as_any_event()`](https://generable.github.io/bmstate/reference/as_any_event.md),
+[`as_survival()`](https://generable.github.io/bmstate/reference/as_survival.md)

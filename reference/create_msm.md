@@ -25,9 +25,8 @@ create_msm(tm, hazard_covs = NULL, pk_covs = NULL, categ_covs = NULL, ...)
 
 - pk_covs:
 
-  *Experimental*. Covariates that affect the PK parameters. A list with
-  elements `ka` `CL`, and `V2`. If `NULL`, a PK model will not be
-  created.
+  Covariates that affect the PK parameters. A list with elements `ka`
+  `CL`, and `V2`. If `NULL`, a PK model will not be created.
 
 - categ_covs:
 

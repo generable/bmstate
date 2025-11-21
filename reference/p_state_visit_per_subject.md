@@ -28,3 +28,8 @@ p_state_visit_per_subject(pd, state_name, t = NULL)
 ## Value
 
 A data frame
+
+## See also
+
+Other PathData summary functions:
+[`p_state_visit()`](https://generable.github.io/bmstate/reference/p_state_visit.md)

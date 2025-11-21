@@ -137,16 +137,10 @@ There should not be errors or warnings.
   : Expose 'Stan' functions if they are not yet exposed
 - [`example_sim_setup_illnessdeath()`](https://generable.github.io/bmstate/reference/example_sim_setup_illnessdeath.md)
   : Example simulation setup
-- [`fit_coxph()`](https://generable.github.io/bmstate/reference/fit_coxph.md)
-  : Fit Cox PH model using Breslow method
 - [`fit_stan()`](https://generable.github.io/bmstate/reference/fit_stan.md)
   : Fit a model using 'Stan'
 - [`generate_paths()`](https://generable.github.io/bmstate/reference/generate_paths.md)
   : Path generation for 'MultistateModelFit'
-- [`msfit_average_hazard()`](https://generable.github.io/bmstate/reference/msfit_average_hazard.md)
-  : Estimate average hazard of an 'msfit'
-- [`msfit_plot_cumhaz()`](https://generable.github.io/bmstate/reference/msfit_plot_cumhaz.md)
-  : Plot cumulative hazard of 'msfit'
 - [`msmfit_exposure()`](https://generable.github.io/bmstate/reference/msmfit_exposure.md)
   : Compute exposure
 - [`msmfit_inst_hazard_param_draws()`](https://generable.github.io/bmstate/reference/msmfit_inst_hazard_param_draws.md)

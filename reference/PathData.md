@@ -500,7 +500,7 @@ Visualize the transition proportion matrix as a graph
 
 ------------------------------------------------------------------------
 
-### Method [`fit_coxph()`](https://generable.github.io/bmstate/reference/fit_coxph.md)
+### Method `fit_coxph()`
 
 Fit Cox proportional hazards model
 

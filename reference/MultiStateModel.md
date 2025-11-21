@@ -13,7 +13,7 @@ Main model class
 
 - `pk_model`:
 
-  *Experimental*. A
+  A
   [`PKModel`](https://generable.github.io/bmstate/reference/PKModel.md)
   or NULL.
 
@@ -23,7 +23,7 @@ Main model class
 
 - `pk_only`:
 
-  *Experimental*. Should the model ignore the entire hazard model part?
+  Should the model ignore the entire hazard model part?
 
 ## Methods
 
@@ -245,8 +245,7 @@ Create model
 
 - `pk_only`:
 
-  *Experimental*. Should the model ignore the entire hazard model part?
-  hazards.
+  Should the model ignore the entire hazard model part? hazards.
 
 ------------------------------------------------------------------------
 
