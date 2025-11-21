@@ -13,11 +13,11 @@ Main model class
 \describe{
 \item{\code{system}}{A \code{\link{MultistateSystem}}}
 
-\item{\code{pk_model}}{\emph{Experimental}. A \code{\link{PKModel}} or NULL.}
+\item{\code{pk_model}}{A \code{\link{PKModel}} or NULL.}
 
 \item{\code{prior_only}}{Should the model ignore likelihood?}
 
-\item{\code{pk_only}}{\emph{Experimental}. Should the model ignore the entire
+\item{\code{pk_only}}{Should the model ignore the entire
 hazard model part?}
 }
 \if{html}{\out{</div>}}
@@ -197,7 +197,7 @@ for categories if there is more than two.}
 
 \item{\code{prior_only}}{Should the model ignore likelihood?}
 
-\item{\code{pk_only}}{\emph{Experimental}. Should the model ignore the entire
+\item{\code{pk_only}}{Should the model ignore the entire
 hazard model part?
 hazards.}
 }

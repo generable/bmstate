@@ -13,7 +13,7 @@ for how to create common transition matrices.}
 \item{hazard_covs}{Covariates that affect the hazard. A character vector.
 The name \code{"dose_amt"} is special if simulating data using the model.}
 
-\item{pk_covs}{\emph{Experimental}. Covariates that affect the PK parameters. A list with
+\item{pk_covs}{Covariates that affect the PK parameters. A list with
 elements \code{ka} \code{CL}, and \code{V2}. If \code{NULL}, a PK model
 will not be created.}
 
