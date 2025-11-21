@@ -1,3 +1,18 @@
+# Check data frame columns
+check_columns <- function(df, needed_columns) {
+  checkmate::assert_data_frame(df)
+  checkmate::assert_character(needed_columns)
+  if (!(all(needed_columns %in% colnames(df)))) {
+    msg <- paste0(
+      "Some needed columns are missing from df:\n - found = {",
+      paste(colnames(df), collapse = ", "), "}\n - required = {",
+      paste(needed_columns, collapse = ", "), "}"
+    )
+    stop(msg)
+  }
+  invisible(TRUE)
+}
+
 # Check for unusual normalized covariate values (will cause issues for hazard)
 check_normalized_covariate <- function(x_norm, name) {
   mabs <- max(abs(x_norm))
@@ -9,7 +24,7 @@ check_normalized_covariate <- function(x_norm, name) {
     warning(msg)
     return(FALSE)
   }
-  TRUE
+  invisible(TRUE)
 }
 
 

@@ -1,12 +1,3 @@
-# util
-check_columns <- function(df, needed_columns) {
-  if (!(all(needed_columns %in% colnames(df)))) {
-    message("found = {", paste(colnames(df), collapse = ", "), "}")
-    message("required = {", paste(needed_columns, collapse = ", "), "}")
-    stop("some needed columns are missing from df")
-  }
-}
-
 #' Path data class (R6 class)
 #'
 #' @export
@@ -411,13 +402,7 @@ PathData <- R6::R6Class(
   )
 )
 
-#' Fit Cox PH model using Breslow method
-#'
-#' @param msdat \code{msdata} object
-#' @param formula_rhs Formula right hand side that is appended to
-#' \code{Surv(Tstart, Tstop, status) ~ }. If \code{NULL} (default), then
-#' \code{strata(trans)} is used
-#' @return value returned by \code{survival::coxph}
+# Fit Cox PH model using Breslow method
 fit_coxph <- function(msdat, formula_rhs = NULL) {
   if (is.null(formula_rhs)) {
     formula_rhs <- "strata(trans)"
@@ -428,11 +413,7 @@ fit_coxph <- function(msdat, formula_rhs = NULL) {
   )
 }
 
-#' Plot cumulative hazard of 'msfit'
-#'
-#' @export
-#' @param msfit An \code{msfit} object
-#' @param legend transition name legend
+# Plot cumulative hazard of 'msfit'
 msfit_plot_cumhaz <- function(msfit, legend = NULL) {
   df <- msfit$Haz
   if (!is.null(legend)) {
@@ -449,10 +430,7 @@ msfit_plot_cumhaz <- function(msfit, legend = NULL) {
     ylab("Cumulative Hazard")
 }
 
-#' Estimate average hazard of an 'msfit'
-#'
-#' @export
-#' @param msfit An \code{msfit} object
+# Estimate average hazard of an 'msfit'
 msfit_average_hazard <- function(msfit) {
   msfit$Haz |>
     dplyr::group_by(.data$trans) |>
@@ -527,26 +505,6 @@ potential_covariates <- function(pd, possible = NULL, ...) {
   df
 }
 
-#' PathData to time-to-event data format for any state other than null state
-#'
-#' @export
-#' @inheritParams as_single_event
-#' @return A \code{\link{PathData}} object
-as_any_event <- function(pd, null_state = "Randomization") {
-  pd_new <- pd$clone(deep = TRUE)
-  df <- pd_new$path_df
-  idx <- which(pd_new$transmat$states == null_state)
-  if (length(idx) != 1) {
-    stop("error")
-  }
-  df$state[which(df$state == idx)] <- 1
-  df$state[which(df$state != 1)] <- 2
-  tm <- transmat_survival(state_names = c(null_state, "Any event"))
-  pd_new$path_df <- df
-  pd_new$transmat <- tm
-  as_single_event(pd_new, "Any event", null_state)
-}
-
 #' PathData to time-to-event data format with a single event
 #'
 #' @export
@@ -554,6 +512,7 @@ as_any_event <- function(pd, null_state = "Randomization") {
 #' @param event Name of the state corresponding to the event of interest (character)
 #' @param null_state Name of the base state
 #' @return A \code{\link{PathData}} object
+#' @family PathData mutation functions
 as_single_event <- function(pd, event, null_state = "Randomization") {
   checkmate::assert_class(pd, "PathData")
   checkmate::assert_character(event, len = 1)
@@ -594,12 +553,34 @@ as_single_event <- function(pd, event, null_state = "Randomization") {
   )
 }
 
+#' PathData to time-to-event data format for any state other than null state
+#'
+#' @export
+#' @inheritParams as_single_event
+#' @return A \code{\link{PathData}} object
+#' @family PathData mutation functions
+as_any_event <- function(pd, null_state = "Randomization") {
+  pd_new <- pd$clone(deep = TRUE)
+  df <- pd_new$path_df
+  idx <- which(pd_new$transmat$states == null_state)
+  if (length(idx) != 1) {
+    stop("given null_state not a state of given pd")
+  }
+  df$state[which(df$state == idx)] <- 1
+  df$state[which(df$state != 1)] <- 2
+  tm <- transmat_survival(state_names = c(null_state, "Any event"))
+  pd_new$path_df <- df
+  pd_new$transmat <- tm
+  as_single_event(pd_new, "Any event", null_state)
+}
+
+
 #' PathData to event-free survival format
 #'
 #' @export
-#' @param pd A \code{\link{PathData}} object
-#' @param event Name of the event of interest (character)
+#' @inheritParams as_single_event
 #' @return A \code{\link{PathData}} object
+#' @family PathData mutation functions
 as_survival <- function(pd, event) {
   checkmate::assert_class(pd, "PathData")
   N_sub <- length(pd$unique_subjects())
@@ -635,6 +616,7 @@ count_paths_with_event <- function(c, t, S) {
 #' @inheritParams p_state_visit
 #' @param state_name Name of the state (character).
 #' @return A data frame
+#' @family PathData summary functions
 p_state_visit_per_subject <- function(pd, state_name, t = NULL) {
   checkmate::assert_character(state_name, len = 1)
   p_state_visit(pd, t, by = "subject_id") |>
@@ -650,6 +632,7 @@ p_state_visit_per_subject <- function(pd, state_name, t = NULL) {
 #' @param t The given time. If \code{NULL}, is set to \code{max(pd$get_path_df()$time)}.
 #' @param by Factor to summarize over.
 #' @return A data frame
+#' @family PathData summary functions
 p_state_visit <- function(pd, t = NULL, by = NULL) {
   checkmate::assert_class(pd, "PathData")
   S <- pd$transmat$num_states()
@@ -790,19 +773,15 @@ df_to_paths_df_part2 <- function(pdf, tm) {
 #' @param validate Do stricter data validation? Recommended to use \code{TRUE}.
 #' @return A \code{\link{PathData}} object
 df_to_pathdata <- function(df, tm, covs = NULL, validate = TRUE) {
+  check_columns(df, c("state", "time", "subject_id", "is_transition"))
+  checkmate::assert_integerish(df$state)
+  checkmate::assert_numeric(df$time)
+  checkmate::assert_character(df$subject_id)
+  checkmate::assert_logical(df$is_transition)
   df <- df |> dplyr::arrange(.data$subject_id, .data$time)
   if (validate) {
     validate_transitions(df)
   }
-  checkmate::assert_data_frame(df)
-  checkmate::assert_true("state" %in% colnames(df))
-  checkmate::assert_integerish(df$state)
-  checkmate::assert_true("time" %in% colnames(df))
-  checkmate::assert_numeric(df$time)
-  checkmate::assert_true("subject_id" %in% colnames(df))
-  checkmate::assert_character(df$subject_id)
-  checkmate::assert_true("is_transition" %in% colnames(df))
-  checkmate::assert_logical(df$is_transition)
   checkmate::assert_class(tm, "TransitionMatrix")
   if (!is.null(covs)) {
     checkmate::assert_character(covs)

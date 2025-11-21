@@ -9,7 +9,7 @@
 #' This only has an effect when simulating data. When fitting a model, all
 #' covariates are treated as continuous, so you should use a binary encoding
 #' for categories if there is more than two.
-#' @param pk_covs \emph{Experimental}. Covariates that affect the PK parameters. A list with
+#' @param pk_covs Covariates that affect the PK parameters. A list with
 #' elements \code{ka} \code{CL}, and \code{V2}. If \code{NULL}, a PK model
 #' will not be created.
 #' @param ... Arguments passed to \code{\link{MultistateModel}} init
@@ -32,9 +32,9 @@ create_msm <- function(tm, hazard_covs = NULL, pk_covs = NULL,
 #'
 #' @export
 #' @field system A \code{\link{MultistateSystem}}
-#' @field pk_model \emph{Experimental}. A \code{\link{PKModel}} or NULL.
+#' @field pk_model A \code{\link{PKModel}} or NULL.
 #' @field prior_only Should the model ignore likelihood?
-#' @field pk_only \emph{Experimental}. Should the model ignore the entire
+#' @field pk_only Should the model ignore the entire
 #' hazard model part?
 MultistateModel <- R6::R6Class("MultistateModel",
 
@@ -208,7 +208,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' for categories if there is more than two.
     #' @param n_grid Number of time discretization points for integrating
     #' @param prior_only Should the model ignore likelihood?
-    #' @param pk_only \emph{Experimental}. Should the model ignore the entire
+    #' @param pk_only Should the model ignore the entire
     #' hazard model part?
     #' hazards.
     initialize = function(system, covariates = NULL, pk_model = NULL,

@@ -9,7 +9,7 @@ as_survival(pd, event)
 \arguments{
 \item{pd}{A \code{\link{PathData}} object}
 
-\item{event}{Name of the event of interest (character)}
+\item{event}{Name of the state corresponding to the event of interest (character)}
 }
 \value{
 A \code{\link{PathData}} object
@@ -17,3 +17,9 @@ A \code{\link{PathData}} object
 \description{
 PathData to event-free survival format
 }
+\seealso{
+Other PathData mutation functions: 
+\code{\link{as_any_event}()},
+\code{\link{as_single_event}()}
+}
+\concept{PathData mutation functions}
