@@ -19,3 +19,9 @@ A \code{\link{PathData}} object
 \description{
 PathData to time-to-event data format with a single event
 }
+\seealso{
+Other PathData mutation functions: 
+\code{\link{as_any_event}()},
+\code{\link{as_survival}()}
+}
+\concept{PathData mutation functions}

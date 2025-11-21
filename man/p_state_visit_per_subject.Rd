@@ -20,3 +20,8 @@ A data frame
 \description{
 Convenient wrapper for \code{\link{p_state_visit}}.
 }
+\seealso{
+Other PathData summary functions: 
+\code{\link{p_state_visit}()}
+}
+\concept{PathData summary functions}

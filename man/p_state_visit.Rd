@@ -21,3 +21,8 @@ A data frame
 For each non-source state, compute probability of visiting it at least once
 before given time
 }
+\seealso{
+Other PathData summary functions: 
+\code{\link{p_state_visit_per_subject}()}
+}
+\concept{PathData summary functions}
