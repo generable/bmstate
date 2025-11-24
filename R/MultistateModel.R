@@ -192,6 +192,17 @@ MultistateModel <- R6::R6Class("MultistateModel",
       invisible(NULL)
     },
 
+    #' @description Set assumed prior mean baseline hazard rates (side
+    #' effect) based on average hazards in data.
+    #' @param data A \code{\link{JointData}} or \code{\link{PathData}} object.
+    set_prior_mean_h0_data = function(data) {
+      if (inherits(data, "PathData")) {
+        data <- JointData$new(data, NULL)
+      }
+      checkmate::assert_class(data, "JointData")
+      df_ttype <- average_haz_per_ttype(data$paths) |> dplyr::arrange(.data$trans_idx)
+      self$set_prior_mean_h0(exp(df_ttype$log_h0_avg))
+    },
 
     #' @description Create model
     #'

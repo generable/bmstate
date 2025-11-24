@@ -32,6 +32,7 @@ hazard model part?}
 \item \href{#method-MultistateModel-set_auc_normalizers}{\code{MultistateModel$set_auc_normalizers()}}
 \item \href{#method-MultistateModel-get_prior_mean_h0}{\code{MultistateModel$get_prior_mean_h0()}}
 \item \href{#method-MultistateModel-set_prior_mean_h0}{\code{MultistateModel$set_prior_mean_h0()}}
+\item \href{#method-MultistateModel-set_prior_mean_h0_data}{\code{MultistateModel$set_prior_mean_h0_data()}}
 \item \href{#method-MultistateModel-new}{\code{MultistateModel$new()}}
 \item \href{#method-MultistateModel-set_knots}{\code{MultistateModel$set_knots()}}
 \item \href{#method-MultistateModel-get_knots}{\code{MultistateModel$get_knots()}}
@@ -150,6 +151,24 @@ effect).
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{mean_h0}}{Numeric vector with length equal to number of transitions}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MultistateModel-set_prior_mean_h0_data"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-set_prior_mean_h0_data}{}}}
+\subsection{Method \code{set_prior_mean_h0_data()}}{
+Set assumed prior mean baseline hazard rates (side
+effect) based on average hazards in data.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$set_prior_mean_h0_data(data)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{data}}{A \code{\link{JointData}} or \code{\link{PathData}} object.}
 }
 \if{html}{\out{</div>}}
 }

@@ -7,7 +7,8 @@
 fit_stan(
   model,
   data,
-  set_auc_normalizers = TRUE,
+  set_normalizers = TRUE,
+  set_prior_h0 = TRUE,
   filepath = NULL,
   return_stanfit = FALSE,
   max_conc_factor = 100,
@@ -20,7 +21,10 @@ fit_stan(
 
 \item{data}{A \code{\link{JointData}} or \code{\link{PathData}} object.}
 
-\item{set_auc_normalizers}{Set AUC normalization based on SS doses.}
+\item{set_normalizers}{Set covariate normalization automatically?}
+
+\item{set_prior_h0}{Set prior mean average baseline hazard levels based
+on data?}
 
 \item{filepath}{Deprecated.}
 
