@@ -131,6 +131,7 @@ PKModel <- R6::R6Class("PKModel",
       dd <- simulate_dosing(df_subjects, tau = tau)
       THETA <- matrix(0, N, 3)
       xu <- unique(c(self$ka_covs(), self$CL_covs(), self$V2_covs()))
+      check_columns(df_subjects, xu)
       x <- data.frame(normalize_columns(as.matrix(df_subjects[, xu])))
 
       # Simulate observation times and parameters
@@ -138,7 +139,7 @@ PKModel <- R6::R6Class("PKModel",
       SUB_ID <- rep("s", N)
       for (n in seq_len(N)) {
         theta_n <- list(
-          ka = exp(-2 + sum(x[n, self$ka_covs()] * beta_pk$ka) + 0.1 * stats::rnorm(1)),
+          ka = exp(-3 + sum(x[n, self$ka_covs()] * beta_pk$ka) + 0.1 * stats::rnorm(1)),
           CL = exp(-2 + sum(x[n, self$CL_covs()] * beta_pk$CL) + 0.1 * stats::rnorm(1)),
           V2 = exp(-2 + sum(x[n, self$V2_covs()] * beta_pk$V2) + 0.1 * stats::rnorm(1))
         )
@@ -162,7 +163,11 @@ PKModel <- R6::R6Class("PKModel",
         df_out <- rbind(df_out, out)
       }
       df_out <- data.frame(df_out)
-      colnames(df_out) <- c("t_pre", "t_post", "conc_pre", "conc_post", "ss_auc")
+      df_out <- cbind(df_out, THETA)
+      colnames(df_out) <- c(
+        "t_pre", "t_post", "conc_pre", "conc_post", "ss_auc",
+        "ka", "CL", "V2"
+      )
       rownames(df_out) <- NULL
       df_out$pk_lloq <- 0
       df_out$subject_id <- df_subjects$subject_id
