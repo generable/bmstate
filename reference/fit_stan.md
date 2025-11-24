@@ -10,7 +10,8 @@ bound (PK) based on data.
 fit_stan(
   model,
   data,
-  set_auc_normalizers = TRUE,
+  set_normalizers = TRUE,
+  set_prior_h0 = TRUE,
   filepath = NULL,
   return_stanfit = FALSE,
   max_conc_factor = 100,
@@ -35,9 +36,13 @@ fit_stan(
   [`PathData`](https://generable.github.io/bmstate/reference/PathData.md)
   object.
 
-- set_auc_normalizers:
+- set_normalizers:
 
-  Set AUC normalization based on SS doses.
+  Set covariate normalization automatically?
+
+- set_prior_h0:
+
+  Set prior mean average baseline hazard levels based on data?
 
 - filepath:
 

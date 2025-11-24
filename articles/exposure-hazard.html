@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bmstate</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,7 +78,7 @@ Timonen</h4>
 </h3>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://generable.github.io/bmstate/">bmstate</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Attached bmstate 0.2.6. Type ?bmstate to get started.</span></span>
+<span><span class="co">#&gt; Attached bmstate 0.2.7. Type ?bmstate to get started.</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
@@ -322,9 +322,9 @@ Timonen</h4>
 <span><span class="va">fit_prelim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_stan.html">fit_stan</a></span><span class="op">(</span><span class="va">mod_true</span>, <span class="va">simdat</span>, method <span class="op">=</span> <span class="st">"optimize"</span>, init <span class="op">=</span> <span class="fl">0</span>, iter <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Shortest time interval (0.100000000000023) is smaller than delta_grid (1.09575). Consider increasing n_grid or decreasing t_max of the model.</span></span>
 <span><span class="co">#&gt; Using stan file at /home/runner/work/_temp/Library/bmstate/stan/msm.stan</span></span>
+<span><span class="co">#&gt; Warning in max(x[!is.na(x)]): no non-missing arguments to max; returning -Inf</span></span>
 <span><span class="co">#&gt; setting auc normalizers to loc = 259.5406, scale = 138.62034</span></span>
 <span><span class="co">#&gt; setting max conc = 15247.12757</span></span>
-<span><span class="co">#&gt; Warning in max(x[!is.na(x)]): no non-missing arguments to max; returning -Inf</span></span>
 <span><span class="co">#&gt; Initial log joint probability = -914138 </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
 <span><span class="co">#&gt; Error evaluating model log probability: Non-finite gradient. </span></span>
@@ -334,7 +334,7 @@ Timonen</h4>
 <span><span class="co">#&gt;      100      -9673.83     0.0812532       566.721       2.225      0.2225      127    </span></span>
 <span><span class="co">#&gt; Optimization terminated normally:  </span></span>
 <span><span class="co">#&gt;   Maximum number of iterations hit, may not be at an optima </span></span>
-<span><span class="co">#&gt; Finished in  0.8 seconds.</span></span>
+<span><span class="co">#&gt; Finished in  0.9 seconds.</span></span>
 <span><span class="va">fit_true</span> <span class="op">&lt;-</span> <span class="fu">create_oracle_fit</span><span class="op">(</span><span class="va">fit_prelim</span>, <span class="va">beta_true</span>, <span class="va">h0_true</span><span class="op">)</span></span>
 <span><span class="va">fit_true</span><span class="op">$</span><span class="fu">covariate_effects</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   covariate      beta target_state_idx target_state</span></span>
@@ -358,9 +358,9 @@ Timonen</h4>
 <code class="sourceCode R"><span><span class="va">fit_ms_eh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_stan.html">fit_stan</a></span><span class="op">(</span><span class="va">mod_ms_eh</span>, <span class="va">simdat</span>, method <span class="op">=</span> <span class="st">"optimize"</span>, init <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Shortest time interval (0.100000000000023) is smaller than delta_grid (1.09575). Consider increasing n_grid or decreasing t_max of the model.</span></span>
 <span><span class="co">#&gt; Using stan file at /home/runner/work/_temp/Library/bmstate/stan/msm.stan</span></span>
+<span><span class="co">#&gt; Warning in max(x[!is.na(x)]): no non-missing arguments to max; returning -Inf</span></span>
 <span><span class="co">#&gt; setting auc normalizers to loc = 259.5406, scale = 138.62034</span></span>
 <span><span class="co">#&gt; setting max conc = 15247.12757</span></span>
-<span><span class="co">#&gt; Warning in max(x[!is.na(x)]): no non-missing arguments to max; returning -Inf</span></span>
 <span><span class="co">#&gt; Initial log joint probability = -913988 </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
 <span><span class="co">#&gt; Error evaluating model log probability: Non-finite gradient. </span></span>
@@ -410,7 +410,7 @@ Timonen</h4>
 <span><span class="co">#&gt;     2000      -6695.49     0.0094888       1097.59           1           1     2320    </span></span>
 <span><span class="co">#&gt; Optimization terminated normally:  </span></span>
 <span><span class="co">#&gt;   Maximum number of iterations hit, may not be at an optima </span></span>
-<span><span class="co">#&gt; Finished in  13.5 seconds.</span></span>
+<span><span class="co">#&gt; Finished in  14.0 seconds.</span></span>
 <span><span class="va">fit_ms_dh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_stan.html">fit_stan</a></span><span class="op">(</span><span class="va">mod_ms_dh</span>, <span class="va">simdat_dh</span>, method <span class="op">=</span> <span class="st">"optimize"</span>, init <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Shortest time interval (0.0999999999999943) is smaller than delta_grid (1.09575). Consider increasing n_grid or decreasing t_max of the model.</span></span>
 <span><span class="co">#&gt; Using stan file at /home/runner/work/_temp/Library/bmstate/stan/msm.stan</span></span>
@@ -459,7 +459,7 @@ Timonen</h4>
 <span><span class="co">#&gt;     2000      -6393.34    0.00244148       2.78249      0.4346      0.4346     2193    </span></span>
 <span><span class="co">#&gt; Optimization terminated normally:  </span></span>
 <span><span class="co">#&gt;   Maximum number of iterations hit, may not be at an optima </span></span>
-<span><span class="co">#&gt; Finished in  9.3 seconds.</span></span>
+<span><span class="co">#&gt; Finished in  9.7 seconds.</span></span>
 <span><span class="va">fit_death</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_stan.html">fit_stan</a></span><span class="op">(</span><span class="va">mod_death</span>, <span class="va">simdat_death</span>, method <span class="op">=</span> <span class="st">"optimize"</span>, init <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using stan file at /home/runner/work/_temp/Library/bmstate/stan/msm.stan</span></span>
 <span><span class="co">#&gt; Initial log joint probability = -220374 </span></span>

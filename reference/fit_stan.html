@@ -11,7 +11,7 @@ bound (PK) based on data."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">bmstate</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,7 +53,8 @@ bound (PK) based on data.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fit_stan</span><span class="op">(</span></span>
 <span>  <span class="va">model</span>,</span>
 <span>  <span class="va">data</span>,</span>
-<span>  set_auc_normalizers <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  set_normalizers <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  set_prior_h0 <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  filepath <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  return_stanfit <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  max_conc_factor <span class="op">=</span> <span class="fl">100</span>,</span>
@@ -74,8 +75,13 @@ bound (PK) based on data.</p>
 <dd><p>A <code><a href="JointData.html">JointData</a></code> or <code><a href="PathData.html">PathData</a></code> object.</p></dd>
 
 
-<dt id="arg-set-auc-normalizers">set_auc_normalizers<a class="anchor" aria-label="anchor" href="#arg-set-auc-normalizers"></a></dt>
-<dd><p>Set AUC normalization based on SS doses.</p></dd>
+<dt id="arg-set-normalizers">set_normalizers<a class="anchor" aria-label="anchor" href="#arg-set-normalizers"></a></dt>
+<dd><p>Set covariate normalization automatically?</p></dd>
+
+
+<dt id="arg-set-prior-h-">set_prior_h0<a class="anchor" aria-label="anchor" href="#arg-set-prior-h-"></a></dt>
+<dd><p>Set prior mean average baseline hazard levels based
+on data?</p></dd>
 
 
 <dt id="arg-filepath">filepath<a class="anchor" aria-label="anchor" href="#arg-filepath"></a></dt>

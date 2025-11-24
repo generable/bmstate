@@ -43,6 +43,8 @@ Main model class
 
 - [`MultistateModel$set_prior_mean_h0()`](#method-MultistateModel-set_prior_mean_h0)
 
+- [`MultistateModel$set_prior_mean_h0_data()`](#method-MultistateModel-set_prior_mean_h0_data)
+
 - [`MultistateModel$new()`](#method-MultistateModel-new)
 
 - [`MultistateModel$set_knots()`](#method-MultistateModel-set_knots)
@@ -180,6 +182,27 @@ Set assumed prior mean baseline hazard rates (side effect).
 - `mean_h0`:
 
   Numeric vector with length equal to number of transitions
+
+------------------------------------------------------------------------
+
+### Method `set_prior_mean_h0_data()`
+
+Set assumed prior mean baseline hazard rates (side effect) based on
+average hazards in data.
+
+#### Usage
+
+    MultistateModel$set_prior_mean_h0_data(data)
+
+#### Arguments
+
+- `data`:
+
+  A
+  [`JointData`](https://generable.github.io/bmstate/reference/JointData.md)
+  or
+  [`PathData`](https://generable.github.io/bmstate/reference/PathData.md)
+  object.
 
 ------------------------------------------------------------------------
 

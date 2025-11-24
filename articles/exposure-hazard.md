@@ -8,7 +8,7 @@ This vignette is work in progress.
 
 ``` r
 library(bmstate)
-#> Attached bmstate 0.2.6. Type ?bmstate to get started.
+#> Attached bmstate 0.2.7. Type ?bmstate to get started.
 library(dplyr)
 #> 
 #> Attaching package: 'dplyr'
@@ -258,9 +258,9 @@ mod_death$set_knots(t3yr, tt3, NK)
 fit_prelim <- fit_stan(mod_true, simdat, method = "optimize", init = 0, iter = 100)
 #> Shortest time interval (0.100000000000023) is smaller than delta_grid (1.09575). Consider increasing n_grid or decreasing t_max of the model.
 #> Using stan file at /home/runner/work/_temp/Library/bmstate/stan/msm.stan
+#> Warning in max(x[!is.na(x)]): no non-missing arguments to max; returning -Inf
 #> setting auc normalizers to loc = 259.5406, scale = 138.62034
 #> setting max conc = 15247.12757
-#> Warning in max(x[!is.na(x)]): no non-missing arguments to max; returning -Inf
 #> Initial log joint probability = -914138 
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
 #> Error evaluating model log probability: Non-finite gradient. 
@@ -270,7 +270,7 @@ fit_prelim <- fit_stan(mod_true, simdat, method = "optimize", init = 0, iter = 1
 #>      100      -9673.83     0.0812532       566.721       2.225      0.2225      127    
 #> Optimization terminated normally:  
 #>   Maximum number of iterations hit, may not be at an optima 
-#> Finished in  0.8 seconds.
+#> Finished in  0.9 seconds.
 fit_true <- create_oracle_fit(fit_prelim, beta_true, h0_true)
 fit_true$covariate_effects()
 #>   covariate      beta target_state_idx target_state
@@ -298,9 +298,9 @@ fit_true$plot_h0()
 fit_ms_eh <- fit_stan(mod_ms_eh, simdat, method = "optimize", init = 0)
 #> Shortest time interval (0.100000000000023) is smaller than delta_grid (1.09575). Consider increasing n_grid or decreasing t_max of the model.
 #> Using stan file at /home/runner/work/_temp/Library/bmstate/stan/msm.stan
+#> Warning in max(x[!is.na(x)]): no non-missing arguments to max; returning -Inf
 #> setting auc normalizers to loc = 259.5406, scale = 138.62034
 #> setting max conc = 15247.12757
-#> Warning in max(x[!is.na(x)]): no non-missing arguments to max; returning -Inf
 #> Initial log joint probability = -913988 
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
 #> Error evaluating model log probability: Non-finite gradient. 
@@ -350,7 +350,7 @@ fit_ms_eh <- fit_stan(mod_ms_eh, simdat, method = "optimize", init = 0)
 #>     2000      -6695.49     0.0094888       1097.59           1           1     2320    
 #> Optimization terminated normally:  
 #>   Maximum number of iterations hit, may not be at an optima 
-#> Finished in  13.5 seconds.
+#> Finished in  14.0 seconds.
 fit_ms_dh <- fit_stan(mod_ms_dh, simdat_dh, method = "optimize", init = 0)
 #> Shortest time interval (0.0999999999999943) is smaller than delta_grid (1.09575). Consider increasing n_grid or decreasing t_max of the model.
 #> Using stan file at /home/runner/work/_temp/Library/bmstate/stan/msm.stan
@@ -399,7 +399,7 @@ fit_ms_dh <- fit_stan(mod_ms_dh, simdat_dh, method = "optimize", init = 0)
 #>     2000      -6393.34    0.00244148       2.78249      0.4346      0.4346     2193    
 #> Optimization terminated normally:  
 #>   Maximum number of iterations hit, may not be at an optima 
-#> Finished in  9.3 seconds.
+#> Finished in  9.7 seconds.
 fit_death <- fit_stan(mod_death, simdat_death, method = "optimize", init = 0)
 #> Using stan file at /home/runner/work/_temp/Library/bmstate/stan/msm.stan
 #> Initial log joint probability = -220374 

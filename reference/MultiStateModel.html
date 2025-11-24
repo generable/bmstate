@@ -9,7 +9,7 @@ Main model class"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">bmstate</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,6 +80,7 @@ hazard model part?</p></dd>
 <li><p><a href="#method-MultistateModel-set_auc_normalizers"><code>MultistateModel$set_auc_normalizers()</code></a></p></li>
 <li><p><a href="#method-MultistateModel-get_prior_mean_h0"><code>MultistateModel$get_prior_mean_h0()</code></a></p></li>
 <li><p><a href="#method-MultistateModel-set_prior_mean_h0"><code>MultistateModel$set_prior_mean_h0()</code></a></p></li>
+<li><p><a href="#method-MultistateModel-set_prior_mean_h0_data"><code>MultistateModel$set_prior_mean_h0_data()</code></a></p></li>
 <li><p><a href="#method-MultistateModel-new"><code>MultistateModel$new()</code></a></p></li>
 <li><p><a href="#method-MultistateModel-set_knots"><code>MultistateModel$set_knots()</code></a></p></li>
 <li><p><a href="#method-MultistateModel-get_knots"><code>MultistateModel$get_knots()</code></a></p></li>
@@ -195,10 +196,27 @@ effect).</p><div class="section">
 </dl><p></p></div>
 </div>
 
+</div><p></p><hr><a id="method-MultistateModel-set_prior_mean_h0_data"></a><div class="section">
+<h3 id="method-set-prior-mean-h-data-">Method <code>set_prior_mean_h0_data()</code><a class="anchor" aria-label="anchor" href="#method-set-prior-mean-h-data-"></a></h3>
+<p>Set assumed prior mean baseline hazard rates (side
+effect) based on average hazards in data.</p><div class="section">
+<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModel</span><span class="op">$</span><span class="fu">set_prior_mean_h0_data</span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>data</code></dt>
+<dd><p>A <code><a href="JointData.html">JointData</a></code> or <code><a href="PathData.html">PathData</a></code> object.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+
 </div><p></p><hr><a id="method-MultistateModel-new"></a><div class="section">
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
 <p>Create model</p><div class="section">
-<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/MultiStateModel.html">MultistateModel</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
 <span>  <span class="va">system</span>,</span>
 <span>  covariates <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -213,7 +231,7 @@ effect).</p><div class="section">
 </div>
 
 <div class="section">
-<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
+<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>system</code></dt>
 <dd><p>A <code><a href="MultistateSystem.html">MultistateSystem</a></code></p></dd>
 
@@ -266,12 +284,12 @@ hazards.</p></dd>
 
 <p>The knots define how the spline basis functions are
 set.</p><div class="section">
-<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModel</span><span class="op">$</span><span class="fu">set_knots</span><span class="op">(</span><span class="va">t_max</span>, <span class="va">t_event</span>, <span class="va">num_knots</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
+<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>t_max</code></dt>
 <dd><p>Max time</p></dd>
 
@@ -291,7 +309,7 @@ Number of spline basis functions will be <code>num_knots + 1</code>.</p></dd>
 </div><p></p><hr><a id="method-MultistateModel-get_knots"></a><div class="section">
 <h3 id="method-get-knots-">Method <code>get_knots()</code><a class="anchor" aria-label="anchor" href="#method-get-knots-"></a></h3>
 <p>Get knots</p><div class="section">
-<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
+<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModel</span><span class="op">$</span><span class="fu">get_knots</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -299,7 +317,7 @@ Number of spline basis functions will be <code>num_knots + 1</code>.</p></dd>
 </div><p></p><hr><a id="method-MultistateModel-get_tmax"></a><div class="section">
 <h3 id="method-get-tmax-">Method <code>get_tmax()</code><a class="anchor" aria-label="anchor" href="#method-get-tmax-"></a></h3>
 <p>Get max time</p><div class="section">
-<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
+<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModel</span><span class="op">$</span><span class="fu">get_tmax</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -307,7 +325,7 @@ Number of spline basis functions will be <code>num_knots + 1</code>.</p></dd>
 </div><p></p><hr><a id="method-MultistateModel-get_states"></a><div class="section">
 <h3 id="method-get-states-">Method <code>get_states()</code><a class="anchor" aria-label="anchor" href="#method-get-states-"></a></h3>
 <p>Get names of the states</p><div class="section">
-<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
+<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModel</span><span class="op">$</span><span class="fu">get_states</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -315,7 +333,7 @@ Number of spline basis functions will be <code>num_knots + 1</code>.</p></dd>
 </div><p></p><hr><a id="method-MultistateModel-has_pk"></a><div class="section">
 <h3 id="method-has-pk-">Method <code>has_pk()</code><a class="anchor" aria-label="anchor" href="#method-has-pk-"></a></h3>
 <p>Is there a PK submodel?</p><div class="section">
-<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
+<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModel</span><span class="op">$</span><span class="fu">has_pk</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -323,7 +341,7 @@ Number of spline basis functions will be <code>num_knots + 1</code>.</p></dd>
 </div><p></p><hr><a id="method-MultistateModel-print"></a><div class="section">
 <h3 id="method-print-">Method <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code><a class="anchor" aria-label="anchor" href="#method-print-"></a></h3>
 <p>Print the object</p><div class="section">
-<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
+<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModel</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -336,7 +354,7 @@ Number of spline basis functions will be <code>num_knots + 1</code>.</p></dd>
 <h3 id="method-covs-">Method <code>covs()</code><a class="anchor" aria-label="anchor" href="#method-covs-"></a></h3>
 <p>Get the hazard covariates (including steady-state exposure
 if PK model is included)</p><div class="section">
-<h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
+<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModel</span><span class="op">$</span><span class="fu">covs</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -344,12 +362,12 @@ if PK model is included)</p><div class="section">
 </div><p></p><hr><a id="method-MultistateModel-data_covs"></a><div class="section">
 <h3 id="method-data-covs-">Method <code>data_covs()</code><a class="anchor" aria-label="anchor" href="#method-data-covs-"></a></h3>
 <p>Get all covariates that need to be given as data</p><div class="section">
-<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
+<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModel</span><span class="op">$</span><span class="fu">data_covs</span><span class="op">(</span>which <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
+<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>which</code></dt>
 <dd><p>Which subset to get?</p></dd>
 
@@ -360,7 +378,7 @@ if PK model is included)</p><div class="section">
 </div><p></p><hr><a id="method-MultistateModel-categ_covs"></a><div class="section">
 <h3 id="method-categ-covs-">Method <code>categ_covs()</code><a class="anchor" aria-label="anchor" href="#method-categ-covs-"></a></h3>
 <p>Get names of categorical covariates</p><div class="section">
-<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
+<h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModel</span><span class="op">$</span><span class="fu">categ_covs</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -368,12 +386,12 @@ if PK model is included)</p><div class="section">
 </div><p></p><hr><a id="method-MultistateModel-simulate_subjects"></a><div class="section">
 <h3 id="method-simulate-subjects-">Method <code>simulate_subjects()</code><a class="anchor" aria-label="anchor" href="#method-simulate-subjects-"></a></h3>
 <p>Simulate subject data, all covariates independently.</p><div class="section">
-<h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
+<h4 id="usage-18">Usage<a class="anchor" aria-label="anchor" href="#usage-18"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModel</span><span class="op">$</span><span class="fu">simulate_subjects</span><span class="op">(</span>N_subject <span class="op">=</span> <span class="fl">100</span>, doses <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">15</span>, <span class="fl">30</span>, <span class="fl">60</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
+<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>N_subject</code></dt>
 <dd><p>Number of subjects.</p></dd>
 
@@ -388,7 +406,7 @@ if PK model is included)</p><div class="section">
 </div><p></p><hr><a id="method-MultistateModel-simulate_data"></a><div class="section">
 <h3 id="method-simulate-data-">Method <code>simulate_data()</code><a class="anchor" aria-label="anchor" href="#method-simulate-data-"></a></h3>
 <p>Simulate data using the multistate model</p><div class="section">
-<h4 id="usage-18">Usage<a class="anchor" aria-label="anchor" href="#usage-18"></a></h4>
+<h4 id="usage-19">Usage<a class="anchor" aria-label="anchor" href="#usage-19"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModel</span><span class="op">$</span><span class="fu">simulate_data</span><span class="op">(</span></span>
 <span>  N_subject <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  beta_haz <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -401,7 +419,7 @@ if PK model is included)</p><div class="section">
 </div>
 
 <div class="section">
-<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
+<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>N_subject</code></dt>
 <dd><p>Number of subjects.</p></dd>
 
@@ -447,7 +465,7 @@ the <code>simulate_subjects</code> method.</p></dd>
 </div><p></p><hr><a id="method-MultistateModel-target_states"></a><div class="section">
 <h3 id="method-target-states-">Method <code>target_states()</code><a class="anchor" aria-label="anchor" href="#method-target-states-"></a></h3>
 <p>Get indices of states that are not source states</p><div class="section">
-<h4 id="usage-19">Usage<a class="anchor" aria-label="anchor" href="#usage-19"></a></h4>
+<h4 id="usage-20">Usage<a class="anchor" aria-label="anchor" href="#usage-20"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModel</span><span class="op">$</span><span class="fu">target_states</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -459,12 +477,12 @@ the <code>simulate_subjects</code> method.</p></dd>
 </div><p></p><hr><a id="method-MultistateModel-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-20">Usage<a class="anchor" aria-label="anchor" href="#usage-20"></a></h4>
+<h4 id="usage-21">Usage<a class="anchor" aria-label="anchor" href="#usage-21"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModel</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
+<h4 id="arguments-9">Arguments<a class="anchor" aria-label="anchor" href="#arguments-9"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 
