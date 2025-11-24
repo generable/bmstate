@@ -57,8 +57,10 @@ ensure_exposed_stan_functions <- function(...) {
 #' @param model A \code{\link{MultistateModel}} object.
 #' @param data A \code{\link{JointData}} or \code{\link{PathData}} object.
 #' @param return_stanfit Return also the raw 'Stan' fit object?
-#' @param set_auc_normalizers Set AUC normalization based on SS doses.
 #' @inheritParams create_stan_model
+#' @param set_normalizers Set covariate normalization automatically?
+#' @param set_prior_h0 Set prior mean average baseline hazard levels based
+#' on data?
 #' @param max_conc_factor Factor to multiply observed max concentration by
 #' to get concentration upper bound.
 #' @param method Must be one of \code{"sample"} (default),
@@ -69,7 +71,8 @@ ensure_exposed_stan_functions <- function(...) {
 #' @return A \code{\link{MultistateModelFit}} object.
 #' @family Stan-related functions
 fit_stan <- function(model, data,
-                     set_auc_normalizers = TRUE,
+                     set_normalizers = TRUE,
+                     set_prior_h0 = TRUE,
                      filepath = NULL,
                      return_stanfit = FALSE,
                      max_conc_factor = 100,
@@ -82,20 +85,28 @@ fit_stan <- function(model, data,
   checkmate::assert_choice(method, c("sample", "pathfinder", "optimize"))
 
   checkmate::assert_logical(return_stanfit, len = 1)
-  checkmate::assert_logical(set_auc_normalizers, len = 1)
+  checkmate::assert_logical(set_normalizers, len = 1)
+  checkmate::assert_logical(set_prior_h0, len = 1)
   prefit_checks(model, data)
 
   # Get Stan model object
   stan_model <- create_stan_model(filepath = filepath)
 
-  # Set normalizing locations and scales (side effect)
-  model$set_normalizers(data)
-  if (!is.null(data$dosing) && set_auc_normalizers) {
-    mu_CL <- exp(-2)
-    aaa <- data$dosing$dose_ss / mu_CL
-    loc <- mean(aaa)
-    sca <- stats::sd(aaa)
-    model$set_auc_normalizers(loc, sca)
+  # Set prior mean baseline hazard rates (side effect)
+  if (set_prior_h0) {
+    model$set_prior_mean_h0_data(data)
+  }
+
+  # Set covariate normalizing locations and scales (side effect)
+  if (set_normalizers) {
+    model$set_normalizers(data)
+    if (!is.null(data$dosing)) {
+      mu_CL <- exp(-2)
+      aaa <- data$dosing$dose_ss / mu_CL
+      loc <- mean(aaa)
+      sca <- stats::sd(aaa)
+      model$set_auc_normalizers(loc, sca)
+    }
   }
 
   # Set max PK concentration
@@ -105,10 +116,6 @@ fit_stan <- function(model, data,
     MC <- max_conc_factor * max(c(c1, c2))
     model$pk_model$set_max_conc(MC)
   }
-
-  # Set prior mean baseline hazard rates (side effect)
-  df_ttype <- average_haz_per_ttype(data$paths) |> dplyr::arrange(.data$trans_idx)
-  model$set_prior_mean_h0(exp(df_ttype$log_h0_avg))
 
   # Create Stan input list
   sd <- create_stan_data(model, data)
