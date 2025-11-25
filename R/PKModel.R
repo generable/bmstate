@@ -1,5 +1,7 @@
 #' One-compartment PK Model
 #'
+#' @description Class that represents a one-compartment PK model with linear
+#' oral absorption.
 #' @export
 PKModel <- R6::R6Class("PKModel",
 

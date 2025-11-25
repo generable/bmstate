@@ -4,6 +4,9 @@
 \alias{PathData}
 \title{Path data class (R6 class)}
 \description{
+Class containing information about state paths and subjects.
+}
+\details{
 It is not recommended for users to try to create data using
 the constructor of this class. Rather use \code{\link{df_to_pathdata}}.
 }

@@ -1,5 +1,6 @@
 #' A multistate system with proportional spline hazards
 #'
+#' @description Class that represents a multistate system.
 #' @export
 MultistateSystem <- R6::R6Class("MultistateSystem",
 

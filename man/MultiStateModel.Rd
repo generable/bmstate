@@ -4,9 +4,7 @@
 \alias{MultistateModel}
 \title{Main model class}
 \description{
-Main model class
-
-Main model class
+Class that represents a multistate model.
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

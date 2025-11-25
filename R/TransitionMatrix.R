@@ -1,6 +1,7 @@
 #' Defines states and possible transitions
 #'
 #' @export
+#' @description Class that represents a transition matrix.
 #' @field matrix a binary \code{N} x \code{N} matrix where
 #' \code{matrix[i,j]} is 1 if transition
 #' from state \code{i} to \code{j} is possible

@@ -4,9 +4,7 @@
 \alias{JointData}
 \title{Joint data class (R6 class)}
 \description{
-Joint data class (R6 class)
-
-Joint data class (R6 class)
+Contains data about both the state paths and dosing.
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

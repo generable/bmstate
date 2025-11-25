@@ -1,7 +1,8 @@
 #' Path data class (R6 class)
 #'
 #' @export
-#' @description It is not recommended for users to try to create data using
+#' @description Class containing information about state paths and subjects.
+#' @details It is not recommended for users to try to create data using
 #' the constructor of this class. Rather use \code{\link{df_to_pathdata}}.
 #' @field subject_df Data frame with one row per subject. Must have one
 #' row for each subject, and

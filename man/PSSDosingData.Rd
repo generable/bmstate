@@ -4,9 +4,7 @@
 \alias{PSSDosingData}
 \title{Partially steady-state dosing data class (R6 class)}
 \description{
-Partially steady-state dosing data class (R6 class)
-
-Partially steady-state dosing data class (R6 class)
+Contains information about taken doses and dose times.
 }
 \section{Super class}{
 \code{\link[bmstate:DosingData]{bmstate::DosingData}} -> \code{PSSDosingData}

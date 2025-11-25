@@ -1,5 +1,7 @@
 #' Minimal fit class
 #'
+#' @description Class that represents a multistate model with certain parameters
+#' or parameter draws.
 #' @export
 #' @field model The \code{\link{MultistateModel}}
 #' @field data A  \code{\link{JointData}} object

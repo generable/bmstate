@@ -4,9 +4,7 @@
 \alias{TransitionMatrix}
 \title{Defines states and possible transitions}
 \description{
-Defines states and possible transitions
-
-Defines states and possible transitions
+Class that represents a transition matrix.
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

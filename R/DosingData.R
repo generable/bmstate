@@ -1,5 +1,8 @@
 #' Dosing data class (R6 class)
 #'
+#' @description
+#' Contains information about taken doses and dose times.
+#'
 #' @export
 #' @field subject_ids Subject ids.
 DosingData <- R6::R6Class(
@@ -31,6 +34,9 @@ DosingData <- R6::R6Class(
 #' Partially steady-state dosing data class (R6 class)
 #'
 #' @export
+#' @description
+#' Contains information about taken doses and dose times.
+#'
 #' @field doses Dose amounts (list with length equal to number of subjects).
 #' Corresponds to doses after the steady state.
 #' @field times Dose times (list with length equal to number of subjects).
