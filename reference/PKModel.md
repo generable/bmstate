@@ -1,8 +1,7 @@
 # One-compartment PK Model
 
-One-compartment PK Model
-
-One-compartment PK Model
+Class that represents a one-compartment PK model with linear oral
+absorption.
 
 ## Methods
 

@@ -1,8 +1,6 @@
 # Partially steady-state dosing data class (R6 class)
 
-Partially steady-state dosing data class (R6 class)
-
-Partially steady-state dosing data class (R6 class)
+Contains information about taken doses and dose times.
 
 ## Super class
 

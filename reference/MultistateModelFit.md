@@ -1,8 +1,7 @@
 # Minimal fit class
 
-Minimal fit class
-
-Minimal fit class
+Class that represents a multistate model with certain parameters or
+parameter draws.
 
 ## Public fields
 

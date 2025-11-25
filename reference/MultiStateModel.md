@@ -1,8 +1,6 @@
 # Main model class
 
-Main model class
-
-Main model class
+Class that represents a multistate model.
 
 ## Public fields
 

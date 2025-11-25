@@ -1,8 +1,6 @@
 # A multistate system with proportional spline hazards
 
-A multistate system with proportional spline hazards
-
-A multistate system with proportional spline hazards
+Class that represents a multistate system.
 
 ## Methods
 

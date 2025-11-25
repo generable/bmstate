@@ -1,5 +1,9 @@
 # Path data class (R6 class)
 
+Class containing information about state paths and subjects.
+
+## Details
+
 It is not recommended for users to try to create data using the
 constructor of this class. Rather use
 [`df_to_pathdata`](https://generable.github.io/bmstate/reference/df_to_pathdata.md).

@@ -1,8 +1,6 @@
 # Defines states and possible transitions
 
-Defines states and possible transitions
-
-Defines states and possible transitions
+Class that represents a transition matrix.
 
 ## Public fields
 

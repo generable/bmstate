@@ -1,8 +1,6 @@
 # Joint data class (R6 class)
 
-Joint data class (R6 class)
-
-Joint data class (R6 class)
+Contains data about both the state paths and dosing.
 
 ## Public fields
 

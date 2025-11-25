@@ -1,8 +1,6 @@
 # Dosing data class (R6 class)
 
-Dosing data class (R6 class)
-
-Dosing data class (R6 class)
+Contains information about taken doses and dose times.
 
 ## Public fields
 
