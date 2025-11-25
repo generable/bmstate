@@ -4,9 +4,7 @@
 \alias{MultistateSystem}
 \title{A multistate system with proportional spline hazards}
 \description{
-A multistate system with proportional spline hazards
-
-A multistate system with proportional spline hazards
+Class that represents a multistate system.
 }
 \section{Methods}{
 \subsection{Public methods}{

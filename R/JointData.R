@@ -10,6 +10,9 @@ pd_to_jointdata <- function(data) {
 #' Joint data class (R6 class)
 #'
 #' @export
+#' @description
+#' Contains data about both the state paths and dosing.
+#'
 #' @field paths The events data, an object of class \code{\link{PathData}}.
 #' @field dosing The dosing data, an object of class \code{\link{DosingData}}.
 JointData <- R6::R6Class(

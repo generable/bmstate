@@ -4,9 +4,7 @@
 \alias{DosingData}
 \title{Dosing data class (R6 class)}
 \description{
-Dosing data class (R6 class)
-
-Dosing data class (R6 class)
+Contains information about taken doses and dose times.
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

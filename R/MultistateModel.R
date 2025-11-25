@@ -30,6 +30,8 @@ create_msm <- function(tm, hazard_covs = NULL, pk_covs = NULL,
 
 #' Main model class
 #'
+#' @description Class that represents a multistate model.
+#'
 #' @export
 #' @field system A \code{\link{MultistateSystem}}
 #' @field pk_model A \code{\link{PKModel}} or NULL.

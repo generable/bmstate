@@ -4,9 +4,8 @@
 \alias{PKModel}
 \title{One-compartment PK Model}
 \description{
-One-compartment PK Model
-
-One-compartment PK Model
+Class that represents a one-compartment PK model with linear
+oral absorption.
 }
 \section{Methods}{
 \subsection{Public methods}{

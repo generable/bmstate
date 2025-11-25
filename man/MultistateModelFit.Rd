@@ -4,9 +4,8 @@
 \alias{MultistateModelFit}
 \title{Minimal fit class}
 \description{
-Minimal fit class
-
-Minimal fit class
+Class that represents a multistate model with certain parameters
+or parameter draws.
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
