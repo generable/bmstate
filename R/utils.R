@@ -1,3 +1,15 @@
+# Helper
+pksim_to_quantiles <- function(sim, ci_alpha) {
+  checkmate::assert_number(ci_alpha, lower = 0, upper = 1)
+  av <- (1 - ci_alpha) / 2
+  sim <- sim |>
+    dplyr::group_by(.data$subject_id, .data$time) |>
+    dplyr::summarise(q = list(quantile(.data$val, probs = c(av / 2, 0.5, 1 - av / 2))), .groups = "drop") |>
+    tidyr::unnest_wider(q, names_sep = "_")
+  colnames(sim)[3:5] <- c("lower", "val", "upper")
+  sim
+}
+
 # Check data frame columns
 check_columns <- function(df, needed_columns) {
   checkmate::assert_data_frame(df)

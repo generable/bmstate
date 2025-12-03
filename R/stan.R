@@ -101,8 +101,9 @@ fit_stan <- function(model, data,
   if (set_normalizers) {
     model$set_normalizers(data)
     if (!is.null(data$dosing)) {
-      mu_CL <- exp(-2)
-      aaa <- data$dosing$dose_ss / mu_CL
+      mu_CL <- exp(-2) # should match msm.stan
+      mu_V2 <- exp(-2) # should match msm.stan
+      aaa <- data$dosing$dose_ss / (mu_CL * mu_V2)
       loc <- mean(aaa)
       sca <- stats::sd(aaa)
       model$set_auc_normalizers(loc, sca)

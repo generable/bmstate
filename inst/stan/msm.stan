@@ -427,8 +427,8 @@ transformed parameters {
       MAX_CONC
     );
 
-    // Auc at steady state
-    ss_auc[1] = dose_ss ./ theta_pk[1][:,2]; // D/CL
+    // Concentration AUC at steady state
+    ss_auc[1] = (dose_ss ./ (theta_pk[1][:,2] .* theta_pk[1][:,3])); // D/(CL*V2)
 
     // Set AUC corresponding to each interval
     for(n in 1:N_int){

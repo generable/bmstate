@@ -102,16 +102,18 @@ PKModel <- R6::R6Class("PKModel",
       conc
     },
 
-    #' @description Compute steady-state area under curve over one dosing interval
+    #' @description Compute steady-state area under concentration curve over
+    #' one dosing interval
     #'
     #' @param theta parameter values
     #' @param dose dose
     #' @return A numeric value
     compute_ss_auc = function(theta, dose) {
       CL <- theta[2]
+      V2 <- theta[3]
       checkmate::assert_number(CL, lower = 0)
       checkmate::assert_number(dose, lower = 0)
-      dose / CL
+      dose / (CL * V2)
     },
 
     #' @description Simulate data with many subjects

@@ -242,7 +242,8 @@ Plot PK fit.
   L = 100,
   timescale = 24,
   n_prev = 3,
-  ci_alpha = 0.9
+  ci_alpha = 0.9,
+  subject_ids = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -263,6 +264,8 @@ training data is used.}
 \item{\code{n_prev}}{number of previous doses to show fit for}
 
 \item{\code{ci_alpha}}{Width of central credible interval.}
+
+\item{\code{subject_ids}}{Which subjects to plot?}
 }
 \if{html}{\out{</div>}}
 }

@@ -169,8 +169,10 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
     #' @param n_prev number of previous doses to show fit for
     #' @param oos Out-of-sample subjects?
     #' @param ci_alpha Width of central credible interval.
+    #' @param subject_ids Which subjects to plot?
     plot_pk = function(max_num_subjects = 12, oos = FALSE, data = NULL, L = 100,
-                       timescale = 24, n_prev = 3, ci_alpha = 0.9) {
+                       timescale = 24, n_prev = 3, ci_alpha = 0.9,
+                       subject_ids = NULL) {
       pksim <- self$simulate_pk(oos, data, L, timescale, n_prev)
       if (is.null(data)) {
         data <- self$data
@@ -180,16 +182,15 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
       } else {
         capt <- paste0("Point-estimate fit")
       }
-      checkmate::assert_number(ci_alpha, lower = 0, upper = 1)
-      av <- (1 - ci_alpha) / 2
-      pksim <- pksim |>
-        dplyr::group_by(.data$subject_id, .data$time) |>
-        dplyr::summarise(q = list(quantile(.data$val, probs = c(av / 2, 0.5, 1 - av / 2))), .groups = "drop") |>
-        tidyr::unnest_wider(q, names_sep = "_")
-      colnames(pksim)[3:5] <- c("lower", "val", "upper")
 
-      data$plot_dosing(df_fit = pksim, max_num_subjects = max_num_subjects) +
-        labs(caption = capt)
+      # Slow for some reason
+      pksim <- pksim_to_quantiles(pksim, ci_alpha)
+
+      # Create plot
+      data$plot_dosing(
+        df_fit = pksim, max_num_subjects = max_num_subjects,
+        subject_ids = subject_ids
+      ) + labs(caption = capt)
     },
 
     #' @description Plot baseline hazard distribution

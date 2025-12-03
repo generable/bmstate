@@ -300,8 +300,7 @@ print(mod)
 ```
 
 Now we can simulate death events with known constant hazard rate `lambda`. For this
-model, we are simulating from a homogeneous Poisson process with rate $\lambda$,
-meaning that the event times should follow an exponential distribution with
+model, the event times should follow an exponential distribution with
 mean $\frac{1}{\lambda}$.
 
 ```{r, fig.width=5}
@@ -360,10 +359,11 @@ mod <- create_msm(tm, t_max = tmax)
 ```
 
 This model has 3 possible transitions. 
-Now we can simulate events with known constant hazard rates `lambda_1`, 
-`lambda_2`, `lambda_3`. For this
-model, we are simulating from independent homogeneous Poisson processes with 
-rates $\lambda_i$, meaning that the transition probabilities should be
+Now we can simulate transition times with known constant hazard rates `lambda_1`, 
+`lambda_2`, `lambda_3`. Simulating the transition times is mathematically equivalent to
+simulating from independent homogeneous Poisson processes with 
+rates $\lambda_i$, and taking the transition that occurred first. This means that 
+the transition probabilities should be
 $$
 P(i) = \frac{\lambda_i}{\sum_{j=1}^ 3 \lambda_j}.
 $$

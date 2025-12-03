@@ -78,7 +78,7 @@ Print info
 \subsection{Method \code{plot_dosing()}}{
 Plot dosing
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{JointData$plot_dosing(df_fit = NULL, max_num_subjects = 12)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{JointData$plot_dosing(df_fit = NULL, max_num_subjects = 12, subject_ids = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -87,6 +87,8 @@ Plot dosing
 \item{\code{df_fit}}{Fit data frame.}
 
 \item{\code{max_num_subjects}}{Max number of subjects to plot.}
+
+\item{\code{subject_ids}}{Which subjects to plot?}
 }
 \if{html}{\out{</div>}}
 }
