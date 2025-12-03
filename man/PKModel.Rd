@@ -154,7 +154,8 @@ concentration in the central compartment.
 \if{html}{\out{<a id="method-PKModel-compute_ss_auc"></a>}}
 \if{latex}{\out{\hypertarget{method-PKModel-compute_ss_auc}{}}}
 \subsection{Method \code{compute_ss_auc()}}{
-Compute steady-state area under curve over one dosing interval
+Compute steady-state area under concentration curve over
+one dosing interval
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{PKModel$compute_ss_auc(theta, dose)}\if{html}{\out{</div>}}
 }
