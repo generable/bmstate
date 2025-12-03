@@ -47,8 +47,8 @@ MultistateModel <- R6::R6Class("MultistateModel",
     categorical = NULL,
     normalizer_locations = NULL,
     normalizer_scales = NULL,
-    auc_normalizer_loc = 300,
-    auc_normalizer_scale = 100,
+    auc_normalizer_loc = 2000,
+    auc_normalizer_scale = 1000,
     n_grid = NULL,
     simulate_log_hazard_multipliers = function(df_subjects, beta) {
       ts <- self$target_states()
