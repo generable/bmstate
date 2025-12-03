@@ -116,7 +116,12 @@ a \code{data.frame}
 \subsection{Method \code{plot()}}{
 Plot dosing (and PK) data
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PSSDosingData$plot(df_fit = NULL, subject_df = NULL, max_num_subjects = 12)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PSSDosingData$plot(
+  df_fit = NULL,
+  subject_df = NULL,
+  max_num_subjects = 12,
+  subject_ids = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -128,6 +133,8 @@ and \code{upper}.}
 \item{\code{subject_df}}{Subject data frame.}
 
 \item{\code{max_num_subjects}}{Max number of subjects to plot.}
+
+\item{\code{subject_ids}}{Which subjects to plot?}
 }
 \if{html}{\out{</div>}}
 }

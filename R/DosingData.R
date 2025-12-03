@@ -136,7 +136,9 @@ PSSDosingData <- R6::R6Class(
     #' and \code{upper}.
     #' @param subject_df Subject data frame.
     #' @param max_num_subjects Max number of subjects to plot.
-    plot = function(df_fit = NULL, subject_df = NULL, max_num_subjects = 12) {
+    #' @param subject_ids Which subjects to plot?
+    plot = function(df_fit = NULL, subject_df = NULL, max_num_subjects = 12,
+                    subject_ids = NULL) {
       dos <- self$as_data_frame()
       fitcolor <- "steelblue"
       if (is.null(max_num_subjects)) {
@@ -144,7 +146,13 @@ PSSDosingData <- R6::R6Class(
       }
       checkmate::assert_integerish(max_num_subjects, len = 1, lower = 1)
       if (self$num_subjects() > max_num_subjects) {
-        sid <- sample(unique(dos$subject_id), max_num_subjects)
+        if (is.null(subject_ids)) {
+          sid <- sample(unique(dos$subject_id), max_num_subjects)
+        } else {
+          checkmate::assert_character(subject_ids)
+          sid <- subject_ids
+        }
+
         dos <- dos |> dplyr::filter(.data$subject_id %in% sid)
         if (!is.null(df_fit)) {
           df_fit <- df_fit |> dplyr::filter(.data$subject_id %in% sid)
