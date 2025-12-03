@@ -166,7 +166,8 @@ the central compartment.
 
 ### Method `compute_ss_auc()`
 
-Compute steady-state area under curve over one dosing interval
+Compute steady-state area under concentration curve over one dosing
+interval
 
 #### Usage
 

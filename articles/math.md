@@ -2,7 +2,7 @@
 
 ``` r
 library(bmstate)
-#> Attached bmstate 0.2.8. Type ?bmstate to get started.
+#> Attached bmstate 0.2.9. Type ?bmstate to get started.
 library(ggplot2)
 theme_set(theme_bw())
 ```
@@ -338,9 +338,8 @@ print(mod)
 ```
 
 Now we can simulate death events with known constant hazard rate
-`lambda`. For this model, we are simulating from a homogeneous Poisson
-process with rate $\lambda$, meaning that the event times should follow
-an exponential distribution with mean $\frac{1}{\lambda}$.
+`lambda`. For this model, the event times should follow an exponential
+distribution with mean $\frac{1}{\lambda}$.
 
 ``` r
 lambda <- 1e-2
@@ -422,11 +421,12 @@ tm$plot()
 mod <- create_msm(tm, t_max = tmax)
 ```
 
-This model has 3 possible transitions. Now we can simulate events with
-known constant hazard rates `lambda_1`, `lambda_2`, `lambda_3`. For this
-model, we are simulating from independent homogeneous Poisson processes
-with rates $\lambda_{i}$, meaning that the transition probabilities
-should be
+This model has 3 possible transitions. Now we can simulate transition
+times with known constant hazard rates `lambda_1`, `lambda_2`,
+`lambda_3`. Simulating the transition times is mathematically equivalent
+to simulating from independent homogeneous Poisson processes with rates
+$\lambda_{i}$, and taking the transition that occurred first. This means
+that the transition probabilities should be
 $$P(i) = \frac{\lambda_{i}}{\sum\limits_{j = 1}^{3}\lambda_{j}}.$$
 
 ``` r

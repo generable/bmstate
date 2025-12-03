@@ -85,7 +85,7 @@ Plot dosing
 
 #### Usage
 
-    JointData$plot_dosing(df_fit = NULL, max_num_subjects = 12)
+    JointData$plot_dosing(df_fit = NULL, max_num_subjects = 12, subject_ids = NULL)
 
 #### Arguments
 
@@ -96,6 +96,10 @@ Plot dosing
 - `max_num_subjects`:
 
   Max number of subjects to plot.
+
+- `subject_ids`:
+
+  Which subjects to plot?
 
 #### Returns
 

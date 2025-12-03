@@ -12,12 +12,12 @@
 ## Citation
 
 Timonen J (2025). *bmstate: Bayesian multistate modeling*. R package
-version 0.2.8, <https://generable.github.io/bmstate/>.
+version 0.2.9, <https://generable.github.io/bmstate/>.
 
     @Manual{,
       title = {bmstate: Bayesian multistate modeling},
       author = {Juho Timonen},
       year = {2025},
-      note = {R package version 0.2.8},
+      note = {R package version 0.2.9},
       url = {https://generable.github.io/bmstate/},
     }

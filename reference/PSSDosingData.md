@@ -136,7 +136,12 @@ Plot dosing (and PK) data
 
 #### Usage
 
-    PSSDosingData$plot(df_fit = NULL, subject_df = NULL, max_num_subjects = 12)
+    PSSDosingData$plot(
+      df_fit = NULL,
+      subject_df = NULL,
+      max_num_subjects = 12,
+      subject_ids = NULL
+    )
 
 #### Arguments
 
@@ -151,6 +156,10 @@ Plot dosing (and PK) data
 - `max_num_subjects`:
 
   Max number of subjects to plot.
+
+- `subject_ids`:
+
+  Which subjects to plot?
 
 ------------------------------------------------------------------------
 

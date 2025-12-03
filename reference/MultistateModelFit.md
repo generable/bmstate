@@ -282,7 +282,8 @@ Plot PK fit.
       L = 100,
       timescale = 24,
       n_prev = 3,
-      ci_alpha = 0.9
+      ci_alpha = 0.9,
+      subject_ids = NULL
     )
 
 #### Arguments
@@ -315,6 +316,10 @@ Plot PK fit.
 - `ci_alpha`:
 
   Width of central credible interval.
+
+- `subject_ids`:
+
+  Which subjects to plot?
 
 ------------------------------------------------------------------------
 
