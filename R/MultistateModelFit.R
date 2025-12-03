@@ -182,21 +182,15 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
       } else {
         capt <- paste0("Point-estimate fit")
       }
-      checkmate::assert_number(ci_alpha, lower = 0, upper = 1)
-      av <- (1 - ci_alpha) / 2
 
-      # Slow
-      pksim <- pksim |>
-        dplyr::group_by(.data$subject_id, .data$time) |>
-        dplyr::summarise(q = list(quantile(.data$val, probs = c(av / 2, 0.5, 1 - av / 2))), .groups = "drop") |>
-        tidyr::unnest_wider(q, names_sep = "_")
-      colnames(pksim)[3:5] <- c("lower", "val", "upper")
+      # Slow for some reason
+      pksim <- pksim_to_quantiles(pksim, ci_alpha)
 
+      # Create plot
       data$plot_dosing(
         df_fit = pksim, max_num_subjects = max_num_subjects,
         subject_ids = subject_ids
-      ) +
-        labs(caption = capt)
+      ) + labs(caption = capt)
     },
 
     #' @description Plot baseline hazard distribution
