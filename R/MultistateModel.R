@@ -399,7 +399,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' @param w Spline weights. Matrix of shape \code{num_trans} x
     #' \code{num_weights}. If \code{NULL}, a matrix of zeros is used.
     #' @param num_doses Average number of doses taken by each subject. Only
-    #' has effect if model as a PK submodel.
+    #' has effect if model has a PK submodel.
     #' @param subjects_df Subject data frame. If \code{NULL}, simulated using
     #' the \code{simulate_subjects} method.
     #' @param truncate Truncate paths after terminal events?

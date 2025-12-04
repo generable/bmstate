@@ -394,7 +394,7 @@ a vector of zeros is used.}
 \code{num_weights}. If \code{NULL}, a matrix of zeros is used.}
 
 \item{\code{num_doses}}{Average number of doses taken by each subject. Only
-has effect if model as a PK submodel.}
+has effect if model has a PK submodel.}
 
 \item{\code{subjects_df}}{Subject data frame. If \code{NULL}, simulated using
 the \code{simulate_subjects} method.}
