@@ -370,7 +370,8 @@ Simulate data using the multistate model
   w0 = 0.001,
   w = NULL,
   num_doses = 10,
-  subjects_df = NULL
+  subjects_df = NULL,
+  truncate = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -393,10 +394,12 @@ a vector of zeros is used.}
 \code{num_weights}. If \code{NULL}, a matrix of zeros is used.}
 
 \item{\code{num_doses}}{Average number of doses taken by each subject. Only
-has effect if model as a PK submodel.}
+has effect if model has a PK submodel.}
 
 \item{\code{subjects_df}}{Subject data frame. If \code{NULL}, simulated using
 the \code{simulate_subjects} method.}
+
+\item{\code{truncate}}{Truncate paths after terminal events?}
 }
 \if{html}{\out{</div>}}
 }

@@ -150,7 +150,7 @@ set.seed(2344)
 mod <- create_msm(tmat, n_grid = 12) # set very low n_grid for demo
 h0_true <- rep(1e-3, 3)
 mod$set_prior_mean_h0(h0_true) # has no effect for simulation
-dat <- mod$simulate_data(N_subject = 1, w0 = h0_true)
+dat <- mod$simulate_data(N_subject = 1, w0 = h0_true, truncate = FALSE)
 dat$paths$plot_paths(truncate = TRUE, alpha = 1) + ggtitle("")
 ```
 

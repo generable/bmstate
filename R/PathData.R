@@ -106,6 +106,14 @@ PathData <- R6::R6Class(
       unique(self$subject_df$subject_id)
     },
 
+    #' @description Truncate paths after terminal events
+    #' @return A new \code{\link{PathData}} object with only the paths data
+    #' frame edited.
+    truncate = function() {
+      pdf <- self$get_path_df(truncate = TRUE)
+      PathData$new(self$subject_df, pdf, self$link_df, self$transmat, self$covs)
+    },
+
     #' @description Get names of covariates
     #' @return a character vector
     covariate_names = function() {

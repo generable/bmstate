@@ -46,6 +46,7 @@ which the paths belong.}
 \itemize{
 \item \href{#method-PathData-new}{\code{PathData$new()}}
 \item \href{#method-PathData-unique_subjects}{\code{PathData$unique_subjects()}}
+\item \href{#method-PathData-truncate}{\code{PathData$truncate()}}
 \item \href{#method-PathData-covariate_names}{\code{PathData$covariate_names()}}
 \item \href{#method-PathData-subset_covariates}{\code{PathData$subset_covariates()}}
 \item \href{#method-PathData-state_at}{\code{PathData$state_at()}}
@@ -120,6 +121,20 @@ Get unique subject ids
 \if{html}{\out{<div class="r">}}\preformatted{PathData$unique_subjects()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-PathData-truncate"></a>}}
+\if{latex}{\out{\hypertarget{method-PathData-truncate}{}}}
+\subsection{Method \code{truncate()}}{
+Truncate paths after terminal events
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{PathData$truncate()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+A new \code{\link{PathData}} object with only the paths data
+frame edited.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-PathData-covariate_names"></a>}}

@@ -399,13 +399,15 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' @param w Spline weights. Matrix of shape \code{num_trans} x
     #' \code{num_weights}. If \code{NULL}, a matrix of zeros is used.
     #' @param num_doses Average number of doses taken by each subject. Only
-    #' has effect if model as a PK submodel.
+    #' has effect if model has a PK submodel.
     #' @param subjects_df Subject data frame. If \code{NULL}, simulated using
     #' the \code{simulate_subjects} method.
+    #' @param truncate Truncate paths after terminal events?
     #' @return A \code{\link{JointData}} object.
     simulate_data = function(N_subject = 100, beta_haz = NULL,
                              beta_pk = NULL, w0 = 1e-3, w = NULL, num_doses = 10,
-                             subjects_df = NULL) {
+                             subjects_df = NULL, truncate = TRUE) {
+      checkmate::assert_logical(truncate, len = 1)
       H <- self$system$num_trans()
       if (is.null(subjects_df)) {
         subjects_df <- self$simulate_subjects(N_subject)
@@ -442,6 +444,9 @@ MultistateModel <- R6::R6Class("MultistateModel",
         subjects_df, path_df, link_df, self$system$tm(),
         colnames(subjects_df)
       )
+      if (truncate) {
+        pd <- pd$truncate()
+      }
       JointData$new(pd, pksim$dosing)
     },
 
