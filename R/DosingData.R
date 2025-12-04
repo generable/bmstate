@@ -92,6 +92,9 @@ PSSDosingData <- R6::R6Class(
           subject_id = sid, dose_ss = dose_ss,
           dose = doses, time = times
         )
+        which_missed <- which(rows$dose == 0)
+        rows$dose_time <- "Taken"
+        rows$dose_time[which_missed] <- "Missed"
         out <- rbind(out, rows)
       }
       out
@@ -167,8 +170,12 @@ PSSDosingData <- R6::R6Class(
       )) +
         facet_wrap(. ~ .data$subject_id, scales = "free_x") +
         geom_vline(
-          data = dos, mapping = aes(xintercept = time),
-          col = "firebrick", lty = 2
+          data = dos, mapping = aes(xintercept = time, lty = .data$dose_time),
+          col = "firebrick"
+        ) +
+        scale_linetype_manual(
+          values =
+            c(3, 1), name = "Dose"
         )
       if (!is.null(df_fit)) {
         if (!is.null(df_fit$lower)) {
