@@ -407,7 +407,7 @@ msmfit_exposure <- function(fit, oos = FALSE, data = NULL) {
   out <- list()
   for (s in seq_len(S)) {
     if (sd$do_pk == 1) {
-      x_auc <- sd$dose_ss / pkpar[[s]][, 2] # D/CL
+      x_auc <- sd$dose_ss / (pkpar[[s]][, 2] * pkpar[[s]][, 3]) # D/(CL*V2)
     } else {
       x_auc <- NULL
     }
