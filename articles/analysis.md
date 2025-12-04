@@ -2,7 +2,7 @@
 
 ``` r
 library(bmstate)
-#> Attached bmstate 0.2.9. Type ?bmstate to get started.
+#> Attached bmstate 0.2.10. Type ?bmstate to get started.
 library(ggplot2)
 library(dplyr)
 #> 
