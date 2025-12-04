@@ -4,7 +4,9 @@ pksim_to_quantiles <- function(sim, ci_alpha) {
   av <- (1 - ci_alpha) / 2
   sim <- sim |>
     dplyr::group_by(.data$subject_id, .data$time) |>
-    dplyr::summarise(q = list(quantile(.data$val, probs = c(av / 2, 0.5, 1 - av / 2))), .groups = "drop") |>
+    dplyr::summarise(q = list(
+      stats::quantile(.data$val, probs = c(av / 2, 0.5, 1 - av / 2))
+    ), .groups = "drop") |>
     tidyr::unnest_wider(q, names_sep = "_")
   colnames(sim)[3:5] <- c("lower", "val", "upper")
   sim
