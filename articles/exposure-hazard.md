@@ -8,7 +8,7 @@ This vignette is work in progress.
 
 ``` r
 library(bmstate)
-#> Attached bmstate 0.2.10. Type ?bmstate to get started.
+#> Attached bmstate 0.2.11. Type ?bmstate to get started.
 library(dplyr)
 #> 
 #> Attaching package: 'dplyr'
@@ -269,7 +269,7 @@ fit_prelim <- fit_stan(mod_true, simdat, method = "optimize", init = 0, iter = 1
 #>      100      -10047.7      0.189833       130.448       0.955       0.955      120    
 #> Optimization terminated normally:  
 #>   Maximum number of iterations hit, may not be at an optima 
-#> Finished in  0.9 seconds.
+#> Finished in  0.7 seconds.
 fit_true <- create_oracle_fit(fit_prelim, beta_true, h0_true)
 fit_true$covariate_effects()
 #>   covariate      beta target_state_idx target_state
@@ -346,7 +346,7 @@ fit_ms_eh <- fit_stan(mod_ms_eh, simdat, method = "optimize", init = 0)
 #>     2000      -6998.35    0.00343086       303.829           1           1     2262    
 #> Optimization terminated normally:  
 #>   Maximum number of iterations hit, may not be at an optima 
-#> Finished in  13.7 seconds.
+#> Finished in  11.7 seconds.
 fit_ms_dh <- fit_stan(mod_ms_dh, simdat_dh, method = "optimize", init = 0)
 #> Shortest time interval (0.0999999999999943) is smaller than delta_grid (1.09575). Consider increasing n_grid or decreasing t_max of the model.
 #> Using stan file at /home/runner/work/_temp/Library/bmstate/stan/msm.stan
@@ -385,7 +385,7 @@ fit_ms_dh <- fit_stan(mod_ms_dh, simdat_dh, method = "optimize", init = 0)
 #>     1555      -6079.03   0.000894302      0.452686           1           1     1728    
 #> Optimization terminated normally:  
 #>   Convergence detected: relative gradient magnitude is below tolerance 
-#> Finished in  7.0 seconds.
+#> Finished in  5.2 seconds.
 fit_death <- fit_stan(mod_death, simdat_death, method = "optimize", init = 0)
 #> Using stan file at /home/runner/work/_temp/Library/bmstate/stan/msm.stan
 #> Initial log joint probability = -290039 

@@ -56,6 +56,8 @@ constructor of this class. Rather use
 
 - [`PathData$unique_subjects()`](#method-PathData-unique_subjects)
 
+- [`PathData$truncate()`](#method-PathData-truncate)
+
 - [`PathData$covariate_names()`](#method-PathData-covariate_names)
 
 - [`PathData$subset_covariates()`](#method-PathData-subset_covariates)
@@ -159,6 +161,20 @@ Get unique subject ids
 #### Usage
 
     PathData$unique_subjects()
+
+------------------------------------------------------------------------
+
+### Method [`truncate()`](https://rdrr.io/r/base/seek.html)
+
+Truncate paths after terminal events
+
+#### Usage
+
+    PathData$truncate()
+
+#### Returns
+
+A new `PathData` object with only the paths data frame edited.
 
 ------------------------------------------------------------------------
 

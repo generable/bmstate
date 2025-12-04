@@ -421,7 +421,8 @@ Simulate data using the multistate model
       w0 = 0.001,
       w = NULL,
       num_doses = 10,
-      subjects_df = NULL
+      subjects_df = NULL,
+      truncate = TRUE
     )
 
 #### Arguments
@@ -454,12 +455,16 @@ Simulate data using the multistate model
 - `num_doses`:
 
   Average number of doses taken by each subject. Only has effect if
-  model as a PK submodel.
+  model has a PK submodel.
 
 - `subjects_df`:
 
   Subject data frame. If `NULL`, simulated using the `simulate_subjects`
   method.
+
+- `truncate`:
+
+  Truncate paths after terminal events?
 
 #### Returns
 

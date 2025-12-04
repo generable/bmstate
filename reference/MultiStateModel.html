@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bmstate</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.10</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.11</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -411,7 +411,8 @@ if PK model is included)</p><div class="section">
 <span>  w0 <span class="op">=</span> <span class="fl">0.001</span>,</span>
 <span>  w <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  num_doses <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>  subjects_df <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  subjects_df <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  truncate <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -444,12 +445,16 @@ a vector of zeros is used.</p></dd>
 
 <dt><code>num_doses</code></dt>
 <dd><p>Average number of doses taken by each subject. Only
-has effect if model as a PK submodel.</p></dd>
+has effect if model has a PK submodel.</p></dd>
 
 
 <dt><code>subjects_df</code></dt>
 <dd><p>Subject data frame. If <code>NULL</code>, simulated using
 the <code>simulate_subjects</code> method.</p></dd>
+
+
+<dt><code>truncate</code></dt>
+<dd><p>Truncate paths after terminal events?</p></dd>
 
 
 </dl><p></p></div>

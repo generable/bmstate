@@ -2,7 +2,7 @@
 
 ``` r
 library(bmstate)
-#> Attached bmstate 0.2.10. Type ?bmstate to get started.
+#> Attached bmstate 0.2.11. Type ?bmstate to get started.
 library(ggplot2)
 theme_set(theme_bw())
 ```
@@ -163,7 +163,7 @@ set.seed(2344)
 mod <- create_msm(tmat, n_grid = 12) # set very low n_grid for demo
 h0_true <- rep(1e-3, 3)
 mod$set_prior_mean_h0(h0_true) # has no effect for simulation
-dat <- mod$simulate_data(N_subject = 1, w0 = h0_true)
+dat <- mod$simulate_data(N_subject = 1, w0 = h0_true, truncate = FALSE)
 #> Generating 1 paths
 dat$paths$plot_paths(truncate = TRUE, alpha = 1) + ggtitle("")
 ```
