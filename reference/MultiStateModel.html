@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bmstate</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.11</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,8 +73,8 @@ hazard model part?</p></dd>
 <ul><li><p><a href="#method-MultistateModel-get_normalizers"><code>MultistateModel$get_normalizers()</code></a></p></li>
 <li><p><a href="#method-MultistateModel-get_n_grid"><code>MultistateModel$get_n_grid()</code></a></p></li>
 <li><p><a href="#method-MultistateModel-set_normalizers"><code>MultistateModel$set_normalizers()</code></a></p></li>
-<li><p><a href="#method-MultistateModel-get_auc_normalizers"><code>MultistateModel$get_auc_normalizers()</code></a></p></li>
-<li><p><a href="#method-MultistateModel-set_auc_normalizers"><code>MultistateModel$set_auc_normalizers()</code></a></p></li>
+<li><p><a href="#method-MultistateModel-get_xpsr_normalizers"><code>MultistateModel$get_xpsr_normalizers()</code></a></p></li>
+<li><p><a href="#method-MultistateModel-set_xpsr_normalizers"><code>MultistateModel$set_xpsr_normalizers()</code></a></p></li>
 <li><p><a href="#method-MultistateModel-get_prior_mean_h0"><code>MultistateModel$get_prior_mean_h0()</code></a></p></li>
 <li><p><a href="#method-MultistateModel-set_prior_mean_h0"><code>MultistateModel$set_prior_mean_h0()</code></a></p></li>
 <li><p><a href="#method-MultistateModel-set_prior_mean_h0_data"><code>MultistateModel$set_prior_mean_h0_data()</code></a></p></li>
@@ -132,11 +132,11 @@ hazard model part?</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-MultistateModel-get_auc_normalizers"></a><div class="section">
-<h3 id="method-get-auc-normalizers-">Method <code>get_auc_normalizers()</code><a class="anchor" aria-label="anchor" href="#method-get-auc-normalizers-"></a></h3>
-<p>Get normalization constants for AUC (PK)</p><div class="section">
+</div><p></p><hr><a id="method-MultistateModel-get_xpsr_normalizers"></a><div class="section">
+<h3 id="method-get-xpsr-normalizers-">Method <code>get_xpsr_normalizers()</code><a class="anchor" aria-label="anchor" href="#method-get-xpsr-normalizers-"></a></h3>
+<p>Get normalization constants for exposure (PK)</p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModel</span><span class="op">$</span><span class="fu">get_auc_normalizers</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModel</span><span class="op">$</span><span class="fu">get_xpsr_normalizers</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -144,11 +144,11 @@ hazard model part?</p></dd>
 <p>list</p>
 </div>
 
-</div><p></p><hr><a id="method-MultistateModel-set_auc_normalizers"></a><div class="section">
-<h3 id="method-set-auc-normalizers-">Method <code>set_auc_normalizers()</code><a class="anchor" aria-label="anchor" href="#method-set-auc-normalizers-"></a></h3>
-<p>Set normalization constants for AUC (side effect)</p><div class="section">
+</div><p></p><hr><a id="method-MultistateModel-set_xpsr_normalizers"></a><div class="section">
+<h3 id="method-set-xpsr-normalizers-">Method <code>set_xpsr_normalizers()</code><a class="anchor" aria-label="anchor" href="#method-set-xpsr-normalizers-"></a></h3>
+<p>Set normalization constants for exposure (side effect)</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModel</span><span class="op">$</span><span class="fu">set_auc_normalizers</span><span class="op">(</span>loc <span class="op">=</span> <span class="fl">0</span>, scale <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">MultistateModel</span><span class="op">$</span><span class="fu">set_xpsr_normalizers</span><span class="op">(</span>loc <span class="op">=</span> <span class="fl">0</span>, scale <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -236,7 +236,7 @@ effect) based on average hazards in data.</p><div class="section">
 <dt><code>covariates</code></dt>
 <dd><p>The names of the hazard covariates (excluding possible
 exposure estimated from PK model). Do not use reserved names
-<code>ss_auc</code> or <code>dose</code>.</p></dd>
+<code>xpsr</code> or <code>dose</code>.</p></dd>
 
 
 <dt><code>pk_model</code></dt>

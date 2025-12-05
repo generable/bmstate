@@ -2,7 +2,7 @@
 
 ``` r
 library(bmstate)
-#> Attached bmstate 0.2.11. Type ?bmstate to get started.
+#> Attached bmstate 0.3.0. Type ?bmstate to get started.
 library(ggplot2)
 library(dplyr)
 #> 
@@ -194,7 +194,7 @@ fit <- fit_stan(mod, data = pd, method = "optimize")
 #>      841      -1857.69   0.000797173     0.0860521           1           1      924    
 #> Optimization terminated normally:  
 #>   Convergence detected: relative gradient magnitude is below tolerance 
-#> Finished in  3.4 seconds.
+#> Finished in  4.7 seconds.
 ```
 
 ### Inferred baseline hazards

@@ -33,9 +33,9 @@ Class that represents a multistate model.
 
 - [`MultistateModel$set_normalizers()`](#method-MultistateModel-set_normalizers)
 
-- [`MultistateModel$get_auc_normalizers()`](#method-MultistateModel-get_auc_normalizers)
+- [`MultistateModel$get_xpsr_normalizers()`](#method-MultistateModel-get_xpsr_normalizers)
 
-- [`MultistateModel$set_auc_normalizers()`](#method-MultistateModel-set_auc_normalizers)
+- [`MultistateModel$set_xpsr_normalizers()`](#method-MultistateModel-set_xpsr_normalizers)
 
 - [`MultistateModel$get_prior_mean_h0()`](#method-MultistateModel-get_prior_mean_h0)
 
@@ -119,13 +119,13 @@ Set normalization constant for each variable (side effect)
 
 ------------------------------------------------------------------------
 
-### Method `get_auc_normalizers()`
+### Method `get_xpsr_normalizers()`
 
-Get normalization constants for AUC (PK)
+Get normalization constants for exposure (PK)
 
 #### Usage
 
-    MultistateModel$get_auc_normalizers()
+    MultistateModel$get_xpsr_normalizers()
 
 #### Returns
 
@@ -133,13 +133,13 @@ list
 
 ------------------------------------------------------------------------
 
-### Method `set_auc_normalizers()`
+### Method `set_xpsr_normalizers()`
 
-Set normalization constants for AUC (side effect)
+Set normalization constants for exposure (side effect)
 
 #### Usage
 
-    MultistateModel$set_auc_normalizers(loc = 0, scale = 1)
+    MultistateModel$set_xpsr_normalizers(loc = 0, scale = 1)
 
 #### Arguments
 
@@ -232,8 +232,7 @@ Create model
 - `covariates`:
 
   The names of the hazard covariates (excluding possible exposure
-  estimated from PK model). Do not use reserved names `ss_auc` or
-  `dose`.
+  estimated from PK model). Do not use reserved names `xpsr` or `dose`.
 
 - `pk_model`:
 

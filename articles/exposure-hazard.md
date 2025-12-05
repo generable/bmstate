@@ -8,7 +8,7 @@ This vignette is work in progress.
 
 ``` r
 library(bmstate)
-#> Attached bmstate 0.2.11. Type ?bmstate to get started.
+#> Attached bmstate 0.3.0. Type ?bmstate to get started.
 library(dplyr)
 #> 
 #> Attaching package: 'dplyr'
@@ -120,8 +120,8 @@ create_oracle_fit <- function(similar_fit, beta_true, h0_true) {
   beta_oth[1, , ] <- t(beta_true$matrix[, 1])
   beta_oth <- posterior::rvar(beta_oth)
 
-  beta_auc <- similar_fit$get_draws("beta_auc")
-  beta_auc[1, , ] <- t(beta_true$matrix[, 2])
+  beta_xpsr <- similar_fit$get_draws("beta_xpsr")
+  beta_xpsr[1, , ] <- t(beta_true$matrix[, 2])
 
   lp <- similar_fit$get_draws("lp__")
   lp[] <- NA
@@ -141,7 +141,7 @@ create_oracle_fit <- function(similar_fit, beta_true, h0_true) {
   # Create fit
   draws <- list(
     beta_oth = beta_oth,
-    beta_auc = beta_auc,
+    beta_xpsr = beta_xpsr,
     beta_CL = beta_CL,
     beta_V2 = beta_V2,
     weights = weights,
@@ -175,17 +175,14 @@ simdat <- mod_true$simulate_data(
 )
 #> Recompiling Stan model
 #> Using stan file at /home/runner/work/_temp/Library/bmstate/stan/msm.stan
-#> Warning in check_normalized_covariate(x_norm, "ss_auc"): Normalized ss_auc has
-#> maximum absolute value 11.11106, are you sure normalization of covariates is
-#> correct?
 #> Generating 600 paths
 covs_dh <- unique(c(mod_true$data_covs(), "dose_amt"))
 simdat_dh <- simdat$paths$subset_covariates(covs_dh, renamed_old = "dose", renamed_new = "dose_amt")
 simdat_death <- as_single_event(simdat_dh, "Dead", null_state = "Healthy")
 
-sa <- simdat$paths$subject_df$ss_auc
-mod_true$set_auc_normalizers(loc = mean(sa), scale = stats::sd(sa))
-#> setting auc normalizers to loc = 2071.2843, scale = 1770.30317
+sa <- simdat$paths$subject_df$xpsr
+mod_true$set_xpsr_normalizers(loc = mean(sa), scale = stats::sd(sa))
+#> setting xpsr normalizers to loc = 7.34488, scale = 0.7649
 
 simdat <- mod_true$simulate_data(
   params$N_subject,
@@ -202,7 +199,7 @@ print(simdat)
 #> A JointData object: 
 #> PathData object with 600 paths
 #>  * States = {Healthy, Bleed, Stroke, Dead}
-#>  * Covariates = {age, CrCL, weight, dose, t_pre, t_post, conc_pre, conc_post, ss_auc, ka, CL, V2, pk_lloq}
+#>  * Covariates = {age, CrCL, weight, dose, t_pre, t_post, conc_pre, conc_post, xpsr, ka, CL, V2, pk_lloq}
 #> 
 #> A DosingData object with 600 subjects
 ```
@@ -223,7 +220,7 @@ pk_covs <- list(
 # Exposure-hazard multistate model
 mod_ms_eh <- create_msm(
   tm,
-  hazard_covs = setdiff(mod_true$covs(), "ss_auc"),
+  hazard_covs = setdiff(mod_true$covs(), "xpsr"),
   pk_covs = pk_covs,
   num_knots = NK, t_max = mod_true$get_tmax()
 )
@@ -256,29 +253,30 @@ mod_death$set_knots(t3yr, tt3, NK)
 ``` r
 # Oracle fit
 fit_prelim <- fit_stan(mod_true, simdat, method = "optimize", init = 0, iter = 100)
-#> Shortest time interval (0.101164891162739) is smaller than delta_grid (1.09575). Consider increasing n_grid or decreasing t_max of the model.
+#> Shortest time interval (0.43180367938658) is smaller than delta_grid (1.09575). Consider increasing n_grid or decreasing t_max of the model.
 #> Using stan file at /home/runner/work/_temp/Library/bmstate/stan/msm.stan
-#> setting auc normalizers to loc = 1946.42405, scale = 1030.76555
-#> setting max conc = 7812.11765
-#> Initial log joint probability = -913364 
+#> setting xpsr normalizers to loc = 7.40235, scale = 0.56995
+#> setting max conc = 11103.35342
+#> Initial log joint probability = -957545 
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
 #> Error evaluating model log probability: Non-finite gradient. 
 #> Error evaluating model log probability: Non-finite gradient. 
-#>       99        -10054      0.533178       236.108           1           1      119    
+#> Error evaluating model log probability: Non-finite gradient. 
+#>       99       -8871.6      0.274837       777.639           1           1      138    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      100      -10047.7      0.189833       130.448       0.955       0.955      120    
+#>      100      -8861.85      0.492775       1504.19           1           1      139    
 #> Optimization terminated normally:  
 #>   Maximum number of iterations hit, may not be at an optima 
-#> Finished in  0.6 seconds.
+#> Finished in  1.0 seconds.
 fit_true <- create_oracle_fit(fit_prelim, beta_true, h0_true)
 fit_true$covariate_effects()
 #>   covariate      beta target_state_idx target_state
 #> 1       age  0.0 ± NA                2        Bleed
 #> 2       age  0.0 ± NA                3       Stroke
 #> 3       age  0.3 ± NA                4         Dead
-#> 4    ss_auc  1.0 ± NA                2        Bleed
-#> 5    ss_auc -1.0 ± NA                3       Stroke
-#> 6    ss_auc  0.0 ± NA                4         Dead
+#> 4      xpsr  1.0 ± NA                2        Bleed
+#> 5      xpsr -1.0 ± NA                3       Stroke
+#> 6      xpsr  0.0 ± NA                4         Dead
 fit_true$plot_pk()
 #> PK simulation
 ```
@@ -295,104 +293,112 @@ fit_true$plot_h0()
 
 ``` r
 fit_ms_eh <- fit_stan(mod_ms_eh, simdat, method = "optimize", init = 0)
-#> Shortest time interval (0.101164891162739) is smaller than delta_grid (1.09575). Consider increasing n_grid or decreasing t_max of the model.
+#> Shortest time interval (0.43180367938658) is smaller than delta_grid (1.09575). Consider increasing n_grid or decreasing t_max of the model.
 #> Using stan file at /home/runner/work/_temp/Library/bmstate/stan/msm.stan
-#> setting auc normalizers to loc = 1946.42405, scale = 1030.76555
-#> setting max conc = 7812.11765
-#> Initial log joint probability = -913214 
+#> setting xpsr normalizers to loc = 7.40235, scale = 0.56995
+#> setting max conc = 11103.35342
+#> Initial log joint probability = -957395 
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#> Error evaluating model log probability: Non-finite gradient. 
-#> Error evaluating model log probability: Non-finite gradient. 
-#>       99        -11598      0.111203       1284.24      0.4398      0.4398      127    
+#>       99      -13466.9      0.134121       585.054      0.7989      0.7989      160    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      199        -10650     0.0147766       3142.56       0.231       0.231      245    
+#>      199      -10548.7      0.065471       205.978      0.6478      0.6478      267    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      299      -10119.2      0.102406       1843.96           1           1      354    
+#>      299      -10287.3     0.0550827       101.984           1           1      374    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      399      -9700.65     0.0939468       1590.68           1           1      479    
+#>      399      -8833.24     0.0117592        498.88      0.5588      0.5588      499    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      499      -9210.67     0.0359452       1998.75      0.8871      0.8871      587    
+#>      499      -8773.69     0.0473253       200.512           1           1      605    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      599      -8661.82      0.128189       3063.91           1           1      695    
+#>      599      -8762.98    0.00380779       23.4628      0.8102      0.8102      714    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      699      -8217.94      0.217147       607.564           1           1      809    
+#>      699      -8757.95     0.0330903       53.5451           1           1      824    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      799      -7993.53     0.0402209       867.503           1           1      924    
+#>      799      -8755.28     0.0178851       44.4238           1           1      931    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      899      -7817.11    0.00780137       2229.05      0.6751      0.6751     1032    
+#>      899       -8752.8    0.00678303       22.1161      0.6257      0.6257     1044    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      999      -7670.43     0.0109006       653.835           1           1     1147    
+#>      999      -8749.74     0.0455133       84.1514      0.4688      0.4688     1155    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>     1099      -7557.53     0.0442656        1474.1       0.339           1     1263    
+#>     1099       -8739.2    0.00686113       52.6303      0.4495      0.4495     1269    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>     1199      -7488.16     0.0392131        1038.8           1           1     1372    
+#>     1199      -8736.53    0.00194763       15.3804      0.2488           1     1385    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>     1299      -7402.29    0.00842692       790.551           1           1     1483    
+#>     1299      -8735.71    0.00472893       13.9008           1           1     1494    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>     1399      -7301.99    0.00629007       654.448           1           1     1594    
+#>     1399      -8735.42    0.00246577       24.7813      0.4241      0.4241     1602    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>     1499      -7212.89     0.0385246       980.136           1           1     1703    
+#>     1499         -8735   0.000959264       12.4187           1           1     1711    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>     1599      -7153.81     0.0102807       561.833           1           1     1810    
+#>     1599      -8734.41    0.00118824       41.6362      0.5342      0.5342     1819    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>     1699      -7105.35    0.00122472       307.033           1           1     1927    
+#>     1699      -8724.82     0.0284222       23.9692           1           1     1933    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>     1799      -7075.92     0.0808023       2341.81           1           1     2039    
+#>     1799      -8720.56     0.0190098       58.0966           1           1     2042    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>     1899      -7028.52    0.00288425       536.327           1           1     2148    
+#>     1899      -8719.85    0.00163301       14.6072           1           1     2151    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>     1999      -6998.48    0.00666188       317.419           1           1     2261    
+#>     1999      -8719.61   0.000322125       8.37171      0.7877      0.7877     2259    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>     2000      -6998.35    0.00343086       303.829           1           1     2262    
+#>     2000      -8719.61   0.000604208       10.8696           1           1     2260    
 #> Optimization terminated normally:  
 #>   Maximum number of iterations hit, may not be at an optima 
-#> Finished in  11.1 seconds.
+#> Finished in  14.4 seconds.
 fit_ms_dh <- fit_stan(mod_ms_dh, simdat_dh, method = "optimize", init = 0)
 #> Shortest time interval (0.0999999999999943) is smaller than delta_grid (1.09575). Consider increasing n_grid or decreasing t_max of the model.
 #> Using stan file at /home/runner/work/_temp/Library/bmstate/stan/msm.stan
-#> Initial log joint probability = -823515 
+#> Initial log joint probability = -721464 
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>       99      -6166.77      0.324794       95.4285           1           1      127    
+#>       99      -6718.59     0.0843703       96.3895           1           1      120    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      199      -6121.13     0.0145094       18.6248           1           1      238    
+#>      199      -6650.16      0.285527       79.8082           1           1      225    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      299      -6093.87     0.0128702       26.3508      0.3991      0.3991      346    
+#>      299      -6642.57    0.00388817       20.9987      0.6704      0.6704      331    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      399      -6081.71    0.00929491       10.9813           1           1      456    
+#>      399      -6638.63     0.0163856       7.03785           1           1      440    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      499      -6080.61    0.00239326       8.66947           1           1      566    
+#>      499      -6632.07     0.0690188       34.2961           1           1      543    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      599      -6080.33    0.00493426       5.41942           1           1      672    
+#>      599      -6626.16     0.0067006       8.83777      0.9939      0.9939      652    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      699      -6080.04     0.0457803       8.99354           1           1      782    
+#>      699      -6625.32     0.0761852       14.0505           1           1      757    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      799      -6079.82     0.0244148       12.3921      0.2345           1      891    
+#>      799      -6622.02     0.0285054       17.4926       0.286           1      867    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      899      -6079.65    0.00134296       1.55655           1           1     1002    
+#>      899      -6614.12    0.00792563       11.0484       0.853       0.853      981    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      999      -6079.59    0.00514431       2.65507           1           1     1119    
+#>      999      -6612.06     0.0328372       23.4549           1           1     1089    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>     1099      -6079.57    0.00460345       1.78312           1           1     1234    
+#>     1099      -6609.61     0.0766424       10.7358           1           1     1197    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>     1199      -6079.54     0.0105793       2.77461           1           1     1342    
+#>     1199      -6606.72     0.0111774       12.9944           1           1     1314    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>     1299      -6079.36      0.118515       9.08166           1           1     1451    
+#>     1299      -6605.14     0.0208145       11.3211           1           1     1430    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>     1399      -6079.13   0.000727898        3.0097           1           1     1558    
+#>     1399      -6603.03     0.0191563       31.4591      0.3404      0.3404     1545    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>     1499      -6079.04   0.000239679       1.89155      0.6807      0.6807     1666    
+#>     1499      -6601.24     0.0120439       6.81678           1           1     1652    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>     1555      -6079.03   0.000894302      0.452686           1           1     1728    
+#>     1599      -6600.98    0.00482129       2.18416       1.656      0.1656     1761    
+#>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
+#>     1699      -6600.87    0.00177176       3.67063           1           1     1866    
+#>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
+#>     1799      -6600.83    0.00287955       1.91997      0.4346      0.4346     1976    
+#>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
+#>     1899       -6600.8    0.00308483      0.885636           1           1     2086    
+#>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
+#>     1999      -6600.78    0.00154565       1.45032           1           1     2192    
+#>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
+#>     2000      -6600.78   0.000849788      0.513626      0.9207      0.9207     2193    
 #> Optimization terminated normally:  
-#>   Convergence detected: relative gradient magnitude is below tolerance 
-#> Finished in  5.0 seconds.
+#>   Maximum number of iterations hit, may not be at an optima 
+#> Finished in  10.1 seconds.
 fit_death <- fit_stan(mod_death, simdat_death, method = "optimize", init = 0)
 #> Using stan file at /home/runner/work/_temp/Library/bmstate/stan/msm.stan
-#> Initial log joint probability = -290039 
+#> Initial log joint probability = -255418 
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>       99       -3436.6      0.013958       2.28045           1           1      119    
+#>       99      -3977.35     0.0183187      0.743335           1           1      121    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      124      -3436.51    0.00200116     0.0855125      0.8082      0.8082      149    
+#>      132       -3977.3   0.000260916     0.0623965      0.9149      0.9149      155    
 #> Optimization terminated normally:  
 #>   Convergence detected: relative gradient magnitude is below tolerance 
 #> Finished in  0.1 seconds.
@@ -404,32 +410,32 @@ fit_ms_eh$plot_h0()
 ``` r
 fit_ms_eh$covariate_effects()
 #>   covariate       beta target_state_idx target_state
-#> 1       age -0.16 ± NA                2        Bleed
-#> 2       age -1.03 ± NA                3       Stroke
-#> 3       age -0.17 ± NA                4         Dead
-#> 4    ss_auc  3.33 ± NA                2        Bleed
-#> 5    ss_auc  3.25 ± NA                3       Stroke
-#> 6    ss_auc  2.13 ± NA                4         Dead
+#> 1       age  0.42 ± NA                2        Bleed
+#> 2       age  0.10 ± NA                3       Stroke
+#> 3       age  0.31 ± NA                4         Dead
+#> 4      xpsr -0.47 ± NA                2        Bleed
+#> 5      xpsr -0.80 ± NA                3       Stroke
+#> 6      xpsr -0.24 ± NA                4         Dead
 fit_ms_dh$covariate_effects()
 #>    covariate        beta target_state_idx target_state
-#> 1        age  0.966 ± NA                2        Bleed
-#> 2        age -0.415 ± NA                3       Stroke
-#> 3        age  0.264 ± NA                4         Dead
-#> 4       CrCL -0.775 ± NA                2        Bleed
-#> 5       CrCL  0.273 ± NA                3       Stroke
-#> 6       CrCL -0.062 ± NA                4         Dead
-#> 7     weight -0.858 ± NA                2        Bleed
-#> 8     weight  0.301 ± NA                3       Stroke
+#> 1        age  0.582 ± NA                2        Bleed
+#> 2        age -0.600 ± NA                3       Stroke
+#> 3        age  0.221 ± NA                4         Dead
+#> 4       CrCL -0.485 ± NA                2        Bleed
+#> 5       CrCL  0.688 ± NA                3       Stroke
+#> 6       CrCL  0.054 ± NA                4         Dead
+#> 7     weight -0.471 ± NA                2        Bleed
+#> 8     weight  0.576 ± NA                3       Stroke
 #> 9     weight -0.034 ± NA                4         Dead
-#> 10  dose_amt  1.451 ± NA                2        Bleed
-#> 11  dose_amt -0.749 ± NA                3       Stroke
-#> 12  dose_amt  0.047 ± NA                4         Dead
+#> 10  dose_amt  0.858 ± NA                2        Bleed
+#> 11  dose_amt -1.060 ± NA                3       Stroke
+#> 12  dose_amt -0.067 ± NA                4         Dead
 fit_death$covariate_effects()
 #>   covariate        beta target_state_idx target_state
-#> 1       age  0.029 ± NA                2         Dead
-#> 2      CrCL -0.016 ± NA                2         Dead
-#> 3    weight  0.032 ± NA                2         Dead
-#> 4  dose_amt -0.016 ± NA                2         Dead
+#> 1       age -0.071 ± NA                2         Dead
+#> 2      CrCL  0.232 ± NA                2         Dead
+#> 3    weight  0.080 ± NA                2         Dead
+#> 4  dose_amt -0.179 ± NA                2         Dead
 ```
 
 ``` r

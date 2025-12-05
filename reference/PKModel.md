@@ -25,7 +25,7 @@ absorption.
 
 - [`PKModel$simulate_ss()`](#method-PKModel-simulate_ss)
 
-- [`PKModel$compute_ss_auc()`](#method-PKModel-compute_ss_auc)
+- [`PKModel$compute_xpsr()`](#method-PKModel-compute_xpsr)
 
 - [`PKModel$simulate_data()`](#method-PKModel-simulate_data)
 
@@ -164,14 +164,14 @@ the central compartment.
 
 ------------------------------------------------------------------------
 
-### Method `compute_ss_auc()`
+### Method `compute_xpsr()`
 
-Compute steady-state area under concentration curve over one dosing
-interval
+Compute exposure, which is the steady-state log area under concentration
+curve over one dosing interval
 
 #### Usage
 
-    PKModel$compute_ss_auc(theta, dose)
+    PKModel$compute_xpsr(theta, dose)
 
 #### Arguments
 

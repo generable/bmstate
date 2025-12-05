@@ -2,7 +2,7 @@
 
 ``` r
 library(bmstate)
-#> Attached bmstate 0.2.11. Type ?bmstate to get started.
+#> Attached bmstate 0.3.0. Type ?bmstate to get started.
 library(ggplot2)
 theme_set(theme_bw())
 ```
@@ -93,7 +93,7 @@ fit <- fit_stan(mod, simdat,
 #> Chain 1 Iteration: 601 / 800 [ 75%]  (Sampling) 
 #> Chain 1 Iteration: 700 / 800 [ 87%]  (Sampling) 
 #> Chain 1 Iteration: 800 / 800 [100%]  (Sampling) 
-#> Chain 1 finished in 7.3 seconds.
+#> Chain 1 finished in 7.7 seconds.
 ```
 
 ## Sampling diagnostics
@@ -107,12 +107,12 @@ print(fit$info$diag)
 #> [1] 0
 #> 
 #> $ebfmi
-#> [1] 0.7357373
+#> [1] 0.9511244
 ```
 
 ``` r
 print(max(fit$info$summary$rhat))
-#> [1] 1.016208
+#> [1] 1.032779
 ```
 
 ## Inferred baseline hazard

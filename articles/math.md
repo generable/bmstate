@@ -2,7 +2,7 @@
 
 ``` r
 library(bmstate)
-#> Attached bmstate 0.2.11. Type ?bmstate to get started.
+#> Attached bmstate 0.3.0. Type ?bmstate to get started.
 library(ggplot2)
 theme_set(theme_bw())
 ```
@@ -102,8 +102,8 @@ cat(prior_stan_code)
 #>         beta_oth[1, k] ~ normal(0, 1);
 #>       }
 #>     }
-#>     if(I_auc==1){
-#>       beta_auc[1, 1] ~ normal(0, 1); // only if has pk submodel
+#>     if(I_xpsr==1){
+#>       beta_xpsr[1, 1] ~ normal(0, 1); // only if has pk submodel
 #>     }
 #> 
 #>     // Baseline hazard base level

@@ -5,7 +5,7 @@ Evaluate PK parameters
 ## Usage
 
 ``` r
-msmfit_pk_params(fit, oos = FALSE, data = NULL)
+msmfit_pk_params(fit, oos = FALSE, data = NULL, log = FALSE)
 ```
 
 ## Arguments
@@ -26,6 +26,10 @@ msmfit_pk_params(fit, oos = FALSE, data = NULL)
   A
   [`JointData`](https://generable.github.io/bmstate/reference/JointData.md)
   object. If `NULL`, the data used to fit the model is used.
+
+- log:
+
+  Get logarithm of params?
 
 ## Value
 
