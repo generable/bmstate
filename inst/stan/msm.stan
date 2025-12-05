@@ -2,7 +2,7 @@ functions {
 
   // log SS AUC
   vector log_ss_area_under_conc(vector dose_ss, matrix log_theta_pk){
-    return(log(dose_ss) - log_theta_pk[:,2] - log_theta_pk[:,3]) ; // log D/(CL*V2)
+    return(log(dose_ss) - log_theta_pk[:,2]) ; // log D/CL
   }
 
   // log of hazard multiplier
@@ -448,7 +448,7 @@ model {
   if(do_haz == 1){
     if(nc_haz > 0){
       for(k in 1:nc_haz){
-        beta_oth[1, k] ~ normal(0, 2);
+        beta_oth[1, k] ~ normal(0, 1);
       }
     }
     if(I_xpsr==1){

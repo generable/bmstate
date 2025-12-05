@@ -142,7 +142,7 @@ mod$get_knots()
 We fit the model by optimizing.
 
 ```{r}
-fit <- fit_stan(mod, data = pd, method = "optimize")
+fit <- fit_stan(mod, data = pd, method = "optimize", init = 0.1)
 ```
 
 ## Inferred baseline hazards
