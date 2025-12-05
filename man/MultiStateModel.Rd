@@ -26,8 +26,8 @@ hazard model part?}
 \item \href{#method-MultistateModel-get_normalizers}{\code{MultistateModel$get_normalizers()}}
 \item \href{#method-MultistateModel-get_n_grid}{\code{MultistateModel$get_n_grid()}}
 \item \href{#method-MultistateModel-set_normalizers}{\code{MultistateModel$set_normalizers()}}
-\item \href{#method-MultistateModel-get_auc_normalizers}{\code{MultistateModel$get_auc_normalizers()}}
-\item \href{#method-MultistateModel-set_auc_normalizers}{\code{MultistateModel$set_auc_normalizers()}}
+\item \href{#method-MultistateModel-get_xpsr_normalizers}{\code{MultistateModel$get_xpsr_normalizers()}}
+\item \href{#method-MultistateModel-set_xpsr_normalizers}{\code{MultistateModel$set_xpsr_normalizers()}}
 \item \href{#method-MultistateModel-get_prior_mean_h0}{\code{MultistateModel$get_prior_mean_h0()}}
 \item \href{#method-MultistateModel-set_prior_mean_h0}{\code{MultistateModel$set_prior_mean_h0()}}
 \item \href{#method-MultistateModel-set_prior_mean_h0_data}{\code{MultistateModel$set_prior_mean_h0_data()}}
@@ -91,12 +91,12 @@ Set normalization constant for each variable (side effect)
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModel-get_auc_normalizers"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModel-get_auc_normalizers}{}}}
-\subsection{Method \code{get_auc_normalizers()}}{
-Get normalization constants for AUC (PK)
+\if{html}{\out{<a id="method-MultistateModel-get_xpsr_normalizers"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-get_xpsr_normalizers}{}}}
+\subsection{Method \code{get_xpsr_normalizers()}}{
+Get normalization constants for exposure (PK)
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$get_auc_normalizers()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$get_xpsr_normalizers()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
@@ -104,12 +104,12 @@ list
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-MultistateModel-set_auc_normalizers"></a>}}
-\if{latex}{\out{\hypertarget{method-MultistateModel-set_auc_normalizers}{}}}
-\subsection{Method \code{set_auc_normalizers()}}{
-Set normalization constants for AUC (side effect)
+\if{html}{\out{<a id="method-MultistateModel-set_xpsr_normalizers"></a>}}
+\if{latex}{\out{\hypertarget{method-MultistateModel-set_xpsr_normalizers}{}}}
+\subsection{Method \code{set_xpsr_normalizers()}}{
+Set normalization constants for exposure (side effect)
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$set_auc_normalizers(loc = 0, scale = 1)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MultistateModel$set_xpsr_normalizers(loc = 0, scale = 1)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -197,7 +197,7 @@ Create model
 
 \item{\code{covariates}}{The names of the hazard covariates (excluding possible
 exposure estimated from PK model). Do not use reserved names
-\code{ss_auc} or \code{dose}.}
+\code{xpsr} or \code{dose}.}
 
 \item{\code{pk_model}}{A \code{\link{PKModel}} or NULL.}
 

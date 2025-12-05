@@ -1,14 +1,19 @@
 functions {
 
+  // log SS AUC
+  vector log_ss_area_under_conc(vector dose_ss, matrix log_theta_pk){
+    return(log(dose_ss) - log_theta_pk[:,2] - log_theta_pk[:,3]) ; // D/(CL*V2)
+  }
+
   // log of hazard multiplier
   matrix compute_log_hazard_multiplier(
       data int N_int,
       array[] vector beta_oth,
-      array[] vector beta_auc,
+      array[] vector beta_xpsr,
       data array[] vector x_haz,
-      array[] vector x_auc,
-      real auc_loc,
-      real auc_scale,
+      array[] vector x_xpsr,
+      real xpsr_loc,
+      real xpsr_scale,
       data array[] int ttype
   ) {
     int N_trans = size(ttype);
@@ -21,8 +26,8 @@ functions {
           log_C_haz[,j] += beta_oth[k][h] * x_haz[k];
         }
       }
-      if(size(beta_auc)==1){
-        log_C_haz[,j] += beta_auc[1][h] * ((x_auc[1] - auc_loc) / auc_scale);
+      if(size(beta_xpsr)==1){
+        log_C_haz[,j] += beta_xpsr[1][h] * ((x_xpsr[1] - xpsr_loc) / xpsr_scale);
       }
     }
     return(log_C_haz);
@@ -50,7 +55,7 @@ functions {
   }
 
   // Transform params
-  matrix compute_theta_pk(
+  matrix compute_log_theta_pk(
       array[] vector log_z, vector log_mu, vector log_sig,
       vector beta_ka, vector beta_CL, vector beta_V2,
       array[] vector x_ka, array[] vector x_CL, array[] vector x_V2
@@ -72,7 +77,7 @@ functions {
         sum(beta_V2 .* x_V2[n]);
 
     }
-    return(exp(log_theta));
+    return(log_theta);
   }
 
   // Analytic solution with general initial condition (A0, C0)
@@ -298,9 +303,9 @@ data {
   array[N_trans] int<lower=1,upper=N_trans_types> ttype;
 
   // PK options
-  int<lower=0,upper=1> I_auc;
-  real<lower=0> auc_loc;
-  real<lower=0> auc_scale;
+  int<lower=0,upper=1> I_xpsr;
+  real<lower=0> xpsr_loc;
+  real<lower=0> xpsr_scale;
   int<lower=0> nc_ka; // num of predictors for ka
   int<lower=0> nc_CL; // num of predictors for CL
   int<lower=0> nc_V2; // num of predictors for V2
@@ -379,7 +384,7 @@ parameters {
 
   // Covariate effects
   array[do_haz, nc_haz] vector[N_trans_types] beta_oth;
-  array[do_haz, I_auc] vector[N_trans_types] beta_auc;
+  array[do_haz, I_xpsr] vector[N_trans_types] beta_xpsr;
 
   // PK model
   array[do_pk, N_sub] vector[3] log_z_pk;
@@ -408,31 +413,31 @@ transformed parameters {
   }
 
   // PK quantities
-  array[do_pk] matrix[N_sub, 3] theta_pk;
+  array[do_pk] matrix[N_sub, 3] log_theta_pk;
   array[do_pk, N_sub] vector[2] conc_mu_pk;
-  array[do_pk] vector[N_sub] ss_auc; // auc for each subject
-  array[do_pk] vector[N_int] x_auc_long; // auc for each interval
+  array[do_pk] vector[N_sub] ss_xpsr; // xpsr for each subject
+  array[do_pk] vector[N_int] x_xpsr_long; // xpsr for each interval
 
   if(do_pk == 1){
 
     // PK params
-    theta_pk[1] = compute_theta_pk(
+    log_theta_pk[1] = compute_log_theta_pk(
       log_z_pk[1], log_mu_pk[1], log_sig_pk[1],
       beta_ka[1], beta_CL[1], beta_V2[1], x_ka, x_CL, x_V2
     );
 
     // Drug concentration estimated at t_obs
     conc_mu_pk[1] = pop_2cpt_partly_ss(
-      t_obs_pk, dose_ss, last_two_times, last_two_doses, theta_pk[1], tau_ss,
+      t_obs_pk, dose_ss, last_two_times, last_two_doses, exp(log_theta_pk[1]), tau_ss,
       MAX_CONC
     );
 
-    // Concentration AUC at steady state
-    ss_auc[1] = (dose_ss ./ (theta_pk[1][:,2] .* theta_pk[1][:,3])); // D/(CL*V2)
+    // Concentration xpsr at steady state
+    ss_xpsr[1] = log_ss_area_under_conc(dose_ss, log_theta_pk[1]);
 
-    // Set AUC corresponding to each interval
+    // Set xpsr corresponding to each interval
     for(n in 1:N_int){
-      x_auc_long[1][n] = ss_auc[1][idx_sub[n]];
+      x_xpsr_long[1][n] = ss_xpsr[1][idx_sub[n]];
     }
   }
 }
@@ -446,8 +451,8 @@ model {
         beta_oth[1, k] ~ normal(0, 1);
       }
     }
-    if(I_auc==1){
-      beta_auc[1, 1] ~ normal(0, 1); // only if has pk submodel
+    if(I_xpsr==1){
+      beta_xpsr[1, 1] ~ normal(0, 1); // only if has pk submodel
     }
 
     // Baseline hazard base level
@@ -481,7 +486,7 @@ model {
 
       // log of hazard multiplier on each interval
       matrix[N_int, N_trans] log_C_haz = compute_log_hazard_multiplier(
-        N_int, beta_oth[1], beta_auc[1], x_haz_long, x_auc_long, auc_loc, auc_scale,
+        N_int, beta_oth[1], beta_xpsr[1], x_haz_long, x_xpsr_long, xpsr_loc, xpsr_scale,
         ttype
       );
 

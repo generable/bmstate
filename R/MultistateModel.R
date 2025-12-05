@@ -47,13 +47,13 @@ MultistateModel <- R6::R6Class("MultistateModel",
     categorical = NULL,
     normalizer_locations = NULL,
     normalizer_scales = NULL,
-    auc_normalizer_loc = 2000,
-    auc_normalizer_scale = 1000,
+    xpsr_normalizer_loc = 7.5,
+    xpsr_normalizer_scale = 0.5,
     n_grid = NULL,
     simulate_log_hazard_multipliers = function(df_subjects, beta) {
       ts <- self$target_states()
       x <- self$covs()
-      auc_norm <- self$get_auc_normalizers()
+      xpsr_norm <- self$get_xpsr_normalizers()
       B <- length(ts)
       K <- length(x)
       checkmate::assert_matrix(beta, nrows = B, ncols = K)
@@ -64,10 +64,10 @@ MultistateModel <- R6::R6Class("MultistateModel",
       X <- df_subjects |> dplyr::select(tidyselect::all_of(x))
       X <- as.matrix(X)
       X_norm <- normalize_columns(X)
-      if ("ss_auc" %in% x) {
-        idx <- which(x == "ss_auc")
-        x_norm <- (X[, idx] - auc_norm$loc) / auc_norm$scale
-        check_normalized_covariate(x_norm, "ss_auc")
+      if ("xpsr" %in% x) {
+        idx <- which(x == "xpsr")
+        x_norm <- (X[, idx] - xpsr_norm$loc) / xpsr_norm$scale
+        check_normalized_covariate(x_norm, "xpsr")
         X_norm[, idx] <- x_norm
       }
       for (s in seq_len(S)) {
@@ -149,28 +149,28 @@ MultistateModel <- R6::R6Class("MultistateModel",
       invisible(NULL)
     },
 
-    #' @description Get normalization constants for AUC (PK)
+    #' @description Get normalization constants for exposure (PK)
     #' @return list
-    get_auc_normalizers = function() {
+    get_xpsr_normalizers = function() {
       list(
-        loc = private$auc_normalizer_loc,
-        scale = private$auc_normalizer_scale
+        loc = private$xpsr_normalizer_loc,
+        scale = private$xpsr_normalizer_scale
       )
     },
 
-    #' @description Set normalization constants for AUC (side effect)
+    #' @description Set normalization constants for exposure (side effect)
     #'
     #' @param loc Location
     #' @param scale Scale
-    set_auc_normalizers = function(loc = 0, scale = 1) {
+    set_xpsr_normalizers = function(loc = 0, scale = 1) {
       checkmate::assert_numeric(loc, lower = 0, len = 1)
       checkmate::assert_numeric(scale, lower = 0, len = 1)
       message(
-        "setting auc normalizers to loc = ",
+        "setting xpsr normalizers to loc = ",
         round(loc, 5), ", scale = ", round(scale, 5)
       )
-      private$auc_normalizer_loc <- loc
-      private$auc_normalizer_scale <- scale
+      private$xpsr_normalizer_loc <- loc
+      private$xpsr_normalizer_scale <- scale
       invisible(NULL)
     },
 
@@ -211,7 +211,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
     #' @param system A \code{\link{MultistateSystem}}
     #' @param covariates The names of the hazard covariates (excluding possible
     #' exposure estimated from PK model). Do not use reserved names
-    #' \code{ss_auc} or \code{dose}.
+    #' \code{xpsr} or \code{dose}.
     #' @param pk_model A \code{\link{PKModel}} or NULL.
     #' @param t_max Max time.
     #' @param num_knots Total number of spline knots.
@@ -232,7 +232,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
       if (!all(categorical %in% covariates)) {
         stop("all categorical covariates should be also in covariates")
       }
-      checkmate::assert_true(!("ss_auc" %in% covariates)) # special name
+      checkmate::assert_true(!("xpsr" %in% covariates)) # special name
       checkmate::assert_true(!("dose" %in% covariates)) # special name
       checkmate::assert_class(system, "MultistateSystem")
       checkmate::assert_integerish(n_grid, lower = 10, len = 1)
@@ -310,7 +310,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
     covs = function() {
       x <- private$hazard_covariates
       if (self$has_pk()) {
-        x <- c(x, "ss_auc")
+        x <- c(x, "xpsr")
       }
       unique(x)
     },

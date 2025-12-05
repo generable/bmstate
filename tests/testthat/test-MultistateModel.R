@@ -59,7 +59,7 @@ test_that("MultistateModel with PK submodel works", {
     V2 = c("weight", "sex")
   )
   mod <- create_msm(tm, covs, pk_covs)
-  expect_equal(mod$covs(), c("sex", "age", "ss_auc"))
+  expect_equal(mod$covs(), c("sex", "age", "xpsr"))
   expect_equal(mod$data_covs(), c("sex", "age", "CrCL", "weight"))
   tmax <- 3 * 365.25
   mod$set_knots(tmax, seq(0, tmax - 1, length.out = 1000), 3)

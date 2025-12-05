@@ -133,8 +133,8 @@ create_oracle_fit <- function(similar_fit, beta_true, h0_true) {
   beta_oth[1, , ] <- t(beta_true$matrix[, 1])
   beta_oth <- posterior::rvar(beta_oth)
 
-  beta_auc <- similar_fit$get_draws("beta_auc")
-  beta_auc[1, , ] <- t(beta_true$matrix[, 2])
+  beta_xpsr <- similar_fit$get_draws("beta_xpsr")
+  beta_xpsr[1, , ] <- t(beta_true$matrix[, 2])
 
   lp <- similar_fit$get_draws("lp__")
   lp[] <- NA
@@ -154,7 +154,7 @@ create_oracle_fit <- function(similar_fit, beta_true, h0_true) {
   # Create fit
   draws <- list(
     beta_oth = beta_oth,
-    beta_auc = beta_auc,
+    beta_xpsr = beta_xpsr,
     beta_CL = beta_CL,
     beta_V2 = beta_V2,
     weights = weights,
@@ -190,8 +190,8 @@ covs_dh <- unique(c(mod_true$data_covs(), "dose_amt"))
 simdat_dh <- simdat$paths$subset_covariates(covs_dh, renamed_old = "dose", renamed_new = "dose_amt")
 simdat_death <- as_single_event(simdat_dh, "Dead", null_state = "Healthy")
 
-sa <- simdat$paths$subject_df$ss_auc
-mod_true$set_auc_normalizers(loc = mean(sa), scale = stats::sd(sa))
+sa <- simdat$paths$subject_df$xpsr
+mod_true$set_xpsr_normalizers(loc = mean(sa), scale = stats::sd(sa))
 
 simdat <- mod_true$simulate_data(
   params$N_subject,
@@ -223,7 +223,7 @@ pk_covs <- list(
 # Exposure-hazard multistate model
 mod_ms_eh <- create_msm(
   tm,
-  hazard_covs = setdiff(mod_true$covs(), "ss_auc"),
+  hazard_covs = setdiff(mod_true$covs(), "xpsr"),
   pk_covs = pk_covs,
   num_knots = NK, t_max = mod_true$get_tmax()
 )
