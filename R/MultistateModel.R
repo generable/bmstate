@@ -47,7 +47,7 @@ MultistateModel <- R6::R6Class("MultistateModel",
     categorical = NULL,
     normalizer_locations = NULL,
     normalizer_scales = NULL,
-    xpsr_normalizer_loc = 7.5,
+    xpsr_normalizer_loc = 5.5, # corresponds to about dose=30
     xpsr_normalizer_scale = 0.5,
     n_grid = NULL,
     simulate_log_hazard_multipliers = function(df_subjects, beta) {
