@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bmstate</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,7 +78,7 @@ Timonen</h4>
 </h3>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://generable.github.io/bmstate/">bmstate</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Attached bmstate 0.3.1. Type ?bmstate to get started.</span></span>
+<span><span class="co">#&gt; Attached bmstate 0.3.3. Type ?bmstate to get started.</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
@@ -250,7 +250,7 @@ Timonen</h4>
 <span></span>
 <span><span class="va">sa</span> <span class="op">&lt;-</span> <span class="va">simdat</span><span class="op">$</span><span class="va">paths</span><span class="op">$</span><span class="va">subject_df</span><span class="op">$</span><span class="va">xpsr</span></span>
 <span><span class="va">mod_true</span><span class="op">$</span><span class="fu">set_xpsr_normalizers</span><span class="op">(</span>loc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">sa</span><span class="op">)</span>, scale <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">sa</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; setting xpsr normalizers to loc = 7.34488, scale = 0.7649</span></span>
+<span><span class="co">#&gt; setting xpsr normalizers to loc = 5.34993, scale = 0.69161</span></span>
 <span></span>
 <span><span class="va">simdat</span> <span class="op">&lt;-</span> <span class="va">mod_true</span><span class="op">$</span><span class="fu">simulate_data</span><span class="op">(</span></span>
 <span>  <span class="va">params</span><span class="op">$</span><span class="va">N_subject</span>,</span>
@@ -317,24 +317,21 @@ Timonen</h4>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Oracle fit</span></span>
 <span><span class="va">fit_prelim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_stan.html">fit_stan</a></span><span class="op">(</span><span class="va">mod_true</span>, <span class="va">simdat</span>, method <span class="op">=</span> <span class="st">"optimize"</span>, init <span class="op">=</span> <span class="fl">0</span>, iter <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Shortest time interval (0.43180367938658) is smaller than delta_grid (1.09575). Consider increasing n_grid or decreasing t_max of the model.</span></span>
+<span><span class="co">#&gt; Shortest time interval (0.100000000000023) is smaller than delta_grid (1.09575). Consider increasing n_grid or decreasing t_max of the model.</span></span>
 <span><span class="co">#&gt; Using stan file at /home/runner/work/_temp/Library/bmstate/stan/msm.stan</span></span>
-<span><span class="co">#&gt; setting xpsr normalizers to loc = 7.40235, scale = 0.56995</span></span>
-<span><span class="co">#&gt; setting max conc = 11103.35342</span></span>
-<span><span class="co">#&gt; Initial log joint probability = -957545 </span></span>
+<span><span class="co">#&gt; setting xpsr normalizers to loc = 5.42315, scale = 0.56671</span></span>
+<span><span class="co">#&gt; setting max conc = 9565.56038</span></span>
+<span><span class="co">#&gt; Initial log joint probability = -899042 </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt; Error evaluating model log probability: Non-finite gradient. </span></span>
-<span><span class="co">#&gt; Error evaluating model log probability: Non-finite gradient. </span></span>
-<span><span class="co">#&gt; Error evaluating model log probability: Non-finite gradient. </span></span>
-<span><span class="co">#&gt;       99      -8890.48     0.0748033       439.968           1           1      144    </span></span>
+<span><span class="co">#&gt;       99      -9793.73      0.045901       1148.39      0.8822      0.8822      120    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      100      -8884.79      0.164095       1041.58           1           1      145    </span></span>
+<span><span class="co">#&gt;      100      -9788.14      0.016727       786.414           1           1      121    </span></span>
 <span><span class="co">#&gt; Optimization terminated normally:  </span></span>
 <span><span class="co">#&gt;   Maximum number of iterations hit, may not be at an optima </span></span>
 <span><span class="co">#&gt; Finished in  0.7 seconds.</span></span>
 <span><span class="co">#&gt; If these don't roughly match, consider refitting after setting xpsr normalizer loc and scale closer to estimated mean and sd. Otherwise interpret baseline hazards and xpsr effect size accodingly.</span></span>
-<span><span class="co">#&gt;  - xpsr normalization loc = 7.40235, mean estimated xpsr = 12.36832</span></span>
-<span><span class="co">#&gt;  - xpsr normalization scale = 0.56995, estimated xpsr sd = 0.70053</span></span>
+<span><span class="co">#&gt;  - xpsr normalization loc = 5.42315, mean estimated xpsr = 5.43736</span></span>
+<span><span class="co">#&gt;  - xpsr normalization scale = 0.56671, estimated xpsr sd = 0.70956</span></span>
 <span><span class="va">fit_true</span> <span class="op">&lt;-</span> <span class="fu">create_oracle_fit</span><span class="op">(</span><span class="va">fit_prelim</span>, <span class="va">beta_true</span>, <span class="va">h0_true</span><span class="op">)</span></span>
 <span><span class="va">fit_true</span><span class="op">$</span><span class="fu">covariate_effects</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   covariate      beta target_state_idx target_state</span></span>
@@ -356,115 +353,109 @@ Timonen</h4>
 </h3>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_ms_eh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_stan.html">fit_stan</a></span><span class="op">(</span><span class="va">mod_ms_eh</span>, <span class="va">simdat</span>, method <span class="op">=</span> <span class="st">"optimize"</span>, init <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Shortest time interval (0.43180367938658) is smaller than delta_grid (1.09575). Consider increasing n_grid or decreasing t_max of the model.</span></span>
+<span><span class="co">#&gt; Shortest time interval (0.100000000000023) is smaller than delta_grid (1.09575). Consider increasing n_grid or decreasing t_max of the model.</span></span>
 <span><span class="co">#&gt; Using stan file at /home/runner/work/_temp/Library/bmstate/stan/msm.stan</span></span>
-<span><span class="co">#&gt; setting xpsr normalizers to loc = 7.40235, scale = 0.56995</span></span>
-<span><span class="co">#&gt; setting max conc = 11103.35342</span></span>
-<span><span class="co">#&gt; Initial log joint probability = -957395 </span></span>
+<span><span class="co">#&gt; setting xpsr normalizers to loc = 5.42315, scale = 0.56671</span></span>
+<span><span class="co">#&gt; setting max conc = 9565.56038</span></span>
+<span><span class="co">#&gt; Initial log joint probability = -898892 </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;       99      -13219.4       3.70974       1123.64           1           1      160    </span></span>
+<span><span class="co">#&gt;       99      -9603.42      0.203959       2084.08      0.5976      0.5976      119    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      199      -9592.67     0.0380356       206.009           1           1      270    </span></span>
+<span><span class="co">#&gt;      199      -8892.36     0.0260811       593.149           1           1      229    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      299      -9078.43    0.00983121       138.463           1           1      377    </span></span>
+<span><span class="co">#&gt;      299      -8465.04      0.036666       1078.48           1           1      343    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      399      -8936.79      0.117285       143.826           1           1      485    </span></span>
+<span><span class="co">#&gt;      399       -8165.9     0.0183767       738.692           1           1      455    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      499      -8856.68     0.0423536       212.376           1           1      593    </span></span>
+<span><span class="co">#&gt;      499      -8008.91    0.00355821        746.45      0.6648      0.6648      565    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      599      -8802.65     0.0445093       124.903           1           1      703    </span></span>
+<span><span class="co">#&gt;      599      -7882.82    0.00308223       1094.79           1           1      669    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      699      -8788.46     0.0245598       87.2478           1           1      818    </span></span>
+<span><span class="co">#&gt;      699      -7788.76    0.00210207        1873.5       0.621       0.621      783    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      799      -8743.91      0.029015       70.7765           1           1      925    </span></span>
+<span><span class="co">#&gt;      799      -7736.08     0.0359836       755.961           1           1      897    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      899      -8736.77     0.0108436       56.4198       0.367           1     1036    </span></span>
+<span><span class="co">#&gt;      899      -7660.32     0.0285034       808.329           1           1     1007    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      999      -8733.21    0.00274683       30.6018           1           1     1146    </span></span>
+<span><span class="co">#&gt;      999      -7537.49     0.0111011       1177.28           1           1     1119    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;     1099      -8731.11    0.00307861       22.8986           1           1     1260    </span></span>
+<span><span class="co">#&gt;     1099       -7482.9     0.0259127       1653.56           1           1     1230    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;     1199      -8726.25     0.0217849       176.386      0.4243           1     1368    </span></span>
+<span><span class="co">#&gt;     1199      -7425.37     0.0235646       3312.85      0.2649           1     1344    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;     1299      -8721.56     0.0143369       17.6503           1           1     1474    </span></span>
+<span><span class="co">#&gt;     1299      -7395.09    0.00192234       679.179           1           1     1453    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;     1399      -8720.08    0.00193987       7.60364      0.8701      0.8701     1580    </span></span>
+<span><span class="co">#&gt;     1399      -7375.47    0.00329343       673.567           1           1     1569    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;     1499      -8719.75    0.00569246       25.9519      0.5364      0.5364     1688    </span></span>
+<span><span class="co">#&gt;     1499      -7354.32    0.00937889       609.642           1           1     1678    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;     1599      -8719.53    0.00151107       12.8847           1           1     1798    </span></span>
+<span><span class="co">#&gt;     1599      -7323.88     0.0372511       1122.04           1           1     1788    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;     1699      -8719.41    0.00671789       10.1732           1           1     1909    </span></span>
+<span><span class="co">#&gt;     1699      -7262.78    0.00805707       1217.84           1           1     1900    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;     1799      -8719.17    0.00245639       3.90602           1           1     2019    </span></span>
+<span><span class="co">#&gt;     1799      -7209.87    0.00826959       1215.84           1           1     2009    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;     1899      -8719.07   0.000581305       4.54652           1           1     2126    </span></span>
+<span><span class="co">#&gt;     1899      -7181.51   0.000383597        406.75           1           1     2116    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;     1999      -8718.97    0.00396648       7.05303      0.8273      0.8273     2236    </span></span>
+<span><span class="co">#&gt;     1999       -7172.3     0.0058379       454.649           1           1     2225    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;     2000      -8718.96    0.00686852       4.71608           1           1     2237    </span></span>
+<span><span class="co">#&gt;     2000      -7172.23    0.00310466       394.594           1           1     2226    </span></span>
 <span><span class="co">#&gt; Optimization terminated normally:  </span></span>
 <span><span class="co">#&gt;   Maximum number of iterations hit, may not be at an optima </span></span>
-<span><span class="co">#&gt; Finished in  10.7 seconds.</span></span>
+<span><span class="co">#&gt; Finished in  10.9 seconds.</span></span>
 <span><span class="co">#&gt; If these don't roughly match, consider refitting after setting xpsr normalizer loc and scale closer to estimated mean and sd. Otherwise interpret baseline hazards and xpsr effect size accodingly.</span></span>
-<span><span class="co">#&gt;  - xpsr normalization loc = 7.40235, mean estimated xpsr = 12.45435</span></span>
-<span><span class="co">#&gt;  - xpsr normalization scale = 0.56995, estimated xpsr sd = 0.73747</span></span>
+<span><span class="co">#&gt;  - xpsr normalization loc = 5.42315, mean estimated xpsr = 5.51054</span></span>
+<span><span class="co">#&gt;  - xpsr normalization scale = 0.56671, estimated xpsr sd = 0.96017</span></span>
 <span><span class="va">fit_ms_dh</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_stan.html">fit_stan</a></span><span class="op">(</span><span class="va">mod_ms_dh</span>, <span class="va">simdat_dh</span>, method <span class="op">=</span> <span class="st">"optimize"</span>, init <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Shortest time interval (0.0999999999999943) is smaller than delta_grid (1.09575). Consider increasing n_grid or decreasing t_max of the model.</span></span>
+<span><span class="co">#&gt; Shortest time interval (0.100000000000001) is smaller than delta_grid (1.09575). Consider increasing n_grid or decreasing t_max of the model.</span></span>
 <span><span class="co">#&gt; Using stan file at /home/runner/work/_temp/Library/bmstate/stan/msm.stan</span></span>
-<span><span class="co">#&gt; Initial log joint probability = -721464 </span></span>
+<span><span class="co">#&gt; Initial log joint probability = -804054 </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;       99      -6710.49     0.0962278       69.9461           1           1      116    </span></span>
+<span><span class="co">#&gt;       99      -6390.86      0.342268       271.848           1           1      120    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      199       -6645.5     0.0270824       28.7697      0.7753      0.7753      229    </span></span>
+<span><span class="co">#&gt;      199      -6212.14     0.0121632       16.9001      0.6773      0.6773      229    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      299      -6640.61      0.022021       19.2347      0.3728      0.3728      340    </span></span>
+<span><span class="co">#&gt;      299      -6205.79     0.0172344       10.0839           1           1      340    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      399      -6617.55     0.0537164       25.6929           1           1      446    </span></span>
+<span><span class="co">#&gt;      399      -6202.51     0.0100091       5.67042           1           1      449    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      499      -6612.47     0.0248891       30.4679      0.4849           1      553    </span></span>
+<span><span class="co">#&gt;      499      -6198.78     0.0317216       15.1583           1           1      553    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      599      -6609.23     0.0240955       18.5197           1           1      664    </span></span>
+<span><span class="co">#&gt;      599      -6196.49    0.00352212       15.3331      0.1617      0.1617      658    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      699      -6607.77    0.00351639       10.6477      0.6013      0.6013      770    </span></span>
+<span><span class="co">#&gt;      699      -6195.72    0.00285264        2.6361           1           1      765    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      799      -6607.62    0.00860762       3.16114           1           1      873    </span></span>
+<span><span class="co">#&gt;      799      -6194.37     0.0135432       13.2688           1           1      874    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      899      -6607.33    0.00500078       4.71301           1           1      982    </span></span>
+<span><span class="co">#&gt;      899      -6193.72    0.00440669       3.78953           1           1      983    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      999       -6606.9     0.0163521       5.11164           1           1     1089    </span></span>
+<span><span class="co">#&gt;      999      -6193.61    0.00951578      0.887477           1           1     1084    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;     1099      -6603.21     0.0274515       13.5618      0.9937      0.9937     1202    </span></span>
+<span><span class="co">#&gt;     1099       -6192.3     0.0308932       8.71699      0.8685      0.8685     1204    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;     1199      -6601.94    0.00884304       9.71218      0.8931      0.8931     1311    </span></span>
+<span><span class="co">#&gt;     1199      -6190.01     0.0363073       13.3343       0.344       0.344     1313    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;     1299      -6600.65    0.00188555       4.85025           1           1     1417    </span></span>
+<span><span class="co">#&gt;     1299      -6189.68     0.0121206       3.91667      0.5025           1     1423    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;     1399      -6599.65    0.00511112       5.37397      0.9658      0.9658     1519    </span></span>
+<span><span class="co">#&gt;     1399      -6189.42    0.00169055       0.66537           1           1     1532    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;     1499      -6599.27    0.00432644       3.03535           1           1     1629    </span></span>
+<span><span class="co">#&gt;     1499      -6189.38      0.004892       1.28893           1           1     1637    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;     1599      -6599.22     0.0013081       1.30039           1           1     1737    </span></span>
+<span><span class="co">#&gt;     1599      -6188.91    0.00174241        2.8089      0.9912      0.9912     1746    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;     1699      -6599.18   0.000627939       1.95542      0.4945           1     1847    </span></span>
+<span><span class="co">#&gt;     1699      -6188.79   0.000936889        1.3612       0.328           1     1860    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;     1799      -6599.09    0.00307922       3.68924      0.2852           1     1957    </span></span>
-<span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;     1899      -6599.02     0.0179589       1.62049           1           1     2067    </span></span>
-<span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;     1999      -6598.97   0.000537596       1.87777      0.2938           1     2181    </span></span>
-<span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;     2000      -6598.97   0.000303309        1.5957      0.2968      0.2968     2182    </span></span>
+<span><span class="co">#&gt;     1787      -6188.78   0.000992681      0.260354      0.8284      0.8284     1953    </span></span>
 <span><span class="co">#&gt; Optimization terminated normally:  </span></span>
-<span><span class="co">#&gt;   Maximum number of iterations hit, may not be at an optima </span></span>
-<span><span class="co">#&gt; Finished in  6.3 seconds.</span></span>
+<span><span class="co">#&gt;   Convergence detected: relative gradient magnitude is below tolerance </span></span>
+<span><span class="co">#&gt; Finished in  5.5 seconds.</span></span>
 <span><span class="va">fit_death</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_stan.html">fit_stan</a></span><span class="op">(</span><span class="va">mod_death</span>, <span class="va">simdat_death</span>, method <span class="op">=</span> <span class="st">"optimize"</span>, init <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using stan file at /home/runner/work/_temp/Library/bmstate/stan/msm.stan</span></span>
-<span><span class="co">#&gt; Initial log joint probability = -255418 </span></span>
+<span><span class="co">#&gt; Initial log joint probability = -281504 </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;       99      -3738.33     0.0427164       2.19728           1           1      128    </span></span>
+<span><span class="co">#&gt;       99      -3522.91     0.0929614       12.8081           1           1      133    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      156      -3738.27    0.00202098      0.080757       1.685      0.1685      198    </span></span>
+<span><span class="co">#&gt;      175      -3522.57    0.00236701     0.0906536           1           1      224    </span></span>
 <span><span class="co">#&gt; Optimization terminated normally:  </span></span>
 <span><span class="co">#&gt;   Convergence detected: relative gradient magnitude is below tolerance </span></span>
 <span><span class="co">#&gt; Finished in  0.1 seconds.</span></span>
@@ -472,33 +463,33 @@ Timonen</h4>
 <p><img src="exposure-hazard_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" width="672"></p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_ms_eh</span><span class="op">$</span><span class="fu">covariate_effects</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   covariate       beta target_state_idx target_state</span></span>
-<span><span class="co">#&gt; 1       age  0.42 ± NA                2        Bleed</span></span>
-<span><span class="co">#&gt; 2       age  0.10 ± NA                3       Stroke</span></span>
-<span><span class="co">#&gt; 3       age  0.35 ± NA                4         Dead</span></span>
-<span><span class="co">#&gt; 4      xpsr -0.48 ± NA                2        Bleed</span></span>
-<span><span class="co">#&gt; 5      xpsr -0.80 ± NA                3       Stroke</span></span>
-<span><span class="co">#&gt; 6      xpsr -0.31 ± NA                4         Dead</span></span>
+<span><span class="co">#&gt;   covariate        beta target_state_idx target_state</span></span>
+<span><span class="co">#&gt; 1       age  0.217 ± NA                2        Bleed</span></span>
+<span><span class="co">#&gt; 2       age -0.133 ± NA                3       Stroke</span></span>
+<span><span class="co">#&gt; 3       age  0.222 ± NA                4         Dead</span></span>
+<span><span class="co">#&gt; 4      xpsr  0.156 ± NA                2        Bleed</span></span>
+<span><span class="co">#&gt; 5      xpsr -0.436 ± NA                3       Stroke</span></span>
+<span><span class="co">#&gt; 6      xpsr  0.026 ± NA                4         Dead</span></span>
 <span><span class="va">fit_ms_dh</span><span class="op">$</span><span class="fu">covariate_effects</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    covariate        beta target_state_idx target_state</span></span>
-<span><span class="co">#&gt; 1        age  0.587 ± NA                2        Bleed</span></span>
-<span><span class="co">#&gt; 2        age -0.603 ± NA                3       Stroke</span></span>
-<span><span class="co">#&gt; 3        age  0.222 ± NA                4         Dead</span></span>
-<span><span class="co">#&gt; 4       CrCL -0.489 ± NA                2        Bleed</span></span>
-<span><span class="co">#&gt; 5       CrCL  0.694 ± NA                3       Stroke</span></span>
-<span><span class="co">#&gt; 6       CrCL  0.055 ± NA                4         Dead</span></span>
-<span><span class="co">#&gt; 7     weight -0.475 ± NA                2        Bleed</span></span>
-<span><span class="co">#&gt; 8     weight  0.580 ± NA                3       Stroke</span></span>
-<span><span class="co">#&gt; 9     weight -0.035 ± NA                4         Dead</span></span>
-<span><span class="co">#&gt; 10  dose_amt  0.863 ± NA                2        Bleed</span></span>
-<span><span class="co">#&gt; 11  dose_amt -1.070 ± NA                3       Stroke</span></span>
-<span><span class="co">#&gt; 12  dose_amt -0.067 ± NA                4         Dead</span></span>
+<span><span class="co">#&gt; 1        age  0.707 ± NA                2        Bleed</span></span>
+<span><span class="co">#&gt; 2        age -0.609 ± NA                3       Stroke</span></span>
+<span><span class="co">#&gt; 3        age  0.272 ± NA                4         Dead</span></span>
+<span><span class="co">#&gt; 4       CrCL -0.603 ± NA                2        Bleed</span></span>
+<span><span class="co">#&gt; 5       CrCL  0.504 ± NA                3       Stroke</span></span>
+<span><span class="co">#&gt; 6       CrCL  0.077 ± NA                4         Dead</span></span>
+<span><span class="co">#&gt; 7     weight  0.085 ± NA                2        Bleed</span></span>
+<span><span class="co">#&gt; 8     weight  0.027 ± NA                3       Stroke</span></span>
+<span><span class="co">#&gt; 9     weight  0.028 ± NA                4         Dead</span></span>
+<span><span class="co">#&gt; 10  dose_amt  1.026 ± NA                2        Bleed</span></span>
+<span><span class="co">#&gt; 11  dose_amt -1.145 ± NA                3       Stroke</span></span>
+<span><span class="co">#&gt; 12  dose_amt  0.052 ± NA                4         Dead</span></span>
 <span><span class="va">fit_death</span><span class="op">$</span><span class="fu">covariate_effects</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   covariate        beta target_state_idx target_state</span></span>
-<span><span class="co">#&gt; 1       age -0.079 ± NA                2         Dead</span></span>
-<span><span class="co">#&gt; 2      CrCL  0.196 ± NA                2         Dead</span></span>
-<span><span class="co">#&gt; 3    weight  0.094 ± NA                2         Dead</span></span>
-<span><span class="co">#&gt; 4  dose_amt -0.166 ± NA                2         Dead</span></span></code></pre></div>
+<span><span class="co">#&gt; 1       age -0.104 ± NA                2         Dead</span></span>
+<span><span class="co">#&gt; 2      CrCL  0.152 ± NA                2         Dead</span></span>
+<span><span class="co">#&gt; 3    weight  0.042 ± NA                2         Dead</span></span>
+<span><span class="co">#&gt; 4  dose_amt -0.181 ± NA                2         Dead</span></span></code></pre></div>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit_ms_eh</span><span class="op">$</span><span class="fu">plot_pk</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; PK simulation</span></span></code></pre></div>

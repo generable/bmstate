@@ -2,7 +2,7 @@
 
 ``` r
 library(bmstate)
-#> Attached bmstate 0.3.1. Type ?bmstate to get started.
+#> Attached bmstate 0.3.3. Type ?bmstate to get started.
 library(ggplot2)
 theme_set(theme_bw())
 ```
@@ -93,7 +93,7 @@ fit <- fit_stan(mod, simdat,
 #> Chain 1 Iteration: 601 / 800 [ 75%]  (Sampling) 
 #> Chain 1 Iteration: 700 / 800 [ 87%]  (Sampling) 
 #> Chain 1 Iteration: 800 / 800 [100%]  (Sampling) 
-#> Chain 1 finished in 7.2 seconds.
+#> Chain 1 finished in 7.5 seconds.
 ```
 
 ## Sampling diagnostics
@@ -107,12 +107,12 @@ print(fit$info$diag)
 #> [1] 0
 #> 
 #> $ebfmi
-#> [1] 0.8047596
+#> [1] 0.7357373
 ```
 
 ``` r
 print(max(fit$info$summary$rhat))
-#> [1] 1.056209
+#> [1] 1.016208
 ```
 
 ## Inferred baseline hazard
@@ -135,7 +135,7 @@ fit$plot_h0() + geom_line(df_h,
 df_beta <- fit$covariate_effects()
 df_beta
 #>   covariate        beta target_state_idx target_state
-#> 1       age 0.42 ± 0.11                2         Dead
+#> 1       age 0.41 ± 0.11                2         Dead
 ```
 
 ## State occupancy probabilities

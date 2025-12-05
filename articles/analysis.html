@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bmstate</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,7 +71,7 @@ Timonen</h4>
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://generable.github.io/bmstate/">bmstate</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Attached bmstate 0.3.1. Type ?bmstate to get started.</span></span>
+<span><span class="co">#&gt; Attached bmstate 0.3.3. Type ?bmstate to get started.</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -228,36 +228,26 @@ quantiles of the observed transition times.</p>
 <span><span class="co">#&gt; [1]  0.000000  4.980822 20.000000</span></span></code></pre></div>
 <p>We fit the model by optimizing.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_stan.html">fit_stan</a></span><span class="op">(</span><span class="va">mod</span>, data <span class="op">=</span> <span class="va">pd</span>, method <span class="op">=</span> <span class="st">"optimize"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_stan.html">fit_stan</a></span><span class="op">(</span><span class="va">mod</span>, data <span class="op">=</span> <span class="va">pd</span>, method <span class="op">=</span> <span class="st">"optimize"</span>, init <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using stan file at /home/runner/work/_temp/Library/bmstate/stan/msm.stan</span></span>
-<span><span class="co">#&gt; Initial log joint probability = -362798 </span></span>
+<span><span class="co">#&gt; Initial log joint probability = -10532.1 </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt; Error evaluating model log probability: Non-finite gradient. </span></span>
-<span><span class="co">#&gt; Error evaluating model log probability: Non-finite gradient. </span></span>
-<span><span class="co">#&gt; Error evaluating model log probability: Non-finite gradient. </span></span>
-<span><span class="co">#&gt; Error evaluating model log probability: Non-finite gradient. </span></span>
-<span><span class="co">#&gt;       99      -1860.64     0.0535212       11.5135           1           1      116    </span></span>
+<span><span class="co">#&gt;       99      -1859.76     0.0370328        5.1373           1           1      109    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      199      -1857.78    0.00330235      0.880466      0.7143      0.7143      222    </span></span>
+<span><span class="co">#&gt;      199      -1858.11     0.0340552       2.81782           1           1      219    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      299      -1857.71    0.00240386      0.937655      0.5728      0.5728      332    </span></span>
+<span><span class="co">#&gt;      299      -1857.94    0.00607352      0.729382           1           1      330    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      399      -1857.65    0.00120433      0.802256      0.3604      0.3604      436    </span></span>
+<span><span class="co">#&gt;      399      -1857.78     0.0150948       2.26897           1           1      435    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      499      -1857.61    0.00592843      0.499508           1           1      541    </span></span>
+<span><span class="co">#&gt;      499      -1857.74    0.00519625      0.699904           1           1      556    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      599      -1857.59    0.00789651      0.707499           1           1      650    </span></span>
+<span><span class="co">#&gt;      599       -1857.7    0.00118138      0.614947      0.4976      0.4976      667    </span></span>
 <span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      699      -1857.58   0.000177959      0.149324      0.4186      0.8437      761    </span></span>
-<span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      799      -1857.57    0.00760494       0.86298      0.4149      0.4149      874    </span></span>
-<span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      899      -1857.56    0.00140453      0.140261           1           1      983    </span></span>
-<span><span class="co">#&gt;     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  </span></span>
-<span><span class="co">#&gt;      900      -1857.56    0.00105923     0.0932426           1           1      984    </span></span>
+<span><span class="co">#&gt;      641       -1857.7   0.000175154     0.0595577           1           1      712    </span></span>
 <span><span class="co">#&gt; Optimization terminated normally:  </span></span>
 <span><span class="co">#&gt;   Convergence detected: relative gradient magnitude is below tolerance </span></span>
-<span><span class="co">#&gt; Finished in  3.7 seconds.</span></span></code></pre></div>
+<span><span class="co">#&gt; Finished in  2.7 seconds.</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="inferred-baseline-hazards">Inferred baseline hazards<a class="anchor" aria-label="anchor" href="#inferred-baseline-hazards"></a>
@@ -273,15 +263,15 @@ quantiles of the observed transition times.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span><span class="op">$</span><span class="fu">covariate_effects</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   covariate         beta target_state_idx target_state</span></span>
-<span><span class="co">#&gt; 1       age -0.0095 ± NA                2         Mild</span></span>
-<span><span class="co">#&gt; 2       age -0.0564 ± NA                3       Severe</span></span>
-<span><span class="co">#&gt; 3       age  0.3148 ± NA                4         Dead</span></span>
-<span><span class="co">#&gt; 4      dage  0.3443 ± NA                2         Mild</span></span>
-<span><span class="co">#&gt; 5      dage  0.0462 ± NA                3       Severe</span></span>
-<span><span class="co">#&gt; 6      dage  0.1013 ± NA                4         Dead</span></span>
-<span><span class="co">#&gt; 7       sex -0.1593 ± NA                2         Mild</span></span>
-<span><span class="co">#&gt; 8       sex -0.0770 ± NA                3       Severe</span></span>
-<span><span class="co">#&gt; 9       sex  0.1417 ± NA                4         Dead</span></span></code></pre></div>
+<span><span class="co">#&gt; 1       age -0.0086 ± NA                2         Mild</span></span>
+<span><span class="co">#&gt; 2       age -0.0557 ± NA                3       Severe</span></span>
+<span><span class="co">#&gt; 3       age  0.3135 ± NA                4         Dead</span></span>
+<span><span class="co">#&gt; 4      dage  0.3427 ± NA                2         Mild</span></span>
+<span><span class="co">#&gt; 5      dage  0.0456 ± NA                3       Severe</span></span>
+<span><span class="co">#&gt; 6      dage  0.1009 ± NA                4         Dead</span></span>
+<span><span class="co">#&gt; 7       sex -0.1582 ± NA                2         Mild</span></span>
+<span><span class="co">#&gt; 8       sex -0.0753 ± NA                3       Severe</span></span>
+<span><span class="co">#&gt; 9       sex  0.1410 ± NA                4         Dead</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="state-occupancy-probabilities">State occupancy probabilities<a class="anchor" aria-label="anchor" href="#state-occupancy-probabilities"></a>
@@ -320,7 +310,6 @@ state at time
 <span><span class="co">#&gt; /usr/include/c++/13/bits/stl_iterator_base_types.h:127:34: note: declared here</span></span>
 <span><span class="co">#&gt;   127 |     struct _GLIBCXX17_DEPRECATED iterator</span></span>
 <span><span class="co">#&gt;       |                                  ^~~~~~~~</span></span>
-<span><span class="co">#&gt; cc1plus: note: unrecognized command-line option ‘-Wno-unknown-warning-option’ may have been intended to silence earlier diagnostics</span></span>
 <span><span class="co">#&gt; In file included from ../tbb_2020.3/src/tbb/concurrent_queue.cpp:22:</span></span>
 <span><span class="co">#&gt; ../tbb_2020.3/include/tbb/internal/_concurrent_queue_impl.h:749:21: warning: ‘template&lt;class _Category, class _Tp, class _Distance, class _Pointer, class _Reference&gt; struct std::iterator’ is deprecated [-Wdeprecated-declarations]</span></span>
 <span><span class="co">#&gt;   749 |         public std::iterator&lt;std::forward_iterator_tag,Value&gt; {</span></span>
@@ -339,6 +328,8 @@ state at time
 <span><span class="co">#&gt; /usr/include/c++/13/bits/stl_iterator_base_types.h:127:34: note: declared here</span></span>
 <span><span class="co">#&gt;   127 |     struct _GLIBCXX17_DEPRECATED iterator</span></span>
 <span><span class="co">#&gt;       |                                  ^~~~~~~~</span></span>
+<span><span class="co">#&gt; cc1plus: note: unrecognized command-line option ‘-Wno-unknown-warning-option’ may have been intended to silence earlier diagnostics</span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; cc1plus: note: unrecognized command-line option ‘-Wno-unknown-warning-option’ may have been intended to silence earlier diagnostics</span></span>
 <span><span class="co">#&gt; calling solve_trans_prob_matrix 622 x 1 times</span></span></code></pre></div>
 <p>We plot the state occupancy probabilities, coloring by different
@@ -462,9 +453,9 @@ got the transplant from a donor of given age.</p>
 <span><span class="va">psv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="va">p1</span>, <span class="va">p2</span>, <span class="va">p3</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">pg</span><span class="op">$</span><span class="va">subject_df</span>, by <span class="op">=</span> <span class="st">"subject_id"</span><span class="op">)</span></span>
 <span><span class="va">psv</span></span>
 <span><span class="co">#&gt;   subject_id  prob      age dage sex</span></span>
-<span><span class="co">#&gt; 1     100002 0.518 52.49589   21   0</span></span>
-<span><span class="co">#&gt; 2     100002 0.273 52.49589   21   0</span></span>
-<span><span class="co">#&gt; 3     100002 0.991 52.49589   21   0</span></span></code></pre></div>
+<span><span class="co">#&gt; 1     100002 0.522 52.49589   21   0</span></span>
+<span><span class="co">#&gt; 2     100002 0.271 52.49589   21   0</span></span>
+<span><span class="co">#&gt; 3     100002 0.990 52.49589   21   0</span></span></code></pre></div>
 <p>We can study the death event time distribution for this subject.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">td</span> <span class="op">&lt;-</span> <span class="va">pg</span><span class="op">$</span><span class="fu">as_transitions</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">trans_idx</span> <span class="op">&gt;</span> <span class="fl">0</span> <span class="op">&amp;</span> <span class="va">to</span> <span class="op">==</span> <span class="fl">4</span><span class="op">)</span></span>

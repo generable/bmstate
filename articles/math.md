@@ -2,7 +2,7 @@
 
 ``` r
 library(bmstate)
-#> Attached bmstate 0.3.1. Type ?bmstate to get started.
+#> Attached bmstate 0.3.3. Type ?bmstate to get started.
 library(ggplot2)
 theme_set(theme_bw())
 ```
@@ -99,7 +99,7 @@ cat(prior_stan_code)
 #>   if(do_haz == 1){
 #>     if(nc_haz > 0){
 #>       for(k in 1:nc_haz){
-#>         beta_oth[1, k] ~ normal(0, 2);
+#>         beta_oth[1, k] ~ normal(0, 1);
 #>       }
 #>     }
 #>     if(I_xpsr==1){
