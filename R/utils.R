@@ -175,3 +175,25 @@ prefit_checks <- function(model, data) {
   }
   TRUE
 }
+
+
+# Normalize columns of matrix A
+normalize_columns <- function(A) {
+  K <- ncol(A)
+  cn <- colnames(A)
+  for (j in seq_len(K)) {
+    A[, j] <- normalize(A[, j], cn[j])
+  }
+  A
+}
+
+# Normalize
+normalize <- function(a, name) {
+  sdd <- stats::sd(a)
+  if (sdd == 0) {
+    stop("error in normalization of ", name, ", zero variance")
+  }
+  x_norm <- (a - mean(a)) / sdd
+  check_normalized_covariate(x_norm, name)
+  x_norm
+}

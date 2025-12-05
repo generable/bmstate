@@ -2,7 +2,7 @@ functions {
 
   // log SS AUC
   vector log_ss_area_under_conc(vector dose_ss, matrix log_theta_pk){
-    return(log(dose_ss) - log_theta_pk[:,2] - log_theta_pk[:,3]) ; // D/(CL*V2)
+    return(log(dose_ss) - log_theta_pk[:,2] - log_theta_pk[:,3]) ; // log D/(CL*V2)
   }
 
   // log of hazard multiplier
@@ -304,7 +304,7 @@ data {
 
   // PK options
   int<lower=0,upper=1> I_xpsr;
-  real<lower=0> xpsr_loc;
+  real xpsr_loc;
   real<lower=0> xpsr_scale;
   int<lower=0> nc_ka; // num of predictors for ka
   int<lower=0> nc_CL; // num of predictors for CL
@@ -448,7 +448,7 @@ model {
   if(do_haz == 1){
     if(nc_haz > 0){
       for(k in 1:nc_haz){
-        beta_oth[1, k] ~ normal(0, 1);
+        beta_oth[1, k] ~ normal(0, 2);
       }
     }
     if(I_xpsr==1){
@@ -471,7 +471,7 @@ model {
     for(n in 1:size(log_z_pk[1])){
       log_z_pk[1, n] ~ normal(0, 1);
     }
-    log_mu_pk[1] ~ normal(0, 3);
+    log_mu_pk[1] ~ normal(0, 2);
     log_sig_pk[1] ~ normal(0, 1);
     beta_ka[1] ~ normal(0, 1);
     beta_CL[1] ~ normal(0, 1);

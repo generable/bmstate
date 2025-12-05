@@ -89,7 +89,7 @@ As data frame
 \subsection{Method \code{simulate_pk()}}{
 Simulate PK dynamics
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PSSDosingData$simulate_pk(t, theta, MAX_CONC, skip_assert = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PSSDosingData$simulate_pk(t, theta, MAX_CONC)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -100,9 +100,6 @@ Simulate PK dynamics
 \item{\code{theta}}{A matrix of parameters.}
 
 \item{\code{MAX_CONC}}{concentration upper bound}
-
-\item{\code{skip_assert}}{Skip most assertions and call exposed Stan directly,
-assuming that it exists?}
 }
 \if{html}{\out{</div>}}
 }
