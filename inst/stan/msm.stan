@@ -448,7 +448,7 @@ model {
   if(do_haz == 1){
     if(nc_haz > 0){
       for(k in 1:nc_haz){
-        beta_oth[1, k] ~ normal(0, 2);
+        beta_oth[1, k] ~ normal(0, 1);
       }
     }
     if(I_xpsr==1){
