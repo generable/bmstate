@@ -103,7 +103,7 @@ Simulate PK dynamics
 
 #### Usage
 
-    PSSDosingData$simulate_pk(t, theta, MAX_CONC, skip_assert = FALSE)
+    PSSDosingData$simulate_pk(t, theta, MAX_CONC)
 
 #### Arguments
 
@@ -118,11 +118,6 @@ Simulate PK dynamics
 - `MAX_CONC`:
 
   concentration upper bound
-
-- `skip_assert`:
-
-  Skip most assertions and call exposed Stan directly, assuming that it
-  exists?
 
 #### Returns
 

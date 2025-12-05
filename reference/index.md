@@ -52,8 +52,12 @@
   : Fit a model using 'Stan'
 - [`generate_paths()`](https://generable.github.io/bmstate/reference/generate_paths.md)
   : Path generation for 'MultistateModelFit'
+- [`msmfit_check_xpsr_norm()`](https://generable.github.io/bmstate/reference/msmfit_check_xpsr_norm.md)
+  : Check exposure normalization
 - [`msmfit_exposure()`](https://generable.github.io/bmstate/reference/msmfit_exposure.md)
   : Compute exposure
+- [`msmfit_exposure_df()`](https://generable.github.io/bmstate/reference/msmfit_exposure_df.md)
+  : Compute exposure and return as rvar in df
 - [`msmfit_inst_hazard_param_draws()`](https://generable.github.io/bmstate/reference/msmfit_inst_hazard_param_draws.md)
   : Extract and reshape draws of instant hazard related parameters
 - [`msmfit_log_hazard_multipliers()`](https://generable.github.io/bmstate/reference/msmfit_log_hazard_multipliers.md)

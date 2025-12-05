@@ -2,7 +2,7 @@
 
 ``` r
 library(bmstate)
-#> Attached bmstate 0.3.0. Type ?bmstate to get started.
+#> Attached bmstate 0.3.1. Type ?bmstate to get started.
 library(ggplot2)
 library(dplyr)
 #> 
@@ -169,32 +169,34 @@ We fit the model by optimizing.
 ``` r
 fit <- fit_stan(mod, data = pd, method = "optimize")
 #> Using stan file at /home/runner/work/_temp/Library/bmstate/stan/msm.stan
-#> Initial log joint probability = -362803 
+#> Initial log joint probability = -362798 
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
 #> Error evaluating model log probability: Non-finite gradient. 
 #> Error evaluating model log probability: Non-finite gradient. 
 #> Error evaluating model log probability: Non-finite gradient. 
 #> Error evaluating model log probability: Non-finite gradient. 
-#>       99      -1859.49     0.0281839       13.4581           1           1      121    
+#>       99      -1860.64     0.0535212       11.5135           1           1      116    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      199      -1858.05     0.0152368       1.88641           1           1      227    
+#>      199      -1857.78    0.00330235      0.880466      0.7143      0.7143      222    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      299      -1857.87    0.00716934       2.13723           1           1      338    
+#>      299      -1857.71    0.00240386      0.937655      0.5728      0.5728      332    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      399      -1857.79    0.00653108       1.98944      0.1595           1      449    
+#>      399      -1857.65    0.00120433      0.802256      0.3604      0.3604      436    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      499      -1857.74    0.00123761      0.191422           1           1      556    
+#>      499      -1857.61    0.00592843      0.499508           1           1      541    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      599      -1857.72     0.0095713      0.502378           1           1      663    
+#>      599      -1857.59    0.00789651      0.707499           1           1      650    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      699      -1857.71    0.00255015      0.596568           1           1      772    
+#>      699      -1857.58   0.000177959      0.149324      0.4186      0.8437      761    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      799      -1857.69   0.000664024      0.230892           1           1      880    
+#>      799      -1857.57    0.00760494       0.86298      0.4149      0.4149      874    
 #>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
-#>      841      -1857.69   0.000797173     0.0860521           1           1      924    
+#>      899      -1857.56    0.00140453      0.140261           1           1      983    
+#>     Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes  
+#>      900      -1857.56    0.00105923     0.0932426           1           1      984    
 #> Optimization terminated normally:  
 #>   Convergence detected: relative gradient magnitude is below tolerance 
-#> Finished in  4.7 seconds.
+#> Finished in  3.7 seconds.
 ```
 
 ### Inferred baseline hazards
@@ -211,15 +213,15 @@ plt
 ``` r
 fit$covariate_effects()
 #>   covariate         beta target_state_idx target_state
-#> 1       age -0.0089 ± NA                2         Mild
-#> 2       age -0.0559 ± NA                3       Severe
-#> 3       age  0.3135 ± NA                4         Dead
-#> 4      dage  0.3429 ± NA                2         Mild
-#> 5      dage  0.0458 ± NA                3       Severe
-#> 6      dage  0.1009 ± NA                4         Dead
-#> 7       sex -0.1583 ± NA                2         Mild
-#> 8       sex -0.0761 ± NA                3       Severe
-#> 9       sex  0.1411 ± NA                4         Dead
+#> 1       age -0.0095 ± NA                2         Mild
+#> 2       age -0.0564 ± NA                3       Severe
+#> 3       age  0.3148 ± NA                4         Dead
+#> 4      dage  0.3443 ± NA                2         Mild
+#> 5      dage  0.0462 ± NA                3       Severe
+#> 6      dage  0.1013 ± NA                4         Dead
+#> 7       sex -0.1593 ± NA                2         Mild
+#> 8       sex -0.0770 ± NA                3       Severe
+#> 9       sex  0.1417 ± NA                4         Dead
 ```
 
 ### State occupancy probabilities
@@ -419,9 +421,9 @@ p3 <- p_state_visit_per_subject(pg, "Dead")
 psv <- rbind(p1, p2, p3) |> left_join(pg$subject_df, by = "subject_id")
 psv
 #>   subject_id  prob      age dage sex
-#> 1     100002 0.519 52.49589   21   0
-#> 2     100002 0.265 52.49589   21   0
-#> 3     100002 0.990 52.49589   21   0
+#> 1     100002 0.518 52.49589   21   0
+#> 2     100002 0.273 52.49589   21   0
+#> 3     100002 0.991 52.49589   21   0
 ```
 
 We can study the death event time distribution for this subject.

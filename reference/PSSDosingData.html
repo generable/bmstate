@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">bmstate</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -132,7 +132,7 @@ of steady-state assumption time range.</p></dd>
 <h3 id="method-simulate-pk-">Method <code>simulate_pk()</code><a class="anchor" aria-label="anchor" href="#method-simulate-pk-"></a></h3>
 <p>Simulate PK dynamics</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PSSDosingData</span><span class="op">$</span><span class="fu">simulate_pk</span><span class="op">(</span><span class="va">t</span>, <span class="va">theta</span>, <span class="va">MAX_CONC</span>, skip_assert <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">PSSDosingData</span><span class="op">$</span><span class="fu">simulate_pk</span><span class="op">(</span><span class="va">t</span>, <span class="va">theta</span>, <span class="va">MAX_CONC</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -147,11 +147,6 @@ of steady-state assumption time range.</p></dd>
 
 <dt><code>MAX_CONC</code></dt>
 <dd><p>concentration upper bound</p></dd>
-
-
-<dt><code>skip_assert</code></dt>
-<dd><p>Skip most assertions and call exposed Stan directly,
-assuming that it exists?</p></dd>
 
 
 </dl><p></p></div>
