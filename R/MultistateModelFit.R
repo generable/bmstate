@@ -414,7 +414,7 @@ msmfit_exposure <- function(fit, oos = FALSE, data = NULL) {
   out <- list()
   for (s in seq_len(S)) {
     if (sd$do_pk == 1) {
-      x_xpsr <- log_ss_area_under_conc(sd$dose_ss, log_pkpar[[s]]) # log D/(CL*V2)
+      x_xpsr <- log_ss_area_under_conc(sd$dose_ss, log_pkpar[[s]]) # log D/CL
     } else {
       x_xpsr <- NULL
     }

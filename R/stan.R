@@ -102,8 +102,7 @@ fit_stan <- function(model, data,
     model$set_normalizers(data)
     if (!is.null(data$dosing)) {
       log_mu_CL <- -2 # should match msm.stan
-      log_mu_V2 <- -2 # should match msm.stan
-      aaa <- log(data$dosing$dose_ss) - log_mu_CL - log_mu_V2
+      aaa <- log(data$dosing$dose_ss) - log_mu_CL
       loc <- mean(aaa)
       sca <- stats::sd(aaa)
       model$set_xpsr_normalizers(loc, sca)

@@ -110,11 +110,9 @@ PKModel <- R6::R6Class("PKModel",
     #' @return A numeric value
     compute_xpsr = function(theta, dose) {
       CL <- theta[2]
-      V2 <- theta[3]
       checkmate::assert_number(CL, lower = 0)
-      checkmate::assert_number(V2, lower = 0)
       checkmate::assert_number(dose, lower = 0)
-      log(dose) - log(CL) - log(V2)
+      log(dose) - log(CL)
     },
 
     #' @description Simulate data with many subjects
