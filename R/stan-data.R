@@ -337,11 +337,11 @@ time_since_last_dose <- function(t_obs_pk, last_two_times) {
   n_before_post <- sum(last_two_times <= t_obs_pk[2])
   if (n_before_pre == 0) {
     n_before_pre <- 1
-    stop("invalid data")
+    stop("invalid data, , 0 doses before pre-dose time")
   }
   if (n_before_post == 0) {
     n_before_pre <- 1
-    stop("invalid data")
+    stop("invalid data, 0 doses before post-dose time")
   }
   t_before_pre <- last_two_times[n_before_pre]
   t_before_post <- last_two_times[n_before_post]
