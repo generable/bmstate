@@ -101,12 +101,12 @@ fit_stan <- function(model, data,
   if (set_normalizers) {
     model$set_normalizers(data)
     if (!is.null(data$dosing)) {
-      mu_CL <- exp(-2) # should match msm.stan
-      mu_V2 <- exp(-2) # should match msm.stan
-      aaa <- data$dosing$dose_ss / (mu_CL * mu_V2)
+      log_mu_CL <- -2 # should match msm.stan
+      log_mu_V2 <- -2 # should match msm.stan
+      aaa <- log(data$dosing$dose_ss) - log_mu_CL - log_mu_V2
       loc <- mean(aaa)
       sca <- stats::sd(aaa)
-      model$set_auc_normalizers(loc, sca)
+      model$set_xpsr_normalizers(loc, sca)
     }
   }
 
@@ -133,7 +133,7 @@ fit_stan <- function(model, data,
   # Return
   pars <- c(
     "weights", "log_w0", "beta_ka", "beta_V2", "beta_CL", "beta_oth",
-    "beta_auc", "sigma_pk", "log_z_pk", "log_mu_pk", "log_sig_pk", "lp__"
+    "beta_xpsr", "sigma_pk", "log_z_pk", "log_mu_pk", "log_sig_pk", "lp__"
   )
   draws <- create_rv_list(stan_fit, pars)
   diag <- NULL

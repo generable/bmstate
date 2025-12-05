@@ -102,18 +102,18 @@ PKModel <- R6::R6Class("PKModel",
       conc
     },
 
-    #' @description Compute steady-state area under concentration curve over
-    #' one dosing interval
+    #' @description Compute exposure, which is the steady-state
+    #' log area under concentration curve over one dosing interval
     #'
     #' @param theta parameter values
     #' @param dose dose
     #' @return A numeric value
-    compute_ss_auc = function(theta, dose) {
+    compute_xpsr = function(theta, dose) {
       CL <- theta[2]
       V2 <- theta[3]
       checkmate::assert_number(CL, lower = 0)
       checkmate::assert_number(dose, lower = 0)
-      dose / (CL * V2)
+      log(dose) - log(CL * V2)
     },
 
     #' @description Simulate data with many subjects
@@ -159,17 +159,17 @@ PKModel <- R6::R6Class("PKModel",
       CONC <- dd$simulate_pk(t_obs, THETA, self$get_max_conc())
       df_out <- NULL
       for (n in seq_len(N)) {
-        ss_auc <- self$compute_ss_auc(THETA[n, ], dd$dose_ss[n])
+        xpsr <- self$compute_xpsr(THETA[n, ], dd$dose_ss[n])
         sid <- SUB_ID[n]
         conc <- (CONC |> dplyr::filter(.data$subject_id == sid))[["val"]]
         conc_noisy <- stats::rlnorm(2, meanlog = log(conc), sdlog = sigma)
-        out <- c(t_obs[[n]], conc_noisy, ss_auc)
+        out <- c(t_obs[[n]], conc_noisy, xpsr)
         df_out <- rbind(df_out, out)
       }
       df_out <- data.frame(df_out)
       df_out <- cbind(df_out, THETA)
       colnames(df_out) <- c(
-        "t_pre", "t_post", "conc_pre", "conc_post", "ss_auc",
+        "t_pre", "t_post", "conc_pre", "conc_post", "xpsr",
         "ka", "CL", "V2"
       )
       rownames(df_out) <- NULL

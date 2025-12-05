@@ -4,7 +4,7 @@
 \alias{msmfit_pk_params}
 \title{Evaluate PK parameters}
 \usage{
-msmfit_pk_params(fit, oos = FALSE, data = NULL)
+msmfit_pk_params(fit, oos = FALSE, data = NULL, log = FALSE)
 }
 \arguments{
 \item{fit}{A \code{\link{MultistateModelFit}} object}
@@ -15,6 +15,8 @@ as if the subjects are new.}
 
 \item{data}{A \code{\link{JointData}} object. If \code{NULL}, the
 data used to fit the model is used.}
+
+\item{log}{Get logarithm of params?}
 }
 \value{
 A list with length equal to number of draws.

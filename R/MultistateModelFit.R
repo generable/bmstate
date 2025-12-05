@@ -292,9 +292,9 @@ msmfit_covariate_effects <- function(fit) {
     df <- rbind(df, df_j)
   }
   if (fit$model$has_pk()) {
-    rv <- as.vector(fit$get_draws("beta_auc")[1, 1, ])
+    rv <- as.vector(fit$get_draws("beta_xpsr")[1, 1, ])
     df_j <- data.frame(
-      covariate = "ss_auc", beta = rv,
+      covariate = "xpsr", beta = rv,
       target_state_idx = fit$model$target_states()
     )
     df <- rbind(df, df_j)
@@ -344,9 +344,11 @@ mat2list <- function(mat) {
 #' @param oos Out-of-sample mode? If \code{FALSE}, the possible subject-specific
 #' fitted parameters are used. If \code{TRUE}, acting
 #' as if the subjects are new.
+#' @param log Get logarithm of params?
 #' @return A list with length equal to number of draws.
-msmfit_pk_params <- function(fit, oos = FALSE, data = NULL) {
+msmfit_pk_params <- function(fit, oos = FALSE, data = NULL, log = FALSE) {
   check_oos(oos, data)
+  checkmate::assert_logical(log, len = 1)
   sd <- msmfit_stan_data(fit, data)
   S <- fit$num_draws()
 
@@ -372,9 +374,9 @@ msmfit_pk_params <- function(fit, oos = FALSE, data = NULL) {
   # Call exposed Stan function for each draw (not optimal)
   out <- list()
   for (s in seq_len(S)) {
-    theta <- NULL
+    log_theta <- NULL
     if (sd$do_pk == 1) {
-      theta <- compute_theta_pk(
+      log_theta <- compute_log_theta_pk(
         mat2list(t(log_z[s, 1, , ])),
         log_mu[s, 1, ],
         log_sig[s, 1, ],
@@ -385,6 +387,11 @@ msmfit_pk_params <- function(fit, oos = FALSE, data = NULL) {
         mat2list(t(sd$x_CL)),
         mat2list(t(sd$x_V2))
       )
+    }
+    if (log) {
+      theta <- log_theta
+    } else {
+      theta <- exp(log_theta)
     }
     out[[s]] <- theta
   }
@@ -400,18 +407,18 @@ msmfit_exposure <- function(fit, oos = FALSE, data = NULL) {
 
   # Get draws
   sd <- msmfit_stan_data(fit, data)
-  pkpar <- msmfit_pk_params(fit, oos, data)
+  log_pkpar <- msmfit_pk_params(fit, oos, data, log = TRUE)
 
   # Call exposed Stan function
   S <- fit$num_draws()
   out <- list()
   for (s in seq_len(S)) {
     if (sd$do_pk == 1) {
-      x_auc <- sd$dose_ss / (pkpar[[s]][, 2] * pkpar[[s]][, 3]) # D/(CL*V2)
+      x_xpsr <- log_ss_area_under_conc(sd$dose_ss, log_pkpar[[s]]) # log D/(CL*V2)
     } else {
-      x_auc <- NULL
+      x_xpsr <- NULL
     }
-    out[[s]] <- x_auc
+    out[[s]] <- x_xpsr
   }
   out
 }
@@ -445,16 +452,16 @@ msmfit_log_hazard_multipliers <- function(fit, oos = FALSE, data = NULL) {
 
   # Get draws
   sd <- msmfit_stan_data(fit, data)
-  auc <- msmfit_exposure(fit, oos, data)
+  xpsr <- msmfit_exposure(fit, oos, data)
   S <- fit$num_draws()
   beta_oth <- fit$get_draws_of("beta_oth")
   if (is.null(beta_oth)) {
     beta_oth <- array(0, dim = c(S, 1, 0, sd$N_trans_types))
   }
   if (sd$do_pk == 1) {
-    beta_auc <- fit$get_draws_of("beta_auc")
+    beta_xpsr <- fit$get_draws_of("beta_xpsr")
   } else {
-    beta_auc <- array(0, dim = c(S, 1, 0, sd$N_trans_types))
+    beta_xpsr <- array(0, dim = c(S, 1, 0, sd$N_trans_types))
   }
 
   # Create x_haz_long (long version of hazard covariates vector)
@@ -465,14 +472,14 @@ msmfit_log_hazard_multipliers <- function(fit, oos = FALSE, data = NULL) {
   } else {
     x_haz_long <- array(0, dim = c(0, sd$N_int))
   }
-  an <- fit$model$get_auc_normalizers()
+  an <- fit$model$get_xpsr_normalizers()
 
   # Call exposed Stan function for each draw (not optimal)
   out <- list()
   for (s in seq_len(S)) {
     if (sd$do_pk == 1) {
-      ba <- list(beta_auc[s, 1, 1, ])
-      aa <- list(auc[[s]][sd$idx_sub])
+      ba <- list(beta_xpsr[s, 1, 1, ])
+      aa <- list(xpsr[[s]][sd$idx_sub])
     } else {
       ba <- NULL
       aa <- NULL

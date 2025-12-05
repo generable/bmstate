@@ -19,7 +19,7 @@ oral absorption.
 \item \href{#method-PKModel-covs}{\code{PKModel$covs()}}
 \item \href{#method-PKModel-print}{\code{PKModel$print()}}
 \item \href{#method-PKModel-simulate_ss}{\code{PKModel$simulate_ss()}}
-\item \href{#method-PKModel-compute_ss_auc}{\code{PKModel$compute_ss_auc()}}
+\item \href{#method-PKModel-compute_xpsr}{\code{PKModel$compute_xpsr()}}
 \item \href{#method-PKModel-simulate_data}{\code{PKModel$simulate_data()}}
 \item \href{#method-PKModel-format_params}{\code{PKModel$format_params()}}
 \item \href{#method-PKModel-clone}{\code{PKModel$clone()}}
@@ -151,13 +151,13 @@ concentration in the central compartment.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-PKModel-compute_ss_auc"></a>}}
-\if{latex}{\out{\hypertarget{method-PKModel-compute_ss_auc}{}}}
-\subsection{Method \code{compute_ss_auc()}}{
-Compute steady-state area under concentration curve over
-one dosing interval
+\if{html}{\out{<a id="method-PKModel-compute_xpsr"></a>}}
+\if{latex}{\out{\hypertarget{method-PKModel-compute_xpsr}{}}}
+\subsection{Method \code{compute_xpsr()}}{
+Compute exposure, which is the steady-state
+log area under concentration curve over one dosing interval
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{PKModel$compute_ss_auc(theta, dose)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{PKModel$compute_xpsr(theta, dose)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

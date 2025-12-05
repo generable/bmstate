@@ -40,7 +40,7 @@ create_stan_data_model <- function(model) {
   sd_t_grid <- create_stan_data_timegrid(model)
 
   # PK options
-  an <- model$get_auc_normalizers()
+  an <- model$get_xpsr_normalizers()
   MC <- 1e-7
   if (model$has_pk()) {
     MC <- model$pk_model$get_max_conc()
@@ -49,9 +49,9 @@ create_stan_data_model <- function(model) {
     nc_ka = length(model$data_covs("ka")),
     nc_CL = length(model$data_covs("CL")),
     nc_V2 = length(model$data_covs("V2")),
-    I_auc = as.numeric(model$has_pk()),
-    auc_loc = an$loc,
-    auc_scale = an$scale,
+    I_xpsr = as.numeric(model$has_pk()),
+    xpsr_loc = an$loc,
+    xpsr_scale = an$scale,
     MAX_CONC = MC
   )
 
