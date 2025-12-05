@@ -152,7 +152,7 @@ MultistateModelFit <- R6::R6Class("MultistateModelFit",
       DF <- list()
       for (s in seq_len(S)) {
         pb$tick()
-        df_s <- data$dosing$simulate_pk(ts, pkpar[[s]], MC, skip_assert = TRUE)
+        df_s <- data$dosing$simulate_pk(ts, pkpar[[s]], MC)
         df_s$.draw_idx <- s
         DF[[s]] <- df_s
       }
@@ -422,6 +422,50 @@ msmfit_exposure <- function(fit, oos = FALSE, data = NULL) {
   }
   out
 }
+
+#' Compute exposure and return as rvar in df
+#'
+#' @export
+#' @inheritParams msmfit_exposure
+msmfit_exposure_df <- function(fit, oos = FALSE, data = NULL) {
+  check_oos(oos, data)
+  xp <- msmfit_exposure(fit, oos, data)
+  xp <- posterior::rvar(t(sapply(xp, function(x) x)))
+  if (is.null(data)) {
+    data <- fit$data
+  }
+  df <- data$paths$subject_df
+  df$xpsr_estimate <- xp
+  df
+}
+
+#' Check exposure normalization
+#'
+#' @export
+#' @inheritParams msmfit_exposure
+msmfit_check_xpsr_norm <- function(fit) {
+  df <- msmfit_exposure_df(fit)
+  r <- mean(df$xpsr_estimate)
+  xn <- fit$model$get_xpsr_normalizers()
+  msg1 <- paste0(
+    "xpsr normalization loc = ", round(xn$loc, 5),
+    ", mean estimated xpsr = ",
+    round(mean(r), 5)
+  )
+  msg2 <- paste0(
+    "xpsr normalization scale = ", round(xn$scale, 5),
+    ", estimated xpsr sd = ",
+    round(stats::sd(r), 5)
+  )
+  message(
+    "If these don't roughly match, consider refitting after setting ",
+    "xpsr normalizer loc and scale closer to estimated mean and sd. ",
+    "Otherwise interpret baseline hazards and xpsr effect size accodingly."
+  )
+  message(" - ", msg1)
+  message(" - ", msg2)
+}
+
 
 # Helper
 check_oos <- function(oos, data) {

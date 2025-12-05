@@ -139,7 +139,7 @@ test_that("entire workflow works (with PK)", {
     iter_warmup = options$iter_warmup,
     iter_sampling = options$iter_sampling,
     chains = options$chains,
-    refresh = 5,
+    refresh = 20,
     adapt_delta = 0.95,
     init = 0.1
   )
@@ -179,28 +179,28 @@ test_that("entire workflow works (with PK)", {
 })
 
 test_that("entire workflow works (with single transition PK)", {
-  # Setup
-  h0_base <- 1e-3
-
   # Create model
   sn <- c("Alive", "Death")
   tm <- transmat_survival(state_names = sn)
   t3yr <- 3 * 365.25
-  covs <- c("age")
+  covs <- c("age", "sex")
   pk_covs <- list(
     CL = "CrCL",
     V2 = c("weight", "sex")
   )
-  mod <- create_msm(tm, covs, pk_covs, num_knots = 5, t_max = t3yr)
-  bh_true <- matrix(0, 1, 2)
+  mod <- create_msm(tm, covs, pk_covs,
+    num_knots = 5, t_max = t3yr,
+    categ_covs = "sex"
+  )
+  bh_true <- matrix(0, 1, 3)
   bh_true[1, 1] <- 0.5 # age effect on death
-  bh_true[1, 2] <- -0.5 # dose effect on death
+  bh_true[1, 2] <- -0.5 # xpsr effect on death
   sn <- "Death"
   rownames(bh_true) <- paste0("Effect on ", sn)
   colnames(bh_true) <- mod$covs()
 
   h0_true <- 1e-3
-  beta_pk <- list(CL = -0.1, V2 = c(0, 0.1))
+  beta_pk <- list(CL = -0.3, V2 = c(0.2, 0.3))
 
   # Simulate data
   simdat <- mod$simulate_data(
@@ -219,7 +219,7 @@ test_that("entire workflow works (with single transition PK)", {
     iter_warmup = options$iter_warmup,
     iter_sampling = options$iter_sampling,
     chains = options$chains,
-    refresh = 5,
+    refresh = 20,
     adapt_delta = 0.95,
     init = 0.1
   )
@@ -250,22 +250,43 @@ test_that("PK-only works", {
   h0_base <- 1e-3
 
   # Simulate data
-  sim <- simulate_example_data(N = options$N_subject, pk_only = TRUE)
-  mod <- sim$model
-  jd <- sim$data
-
-  # Split
-  jd <- split_data(jd)
+  pk_covs <- list(
+    V2 = "weight"
+  )
+  tm <- transmat_survival()
+  tmax <- 3 * 365.25
+  mod <- create_msm(tm, hazard_covs = NULL, pk_covs, t_max = tmax, pk_only = TRUE)
+  jd <- mod$simulate_data(options$N_subject)
 
   # Fit the model
-  fit <- fit_stan(mod, jd$train,
+  fit <- fit_stan(mod, jd,
     iter_warmup = options$iter_warmup,
     iter_sampling = options$iter_sampling,
     chains = options$chains,
-    refresh = 5,
+    refresh = 20,
     adapt_delta = 0.95,
     init = 0.1
   )
+
+  # Plot pk fit
+  sid <- unique(jd$paths$subject_df$subject_id)[1:6]
+  plt <- fit$plot_pk(subject_ids = sid)
+  ttt <- seq(100, 300, by = 1)
+  tl <- list()
+  for (j in 1:options$N_subject) {
+    tl[[j]] <- seq(180, 220, by = 1)
+  }
+  dd <- fit$data$dosing
+  TH_true <- as.matrix(fit$data$paths$subject_df[, c("ka", "CL", "V2")])
+  TH_fit <- as.matrix(msmfit_pk_params(fit$mean_fit())[[1]])
+  pks1 <- dd$simulate_pk(tl, TH_true, 10^5)
+  pks1 <- pks1 |> dplyr::filter(.data$subject_id %in% sid)
+  pks2 <- dd$simulate_pk(tl, TH_fit, 10^5)
+  pks2 <- pks2 |> dplyr::filter(.data$subject_id %in% sid)
+  plt2 <- plt + geom_line(data = pks1, aes(x = time, y = val, group = subject_id)) +
+    geom_line(data = pks2, aes(x = time, y = val, group = subject_id), color = "red")
+  expect_true(is_ggplot(plt2))
+
   fit <- fit$mean_fit()
   expect_true(inherits(fit, "MultistateModelFit"))
 

@@ -104,23 +104,14 @@ PSSDosingData <- R6::R6Class(
     #'
     #' @param t A vector of output times for each subject (a list).
     #' @param theta A matrix of parameters.
-    #' @param skip_assert Skip most assertions and call exposed Stan directly,
-    #' assuming that it exists?
     #' @param MAX_CONC concentration upper bound
     #' @return a \code{data.frame}
-    simulate_pk = function(t, theta, MAX_CONC, skip_assert = FALSE) {
+    simulate_pk = function(t, theta, MAX_CONC) {
       checkmate::assert_list(t, len = self$num_subjects())
-      checkmate::assert_logical(skip_assert, len = 1)
       checkmate::assert_number(MAX_CONC, lower = 0)
-      if (skip_assert) {
-        out <- pop_2cpt_partly_ss(
-          t, self$dose_ss, self$times, self$doses, theta, self$tau_ss, MAX_CONC
-        )
-      } else {
-        out <- pk_2cpt_pss(
-          t, self$dose_ss, self$times, self$doses, theta, self$tau_ss, MAX_CONC
-        )
-      }
+      out <- pk_2cpt_pss(
+        t, self$dose_ss, self$times, self$doses, theta, self$tau_ss, MAX_CONC
+      )
 
       time <- as.numeric(unlist(t))
       val <- unlist(out)

@@ -474,24 +474,3 @@ place_internal_knots <- function(t_max, num_knots, t_event) {
   knots <- stats::quantile(t_event, probs = seq(0, 1, h))
   knots[2:(length(knots) - 1)]
 }
-
-# Normalize columns of matrix A
-normalize_columns <- function(A) {
-  K <- ncol(A)
-  cn <- colnames(A)
-  for (j in seq_len(K)) {
-    A[, j] <- normalize(A[, j], cn[j])
-  }
-  A
-}
-
-# Normalize
-normalize <- function(a, name) {
-  sdd <- stats::sd(a)
-  if (sdd == 0) {
-    stop("error in normalization of ", name, ", zero variance")
-  }
-  x_norm <- (a - mean(a)) / sdd
-  check_normalized_covariate(x_norm, name)
-  x_norm
-}

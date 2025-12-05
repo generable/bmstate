@@ -150,6 +150,9 @@ fit_stan <- function(model, data,
     time = stan_fit$time()
   )
   fit <- MultistateModelFit$new(data, sd, model, draws, info)
+  if (fit$model$has_pk()) {
+    msmfit_check_xpsr_norm(fit)
+  }
   if (!return_stanfit) {
     return(fit)
   }
