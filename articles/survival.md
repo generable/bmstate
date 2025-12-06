@@ -93,7 +93,7 @@ fit <- fit_stan(mod, simdat,
 #> Chain 1 Iteration: 601 / 800 [ 75%]  (Sampling) 
 #> Chain 1 Iteration: 700 / 800 [ 87%]  (Sampling) 
 #> Chain 1 Iteration: 800 / 800 [100%]  (Sampling) 
-#> Chain 1 finished in 7.5 seconds.
+#> Chain 1 finished in 7.4 seconds.
 ```
 
 ## Sampling diagnostics

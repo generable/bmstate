@@ -264,7 +264,7 @@ fit_prelim <- fit_stan(mod_true, simdat, method = "optimize", init = 0, iter = 1
 #>      100      -9788.14      0.016727       786.414           1           1      121    
 #> Optimization terminated normally:  
 #>   Maximum number of iterations hit, may not be at an optima 
-#> Finished in  0.7 seconds.
+#> Finished in  0.6 seconds.
 #> If these don't roughly match, consider refitting after setting xpsr normalizer loc and scale closer to estimated mean and sd. Otherwise interpret baseline hazards and xpsr effect size accodingly.
 #>  - xpsr normalization loc = 5.42315, mean estimated xpsr = 5.43736
 #>  - xpsr normalization scale = 0.56671, estimated xpsr sd = 0.70956
@@ -342,7 +342,7 @@ fit_ms_eh <- fit_stan(mod_ms_eh, simdat, method = "optimize", init = 0)
 #>     2000      -7172.23    0.00310466       394.594           1           1     2226    
 #> Optimization terminated normally:  
 #>   Maximum number of iterations hit, may not be at an optima 
-#> Finished in  10.9 seconds.
+#> Finished in  11.0 seconds.
 #> If these don't roughly match, consider refitting after setting xpsr normalizer loc and scale closer to estimated mean and sd. Otherwise interpret baseline hazards and xpsr effect size accodingly.
 #>  - xpsr normalization loc = 5.42315, mean estimated xpsr = 5.51054
 #>  - xpsr normalization scale = 0.56671, estimated xpsr sd = 0.96017
@@ -388,7 +388,7 @@ fit_ms_dh <- fit_stan(mod_ms_dh, simdat_dh, method = "optimize", init = 0)
 #>     1787      -6188.78   0.000992681      0.260354      0.8284      0.8284     1953    
 #> Optimization terminated normally:  
 #>   Convergence detected: relative gradient magnitude is below tolerance 
-#> Finished in  5.5 seconds.
+#> Finished in  5.7 seconds.
 fit_death <- fit_stan(mod_death, simdat_death, method = "optimize", init = 0)
 #> Using stan file at /home/runner/work/_temp/Library/bmstate/stan/msm.stan
 #> Initial log joint probability = -281504 
