@@ -186,7 +186,7 @@ fit <- fit_stan(mod, data = pd, method = "optimize", init = 0.1)
 #>      641       -1857.7   0.000175154     0.0595577           1           1      712    
 #> Optimization terminated normally:  
 #>   Convergence detected: relative gradient magnitude is below tolerance 
-#> Finished in  2.7 seconds.
+#> Finished in  2.9 seconds.
 ```
 
 ### Inferred baseline hazards

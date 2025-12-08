@@ -9,6 +9,8 @@
 
 - **Generable**. Copyright holder, funder.
 
+- **Daiichi Sankyo**. Funder.
+
 ## Citation
 
 Timonen J (2025). *bmstate: Bayesian multistate modeling*. R package

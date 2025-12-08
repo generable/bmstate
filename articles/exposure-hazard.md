@@ -264,7 +264,7 @@ fit_prelim <- fit_stan(mod_true, simdat, method = "optimize", init = 0, iter = 1
 #>      100      -9788.14      0.016727       786.414           1           1      121    
 #> Optimization terminated normally:  
 #>   Maximum number of iterations hit, may not be at an optima 
-#> Finished in  0.6 seconds.
+#> Finished in  0.8 seconds.
 #> If these don't roughly match, consider refitting after setting xpsr normalizer loc and scale closer to estimated mean and sd. Otherwise interpret baseline hazards and xpsr effect size accodingly.
 #>  - xpsr normalization loc = 5.42315, mean estimated xpsr = 5.43736
 #>  - xpsr normalization scale = 0.56671, estimated xpsr sd = 0.70956
@@ -342,7 +342,7 @@ fit_ms_eh <- fit_stan(mod_ms_eh, simdat, method = "optimize", init = 0)
 #>     2000      -7172.23    0.00310466       394.594           1           1     2226    
 #> Optimization terminated normally:  
 #>   Maximum number of iterations hit, may not be at an optima 
-#> Finished in  11.0 seconds.
+#> Finished in  11.2 seconds.
 #> If these don't roughly match, consider refitting after setting xpsr normalizer loc and scale closer to estimated mean and sd. Otherwise interpret baseline hazards and xpsr effect size accodingly.
 #>  - xpsr normalization loc = 5.42315, mean estimated xpsr = 5.51054
 #>  - xpsr normalization scale = 0.56671, estimated xpsr sd = 0.96017
